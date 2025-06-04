@@ -1,6 +1,6 @@
 """
 """
-    title="Orchestra LLM Testing Service",
+    title="cherry_ai LLM Testing Service",
     description="Service for testing and benchmarking LLM providers",
 )
 

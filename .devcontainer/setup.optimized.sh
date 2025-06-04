@@ -1,13 +1,13 @@
 #!/bin/bash
-# Enhanced setup script for AI Orchestra development environment
+# Enhanced setup script for AI cherry_ai development environment
 # Implements recommendations from the infrastructure audit
 
 set -e
 
-echo "Setting up AI Orchestra development environment..."
+echo "Setting up AI cherry_ai development environment..."
 
 # Create a log file for the setup process
-SETUP_LOG="/tmp/orchestra_setup_$(date +%Y%m%d_%H%M%S).log"
+SETUP_LOG="/tmp/cherry_ai_setup_$(date +%Y%m%d_%H%M%S).log"
 exec > >(tee -a "$SETUP_LOG") 2>&1
 
 echo "Setup started at $(date)"
@@ -134,7 +134,7 @@ if [ ! -f .vscode/launch.json ]; then
       "request": "launch",
       "module": "uvicorn",
       "args": [
-        "core.orchestrator.src.api.app:app",
+        "core.conductor.src.api.app:app",
         "--reload",
         "--host",
         "0.0.0.0",
@@ -217,7 +217,7 @@ cat > verify_environment.sh << 'EOF'
 
 set -e
 
-echo "Verifying AI Orchestra development environment..."
+echo "Verifying AI cherry_ai development environment..."
 
 # Check Python version
 PYTHON_VERSION=$(python --version)

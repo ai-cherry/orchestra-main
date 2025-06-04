@@ -27,7 +27,7 @@ MCP (Model Context Protocol) provides memory, context, and tools for AI agents. 
 ### 1. **Memory Server** (`memory_server.py`)
 Manages memories, conversations, and knowledge using PostgreSQL + Weaviate.
 
-### 2. **Orchestrator Server** (`orchestrator_server.py`)
+### 2. **conductor Server** (`conductor_server.py`)
 Coordinates multiple AI agents and workflows.
 
 ### 3. **Tools Server** (`tools_server.py`)
@@ -284,7 +284,7 @@ store_memory(
    # Required for MCP to work
    POSTGRES_HOST=localhost
    POSTGRES_PORT=5432
-   POSTGRES_DB=orchestra
+   POSTGRES_DB=cherry_ai
    POSTGRES_USER=postgres
    POSTGRES_PASSWORD=your_password
    

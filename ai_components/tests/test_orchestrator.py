@@ -2,23 +2,23 @@
 #!/usr/bin/env python3
 """
 """
-    """Test WorkflowOrchestrator functionality"""
+    """Test Workflowconductor functionality"""
         """Mock database logger"""
         """Mock Weaviate manager"""
-        """Create orchestrator with mocked dependencies"""
+        """Create conductor with mocked dependencies"""
         """Test workflow creation"""
         workflow_id = "test_workflow_001"
-        context = await orchestrator.create_workflow(workflow_id)
+        context = await conductor.create_workflow(workflow_id)
         
         assert context.workflow_id == workflow_id
         assert context.status == TaskStatus.PENDING
-        assert workflow_id in orchestrator.workflows
+        assert workflow_id in conductor.workflows
     
     @pytest.mark.asyncio
-    async def test_simple_task_execution(self, orchestrator):
+    async def test_simple_task_execution(self, conductor):
         """Test execution of a simple task"""
         workflow_id = "test_workflow_002"
-        context = await orchestrator.create_workflow(workflow_id)
+        context = await conductor.create_workflow(workflow_id)
         
         task = TaskDefinition(
             task_id="test_task",
@@ -27,19 +27,19 @@
             inputs={"test": True}
         )
         
-        with patch.object(orchestrator.agent_coordinator, 'execute_task', 
+        with patch.object(conductor.agent_coordinator, 'execute_task', 
                          return_value={"result": "success"}):
-            result = await orchestrator.execute_workflow(workflow_id, [task])
+            result = await conductor.execute_workflow(workflow_id, [task])
         
         assert result.status == TaskStatus.COMPLETED
         assert "test_task" in result.results
         assert result.results["test_task"]["result"] == "success"
     
     @pytest.mark.asyncio
-    async def test_task_dependencies(self, orchestrator):
+    async def test_task_dependencies(self, conductor):
         """Test task execution with dependencies"""
         workflow_id = "test_workflow_003"
-        context = await orchestrator.create_workflow(workflow_id)
+        context = await conductor.create_workflow(workflow_id)
         
         tasks = [
             TaskDefinition(
@@ -70,9 +70,9 @@
             execution_order.append(task.task_id)
             return {"order": task.inputs["order"]}
         
-        with patch.object(orchestrator.agent_coordinator, 'execute_task', 
+        with patch.object(conductor.agent_coordinator, 'execute_task', 
                          side_effect=mock_execute_task):
-            result = await orchestrator.execute_workflow(workflow_id, tasks)
+            result = await conductor.execute_workflow(workflow_id, tasks)
         
         # Verify execution order respects dependencies
         assert execution_order.index("task1") < execution_order.index("task2")
@@ -80,10 +80,10 @@
         assert result.status == TaskStatus.COMPLETED
     
     @pytest.mark.asyncio
-    async def test_parallel_execution(self, orchestrator):
+    async def test_parallel_execution(self, conductor):
         """Test parallel task execution"""
         workflow_id = "test_workflow_004"
-        context = await orchestrator.create_workflow(workflow_id)
+        context = await conductor.create_workflow(workflow_id)
         
         # Create tasks that can run in parallel
         tasks = [
@@ -103,9 +103,9 @@
             await asyncio.sleep(0.1)  # Simulate work
             return {"completed": True}
         
-        with patch.object(orchestrator.agent_coordinator, 'execute_task', 
+        with patch.object(conductor.agent_coordinator, 'execute_task', 
                          side_effect=mock_execute_task):
-            result = await orchestrator.execute_workflow(workflow_id, tasks)
+            result = await conductor.execute_workflow(workflow_id, tasks)
         
         # Verify tasks ran in parallel (execution times should be close)
         times = list(execution_times.values())
@@ -117,10 +117,10 @@
         assert result.status == TaskStatus.COMPLETED
     
     @pytest.mark.asyncio
-    async def test_task_failure_handling(self, orchestrator):
+    async def test_task_failure_handling(self, conductor):
         """Test handling of task failures"""
         workflow_id = "test_workflow_005"
-        context = await orchestrator.create_workflow(workflow_id)
+        context = await conductor.create_workflow(workflow_id)
         
         task = TaskDefinition(
             task_id="failing_task",
@@ -132,19 +132,19 @@
         async def mock_execute_task(task, context):
             raise Exception("Task execution failed")
         
-        with patch.object(orchestrator.agent_coordinator, 'execute_task', 
+        with patch.object(conductor.agent_coordinator, 'execute_task', 
                          side_effect=mock_execute_task):
-            result = await orchestrator.execute_workflow(workflow_id, [task])
+            result = await conductor.execute_workflow(workflow_id, [task])
         
         assert result.status == TaskStatus.FAILED
         assert len(result.errors) > 0
         assert "Task execution failed" in result.errors[0]
     
     @pytest.mark.asyncio
-    async def test_task_timeout(self, orchestrator):
+    async def test_task_timeout(self, conductor):
         """Test task timeout handling"""
         workflow_id = "test_workflow_006"
-        context = await orchestrator.create_workflow(workflow_id)
+        context = await conductor.create_workflow(workflow_id)
         
         task = TaskDefinition(
             task_id="slow_task",
@@ -158,9 +158,9 @@
             await asyncio.sleep(2)  # Sleep longer than timeout
             return {"completed": True}
         
-        with patch.object(orchestrator.agent_coordinator, 'execute_task', 
+        with patch.object(conductor.agent_coordinator, 'execute_task', 
                          side_effect=mock_execute_task):
-            result = await orchestrator.execute_workflow(workflow_id, [task])
+            result = await conductor.execute_workflow(workflow_id, [task])
         
         assert result.status == TaskStatus.FAILED
         assert any("timed out" in error for error in result.errors)
@@ -268,13 +268,13 @@ class TestDatabaseLogger:
             # Verify INSERT was called
             mock_cursor.execute.assert_called()
             call_args = mock_cursor.execute.call_args[0]
-            assert "INSERT INTO orchestration_logs" in call_args[0]
+            assert "INSERT INTO coordination_logs" in call_args[0]
 
 
 class TestWeaviateManager:
     """Test Weaviate manager functionality"""
         """Mock Weaviate client"""
-                "data": {"Get": {"OrchestrationContext": []}}
+                "data": {"Get": {"coordinationContext": []}}
             }
             mock_client_class.return_value = mock_client
             yield mock_client
@@ -290,7 +290,7 @@ class TestWeaviateManager:
             
             mock_client.data_object.create.assert_called_once()
             call_args = mock_client.data_object.create.call_args
-            assert call_args[1]["class_name"] == "OrchestrationContext"
+            assert call_args[1]["class_name"] == "coordinationContext"
             assert call_args[1]["data_object"]["workflow_id"] == "test_workflow"
 
 

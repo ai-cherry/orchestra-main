@@ -10,7 +10,7 @@
         
         # MCP server endpoints
         self.mcp_servers = mcp_servers or {
-            'orchestrator': 'http://localhost:8002',
+            'conductor': 'http://localhost:8002',
             'memory': 'http://localhost:8003',
             'weaviate': 'http://localhost:8001',
             'deployment': 'http://localhost:8005',
@@ -210,9 +210,9 @@
                     if response.status == 200:
                         mcp_context["memory"] = await response.json()
                 
-                # Get orchestrator context
+                # Get conductor context
                 async with session.get(
-                    f"{self.mcp_servers['orchestrator']}/tasks"
+                    f"{self.mcp_servers['conductor']}/tasks"
                 ) as response:
                     if response.status == 200:
                         mcp_context["active_tasks"] = await response.json()

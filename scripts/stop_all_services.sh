@@ -1,7 +1,7 @@
 #!/bin/bash
-# Stop all Orchestra AI services
+# Stop all Cherry AI services
 
-echo "🛑 Stopping Orchestra AI Services..."
+echo "🛑 Stopping Cherry AI Services..."
 echo "=================================="
 
 # Stop MCP servers

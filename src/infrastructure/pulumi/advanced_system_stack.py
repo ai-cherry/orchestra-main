@@ -1,7 +1,7 @@
 # TODO: Consider adding connection pooling configuration
 """
 """
-project_name = "orchestra-advanced"
+project_name = "cherry_ai-advanced"
 environment = config.get("environment") or "production"
 
 # Tags for all resources

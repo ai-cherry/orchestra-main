@@ -1,4 +1,4 @@
-# Cherry AI Orchestra Deployment Action Plan
+# Cherry AI cherry_ai Deployment Action Plan
 **Date:** May 30, 2025  
 **Status:** Admin UI built successfully, ready for deployment
 
@@ -59,7 +59,7 @@ Since the DIGITALOCEAN_TOKEN and PULUMI_ACCESS_TOKEN are stored as GitHub secret
 The `implement_two_node_architecture.sh` script is ready for the full migration to the two-node DigitalOcean architecture:
 
 - **Vector + Storage Node**: CPU-Optimized Premium (4 vCPU / 8 GB) with NVMe
-- **App / Orchestrator / MCP Node**: General-Purpose (8 vCPU / 32 GB)
+- **App / conductor / MCP Node**: General-Purpose (8 vCPU / 32 GB)
 
 This migration requires:
 - DIGITALOCEAN_TOKEN

@@ -17,9 +17,9 @@ def cli(ctx, verbose, config):
             click.echo(f"Focus areas: {', '.join(focus)}")
     
     async def run_analysis():
-        orchestrator = WorkflowOrchestrator()
+        conductor = Workflowconductor()
         workflow_id = f"analysis_{Path(codebase).name}_{int(time.time())}"
-        context = await orchestrator.create_workflow(workflow_id)
+        context = await conductor.create_workflow(workflow_id)
         
         task = TaskDefinition(
             task_id="analyze",
@@ -31,7 +31,7 @@ def cli(ctx, verbose, config):
             }
         )
         
-        result = await orchestrator.execute_workflow(workflow_id, [task])
+        result = await conductor.execute_workflow(workflow_id, [task])
         
         # Save results
         with open(output, 'w') as f:
@@ -61,9 +61,9 @@ def implement(ctx, analysis, focus, dry_run):
         with open(analysis, 'r') as f:
             analysis_data = json.load(f)
         
-        orchestrator = WorkflowOrchestrator()
+        conductor = Workflowconductor()
         workflow_id = f"implementation_{focus}_{int(time.time())}"
-        context = await orchestrator.create_workflow(workflow_id)
+        context = await conductor.create_workflow(workflow_id)
         
         task = TaskDefinition(
             task_id="implement",
@@ -76,7 +76,7 @@ def implement(ctx, analysis, focus, dry_run):
             }
         )
         
-        result = await orchestrator.execute_workflow(workflow_id, [task])
+        result = await conductor.execute_workflow(workflow_id, [task])
         
         if dry_run:
             click.echo("DRY RUN - No changes were made")
@@ -104,9 +104,9 @@ def refine(ctx, stack, priorities):
             click.echo(f"Priorities: {', '.join(priorities)}")
     
     async def run_refinement():
-        orchestrator = WorkflowOrchestrator()
+        conductor = Workflowconductor()
         workflow_id = f"refinement_{stack}_{int(time.time())}"
-        context = await orchestrator.create_workflow(workflow_id)
+        context = await conductor.create_workflow(workflow_id)
         
         task = TaskDefinition(
             task_id="refine",
@@ -118,7 +118,7 @@ def refine(ctx, stack, priorities):
             }
         )
         
-        result = await orchestrator.execute_workflow(workflow_id, [task])
+        result = await conductor.execute_workflow(workflow_id, [task])
         click.echo(f"✓ Refinement complete!")
         
         # Display recommendations
@@ -210,7 +210,7 @@ def status(ctx):
     
     if not found:
         click.echo("✗ EigenCode not found")
-        click.echo("Run 'orchestrator-cli eigencode install' to attempt installation")
+        click.echo("Run 'conductor-cli eigencode install' to attempt installation")
 
 
 @cli.group()
@@ -280,7 +280,7 @@ def stress_test(ctx, duration, concurrent):
     click.echo(f"Running stress test for {duration}s with {concurrent} concurrent workflows...")
     
     async def run_stress_test():
-        orchestrator = WorkflowOrchestrator()
+        conductor = Workflowconductor()
         start_time = time.time()
         end_time = start_time + duration
         
@@ -297,7 +297,7 @@ def stress_test(ctx, duration, concurrent):
 
                 
                     pass
-                    context = await orchestrator.create_workflow(workflow_id)
+                    context = await conductor.create_workflow(workflow_id)
                     
                     # Simple test task
                     task = TaskDefinition(
@@ -307,7 +307,7 @@ def stress_test(ctx, duration, concurrent):
                         inputs={"test": True, "index": index}
                     )
                     
-                    result = await orchestrator.execute_workflow(workflow_id, [task])
+                    result = await conductor.execute_workflow(workflow_id, [task])
                     
                     if result.status.value == "completed":
                         workflows_completed += 1
@@ -429,7 +429,7 @@ def scalability():
     click.echo(f"Running scalability test: {workers} workers, {tasks} tasks, {complexity} complexity")
     
     async def run_scalability_test():
-        orchestrator = WorkflowOrchestrator()
+        conductor = Workflowconductor()
         start_time = time.time()
         
         # Create task queue
@@ -466,8 +466,8 @@ def scalability():
 
                 
                     pass
-                    context = await orchestrator.create_workflow(workflow_id)
-                    await orchestrator.execute_workflow(workflow_id, [task])
+                    context = await conductor.create_workflow(workflow_id)
+                    await conductor.execute_workflow(workflow_id, [task])
                     completed += 1
                 except Exception:
 
@@ -501,15 +501,15 @@ def scalability():
 
 
 @scalability.command()
-@click.option('--instances', '-i', default=3, help='Number of orchestrator instances')
+@click.option('--instances', '-i', default=3, help='Number of conductor instances')
 @click.pass_context
 def configure(ctx, instances):
-    """Configure orchestrator for horizontal scaling"""
-    click.echo(f"Configuring orchestrator for {instances} instances...")
+    """Configure conductor for horizontal scaling"""
+    click.echo(f"Configuring conductor for {instances} instances...")
     
     # Generate configuration
     config = {
-        "orchestrator": {
+        "conductor": {
             "instances": instances,
             "load_balancer": {
                 "algorithm": "round_robin",
@@ -518,7 +518,7 @@ def configure(ctx, instances):
             "redis": {
                 "enabled": True,
                 "url": "redis://localhost:6379",
-                "queue_name": "orchestrator_tasks"
+                "queue_name": "conductor_tasks"
             }
         },
         "database": {
@@ -552,20 +552,20 @@ def configure(ctx, instances):
 @click.option('--config', '-c', default='configs/example_workflow.json', help='Workflow configuration file')
 @click.option('--watch', '-w', is_flag=True, help='Watch workflow progress in real-time')
 @click.pass_context
-def orchestrate(ctx, config, watch):
-    """Run full orchestration workflow from config file"""
+def cherry_aite(ctx, config, watch):
+    """Run full coordination workflow from config file"""
         click.echo(f"Error: Configuration file '{config}' not found")
         return
     
-    click.echo(f"Running orchestration from {config}...")
+    click.echo(f"Running coordination from {config}...")
     
-    async def run_orchestration():
+    async def run_coordination():
         with open(config, 'r') as f:
             workflow_config = json.load(f)
         
-        orchestrator = WorkflowOrchestrator()
+        conductor = Workflowconductor()
         workflow_id = workflow_config.get('workflow_id', f'custom_workflow_{int(time.time())}')
-        context = await orchestrator.create_workflow(workflow_id)
+        context = await conductor.create_workflow(workflow_id)
         
         # Create tasks from config
         tasks = []
@@ -588,9 +588,9 @@ def orchestrate(ctx, config, watch):
             # This would ideally connect to MCP server for real-time updates
             # For now, we'll just show the final result
         
-        result = await orchestrator.execute_workflow(workflow_id, tasks)
+        result = await conductor.execute_workflow(workflow_id, tasks)
         
-        click.echo(f"\n✓ Orchestration complete!")
+        click.echo(f"\n✓ coordination complete!")
         click.echo(f"Status: {result.status.value}")
         
         if ctx.obj['verbose']:
@@ -598,7 +598,7 @@ def orchestrate(ctx, config, watch):
             click.echo(json.dumps(result.results, indent=2))
         
         # Save results
-        output_file = f"orchestration_result_{workflow_id}.json"
+        output_file = f"coordination_result_{workflow_id}.json"
         with open(output_file, 'w') as f:
             json.dump({
                 "workflow_id": workflow_id,
@@ -610,14 +610,14 @@ def orchestrate(ctx, config, watch):
         
         click.echo(f"\nResults saved to: {output_file}")
     
-    asyncio.run(run_orchestration())
+    asyncio.run(run_coordination())
 
 
 @cli.command()
 @click.pass_context
 def status(ctx):
     """Show overall system status"""
-    click.echo("AI Orchestrator System Status")
+    click.echo("AI conductor System Status")
     click.echo("=" * 40)
     
     # Check services
@@ -636,7 +636,7 @@ def status(ctx):
             try:
 
                 pass
-                from ai_orchestrator import DatabaseLogger
+                from ai_conductor import DatabaseLogger
                 db = DatabaseLogger()
                 with db._get_connection() as conn:
                     status = "✓ Running"
@@ -689,19 +689,19 @@ def status(ctx):
         pass
         # Try to create a simple workflow
         async def health_check():
-            orchestrator = WorkflowOrchestrator()
+            conductor = Workflowconductor()
             workflow_id = f"health_check_{int(time.time())}"
-            await orchestrator.create_workflow(workflow_id)
+            await conductor.create_workflow(workflow_id)
             return True
         
         if asyncio.run(health_check()):
-            click.echo("  ✓ Orchestrator is operational")
+            click.echo("  ✓ conductor is operational")
         else:
-            click.echo("  ✗ Orchestrator health check failed")
+            click.echo("  ✗ conductor health check failed")
     except Exception:
 
         pass
-        click.echo(f"  ✗ Orchestrator error: {str(e)}")
+        click.echo(f"  ✗ conductor error: {str(e)}")
 
 
 if __name__ == '__main__':

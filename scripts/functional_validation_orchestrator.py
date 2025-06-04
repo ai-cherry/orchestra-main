@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Functional Validation Orchestrator for Orchestra AI - Phase 4
+Functional Validation conductor for Cherry AI - Phase 4
 Validates search engine modules, persona system, and API endpoint consistency.
 """
 
@@ -12,7 +12,8 @@ import aiohttp
 import importlib
 import inspect
 from pathlib import Path
-from typing import Dict, List, Any, Optional, Set, Tuple
+from typing import Dict, List, Any, Optional
+from typing_extensions import Optional, Set, Tuple
 from datetime import datetime
 import yaml
 import ast
@@ -22,8 +23,8 @@ import re
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-class FunctionalValidationOrchestrator:
-    """Orchestrates comprehensive functional validation of Orchestra AI components."""
+class FunctionalValidationconductor:
+    """cherry_aites comprehensive functional validation of Cherry AI components."""
     
     def __init__(self, root_path: str = "."):
         self.root_path = Path(root_path).resolve()
@@ -325,7 +326,7 @@ class FunctionalValidationOrchestrator:
         config_files = [
             f"config/personas/{persona}.yaml",
             f"core/config/personas/{persona}.yaml",
-            f"core/orchestrator/src/config/personas/{persona}.yaml",
+            f"core/conductor/src/config/personas/{persona}.yaml",
             f"config/personas.yaml",
             f"core/personas/personas_detailed.yaml"
         ]
@@ -953,7 +954,7 @@ Overall System Health: {(summary['search_engine']['health_score'] + summary['per
 
 async def main():
     """Run the functional validation."""
-    validator = FunctionalValidationOrchestrator(".")
+    validator = FunctionalValidationconductor(".")
     results = await validator.run_validation()
     
     # Generate and save report

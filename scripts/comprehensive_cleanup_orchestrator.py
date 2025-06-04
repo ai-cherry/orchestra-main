@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Comprehensive Cleanup Orchestrator - Phases 5-7
-Handles Security, Performance, Documentation, and Testing cleanup for Orchestra AI.
+Comprehensive Cleanup conductor - Phases 5-7
+Handles Security, Performance, Documentation, and Testing cleanup for Cherry AI.
 """
 
 import os
@@ -10,7 +10,8 @@ import json
 import asyncio
 import logging
 from pathlib import Path
-from typing import Dict, List, Any, Optional, Set, Tuple
+from typing import Dict, List, Any, Optional
+from typing_extensions import Optional, Set, Tuple
 from datetime import datetime
 import subprocess
 import re
@@ -24,8 +25,8 @@ sys.path.insert(0, str(project_root))
 logger = logging.getLogger(__name__)
 
 
-class ComprehensiveCleanupOrchestrator:
-    """Orchestrates comprehensive cleanup for Orchestra AI - Phases 5-7."""
+class ComprehensiveCleanupconductor:
+    """cherry_aites comprehensive cleanup for Cherry AI - Phases 5-7."""
     
     def __init__(self, root_path: str = "."):
         self.root_path = Path(root_path).resolve()
@@ -578,11 +579,11 @@ class TestingHandler:
 
 async def main():
     """Run the comprehensive cleanup."""
-    orchestrator = ComprehensiveCleanupOrchestrator(".")
-    results = await orchestrator.run_comprehensive_cleanup()
+    conductor = ComprehensiveCleanupconductor(".")
+    results = await conductor.run_comprehensive_cleanup()
     
     # Generate and display report
-    report = orchestrator.generate_cleanup_summary_report()
+    report = conductor.generate_cleanup_summary_report()
     print(report)
     
     # Save detailed results

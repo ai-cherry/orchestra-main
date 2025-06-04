@@ -1,7 +1,7 @@
 config:
   vultr:apiKey:
     secure: ${VULTR_API_KEY}
-  orchestra-infra:
+  cherry_ai-infra:
     environment: production
     region: ewr  # New Jersey datacenter
     instanceType: vc2-4c-8gb  # 4 vCPU, 8GB RAM
@@ -21,8 +21,8 @@ config:
       trafficSplitPercentage: 20  # Start with 20% traffic to new deployment
     ssl:
       enabled: true
-      domain: orchestra-api.com
-      email: admin@orchestra-api.com
+      domain: cherry_ai-api.com
+      email: admin@cherry_ai-api.com
     database:
       type: postgresql
       version: "15"

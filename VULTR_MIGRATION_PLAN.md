@@ -17,11 +17,11 @@
 ### 1. Backup Paperspace Data
 ```bash
 # On Paperspace
-tar -czf orchestra-dev-backup.tar.gz \
-  ~/orchestra-main/.env \
-  ~/orchestra-main/venv \
-  ~/orchestra-main/.secrets \
-  ~/.ssh/vultr_orchestra*
+tar -czf cherry_ai-dev-backup.tar.gz \
+  ~/cherry_ai-main/.env \
+  ~/cherry_ai-main/venv \
+  ~/cherry_ai-main/.secrets \
+  ~/.ssh/vultr_cherry_ai*
 ```
 
 ### 2. Setup Dev Environment on Vultr
@@ -36,8 +36,8 @@ usermod -aG sudo dev
 ```bash
 # As dev user
 cd /home/dev
-git clone https://github.com/ai-cherry/orchestra-main.git
-cd orchestra-main
+git clone https://github.com/ai-cherry/cherry_ai-main.git
+cd cherry_ai-main
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements/production/requirements.txt
@@ -50,7 +50,7 @@ pip install -r requirements/production/requirements.txt
 
 ### 5. Update GitHub Actions
 - Use Vultr server for both dev and prod deployments
-- Different directories: `/home/dev/orchestra-main` vs `/root/orchestra-main`
+- Different directories: `/home/dev/cherry_ai-main` vs `/root/cherry_ai-main`
 
 ## Alternative: Docker-based Separation
 If you prefer to keep some separation:

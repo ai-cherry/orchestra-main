@@ -1,10 +1,10 @@
-# Orchestrator Landing Page Components
+# conductor Landing Page Components
 
-This directory contains all components for the Orchestrator Landing Page, a sophisticated multi-modal search interface with voice, text, and file input capabilities.
+This directory contains all components for the conductor Landing Page, a sophisticated multi-modal search interface with voice, text, and file input capabilities.
 
 ## Overview
 
-The Orchestrator Landing Page provides:
+The conductor Landing Page provides:
 - Multi-modal input (text, voice, file)
 - Three search modes (Creative, Deep, Super Deep)
 - Real-time suggestions
@@ -15,7 +15,7 @@ The Orchestrator Landing Page provides:
 ## Component Structure
 
 ```
-orchestrator/
+conductor/
 ├── SearchInterface/
 │   ├── index.tsx           # Main search interface container
 │   ├── SearchInput.tsx     # Multi-modal input component
@@ -29,7 +29,7 @@ orchestrator/
 ## Key Features
 
 ### 1. Search Interface
-The main component that orchestrates all search functionality:
+The main component that cherry_aites all search functionality:
 - Manages search state through Zustand store
 - Handles mode selection and input type switching
 - Displays suggestions dynamically
@@ -46,7 +46,7 @@ The main component that orchestrates all search functionality:
 
 ## Styling
 
-The components use a custom dark theme defined in `orchestrator.css`:
+The components use a custom dark theme defined in `conductor.css`:
 - Background: `#181111`
 - Secondary: `#261C1C`
 - Border: `#382929`
@@ -55,7 +55,7 @@ The components use a custom dark theme defined in `orchestrator.css`:
 
 ## State Management
 
-Uses Zustand store (`orchestratorStore.ts`) for:
+Uses Zustand store (`conductorStore.ts`) for:
 - Search query and mode management
 - Voice recording state
 - File upload/download tracking
@@ -64,7 +64,7 @@ Uses Zustand store (`orchestratorStore.ts`) for:
 
 ## API Integration
 
-The `orchestratorService.ts` provides:
+The `conductorService.ts` provides:
 - Search operations
 - Suggestion fetching
 - Voice transcription/synthesis
@@ -73,10 +73,10 @@ The `orchestratorService.ts` provides:
 ## Usage Example
 
 ```tsx
-import { OrchestratorLandingPage } from './pages/OrchestratorLandingPage';
+import { conductorLandingPage } from './pages/conductorLandingPage';
 
 // In your routes
-<Route path="/orchestrator" component={OrchestratorLandingPage} />
+<Route path="/conductor" component={conductorLandingPage} />
 ```
 
 ## Development Status
@@ -125,7 +125,7 @@ import { OrchestratorLandingPage } from './pages/OrchestratorLandingPage';
 
 Run tests with:
 ```bash
-npm test -- --coverage src/components/orchestrator
+npm test -- --coverage src/components/conductor
 ```
 
 ## Contributing

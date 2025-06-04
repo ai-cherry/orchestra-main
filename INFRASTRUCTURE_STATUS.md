@@ -1,11 +1,11 @@
-# Orchestra AI Infrastructure Status
+# Cherry AI Infrastructure Status
 
 The platform now runs entirely on a single Vultr bare-metal server managed via Pulumi.
 
 ## Services
 - **Weaviate** 1.30 with Agents and ACORN enabled
 - **PostgreSQL** 16 with pgvector
-- **Orchestrator & MCP servers** using Uvicorn/Gunicorn workers
+- **conductor & MCP servers** using Uvicorn/Gunicorn workers
 - **Langfuse** observability
 - **Optional Redis/Dragonfly** cache
 

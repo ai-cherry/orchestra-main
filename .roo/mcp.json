@@ -1,62 +1,158 @@
 {
   "mcpServers": {
-    "memory-bank": {
-      "command": "docker",
+    "memory": {
+      "command": "python",
       "args": [
-        "run",
-        "-i",
-        "--rm",
-        "-e",
-        "MEMORY_BANK_ROOT",
-        "-v",
-        "${workspaceFolder}/.roo/memory:/mnt/memory_bank",
-        "allpepper/memory-bank-mcp:latest"
+        "${workspaceFolder}/mcp_server/servers/memory_server.py"
       ],
       "env": {
-        "MEMORY_BANK_ROOT": "/mnt/memory_bank"
+        "REDIS_URL": "${REDIS_URL:-redis://redis:6379}",
+        "POSTGRES_URL": "postgresql://postgres:postgres@postgres:5432/cherry_ai"
       },
       "alwaysAllow": [
-        "memory_bank_read",
-        "memory_bank_write",
-        "memory_bank_update"
+        "context_storage",
+        "vector_search",
+        "memory_management"
       ]
     },
-    "portkey-router": {
-      "command": "node",
-      "args": ["${workspaceFolder}/.roo/scripts/portkey-router.js"],
-      "alwaysAllow": ["route_model_request"]
-    },
-    "orchestra-mcp": {
+    "conductor": {
       "command": "python",
-      "args": ["${workspaceFolder}/mcp_server/servers/orchestrator_server.py"],
+      "args": [
+        "${workspaceFolder}/mcp_server/servers/conductor_server.py"
+      ],
       "env": {
-        "ORCHESTRA_DB": "postgresql://user:pass@localhost:5432/context",
-        "WEAVIATE_URL": "http://localhost:8080",
-        "CONTEXT_CACHE": "lru",
-        "CONTEXT_TTL": "3600"
+        "REDIS_URL": "${REDIS_URL:-redis://redis:6379}",
+        "API_URL": "http://api:8080"
       },
       "alwaysAllow": [
-        "context_read",
-        "context_write",
-        "vector_search",
-        "vector_store",
-        "db_query",
-        "db_write",
-        "deploy_service",
-        "monitor_metrics"
+        "workflow_management",
+        "task_coordination",
+        "agent_coordination"
+      ]
+    },
+    "tools": {
+      "command": "python",
+      "args": [
+        "${workspaceFolder}/mcp_server/servers/tools_server.py"
+      ],
+      "env": {
+        "REDIS_URL": "${REDIS_URL:-redis://redis:6379}"
+      },
+      "alwaysAllow": [
+        "tool_discovery",
+        "tool_execution",
+        "postgres_query",
+        "cache_operations"
+      ]
+    },
+    "code-intelligence": {
+      "command": "python",
+      "args": [
+        "${workspaceFolder}/mcp_server/servers/code_intelligence_server.py"
+      ],
+      "env": {
+        "REDIS_URL": "${REDIS_URL:-redis://redis:6379}"
+      },
+      "alwaysAllow": [
+        "ast_analysis",
+        "function_search",
+        "complexity_analysis",
+        "code_smells"
+      ]
+    },
+    "git-intelligence": {
+      "command": "python",
+      "args": [
+        "${workspaceFolder}/mcp_server/servers/git_intelligence_server.py"
+      ],
+      "env": {
+        "REDIS_URL": "${REDIS_URL:-redis://redis:6379}"
+      },
+      "alwaysAllow": [
+        "git_history",
+        "blame_analysis",
+        "hotspot_detection",
+        "contributor_stats"
       ]
     }
   },
   "servers": [
     {
-      "name": "orchestra-mcp",
-      "url": "http://localhost:7681",
-      "tools": ["context", "vector", "db", "deploy", "monitor"],
-      "context_cache": "lru",
-      "vector_store": "weaviate",
-      "db": "postgresql://user:pass@localhost:5432/context",
-      "auto_sync": true,
-      "context_ttl": 3600
+      "name": "memory",
+      "port": 8003,
+      "capabilities": [
+        "context_storage",
+        "vector_search",
+        "memory_management"
+      ],
+      "description": "Memory and context management with PostgreSQL + Weaviate",
+      "priority": 1,
+      "health_endpoint": "/health"
+    },
+    {
+      "name": "conductor",
+      "port": 8002,
+      "capabilities": [
+        "workflow_management",
+        "task_coordination",
+        "agent_coordination"
+      ],
+      "description": "Agent coordination and workflow management",
+      "priority": 1,
+      "health_endpoint": "/health"
+    },
+    {
+      "name": "tools",
+      "port": 8006,
+      "capabilities": [
+        "tool_discovery",
+        "tool_execution",
+        "postgres_query",
+        "cache_operations"
+      ],
+      "description": "Tool registry and execution with PostgreSQL/Redis/Weaviate tools",
+      "priority": 2,
+      "health_endpoint": "/health"
+    },
+    {
+      "name": "code-intelligence",
+      "port": 8007,
+      "capabilities": [
+        "ast_analysis",
+        "function_search",
+        "complexity_analysis",
+        "code_smells"
+      ],
+      "description": "Advanced code analysis and intelligence",
+      "priority": 2,
+      "health_endpoint": "/health"
+    },
+    {
+      "name": "git-intelligence",
+      "port": 8008,
+      "capabilities": [
+        "git_history",
+        "blame_analysis",
+        "hotspot_detection",
+        "contributor_stats"
+      ],
+      "description": "Git history and change analysis",
+      "priority": 3,
+      "health_endpoint": "/health"
     }
-  ]
+  ],
+  "routing": {
+    "code_analysis": "code-intelligence",
+    "git_operations": "git-intelligence",
+    "context_retrieval": "memory",
+    "tool_execution": "tools",
+    "workflow_management": "conductor"
+  },
+  "cache": {
+    "ttl": 3600,
+    "strategy": "lru"
+  },
+  "rate_limits": {
+    "requests_per_minute": 120
+  }
 }

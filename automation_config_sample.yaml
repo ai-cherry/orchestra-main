@@ -1,4 +1,4 @@
-# AI Orchestra Automation Configuration
+# AI cherry_ai Automation Configuration
 # This configuration file controls all aspects of the automation system
 
 # Performance Enhancement Configuration
@@ -40,7 +40,7 @@ workspace:
       - "llm-chat/"
       - "admin-interface/"
     backend:
-      - "ai-orchestra/"
+      - "ai-cherry_ai/"
       - "core/"
       - "packages/"
       - "services/"

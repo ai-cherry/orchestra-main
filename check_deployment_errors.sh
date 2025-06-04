@@ -53,7 +53,7 @@ echo "5. Checking for container startup errors..."
 
 echo
 echo "6. Quick service status check..."
-for SERVICE in "ai-orchestra-minimal" "web-scraping-agents"; do
+for SERVICE in "ai-cherry_ai-minimal" "web-scraping-agents"; do
     STATUS=$(# vultr-cli kubernetes services describe $SERVICE --region=$REGION --format="value(status.conditions[0].message)" 2>/dev/null)
     if [ -n "$STATUS" ]; then
         echo "$SERVICE: $STATUS"

@@ -24,7 +24,7 @@ This document outlines the process for promoting the Admin UI to the production 
 
 3.  **Triggering Production Deployment:**
     *   **Option A (Version Tag - Recommended):** Create and push a new version tag (e.g., `git tag v1.0.0 && git push origin v1.0.0`). This automatically triggers the `deploy-to-prod` job in the CI/CD workflow.
-    *   **Option B (Manual Dispatch):** Manually trigger the "Deploy Orchestra AI (including Admin UI)" workflow from the GitHub Actions UI, selecting the appropriate branch/commit that has been verified on `dev`. The `deploy-to-prod` job will run based on its `workflow_dispatch` trigger.
+    *   **Option B (Manual Dispatch):** Manually trigger the "Deploy Cherry AI (including Admin UI)" workflow from the GitHub Actions UI, selecting the appropriate branch/commit that has been verified on `dev`. The `deploy-to-prod` job will run based on its `workflow_dispatch` trigger.
 
 4.  **Manual Approval (GitHub Environment):**
     *   The `deploy-to-prod` job targets the "production" GitHub environment.
@@ -48,7 +48,7 @@ This document outlines the process for promoting the Admin UI to the production 
     *   The current Pulumi script (`infra/do_superagi_stack.py`) deploys the SuperAGI Docker container to a single Droplet. This setup does **not** inherently support zero-downtime rollouts for the SuperAGI service itself.
     *   To achieve zero-downtime for backend services, a more advanced setup would be required, such as:
         *   **Blue/Green Deployments:** Provisioning a second Droplet (or set of Droplets) with the new version, testing it, and then switching traffic at a load balancer level.
-        *   **Rolling Updates:** If using an orchestrator like Kubernetes or Docker Swarm on multiple Droplets, performing rolling updates.
+        *   **Rolling Updates:** If using an conductor like Kubernetes or Docker Swarm on multiple Droplets, performing rolling updates.
         *   **Load Balancers:** Consider introducing a Vultr Load Balancer if multiple backend instances are used.
     *   These backend zero-downtime strategies are significant infrastructure changes and are currently out of scope for the Admin UI deployment but should be considered for overall platform reliability.
 

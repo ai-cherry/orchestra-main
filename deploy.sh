@@ -1,9 +1,9 @@
 #!/bin/bash
-# Deploy Orchestra AI to cherry-ai.me
+# Deploy Cherry AI to cherry-ai.me
 
 set -e
 
-echo "🚀 Deploying Orchestra AI to cherry-ai.me..."
+echo "🚀 Deploying Cherry AI to cherry-ai.me..."
 
 # Load environment variables
 export $(cat .env | grep -v '^#' | xargs)

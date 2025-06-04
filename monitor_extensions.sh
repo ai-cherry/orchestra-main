@@ -13,7 +13,7 @@ RED='\033[0;31m'
 NC='\033[0m' # No Color
 
 # Configuration
-WORKSPACE_ROOT="/workspaces/orchestra-main"
+WORKSPACE_ROOT="/workspaces/cherry_ai-main"
 MONITOR_SCRIPT="${WORKSPACE_ROOT}/monitor_extension_performance.py"
 LOG_DIR="${WORKSPACE_ROOT}/logs"
 MONITOR_LOG="${LOG_DIR}/extension_monitor.log"

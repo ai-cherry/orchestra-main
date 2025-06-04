@@ -1,6 +1,6 @@
 # Memory Integration Guide
 
-This guide explains how to integrate the AI Orchestra memory system with agents. It provides step-by-step instructions for implementing different types of memory and using them in agents.
+This guide explains how to integrate the AI cherry_ai memory system with agents. It provides step-by-step instructions for implementing different types of memory and using them in agents.
 
 ## Table of Contents
 
@@ -14,7 +14,7 @@ This guide explains how to integrate the AI Orchestra memory system with agents.
 
 ## Overview
 
-The AI Orchestra memory system provides a layered approach to memory management, with different types of memory for different use cases:
+The AI cherry_ai memory system provides a layered approach to memory management, with different types of memory for different use cases:
 
 - **Short-term Memory**: Fast, ephemeral storage for conversation context and working memory
 - **Mid-term Memory**: Structured storage for session data and user preferences
@@ -85,7 +85,7 @@ agents:
 You can also configure memory programmatically using Pydantic models:
 
 ```python
-from core.orchestrator.src.config.models import MemoryConfig, MemoryType
+from core.conductor.src.config.models import MemoryConfig, MemoryType
 
 # Configure layered memory
 memory_config = MemoryConfig(
@@ -120,10 +120,10 @@ PostgreSQL
 ### Step 1: Import Required Modules
 
 ```python
-from core.orchestrator.src.agents.observable_agent import ObservableAgentFactory
-from core.orchestrator.src.memory.factory import MemoryFactory, get_memory_factory
-from core.orchestrator.src.config.models import MemoryConfig, MemoryType
-from core.orchestrator.src.services.unified_registry import get_service
+from core.conductor.src.agents.observable_agent import ObservableAgentFactory
+from core.conductor.src.memory.factory import MemoryFactory, get_memory_factory
+from core.conductor.src.config.models import MemoryConfig, MemoryType
+from core.conductor.src.services.unified_registry import get_service
 ```
 
 ### Step 2: Create Memory Factory
@@ -168,8 +168,8 @@ registry.register_agent(observable_agent, agent_type, capabilities, priority)
 You can also use the memory system directly in your agents:
 
 ```python
-from core.orchestrator.src.memory.factory import get_memory_factory
-from core.orchestrator.src.config.models import MemoryConfig, MemoryType
+from core.conductor.src.memory.factory import get_memory_factory
+from core.conductor.src.config.models import MemoryConfig, MemoryType
 
 class MyAgent:
     def __init__(self):
@@ -216,8 +216,8 @@ class MyAgent:
 For more advanced use cases, you can create a custom memory integration:
 
 ```python
-from core.orchestrator.src.memory.factory import get_memory_factory
-from core.orchestrator.src.memory.layered_memory import LayeredMemory
+from core.conductor.src.memory.factory import get_memory_factory
+from core.conductor.src.memory.layered_memory import LayeredMemory
 
 class CustomMemoryAgent:
     def __init__(self):
@@ -299,9 +299,9 @@ Here's an example of how to unit test memory integration:
 import pytest
 from unittest.mock import MagicMock, patch
 
-from core.orchestrator.src.memory.factory import MemoryFactory
-from core.orchestrator.src.config.models import MemoryConfig, MemoryType
-from core.orchestrator.src.agents.observable_agent import ObservableAgentFactory
+from core.conductor.src.memory.factory import MemoryFactory
+from core.conductor.src.config.models import MemoryConfig, MemoryType
+from core.conductor.src.agents.observable_agent import ObservableAgentFactory
 
 @pytest.fixture
 def mock_memory_factory():
@@ -360,8 +360,8 @@ Here's an example of how to integration test the memory system:
 import pytest
 import time
 
-from core.orchestrator.src.memory.factory import get_memory_factory
-from core.orchestrator.src.config.models import MemoryConfig, MemoryType
+from core.conductor.src.memory.factory import get_memory_factory
+from core.conductor.src.config.models import MemoryConfig, MemoryType
 
 @pytest.mark.asyncio
 async def test_redis_memory():
@@ -471,9 +471,9 @@ import logging
 
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
-logging.getLogger("core.orchestrator.src.memory").setLevel(logging.DEBUG)
+logging.getLogger("core.conductor.src.memory").setLevel(logging.DEBUG)
 ```
 
 ### Support
 
-If you encounter issues that you can't resolve, please contact the AI Orchestra team for support.
+If you encounter issues that you can't resolve, please contact the AI cherry_ai team for support.

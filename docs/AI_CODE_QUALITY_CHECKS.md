@@ -1,6 +1,6 @@
 # AI Code Quality Checks
 
-This document provides an overview of the AI-assisted code quality checks implemented in the Orchestra System. These checks are designed to address unique risks in AI-heavy codebases while maintaining development velocity by flagging potential issues for human review.
+This document provides an overview of the AI-assisted code quality checks implemented in the cherry_ai System. These checks are designed to address unique risks in AI-heavy codebases while maintaining development velocity by flagging potential issues for human review.
 
 ## Purpose
 

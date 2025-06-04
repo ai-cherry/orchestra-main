@@ -3,7 +3,7 @@
 # Dashboard Setup Script
 # This script helps set up the dashboard with proper dependencies
 
-echo "🚀 Setting up AI Orchestrator Dashboard..."
+echo "🚀 Setting up AI conductor Dashboard..."
 
 # Check if Node.js is installed
 if ! command -v node &> /dev/null; then

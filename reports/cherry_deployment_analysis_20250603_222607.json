@@ -1,0 +1,195 @@
+{
+  "timestamp": "2025-06-03T22:26:06.808209",
+  "domain": "cherry-ai.me",
+  "current_state": {
+    "ip_address": "45.32.69.157",
+    "status_code": 200,
+    "server": "nginx/1.24.0 (Ubuntu)",
+    "build_timestamp": "1748981508195",
+    "title": "Cherry AI",
+    "cache_control": "no-cache, no-store, must-revalidate",
+    "ssl_issuer": "Let's Encrypt",
+    "ssl_expires": "Sep  1 18:23:59 2025 GMT",
+    "local_build_ready": true,
+    "local_build_files": 3
+  },
+  "migration_plan": {
+    "pre_deployment": [
+      {
+        "step": 1,
+        "action": "Backup current production",
+        "commands": [
+          "# SSH to production server",
+          "ssh root@cherry-ai.me",
+          "",
+          "# Create backup directory",
+          "mkdir -p /backup/$(date +%Y%m%d)",
+          "",
+          "# Backup current deployment",
+          "tar -czf /backup/$(date +%Y%m%d)/cherry_ai-admin-backup.tar.gz /var/www/cherry_ai-admin",
+          "",
+          "# Backup Nginx config",
+          "cp -r /etc/nginx /backup/$(date +%Y%m%d)/nginx-backup"
+        ]
+      },
+      {
+        "step": 2,
+        "action": "Build latest version locally",
+        "commands": [
+          "cd /root/cherry_ai-main/admin-ui",
+          "npm install",
+          "npm run build",
+          "# Verify build output",
+          "ls -la dist/"
+        ]
+      }
+    ],
+    "deployment": [
+      {
+        "step": 3,
+        "action": "Deploy new build",
+        "commands": [
+          "# Copy build to server",
+          "rsync -avz --delete /root/cherry_ai-main/admin-ui/dist/ root@cherry-ai.me:/var/www/cherry_ai-admin-new/",
+          "",
+          "# SSH to server",
+          "ssh root@cherry-ai.me",
+          "",
+          "# Swap deployments",
+          "mv /var/www/cherry_ai-admin /var/www/cherry_ai-admin-old",
+          "mv /var/www/cherry_ai-admin-new /var/www/cherry_ai-admin",
+          "",
+          "# Set permissions",
+          "chown -R www-data:www-data /var/www/cherry_ai-admin",
+          "chmod -R 755 /var/www/cherry_ai-admin"
+        ]
+      },
+      {
+        "step": 4,
+        "action": "Update Nginx configuration",
+        "commands": [
+          "# Edit Nginx config to prevent caching",
+          "cat > /etc/nginx/sites-available/cherry_ai-admin << 'EOF'",
+          "server {",
+          "    listen 443 ssl http2;",
+          "    server_name cherry-ai.me;",
+          "    ",
+          "    ssl_certificate /etc/letsencrypt/live/cherry-ai.me/fullchain.pem;",
+          "    ssl_certificate_key /etc/letsencrypt/live/cherry-ai.me/privkey.pem;",
+          "    ",
+          "    root /var/www/cherry_ai-admin;",
+          "    index index.html;",
+          "    ",
+          "    # Security headers",
+          "    add_header X-Frame-Options \"SAMEORIGIN\" always;",
+          "    add_header X-Content-Type-Options \"nosniff\" always;",
+          "    add_header X-XSS-Protection \"1; mode=block\" always;",
+          "    ",
+          "    # Prevent HTML caching",
+          "    location / {",
+          "        try_files $uri $uri/ /index.html;",
+          "        add_header Cache-Control \"no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0\";",
+          "        expires off;",
+          "        etag off;",
+          "    }",
+          "    ",
+          "    # Cache static assets",
+          "    location ~* \\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {",
+          "        expires 1y;",
+          "        add_header Cache-Control \"public, immutable\";",
+          "    }",
+          "    ",
+          "    # API proxy",
+          "    location /api {",
+          "        proxy_pass http://localhost:8001;",
+          "        proxy_http_version 1.1;",
+          "        proxy_set_header Upgrade $http_upgrade;",
+          "        proxy_set_header Connection 'upgrade';",
+          "        proxy_set_header Host $host;",
+          "        proxy_cache_bypass $http_upgrade;",
+          "    }",
+          "}",
+          "EOF",
+          "",
+          "# Test and reload",
+          "nginx -t && systemctl reload nginx"
+        ]
+      }
+    ],
+    "post_deployment": [
+      {
+        "step": 5,
+        "action": "Clear caches",
+        "commands": [
+          "# Clear any CDN cache if applicable",
+          "# For Cloudflare: Use dashboard or API",
+          "",
+          "# Force browser cache clear",
+          "curl -I https://cherry-ai.me",
+          "",
+          "# Test in incognito mode"
+        ]
+      },
+      {
+        "step": 6,
+        "action": "Verify deployment",
+        "checks": [
+          "\u2713 Homepage loads without errors",
+          "\u2713 Console shows no 404s",
+          "\u2713 Login functionality works",
+          "\u2713 API endpoints respond",
+          "\u2713 New build timestamp visible"
+        ]
+      },
+      {
+        "step": 7,
+        "action": "Monitor and rollback if needed",
+        "commands": [
+          "# Monitor logs",
+          "tail -f /var/log/nginx/error.log",
+          "",
+          "# If rollback needed:",
+          "mv /var/www/cherry_ai-admin /var/www/cherry_ai-admin-failed",
+          "mv /var/www/cherry_ai-admin-old /var/www/cherry_ai-admin",
+          "systemctl reload nginx"
+        ]
+      }
+    ]
+  },
+  "risks": [
+    "Browser Cache Persistence",
+    "API Connection Issues",
+    "SSL Certificate",
+    "File Permissions",
+    "Build Version Mismatch"
+  ],
+  "recommendations": [],
+  "risk_mitigation": [
+    {
+      "risk": "Browser Cache Persistence",
+      "impact": "Users see old version",
+      "mitigation": "Implement aggressive cache busting, clear CDN"
+    },
+    {
+      "risk": "API Connection Issues",
+      "impact": "Login/functionality broken",
+      "mitigation": "Ensure API is running on port 8001, test endpoints"
+    },
+    {
+      "risk": "SSL Certificate",
+      "impact": "Security warnings",
+      "mitigation": "Verify cert is valid and covers domain"
+    },
+    {
+      "risk": "File Permissions",
+      "impact": "403 errors",
+      "mitigation": "Set correct ownership (www-data) and permissions (755)"
+    },
+    {
+      "risk": "Build Version Mismatch",
+      "impact": "Wrong version deployed",
+      "mitigation": "Verify build timestamp before deployment"
+    }
+  ],
+  "deployment_script": "scripts/deploy_to_cherry.sh"
+}

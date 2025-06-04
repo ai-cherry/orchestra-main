@@ -10,7 +10,7 @@ if [[ $(hostname -I) != *"45.32.69.157"* ]]; then
     exit 1
 fi
 
-cd /root/orchestra-main
+cd /root/cherry_ai-main
 
 # Install development tools
 echo "Installing development tools..."
@@ -29,15 +29,15 @@ pip install -r requirements.txt
 
 # Configure git
 git config --global user.email "admin@cherry-ai.me"
-git config --global user.name "Orchestra Admin"
+git config --global user.name "cherry_ai Admin"
 
 # Create development aliases
 cat >> ~/.bashrc << 'EOF'
 
-# Orchestra aliases
-alias orch='cd /root/orchestra-main'
+# cherry_ai aliases
+alias orch='cd /root/cherry_ai-main'
 alias logs='docker-compose logs -f'
-alias deploy='cd /root/orchestra-main && ./deploy.sh'
+alias deploy='cd /root/cherry_ai-main && ./deploy.sh'
 alias status='docker-compose ps'
 alias restart='docker-compose restart'
 EOF
@@ -53,6 +53,6 @@ echo "- status: Check service status"
 echo "- restart: Restart services"
 echo ""
 echo "To start coding:"
-echo "1. cd /root/orchestra-main"
+echo "1. cd /root/cherry_ai-main"
 echo "2. Edit files with vim or nano"
 echo "3. Run ./deploy.sh to deploy changes"

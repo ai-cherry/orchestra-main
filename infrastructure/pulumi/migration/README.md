@@ -136,7 +136,7 @@ pulumi-migrate rollback --yes
 ┌─────────────────────────────────────────────────────────────┐
 │                     CLI Interface (index.ts)                 │
 ├─────────────────────────────────────────────────────────────┤
-│              Enhanced Orchestrator (orchestrator-enhanced.ts) │
+│              Enhanced conductor (conductor-enhanced.ts) │
 ├─────────────┬─────────────┬─────────────┬─────────────────┤
 │   State     │  Resource   │ Dependency  │     Retry       │
 │  Manager    │  Discovery  │  Resolver   │    Manager      │
@@ -176,11 +176,11 @@ class CustomProvider implements DiscoveryProvider {
 ### Event Handling
 
 ```typescript
-orchestrator.on('resourceMigrated', (resource) => {
+conductor.on('resourceMigrated', (resource) => {
     console.log(`Migrated: ${resource.name}`);
 });
 
-orchestrator.on('migrationFailed', (error) => {
+conductor.on('migrationFailed', (error) => {
     console.error(`Failed: ${error.message}`);
 });
 ```

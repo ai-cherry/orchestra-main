@@ -1,4 +1,4 @@
-# API Key Security Guide for Orchestra AI
+# API Key Security Guide for Cherry AI
 
 ## Overview
 This guide ensures that sensitive API keys are never exposed in your codebase or GitHub repository.

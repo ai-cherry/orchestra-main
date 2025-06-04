@@ -1,7 +1,7 @@
 # TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """
-Comprehensive Production Deployment Script for Orchestra AI
+Comprehensive Production Deployment Script for Cherry AI
 Full security, monitoring, and feature deployment (4-5 days)
 """
 
@@ -14,7 +14,8 @@ import sys
 import time
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Any
+from typing import Dict, List, Optional
+from typing_extensions import Optional, Tuple, Any
 from unittest.mock import Mock, patch
 
 import bcrypt
@@ -29,7 +30,7 @@ class ComprehensiveProductionDeploy:
     """Comprehensive deployment with full security and features"""
     
     def __init__(self):
-        self.base_dir = Path("/root/orchestra-main")
+        self.base_dir = Path("/root/cherry_ai-main")
         self.domain = "cherry-ai.me"
         self.deployment_log = []
         self.start_time = datetime.now()
@@ -69,6 +70,7 @@ import secrets
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Dict, Any, Optional
+from typing_extensions import Optional
 
 class AuthenticationSystem:
     def __init__(self):
@@ -79,7 +81,7 @@ class AuthenticationSystem:
     
     def _get_or_create_secret(self) -> str:
         '''Get or create JWT secret'''
-        secret_file = Path('/etc/orchestra/jwt_secret')
+        secret_file = Path('/etc/cherry_ai/jwt_secret')
         secret_file.parent.mkdir(parents=True, exist_ok=True)
         
         if secret_file.exists():
@@ -214,6 +216,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 import time
 import re
 from typing import Optional
+from typing_extensions import Optional
 
 security = HTTPBearer()
 
@@ -249,6 +252,7 @@ def setup_security_middleware(app):
         input_validation = """
 import re
 from typing import Any, Dict, List, Optional
+from typing_extensions import Optional
 from pydantic import BaseModel, validator, EmailStr
 
 class InputValidator:
@@ -345,6 +349,7 @@ import redis
 import time
 from fastapi import Request, HTTPException
 from typing import Dict, Optional
+from typing_extensions import Optional
 
 class RateLimiter:
     def __init__(self, redis_client: redis.Redis):
@@ -424,10 +429,11 @@ import json
 from pathlib import Path
 from cryptography.fernet import Fernet
 from typing import Dict, Optional
+from typing_extensions import Optional
 
 class SecretsManager:
     def __init__(self):
-        self.secrets_dir = Path('/etc/orchestra/secrets')
+        self.secrets_dir = Path('/etc/cherry_ai/secrets')
         self.secrets_dir.mkdir(parents=True, exist_ok=True)
         self.master_key = self._get_or_create_master_key()
         self.cipher = Fernet(self.master_key)
@@ -961,7 +967,7 @@ rule_files:
   - "alerts/*.yml"
 
 scrape_configs:
-  - job_name: 'orchestra-api'
+  - job_name: 'cherry_ai-api'
     static_configs:
       - targets: ['localhost:8000']
     metrics_path: '/metrics'
@@ -985,7 +991,7 @@ scrape_configs:
         # Alert rules
         alert_rules = """
 groups:
-  - name: orchestra_alerts
+  - name: cherry_ai_alerts
     interval: 30s
     rules:
       - alert: HighAPILatency
@@ -1024,14 +1030,14 @@ groups:
           summary: "High memory usage"
           description: "Memory usage is above 90%"
 """
-        alerts_path = self.base_dir / "monitoring" / "alerts" / "orchestra.yml"
+        alerts_path = self.base_dir / "monitoring" / "alerts" / "cherry_ai.yml"
         alerts_path.parent.mkdir(parents=True, exist_ok=True)
         alerts_path.write_text(alert_rules)
         
         # Grafana dashboard
         grafana_dashboard = {
             "dashboard": {
-                "title": "Orchestra AI Monitoring",
+                "title": "Cherry AI Monitoring",
                 "panels": [
                     {
                         "title": "API Request Rate",
@@ -1053,7 +1059,7 @@ groups:
             }
         }
         
-        dashboard_path = self.base_dir / "monitoring" / "dashboards" / "orchestra.json"
+        dashboard_path = self.base_dir / "monitoring" / "dashboards" / "cherry_ai.json"
         dashboard_path.parent.mkdir(parents=True, exist_ok=True)
         dashboard_path.write_text(json.dumps(grafana_dashboard, indent=2))
         
@@ -1100,7 +1106,7 @@ services:
     ports:
       - "9187:9187"
     environment:
-      DATA_SOURCE_NAME: "postgresql://orchestra:password@postgres:5432/orchestra?sslmode=disable"
+      DATA_SOURCE_NAME: "postgresql://cherry_ai:password@postgres:5432/cherry_ai?sslmode=disable"
   
   redis_exporter:
     image: oliver006/redis_exporter:latest
@@ -1142,7 +1148,7 @@ from locust import HttpUser, task, between
 import random
 import json
 
-class OrchestraUser(HttpUser):
+class cherry_aiUser(HttpUser):
     wait_time = between(1, 3)
     
     def on_start(self):
@@ -1196,8 +1202,8 @@ async def optimize_database():
     '''Optimize PostgreSQL performance'''
     conn = psycopg2.connect(
         host="localhost",
-        database="orchestra",
-        user="orchestra",
+        database="cherry_ai",
+        user="cherry_ai",
         os.getenv("API_KEY")
     )
     cur = conn.cursor()

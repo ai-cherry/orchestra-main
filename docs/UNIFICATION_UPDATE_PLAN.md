@@ -32,7 +32,7 @@ This document tracks the necessary updates to align all documentation, tools, an
 
 **Update:**
 - `deploy_real_agents.sh` - Simplify for single server
-- `start_orchestra.sh` - Ensure it works for unified setup
+- `start_cherry_ai.sh` - Ensure it works for unified setup
 
 ### 3. Documentation Updates
 **Files to Update:**
@@ -76,7 +76,7 @@ jobs:
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd /root/orchestra-main
+            cd /root/cherry_ai-main
             git pull origin main
             make validate
             make restart-services

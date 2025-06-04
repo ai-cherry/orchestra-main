@@ -1,4 +1,4 @@
-# Roo Setup Complete for Orchestra Project
+# Roo Setup Complete for cherry_ai Project
 
 ✅ **Setup Status**: All components successfully configured
 
@@ -9,7 +9,7 @@ Location: `.roo/modes/`
 - ✅ architect.json (Claude Opus 4)
 - ✅ code.json (Gemini 2.5 Flash)
 - ✅ debug.json (GPT-4.1)
-- ✅ orchestrator.json (Claude Sonnet 4)
+- ✅ conductor.json (Claude Sonnet 4)
 - ✅ strategy.json (Claude Opus 4)
 - ✅ research.json (Claude Sonnet 4)
 - ✅ analytics.json (Gemini 2.5 Flash)
@@ -26,7 +26,7 @@ Location: `.roo/mcp.json`
 Configured with:
 - memory-bank (Docker-based memory storage)
 - portkey-router (Model routing)
-- orchestra-mcp (Project-specific tools)
+- conductor-mcp (Project-specific tools)
 
 ### 4. Verification Script
 Location: `.roo/scripts/verify_setup.py`
@@ -37,8 +37,8 @@ Run with: `python3 .roo/scripts/verify_setup.py`
 1. **Close Roo** (if currently running)
 2. **Start MCP servers**:
    ```bash
-   # Start the Orchestra MCP server
-   python mcp_server/servers/orchestra_server.py
+   # Start the cherry_ai MCP server
+   python mcp_server/servers/cherry_ai_server.py
    ```
 3. **Reopen Roo**
 4. **Test mode switching**:
@@ -59,7 +59,7 @@ Run with: `python3 .roo/scripts/verify_setup.py`
 | Architect | System Design | Claude Opus 4 | 0.2 |
 | Code | Implementation | Gemini 2.5 Flash | 0.1 |
 | Debug | Troubleshooting | GPT-4.1 | 0.05 |
-| Orchestrator | Workflow | Claude Sonnet 4 | 0.2 |
+| conductor | Workflow | Claude Sonnet 4 | 0.2 |
 | Strategy | Planning | Claude Opus 4 | 0.3 |
 | Research | Analysis | Claude Sonnet 4 | 0.2 |
 | Analytics | Data | Gemini 2.5 Flash | 0.1 |

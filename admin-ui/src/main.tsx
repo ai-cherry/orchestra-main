@@ -15,7 +15,7 @@ const BUILD_VERSION = import.meta.env.VITE_BUILD_TIME || Date.now().toString();
 const BUILD_DATE = new Date().toISOString();
 
 // Log version info
-console.log(`🎼 Cherry Admin UI v${BUILD_VERSION}`);
+console.log(`🎼 Orchestra AI v${BUILD_VERSION}`);
 console.log(`📅 Built: ${BUILD_DATE}`);
 
 // Add global error handlers

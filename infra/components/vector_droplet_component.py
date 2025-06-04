@@ -16,7 +16,7 @@
 """
     """
     """
-        super().__init__("orchestra:vector:DropletComponent", name, None, opts)
+        super().__init__("cherry_ai:vector:DropletComponent", name, None, opts)
 
         self.config = config
         self.droplet_id = config.get("droplet_id")

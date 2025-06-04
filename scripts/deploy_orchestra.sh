@@ -1,5 +1,5 @@
 #!/bin/bash
-# Orchestra Deployment Script
+# cherry_ai Deployment Script
 # Handles complete deployment to DigitalOcean with proper error handling
 
 set -euo pipefail
@@ -17,7 +17,7 @@ PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 INFRA_DIR="$PROJECT_ROOT/infra"
 
 # Set Pulumi configuration
-export PULUMI_CONFIG_PASSPHRASE="orchestra-dev-123"
+export PULUMI_CONFIG_PASSPHRASE="cherry_ai-dev-123"
 export PULUMI_SKIP_UPDATE_CHECK=true
 
 # Functions
@@ -85,7 +85,7 @@ deploy_infrastructure() {
 
 # Deploy the modular API
 deploy_api() {
-    log_step "Deploying Orchestra API..."
+    log_step "Deploying cherry_ai API..."
 
     cd "$PROJECT_ROOT"
 
@@ -118,7 +118,7 @@ deploy_api() {
 
 # Main execution
 main() {
-    log_info "Starting Orchestra deployment..."
+    log_info "Starting cherry_ai deployment..."
 
     check_prerequisites
     deploy_infrastructure
@@ -127,7 +127,7 @@ main() {
     # Summary
     echo ""
     echo "======================================"
-    echo "Orchestra Deployment Summary"
+    echo "cherry_ai Deployment Summary"
     echo "======================================"
 
     if [ -n "${DROPLET_IP:-}" ]; then
@@ -136,7 +136,7 @@ main() {
         echo ""
         echo "Services:"
         echo "- SuperAGI: $SUPERAGI_URL"
-        echo "- Orchestra API: http://$DROPLET_IP:8000 (when deployed)"
+        echo "- cherry_ai API: http://$DROPLET_IP:8000 (when deployed)"
         echo "- Admin UI: https://cherry-ai.me"
     else
         echo "Deployment status: Check Pulumi outputs"

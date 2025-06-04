@@ -1,3 +1,4 @@
+import os
 # TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """
@@ -20,7 +21,7 @@
         pass
         print(f"Error getting secret: {str(e)}")
         print("Creating a mock secret for demonstration purposes...")
-        api_key = "mock-api-key-12345"
+        api_key = os.getenv('API_KEY')
 
     # Get a JSON secret
     try:
@@ -176,7 +177,7 @@ async def example_fastapi_integration():
     # This is just a demonstration of how the FastAPI integration would work
     print("In a FastAPI application, you would use the dependencies like this:")
     print("\nfrom fastapi import Depends, FastAPI")
-    print("from core.orchestrator.src.api.dependencies.credentials import (")
+    print("from core.conductor.src.api.dependencies.credentials import (")
     print("    get_openai_credentials,")
     print("    get_gemini_credentials,")
     print("    get_redis_credentials,")
@@ -224,7 +225,7 @@ async def example_credential_rotation():
         pass
         print(f"   Error getting secret: {str(e)}")
         print("   Creating a mock secret for demonstration purposes...")
-        api_key = "mock-api-key-12345"
+        api_key = os.getenv('API_KEY')
 
     print("\n2. Second access (cached credential):")
     try:
@@ -237,7 +238,7 @@ async def example_credential_rotation():
 
         pass
         print(f"   Error getting secret: {str(e)}")
-        api_key = "mock-api-key-12345"
+        api_key = os.getenv('API_KEY')
 
     print("\n3. After rotation (new credential):")
     # Clear the cache to simulate credential rotation
@@ -255,7 +256,7 @@ async def example_credential_rotation():
 
         pass
         print(f"   Error getting secret: {str(e)}")
-        api_key = "mock-api-key-67890"  # Simulate a new key
+        api_key = os.getenv('API_KEY')  # Simulate a new key
         print(f"   API Key: {api_key[:5]}...")
 
     print(
@@ -265,7 +266,7 @@ async def example_credential_rotation():
 
 async def main():
     """Main function to run all examples."""
-    print("AI Orchestra Credential Management System Examples")
+    print("AI cherry_ai Credential Management System Examples")
     print("================================================")
 
     # Run the examples

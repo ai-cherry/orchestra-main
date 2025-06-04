@@ -1,5 +1,5 @@
 #!/bin/bash
-# Setup deployment environment variables for Orchestra AI
+# Setup deployment environment variables for Cherry AI
 
 echo "🔧 Setting up deployment environment variables..."
 
@@ -23,7 +23,7 @@ fi
 
 # Save to .env file for persistence
 cat > .env.deployment << EOF
-# Orchestra AI Deployment Environment Variables
+# Cherry AI Deployment Environment Variables
 # Generated: $(date)
 export VULTR_API_KEY="${VULTR_API_KEY}"
 export POSTGRES_PASSWORD="${POSTGRES_PASSWORD}"

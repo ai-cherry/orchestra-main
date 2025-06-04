@@ -1,8 +1,8 @@
 # TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
-"""Test script for orchestrator server functions."""
-    """Test the orchestrator functions."""
-    print("Testing Orchestrator Server Functions...\n")
+"""Test script for conductor server functions."""
+    """Test the conductor functions."""
+    print("Testing conductor Server Functions...\n")
 
     # Test get_all_agents
     print("1. Testing get_all_agents():")
@@ -22,7 +22,7 @@
     )
     print(f"   Result: {workflow_result}")
 
-    print("\n✅ All tests passed! The orchestrator server functions are working correctly.")
+    print("\n✅ All tests passed! The conductor server functions are working correctly.")
 
 if __name__ == "__main__":
     asyncio.run(test_functions())

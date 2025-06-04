@@ -1,7 +1,7 @@
-# Orchestrator Landing Page - Component Architecture
+# conductor Landing Page - Component Architecture
 
 ## Executive Summary
-This document outlines the comprehensive component architecture for the Orchestrator Landing Page, designed to integrate seamlessly with the existing admin-ui infrastructure while providing advanced search, voice, and file management capabilities.
+This document outlines the comprehensive component architecture for the conductor Landing Page, designed to integrate seamlessly with the existing admin-ui infrastructure while providing advanced search, voice, and file management capabilities.
 
 ## Architecture Overview
 
@@ -24,7 +24,7 @@ This document outlines the comprehensive component architecture for the Orchestr
 
 ```typescript
 // Root Component Structure
-OrchestratorLandingPage/
+conductorLandingPage/
 ├── Header/
 │   ├── Logo
 │   ├── Navigation
@@ -55,8 +55,8 @@ OrchestratorLandingPage/
 ### 1. Core Layout Components
 
 ```typescript
-// OrchestratorLandingPage.tsx
-interface OrchestratorLandingPageProps {
+// conductorLandingPage.tsx
+interface conductorLandingPageProps {
   className?: string;
   initialMode?: SearchMode;
   onSearchComplete?: (results: SearchResult[]) => void;
@@ -171,12 +171,12 @@ interface FileDownload {
 ### Zustand Store Design
 
 ```typescript
-// stores/orchestratorStore.ts
+// stores/conductorStore.ts
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { subscribeWithSelector } from 'zustand/middleware';
 
-interface OrchestratorState {
+interface conductorState {
   // Search State
   search: {
     query: string;
@@ -240,7 +240,7 @@ interface OrchestratorState {
   };
 }
 
-export const useOrchestratorStore = create<OrchestratorState>()(
+export const useconductorStore = create<conductorState>()(
   subscribeWithSelector(
     persist(
       (set, get) => ({
@@ -278,7 +278,7 @@ export const useOrchestratorStore = create<OrchestratorState>()(
         },
       }),
       {
-        name: 'orchestrator-storage',
+        name: 'conductor-storage',
         storage: createJSONStorage(() => localStorage),
         partialize: (state) => ({
           search: { mode: state.search.mode },
@@ -295,7 +295,7 @@ export const useOrchestratorStore = create<OrchestratorState>()(
 
 ```typescript
 // Subscription for WebSocket updates
-useOrchestratorStore.subscribe(
+useconductorStore.subscribe(
   (state) => state.search.query,
   (query) => {
     if (query.length > 2) {
@@ -305,7 +305,7 @@ useOrchestratorStore.subscribe(
 );
 
 // Subscription for voice recording duration
-useOrchestratorStore.subscribe(
+useconductorStore.subscribe(
   (state) => state.voice.isRecording,
   (isRecording) => {
     if (isRecording) {
@@ -324,13 +324,13 @@ useOrchestratorStore.subscribe(
 ```typescript
 // Search API
 interface SearchAPI {
-  // POST /api/orchestrator/search
+  // POST /api/conductor/search
   search(request: SearchRequest): Promise<SearchResponse>;
   
-  // GET /api/orchestrator/suggestions
+  // GET /api/conductor/suggestions
   getSuggestions(query: string): Promise<SuggestionResponse>;
   
-  // POST /api/orchestrator/search/cancel
+  // POST /api/conductor/search/cancel
   cancelSearch(searchId: string): Promise<void>;
 }
 
@@ -363,13 +363,13 @@ interface SearchResponse {
 
 // Voice API
 interface VoiceAPI {
-  // POST /api/orchestrator/voice/transcribe
+  // POST /api/conductor/voice/transcribe
   transcribe(request: TranscribeRequest): Promise<TranscribeResponse>;
   
-  // POST /api/orchestrator/voice/synthesize
+  // POST /api/conductor/voice/synthesize
   synthesize(request: SynthesizeRequest): Promise<SynthesizeResponse>;
   
-  // GET /api/orchestrator/voice/voices
+  // GET /api/conductor/voice/voices
   getAvailableVoices(): Promise<VoiceOption[]>;
 }
 
@@ -410,16 +410,16 @@ interface SynthesizeResponse {
 
 // File API
 interface FileAPI {
-  // POST /api/orchestrator/files/upload
+  // POST /api/conductor/files/upload
   uploadFile(request: FileUploadRequest): Promise<FileUploadResponse>;
   
-  // GET /api/orchestrator/files/{fileId}/status
+  // GET /api/conductor/files/{fileId}/status
   getFileStatus(fileId: string): Promise<FileStatusResponse>;
   
-  // DELETE /api/orchestrator/files/{fileId}
+  // DELETE /api/conductor/files/{fileId}
   deleteFile(fileId: string): Promise<void>;
   
-  // POST /api/orchestrator/files/{fileId}/process
+  // POST /api/conductor/files/{fileId}/process
   processFile(fileId: string, options: ProcessOptions): Promise<ProcessResponse>;
 }
 
@@ -483,7 +483,7 @@ interface WebSocketEvents {
 }
 
 // WebSocket Manager
-class OrchestratorWebSocket {
+class conductorWebSocket {
   private ws: WebSocket | null = null;
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 5;
@@ -551,8 +551,8 @@ const FileManager = lazy(() => import('./components/FileManager'));
 // Route-based code splitting
 const routes = [
   {
-    path: '/orchestrator',
-    component: lazy(() => import('./pages/OrchestratorLanding')),
+    path: '/conductor',
+    component: lazy(() => import('./pages/conductorLanding')),
   },
 ];
 ```
@@ -676,7 +676,7 @@ const cachingStrategy = {
   },
   api: {
     name: 'api-v1',
-    urls: ['/api/orchestrator/suggestions'],
+    urls: ['/api/conductor/suggestions'],
     strategy: 'NetworkFirst',
     ttl: 300, // 5 minutes
   },
@@ -764,7 +764,7 @@ const SearchInput: FC<SearchInputProps> = ({ value, onChange, onSubmit }) => {
   const [announcement, setAnnouncement] = useState('');
   
   return (
-    <div role="search" aria-label="Orchestrator search">
+    <div role="search" aria-label="conductor search">
       <label htmlFor={inputId} className="sr-only">
         Search query
       </label>
@@ -835,7 +835,7 @@ const useFocusTrap = (ref: RefObject<HTMLElement>) => {
 ## Integration Plan
 
 ### Phase 1: Foundation (Week 1)
-1. Set up new route `/orchestrator` in TanStack Router
+1. Set up new route `/conductor` in TanStack Router
 2. Create base Zustand store with TypeScript interfaces
 3. Implement core layout components
 4. Set up WebSocket infrastructure
@@ -898,10 +898,10 @@ describe('Search API', () => {
 ```typescript
 // Playwright E2E tests
 test('complete search flow', async ({ page }) => {
-  await page.goto('/orchestrator');
+  await page.goto('/conductor');
   
   // Type search query
-  await page.fill('[role="searchbox"]', 'AI orchestration');
+  await page.fill('[role="searchbox"]', 'AI coordination');
   await page.press('[role="searchbox"]', 'Enter');
   
   // Wait for results
@@ -945,7 +945,7 @@ interface UserAnalytics {
 
 ## Conclusion
 
-This architecture provides a solid foundation for implementing the Orchestrator Landing Page with:
+This architecture provides a solid foundation for implementing the conductor Landing Page with:
 - Modular, maintainable component structure
 - Comprehensive state management
 - Robust API contracts

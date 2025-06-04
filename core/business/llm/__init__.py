@@ -1,4 +1,4 @@
-"""LLM module for Orchestra AI."""
+"""LLM module for Cherry AI."""
     "CompletionMode",
     "LLMProvider",
     "LLMRequest",

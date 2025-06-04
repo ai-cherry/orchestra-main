@@ -29,7 +29,7 @@ async def main():
     logger.info("Starting Redis semantic caching example")
 
     # Check for environment variables
-    redis_url = os.environ.get("REDIS_URL", "redis://vertex-agent@cherry-ai-project")
+    redis_url = os.environ.get("REDIS_URL", "redis://localhost:6379")  # Standard Redis config
     gemini_api_key = os.environ.get("GEMINI_API_KEY")
 
     if not gemini_api_key:
@@ -81,12 +81,12 @@ async def main():
         logger.error(f"Failed to initialize LangChain RedisSemanticCache: {e}")
         sys.exit(1)
 
-    # 3. Set up Orchestra's RedisSemanticCacheProvider
-    logger.info("Setting up Orchestra's RedisSemanticCacheProvider")
+    # 3. Set up cherry_ai's RedisSemanticCacheProvider
+    logger.info("Setting up cherry_ai's RedisSemanticCacheProvider")
     try:
 
         pass
-        # Configure Orchestra's provider
+        # Configure cherry_ai's provider
         provider_config = {
             "threshold": 0.85,
             "ttl": 3600,
@@ -112,11 +112,11 @@ async def main():
         user_id="test_user",
         session_id="test_session",
         item_type="conversation",
-        text_content="This is a test memory about AI orchestration and semantic caching",
+        text_content="This is a test memory about AI coordination and semantic caching",
         metadata={"source": "user", "importance": "high"},
     )
 
-    # Add to Orchestra's provider
+    # Add to cherry_ai's provider
     try:
 
         pass
@@ -135,7 +135,7 @@ async def main():
         memories = await provider.get_memories(
             user_id="test_user",
             session_id="test_session",
-            query="Tell me about orchestration",
+            query="Tell me about coordination",
             limit=5,
         )
         logger.info(f"Retrieved {len(memories)} memories")

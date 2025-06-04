@@ -39,7 +39,7 @@ echo "=== Recent Errors (last hour) ==="
 
 echo
 echo "=== Quick Health Checks ==="
-for SERVICE in "ai-orchestra-minimal" "web-scraping-agents"; do
+for SERVICE in "ai-cherry_ai-minimal" "web-scraping-agents"; do
     echo -n "$SERVICE: "
     if # vultr-cli kubernetes services describe $SERVICE --region=$REGION &>/dev/null; then
         URL=$(# vultr-cli kubernetes services describe $SERVICE --region=$REGION --format="value(status.url)" 2>/dev/null)

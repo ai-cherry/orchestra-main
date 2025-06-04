@@ -1,6 +1,6 @@
 #!/bin/bash
-# deploy_orchestra_api.sh
-# DigitalOcean deployment script for Orchestra API
+# deploy_cherry_ai_api.sh
+# DigitalOcean deployment script for cherry_ai API
 # - Builds Docker image locally and pushes to DigitalOcean Container Registry
 # - Deploys to DigitalOcean App Platform
 # - Ensures Redis is present via Managed Database
@@ -10,10 +10,10 @@ set -e
 
 # Configurable variables
 DO_REGION="nyc3"
-SERVICE_NAME="orchestra-api"
-IMAGE_NAME="orchestra-api"
-CONTAINER_REGISTRY="ai-orchestra"
-REDIS_NAME="orchestra-redis"
+SERVICE_NAME="cherry_ai-api"
+IMAGE_NAME="cherry_ai-api"
+CONTAINER_REGISTRY="ai-cherry_ai"
+REDIS_NAME="cherry_ai-redis"
 REDIS_SIZE="db-s-1vcpu-1gb"
 REDIS_VERSION="7"
 
@@ -22,12 +22,12 @@ echo "Authenticating with DigitalOcean..."
 doctl auth init
 
 # 2. Ensure requirements.txt is present in build context
-echo "Copying requirements/base.txt to orchestra_api/requirements.txt..."
-cp requirements/base.txt orchestra_api/requirements.txt
+echo "Copying requirements/base.txt to cherry_ai_api/requirements.txt..."
+cp requirements/base.txt cherry_ai_api/requirements.txt
 
 # 3. Build and push Docker image to DigitalOcean Container Registry
 echo "Building Docker image..."
-docker build -t $IMAGE_NAME ./orchestra_api
+docker build -t $IMAGE_NAME ./cherry_ai_api
 
 echo "Tagging and pushing to DigitalOcean Container Registry..."
 doctl registry login
@@ -44,7 +44,7 @@ services:
   github:
     branch: main
     deploy_on_push: true
-  dockerfile_path: ./orchestra_api/Dockerfile
+  dockerfile_path: ./cherry_ai_api/Dockerfile
   instance_size_slug: basic-xxs
   instance_count: 1
   envs:

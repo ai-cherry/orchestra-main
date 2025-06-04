@@ -1,12 +1,12 @@
 #!/bin/bash
 
-# Orchestra AI Development Helpers
+# Cherry AI Development Helpers
 
 # Activate virtual environment
 alias activate-venv='source venv/bin/activate'
 
 # API commands
-alias run-api='python -m uvicorn orchestra_api.main:app --reload --host 0.0.0.0 --port 8000'
+alias run-api='python -m uvicorn cherry_ai_api.main:app --reload --host 0.0.0.0 --port 8000'
 alias test-api='python -m pytest tests/api/'
 
 # Admin UI commands

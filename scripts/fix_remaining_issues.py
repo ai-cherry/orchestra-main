@@ -32,8 +32,9 @@ def main():
         "infra/components/monitoring_component.py": [
             ("regex", r"regex: r'([^']+)'", r"regex: r'\\1'"),
         ],
-        "orchestrator/enrichment_orchestrator.py": [
-            ("regex", r"from typing import .*Optional.*\n", ""),
+        "conductor/enrichment_conductor.py": [
+            ("regex", r"from typing import .*Optional
+from typing_extensions import Optional.*\n", ""),
         ],
         "packages/shared/src/gateway_adapter.py": [
             ("regex", r'f"([^{}"]*)"', r'"\1"'),  # Remove f-string without placeholders
@@ -41,7 +42,7 @@ def main():
         "scripts/fix_python_version_permanently.py": [
             ("regex", r'f"([^{}"]*)"', r'"\1"'),  # Remove f-string without placeholders
         ],
-        "scripts/orchestra_adapter.py": [
+        "scripts/cherry_ai_adapter.py": [
             ("regex", r"import json\n", ""),
             ("regex", r"from typing import .*Protocol.*\n", ""),
             ("regex", r"persona_id = [^\n]+\n", ""),  # Remove unused variable

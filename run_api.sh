@@ -17,16 +17,16 @@ while [[ "$#" -gt 0 ]]; do
     esac
 done
 
-echo -e "${YELLOW}Starting Orchestra API in ${MODE^^} MODE${NC}"
+echo -e "${YELLOW}Starting cherry_ai API in ${MODE^^} MODE${NC}"
 
 # Source environment variables from set_env.sh if it exists
-if [ -f "/workspaces/orchestra-main/set_env.sh" ]; then
+if [ -f "/workspaces/cherry_ai-main/set_env.sh" ]; then
     echo -e "${GREEN}Loading environment variables from set_env.sh...${NC}"
-    source /workspaces/orchestra-main/set_env.sh
+    source /workspaces/cherry_ai-main/set_env.sh
 fi
 
 # Setting PYTHONPATH
-export PYTHONPATH=/workspaces/orchestra-main
+export PYTHONPATH=/workspaces/cherry_ai-main
 
 # Set mode based on parameter
 if [ "$MODE" == "recovery" ]; then
@@ -58,9 +58,9 @@ else
     echo -e "${RED}Virtual environment not found at $VENV_PATH${NC}"
     # Try to create it on-the-fly
     echo -e "${YELLOW}Attempting to create virtual environment now...${NC}"
-    if [ -f "/workspaces/orchestra-main/fix_dependencies.sh" ]; then
+    if [ -f "/workspaces/cherry_ai-main/fix_dependencies.sh" ]; then
         echo -e "${YELLOW}Running fix_dependencies.sh...${NC}"
-        bash /workspaces/orchestra-main/fix_dependencies.sh
+        bash /workspaces/cherry_ai-main/fix_dependencies.sh
         if [ -d "$VENV_PATH" ]; then
             echo -e "${GREEN}Virtual environment created successfully.${NC}"
             source "$VENV_PATH/bin/activate"
@@ -111,8 +111,8 @@ done
 if [ $IMPORT_FAILED -eq 1 ]; then
     echo -e "${RED}Some required packages are missing!${NC}"
     echo -e "${YELLOW}Attempting to run fix_dependencies.sh...${NC}"
-    if [ -f "/workspaces/orchestra-main/fix_dependencies.sh" ]; then
-        bash /workspaces/orchestra-main/fix_dependencies.sh
+    if [ -f "/workspaces/cherry_ai-main/fix_dependencies.sh" ]; then
+        bash /workspaces/cherry_ai-main/fix_dependencies.sh
         IMPORT_FAILED=0
         # Check imports again after running fix_dependencies.sh
         for package in fastapi pydantic openai uvicorn
@@ -137,8 +137,8 @@ fi
 # Only apply force_standard_mode patch if we're in standard mode
 if [ "$MODE" == "standard" ]; then
     echo -e "${YELLOW}Applying standard mode patch...${NC}"
-    if [ -f "/workspaces/orchestra-main/force_standard_mode.py" ]; then
-        python /workspaces/orchestra-main/force_standard_mode.py
+    if [ -f "/workspaces/cherry_ai-main/force_standard_mode.py" ]; then
+        python /workspaces/cherry_ai-main/force_standard_mode.py
         if [ $? -eq 0 ]; then
             echo -e "${GREEN}Standard mode patch applied successfully.${NC}"
         else
@@ -152,7 +152,7 @@ else
 fi
 
 # Run the FastAPI app with the appropriate structure
-echo -e "${GREEN}Starting FastAPI app - Orchestrator API (${MODE^^} MODE)${NC}"
+echo -e "${GREEN}Starting FastAPI app - conductor API (${MODE^^} MODE)${NC}"
 echo -e "${GREEN}Using Python: $(which python)${NC}"
 echo -e "${GREEN}PYTHONPATH: $PYTHONPATH${NC}"
 echo -e "${GREEN}USE_RECOVERY_MODE: $USE_RECOVERY_MODE${NC}"
@@ -162,7 +162,7 @@ echo -e "${GREEN}STANDARD_MODE: $STANDARD_MODE${NC}"
 PYTHONPATH=$PYTHONPATH python -c "import os; print('Python sees USE_RECOVERY_MODE=', os.environ.get('USE_RECOVERY_MODE', 'not set'))"
 
 if [ "$MODE" == "recovery" ]; then
-    PYTHONPATH=$PYTHONPATH python -m uvicorn core.orchestrator.src.main_simple:app --reload --host 0.0.0.0 --port 8000
+    PYTHONPATH=$PYTHONPATH python -m uvicorn core.conductor.src.main_simple:app --reload --host 0.0.0.0 --port 8000
 else
-    PYTHONPATH=$PYTHONPATH python -m uvicorn core.orchestrator.src.main:app --reload --host 0.0.0.0 --port 8000
+    PYTHONPATH=$PYTHONPATH python -m uvicorn core.conductor.src.main:app --reload --host 0.0.0.0 --port 8000
 fi

@@ -1,4 +1,4 @@
-# AI Orchestrator Dashboard
+# AI conductor Dashboard
 
 A modern, conversational AI-first admin interface built with Next.js, TypeScript, and Tailwind CSS.
 

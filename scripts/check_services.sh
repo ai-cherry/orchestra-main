@@ -1,7 +1,7 @@
 #!/bin/bash
-# Check status of Orchestra AI services
+# Check status of Cherry AI services
 
-echo "🔍 Orchestra AI Service Status"
+echo "🔍 Cherry AI Service Status"
 echo "=============================="
 echo ""
 
@@ -34,7 +34,7 @@ check_service() {
 
 # Check each service
 echo "MCP Servers:"
-check_service "orchestrator" "${MCP_ORCHESTRATOR_PORT:-8002}"
+check_service "conductor" "${CHERRY_AI_CONDUCTOR_PORT:-8002}"
 check_service "memory" "${MCP_MEMORY_PORT:-8003}"
 check_service "tools" "${MCP_TOOLS_PORT:-8006}"
 check_service "weaviate" "${MCP_WEAVIATE_DIRECT_PORT:-8001}"

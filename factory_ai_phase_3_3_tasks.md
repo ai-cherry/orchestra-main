@@ -230,7 +230,7 @@ cache:
 postgresql:
   host: localhost
   port: 5432
-  database: orchestra
+  database: cherry_ai
   pool_size: 20
   
 weaviate:

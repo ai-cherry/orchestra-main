@@ -1,7 +1,7 @@
 # Architect Mode Handoff: Factory AI Droid Integration
 
 ## Context Summary
-The Orchestrator has completed Phase 1 of the Factory AI Droid integration workflow. This handoff contains all necessary information for the Architect mode to design the detailed system architecture.
+The conductor has completed Phase 1 of the Factory AI Droid integration workflow. This handoff contains all necessary information for the Architect mode to design the detailed system architecture.
 
 ## Completed Work
 1. ✓ Analyzed current project structure
@@ -12,7 +12,7 @@ The Orchestrator has completed Phase 1 of the Factory AI Droid integration workf
 ## Architect Mode Tasks
 
 ### Primary Objective
-Design a detailed system architecture that integrates Factory AI Droids with our existing Orchestra project while maintaining full compatibility with Roo coder.
+Design a detailed system architecture that integrates Factory AI Droids with our existing cherry_ai project while maintaining full compatibility with Roo coder.
 
 ### Specific Deliverables Required
 
@@ -34,7 +34,7 @@ Detail the technical implementation of:
 Define precise mappings:
 ```
 Factory Droid → MCP Server → Capabilities
-- Architect Droid → Orchestrator Server → System design, Pulumi IaC
+- Architect Droid → conductor Server → System design, Pulumi IaC
 - Code Droid → Tools Server → Fast generation, optimization
 - Debug Droid → Tools Server → Error diagnosis, query optimization
 - Reliability Droid → Deployment Server → Incident management
@@ -63,7 +63,7 @@ Design for the 40% performance improvement target:
 
 ### Available Resources
 1. **Current MCP Servers**:
-   - orchestrator_server.py
+   - conductor_server.py
    - memory_server.py
    - weaviate_direct_mcp_server.py
    - deployment_server.py

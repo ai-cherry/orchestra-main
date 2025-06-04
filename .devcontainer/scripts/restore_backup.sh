@@ -5,12 +5,12 @@ set -e
 
 # List available backups
 echo "Available configuration backups:"
-ls -la /workspaces/orchestra-main/.devcontainer/backups/
+ls -la /workspaces/cherry_ai-main/.devcontainer/backups/
 
 # Prompt for backup to restore
 read -p "Enter backup directory name to restore (YYYYMMDD-HHMMSS format): " BACKUP_DIR
 
-if [ ! -d "/workspaces/orchestra-main/.devcontainer/backups/${BACKUP_DIR}" ]; then
+if [ ! -d "/workspaces/cherry_ai-main/.devcontainer/backups/${BACKUP_DIR}" ]; then
     echo "Error: Backup directory not found"
     exit 1
 fi
@@ -25,15 +25,15 @@ fi
 
 # Backup current configuration first
 TIMESTAMP=$(date +%Y%m%d-%H%M%S)
-mkdir -p "/workspaces/orchestra-main/.devcontainer/backups/${TIMESTAMP}-pre-restore"
-cp /workspaces/orchestra-main/.devcontainer/Dockerfile "/workspaces/orchestra-main/.devcontainer/backups/${TIMESTAMP}-pre-restore/"
-cp /workspaces/orchestra-main/.devcontainer/devcontainer.json "/workspaces/orchestra-main/.devcontainer/backups/${TIMESTAMP}-pre-restore/"
-cp /workspaces/orchestra-main/.devcontainer/setup.sh "/workspaces/orchestra-main/.devcontainer/backups/${TIMESTAMP}-pre-restore/"
+mkdir -p "/workspaces/cherry_ai-main/.devcontainer/backups/${TIMESTAMP}-pre-restore"
+cp /workspaces/cherry_ai-main/.devcontainer/Dockerfile "/workspaces/cherry_ai-main/.devcontainer/backups/${TIMESTAMP}-pre-restore/"
+cp /workspaces/cherry_ai-main/.devcontainer/devcontainer.json "/workspaces/cherry_ai-main/.devcontainer/backups/${TIMESTAMP}-pre-restore/"
+cp /workspaces/cherry_ai-main/.devcontainer/setup.sh "/workspaces/cherry_ai-main/.devcontainer/backups/${TIMESTAMP}-pre-restore/"
 
 # Restore selected backup
-cp "/workspaces/orchestra-main/.devcontainer/backups/${BACKUP_DIR}/Dockerfile" /workspaces/orchestra-main/.devcontainer/
-cp "/workspaces/orchestra-main/.devcontainer/backups/${BACKUP_DIR}/devcontainer.json" /workspaces/orchestra-main/.devcontainer/
-cp "/workspaces/orchestra-main/.devcontainer/backups/${BACKUP_DIR}/setup.sh" /workspaces/orchestra-main/.devcontainer/
+cp "/workspaces/cherry_ai-main/.devcontainer/backups/${BACKUP_DIR}/Dockerfile" /workspaces/cherry_ai-main/.devcontainer/
+cp "/workspaces/cherry_ai-main/.devcontainer/backups/${BACKUP_DIR}/devcontainer.json" /workspaces/cherry_ai-main/.devcontainer/
+cp "/workspaces/cherry_ai-main/.devcontainer/backups/${BACKUP_DIR}/setup.sh" /workspaces/cherry_ai-main/.devcontainer/
 
 echo "Configuration restored from backup: ${BACKUP_DIR}"
 echo "A backup of your previous configuration was saved to: ${TIMESTAMP}-pre-restore"

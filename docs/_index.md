@@ -1,6 +1,6 @@
-# Orchestra Documentation Index
+# cherry_ai Documentation Index
 
-Welcome! Start here to navigate the most relevant, up-to-date documentation for the Orchestra codebase. Each section links to a canonical guide; superseded files have been removed to keep the set concise.
+Welcome! Start here to navigate the most relevant, up-to-date documentation for the cherry_ai codebase. Each section links to a canonical guide; superseded files have been removed to keep the set concise.
 
 ## 1 — Core Overview
 
@@ -25,7 +25,7 @@ Welcome! Start here to navigate the most relevant, up-to-date documentation for 
 - [memory_system_usage_examples.md](memory_system_usage_examples.md)
 - Implementation spec: [README-IMPLEMENTATION.md](../README-IMPLEMENTATION.md)
 
-## 5 — Agents & Orchestration
+## 5 — Agents & coordination
 
 - [agent_infrastructure.md](agent_infrastructure.md)
 - [agent_communication_guide.md](agent_communication_guide.md)

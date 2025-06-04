@@ -1,10 +1,10 @@
-# AI Orchestra MCP Server Implementation
+# AI cherry_ai MCP Server Implementation
 
 **Note:** The MCP components described herein are now integrated as modules within the main application running on a single Vultr server. This documentation requires further updates to fully reflect the simplified single-server architecture.
 
 ## Overview
 
-The Model Context Protocol (MCP) implementation for AI Orchestra provides a comprehensive set of servers that enable Claude and other AI assistants to interact with the project's infrastructure through a standardized protocol.
+The Model Context Protocol (MCP) implementation for AI cherry_ai provides a comprehensive set of servers that enable Claude and other AI assistants to interact with the project's infrastructure through a standardized protocol.
 
 ## Architecture
 
@@ -23,7 +23,7 @@ The Model Context Protocol (MCP) implementation for AI Orchestra provides a comp
     │      MCP Servers              │
     ├───────────────────────────────┤
     │ • Memory MCP       :8003      │
-    │ • Orchestrator MCP :8004      │
+    │ • conductor MCP :8004      │
     └───────────────────────────────┘
 ```
 
@@ -116,7 +116,7 @@ Implements layered memory architecture:
 }
 ```
 
-### 3. Orchestrator MCP Server (Port 8004)
+### 3. conductor MCP Server (Port 8004)
 
 Manages agent modes and workflows:
 
@@ -129,7 +129,7 @@ Manages agent modes and workflows:
 - `switch_mode` – Change operational mode  
 - `execute` – Execute predefined workflows  
 - `execute_task` – Run specific tasks  
-- `get_status` – Get orchestrator status  
+- `get_status` – Get conductor status  
 
 **Available Workflows**
 
@@ -149,7 +149,7 @@ The `.mcp.json` file contains all server configurations:
   },
   "servers": {
     "memory": { ... },
-    "orchestrator": { ... }
+    "conductor": { ... }
   },
   "performance": {
     "caching": { ... },
@@ -259,7 +259,7 @@ Key metrics:
    redis-cli ping
 
    # Test PostgreSQL
-   psql -h localhost -U postgres -d orchestra -c '\q'
+   psql -h localhost -U postgres -d cherry_ai -c '\q'
 
    # Test Weaviate
    curl http://localhost:8080/v1/.well-known/ready
@@ -344,3 +344,9 @@ For issues or questions:
 3. Run integration tests  
 4. Review this documentation  
 5. Review individual server code  
+
+## Docker & Redis Integration
+
+- Docker Compose is the preferred way to run the MCP server stack locally and for development.
+- Redis is required for caching and semantic caching. It is included in the Docker Compose setup.
+- All AI coding context for Cursor AI and other agents should be provided via the MCP servers to ensure consistent, up-to-date project context.

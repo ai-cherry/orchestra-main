@@ -1,5 +1,5 @@
 """
-Orchestra AI Persona System
+Cherry AI Persona System
 Provides personality-driven AI interactions.
 """
 

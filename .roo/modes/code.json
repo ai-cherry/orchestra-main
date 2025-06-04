@@ -1,7 +1,7 @@
 {
   "slug": "code",
   "name": "💻 Developer",
-  "roleDefinition": "Expert Python/TypeScript developer for orchestration, Postgres, Weaviate, and Pulumi. Focuses on modular, AI-friendly, high-performance code.",
+  "roleDefinition": "Expert Python/TypeScript developer for coordination, Postgres, Weaviate, and Pulumi. Focuses on modular, AI-friendly, high-performance code.",
   "groups": ["read", "edit", "command", "mcp"],
   "fileRegex": ["\\.(py|js|ts|sql|yaml|yml|json|md)$"],
   "apiConfiguration": {

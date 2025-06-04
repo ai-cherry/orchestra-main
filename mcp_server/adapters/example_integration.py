@@ -26,7 +26,7 @@ class IntegratedAdapterSystem:
 
         # Initialize MCP servers (mocked for example)
         self.mcp_servers = {
-            "orchestrator": MockMCPServer("orchestrator"),
+            "conductor": MockMCPServer("conductor"),
             "tools": MockMCPServer("tools"),
             "deployment": MockMCPServer("deployment"),
             "memory": MockMCPServer("memory"),
@@ -35,7 +35,7 @@ class IntegratedAdapterSystem:
         # Initialize adapters
         self.adapters = {
             "architect": ArchitectAdapter(
-                self.mcp_servers["orchestrator"],
+                self.mcp_servers["conductor"],
                 self.config.architect.__dict__,
             ),
             "code": CodeAdapter(

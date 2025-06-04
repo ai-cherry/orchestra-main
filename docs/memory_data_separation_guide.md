@@ -124,11 +124,11 @@ service cloud.PostgreSQL
 
       // Services can access data according to their permissions
       allow read: if request.auth.token.role == 'service' &&
-                   request.auth.token.service_name in ['orchestrator', 'memory_service'];
+                   request.auth.token.service_name in ['conductor', 'memory_service'];
 
       // Write permissions are strictly limited to authorized services
       allow write: if request.auth.token.role == 'service' &&
-                   request.auth.token.service_name in ['orchestrator', 'memory_service'] &&
+                   request.auth.token.service_name in ['conductor', 'memory_service'] &&
                    request.auth.token.write_access == true;
     }
 

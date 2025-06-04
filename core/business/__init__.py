@@ -1,1 +1,1 @@
-"""Business logic module for Orchestra AI."""
+"""Business logic module for Cherry AI."""

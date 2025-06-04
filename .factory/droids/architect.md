@@ -11,7 +11,7 @@ The Architect Droid specializes in system design, architecture planning, and int
 - **Performance Optimization**: Suggests architectural improvements for performance
 
 ## Integration with Roo
-- Maps to: `orchestrator_server.py`
+- Maps to: `conductor_server.py`
 - Context sharing: Full system architecture context
 - Fallback: Roo's architect mode handles requests if Factory AI is unavailable
 

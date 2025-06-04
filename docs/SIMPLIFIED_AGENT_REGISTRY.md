@@ -1,6 +1,6 @@
 # Simplified Agent Registry
 
-This document describes the Simplified Agent Registry implementation for the AI Orchestra project, which provides a streamlined approach to agent management without the security overhead of the original implementations.
+This document describes the Simplified Agent Registry implementation for the AI cherry_ai project, which provides a streamlined approach to agent management without the security overhead of the original implementations.
 
 ## Overview
 
@@ -48,7 +48,7 @@ Use the original or enhanced registries when:
 ### Basic Usage
 
 ```python
-from core.orchestrator.src.agents.simplified_agent_registry import (
+from core.conductor.src.agents.simplified_agent_registry import (
     get_simplified_agent_registry,
     register_default_agents,
     AgentCapability
@@ -68,7 +68,7 @@ response = await agent.process("Hello, how can I help you?")
 ### Agent Selection
 
 ```python
-from core.orchestrator.src.agents.agent_base import AgentContext
+from core.conductor.src.agents.agent_base import AgentContext
 
 # Create a context
 context = AgentContext(
@@ -146,9 +146,9 @@ To migrate from the original or enhanced registry to the simplified registry:
 
    ```python
    # From
-   from core.orchestrator.src.agents.agent_registry import get_agent_registry
+   from core.conductor.src.agents.agent_registry import get_agent_registry
    # To
-   from core.orchestrator.src.agents.simplified_agent_registry import get_simplified_agent_registry
+   from core.conductor.src.agents.simplified_agent_registry import get_simplified_agent_registry
    ```
 
 2. Update agent registration:

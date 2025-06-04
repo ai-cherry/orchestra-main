@@ -1,4 +1,4 @@
-"""Vector database module for Orchestra AI"""
+"""Vector database module for Cherry AI"""
 
 from .weaviate_adapter import WeaviateAdapter
 

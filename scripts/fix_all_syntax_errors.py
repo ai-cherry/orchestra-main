@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Comprehensive script to fix all syntax errors in the Orchestra AI codebase
+Comprehensive script to fix all syntax errors in the Cherry AI codebase
 """
 
 import os
@@ -10,16 +10,16 @@ from typing import List, Tuple
 
 class SyntaxFixer:
     def __init__(self):
-        self.base_dir = Path("/root/orchestra-main")
+        self.base_dir = Path("/root/cherry_ai-main")
         self.fixed_files = []
         self.errors_found = []
     
-    def fix_orchestra_system_status(self):
-        """Fix scripts/orchestra_system_status.py"""
-        file_path = self.base_dir / "scripts" / "orchestra_system_status.py"
+    def fix_cherry_ai_system_status(self):
+        """Fix scripts/cherry_ai_system_status.py"""
+        file_path = self.base_dir / "scripts" / "cherry_ai_system_status.py"
         
         content = '''#!/usr/bin/env python3
-"""Orchestra System Status Checker"""
+"""cherry_ai System Status Checker"""
 
 import subprocess
 import json
@@ -103,7 +103,7 @@ def check_weaviate() -> Dict[str, any]:
 
 def main():
     """Main status check function"""
-    print("🔍 Orchestra AI System Status Check")
+    print("🔍 Cherry AI System Status Check")
     print("=" * 50)
     print(f"Timestamp: {datetime.now().isoformat()}")
     print("=" * 50)
@@ -143,7 +143,7 @@ def main():
         "overall_healthy": all_healthy
     }
     
-    status_file = Path("orchestra_status.json")
+    status_file = Path("cherry_ai_status.json")
     with open(status_file, "w") as f:
         json.dump(status_data, f, indent=2)
     
@@ -164,17 +164,17 @@ if __name__ == "__main__":
         
         # Read the current content and fix the syntax issues
         content = '''#!/usr/bin/env python3
-"""Mobile App Integration for Orchestra AI"""
+"""Mobile App Integration for Cherry AI"""
 
 from pathlib import Path
 import json
 
 
 class MobileAppIntegration:
-    """Setup mobile app integration for Orchestra AI"""
+    """Setup mobile app integration for Cherry AI"""
     
     def __init__(self):
-        self.base_dir = Path("/root/orchestra-main")
+        self.base_dir = Path("/root/cherry_ai-main")
         self.mobile_api_created = False
     
     def create_mobile_api(self):
@@ -183,7 +183,8 @@ class MobileAppIntegration:
         mobile_api_content = """
 from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional
+from typing_extensions import Optional, Any
 from datetime import datetime
 import jwt
 
@@ -301,14 +302,14 @@ async def websocket_endpoint(websocket: WebSocket, device_id: str):
         
         # Create Android SDK
         android_sdk_content = """
-package com.orchestra.ai.sdk
+package com.cherry_ai.ai.sdk
 
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import okhttp3.OkHttpClient
 import java.util.concurrent.TimeUnit
 
-class OrchestraAISDK(private val apiKey: String, private val baseUrl: String = "https://cherry-ai.me") {
+class cherry_aiAISDK(private val apiKey: String, private val baseUrl: String = "https://cherry-ai.me") {
     
     private val client = OkHttpClient.Builder()
         .connectTimeout(30, TimeUnit.SECONDS)
@@ -327,7 +328,7 @@ class OrchestraAISDK(private val apiKey: String, private val baseUrl: String = "
         .addConverterFactory(GsonConverterFactory.create())
         .build()
     
-    private val api = retrofit.create(OrchestraAPI::class.java)
+    private val api = retrofit.create(cherry_aiAPI::class.java)
     
     suspend fun search(query: String, mode: String = "normal"): SearchResponse {
         return api.search(SearchRequest(query, mode))
@@ -344,7 +345,7 @@ class OrchestraAISDK(private val apiKey: String, private val baseUrl: String = "
 """
         
         # Save Android SDK
-        android_sdk_path = self.base_dir / "mobile" / "android" / "OrchestraAISDK.kt"
+        android_sdk_path = self.base_dir / "mobile" / "android" / "cherry_aiAISDK.kt"
         android_sdk_path.parent.mkdir(parents=True, exist_ok=True)
         android_sdk_path.write_text(android_sdk_content)
         
@@ -354,7 +355,7 @@ class OrchestraAISDK(private val apiKey: String, private val baseUrl: String = "
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Orchestra AI Analytics Dashboard</title>
+    <title>Cherry AI Analytics Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
@@ -397,7 +398,7 @@ class OrchestraAISDK(private val apiKey: String, private val baseUrl: String = "
 </head>
 <body>
     <div class="dashboard">
-        <h1>Orchestra AI Analytics Dashboard</h1>
+        <h1>Cherry AI Analytics Dashboard</h1>
         
         <div class="metric-grid">
             <div class="metric-card">
@@ -516,12 +517,12 @@ if __name__ == "__main__":
         self.fixed_files.append(str(file_path))
         print(f"✅ Fixed {file_path}")
     
-    def fix_auto_start_orchestra_roo(self):
-        """Fix scripts/auto_start_orchestra_roo.py"""
-        file_path = self.base_dir / "scripts" / "auto_start_orchestra_roo.py"
+    def fix_auto_start_cherry_ai_roo(self):
+        """Fix scripts/auto_start_cherry_ai_roo.py"""
+        file_path = self.base_dir / "scripts" / "auto_start_cherry_ai_roo.py"
         
         content = '''#!/usr/bin/env python3
-"""Auto-start Orchestra AI with Roo integration"""
+"""Auto-start Cherry AI with Roo integration"""
 
 import asyncio
 import subprocess
@@ -529,13 +530,14 @@ import sys
 import time
 from pathlib import Path
 from typing import List, Optional
+from typing_extensions import Optional
 
 
-class OrchestraRooAutoStarter:
-    """Automatically starts and integrates Orchestra AI with Roo."""
+class cherry_aiRooAutoStarter:
+    """Automatically starts and integrates Cherry AI with Roo."""
     
     def __init__(self):
-        self.project_root = Path("/root/orchestra-main")
+        self.project_root = Path("/root/cherry_ai-main")
         self.venv_python = self.project_root / "venv" / "bin" / "python"
         self.services_started = False
         self.integration_enabled = False
@@ -583,22 +585,22 @@ class OrchestraRooAutoStarter:
         self.services_started = True
         return True
     
-    async def enable_orchestra_integration(self):
-        """Enable Orchestra AI integration in Roo"""
-        print("🎭 Enabling Orchestra AI integration...")
+    async def enable_cherry_ai_integration(self):
+        """Enable Cherry AI integration in Roo"""
+        print("🎭 Enabling Cherry AI integration...")
         
-        integration_script = self.project_root / "scripts" / "activate_orchestra_in_roo.py"
+        integration_script = self.project_root / "scripts" / "activate_cherry_ai_in_roo.py"
         
         if not integration_script.exists():
             # Create the integration activation script
             content = """
 import sys
-sys.path.append('/root/orchestra-main')
+sys.path.append('/root/cherry_ai-main')
 
 try:
-    from .roo.integrations.orchestra_ai import initialize_orchestra_integration
-    initialize_orchestra_integration()
-    print("✅ Orchestra AI integration enabled in Roo")
+    from .roo.integrations.cherry_ai_ai import initialize_cherry_ai_integration
+    initialize_cherry_ai_integration()
+    print("✅ Cherry AI integration enabled in Roo")
 except Exception as e:
     print(f"❌ Failed to enable integration: {e}")
 """
@@ -612,7 +614,7 @@ except Exception as e:
         )
         
         if result.returncode == 0:
-            print("✅ Orchestra AI integration enabled")
+            print("✅ Cherry AI integration enabled")
             self.integration_enabled = True
             return True
         else:
@@ -641,7 +643,7 @@ except Exception as e:
     
     async def run(self):
         """Main execution flow"""
-        print("🚀 Orchestra AI Auto-Starter")
+        print("🚀 Cherry AI Auto-Starter")
         print("=" * 50)
         
         # Start Docker services
@@ -650,7 +652,7 @@ except Exception as e:
             return False
         
         # Enable Roo integration
-        if not await self.enable_orchestra_integration():
+        if not await self.enable_cherry_ai_integration():
             print("❌ Failed to enable Roo integration")
             return False
         
@@ -659,7 +661,7 @@ except Exception as e:
             print("❌ System verification failed")
             return False
         
-        print("\n✅ Orchestra AI is ready!")
+        print("\n✅ Cherry AI is ready!")
         print("🌐 Access the UI at: http://localhost:3000")
         print("📚 API docs at: http://localhost:8001/docs")
         print("🎭 Roo integration is active")
@@ -669,7 +671,7 @@ except Exception as e:
 
 async def main():
     """Main entry point"""
-    starter = OrchestraRooAutoStarter()
+    starter = cherry_aiRooAutoStarter()
     success = await starter.run()
     sys.exit(0 if success else 1)
 
@@ -682,57 +684,58 @@ if __name__ == "__main__":
         self.fixed_files.append(str(file_path))
         print(f"✅ Fixed {file_path}")
     
-    def fix_orchestra_ai_integration(self):
-        """Fix .roo/integrations/orchestra_ai.py"""
-        file_path = self.base_dir / ".roo" / "integrations" / "orchestra_ai.py"
+    def fix_cherry_ai_ai_integration(self):
+        """Fix .roo/integrations/cherry_ai_ai.py"""
+        file_path = self.base_dir / ".roo" / "integrations" / "cherry_ai_ai.py"
         
         content = '''#!/usr/bin/env python3
-"""Orchestra AI integration for Roo Coder"""
+"""Cherry AI integration for Roo Coder"""
 
 import logging
 from typing import Dict, Any, Optional
+from typing_extensions import Optional
 
 logger = logging.getLogger(__name__)
 
 # Global integration instance
-_orchestra_integration = None
+_cherry_ai_integration = None
 
 
-def get_orchestra_integration():
-    """Get or create the Orchestra integration instance."""
-    global _orchestra_integration
-    if _orchestra_integration is None:
+def get_cherry_ai_integration():
+    """Get or create the cherry_ai integration instance."""
+    global _cherry_ai_integration
+    if _cherry_ai_integration is None:
         try:
-            from mcp_server.roo.orchestra_integration import OrchestraRooIntegration
-            _orchestra_integration = OrchestraRooIntegration()
-            logger.info("🎭 Orchestra AI integration created")
+            from mcp_server.roo.cherry_ai_integration import cherry_aiRooIntegration
+            _cherry_ai_integration = cherry_aiRooIntegration()
+            logger.info("🎭 Cherry AI integration created")
         except Exception as e:
-            logger.error(f"Failed to create Orchestra integration: {e}")
-            _orchestra_integration = None
+            logger.error(f"Failed to create cherry_ai integration: {e}")
+            _cherry_ai_integration = None
     
-    return _orchestra_integration
+    return _cherry_ai_integration
 
 
 async def _initialize_integration():
-    """Initialize the Orchestra AI integration"""
-    integration = get_orchestra_integration()
+    """Initialize the Cherry AI integration"""
+    integration = get_cherry_ai_integration()
     if integration:
         try:
             await integration.initialize()
-            logger.info("✅ Orchestra AI integration initialized")
+            logger.info("✅ Cherry AI integration initialized")
         except Exception as e:
-            logger.error(f"Failed to initialize Orchestra integration: {e}")
+            logger.error(f"Failed to initialize cherry_ai integration: {e}")
 
 
-class OrchestraEnhancedMode:
-    """Base class for Orchestra-enhanced Roo modes"""
+class cherry_aiEnhancedMode:
+    """Base class for cherry_ai-enhanced Roo modes"""
     
     def __init__(self, mode_name: str):
         self.mode_name = mode_name
-        self.integration = get_orchestra_integration()
+        self.integration = get_cherry_ai_integration()
     
     async def process_request(self, request: str) -> str:
-        """Process request with Orchestra AI enhancement."""
+        """Process request with Cherry AI enhancement."""
         if not self.integration:
             return request
         
@@ -740,18 +743,18 @@ class OrchestraEnhancedMode:
             enhanced = await self.integration.enhance_request(self.mode_name, request)
             return enhanced.get("enhanced_request", request)
         except Exception as e:
-            logger.error(f"Orchestra processing error: {e}")
+            logger.error(f"cherry_ai processing error: {e}")
             return request
 
 
-class CodeModeEnhancement(OrchestraEnhancedMode):
-    """Orchestra enhancement for code mode."""
+class CodeModeEnhancement(cherry_aiEnhancedMode):
+    """cherry_ai enhancement for code mode."""
     
     def __init__(self):
         super().__init__("code")
     
     async def analyze_code(self, code: str, language: str) -> Dict[str, Any]:
-        """Analyze code using Orchestra AI agents"""
+        """Analyze code using Cherry AI agents"""
         if not self.integration:
             return {"analysis": "Integration not available"}
         
@@ -772,14 +775,14 @@ class CodeModeEnhancement(OrchestraEnhancedMode):
         })
 
 
-class ArchitectModeEnhancement(OrchestraEnhancedMode):
-    """Orchestra enhancement for architect mode."""
+class ArchitectModeEnhancement(cherry_aiEnhancedMode):
+    """cherry_ai enhancement for architect mode."""
     
     def __init__(self):
         super().__init__("architect")
     
     async def design_system(self, requirements: str) -> Dict[str, Any]:
-        """Design system architecture using Orchestra AI"""
+        """Design system architecture using Cherry AI"""
         if not self.integration:
             return {"design": "Integration not available"}
         
@@ -789,14 +792,14 @@ class ArchitectModeEnhancement(OrchestraEnhancedMode):
         })
 
 
-class DebugModeEnhancement(OrchestraEnhancedMode):
-    """Orchestra enhancement for debug mode."""
+class DebugModeEnhancement(cherry_aiEnhancedMode):
+    """cherry_ai enhancement for debug mode."""
     
     def __init__(self):
         super().__init__("debug")
     
     async def analyze_error(self, error: str, context: Dict[str, Any]) -> Dict[str, Any]:
-        """Analyze error using Orchestra AI debugging agents"""
+        """Analyze error using Cherry AI debugging agents"""
         if not self.integration:
             return {"analysis": "Integration not available"}
         
@@ -807,8 +810,8 @@ class DebugModeEnhancement(OrchestraEnhancedMode):
         })
 
 
-def initialize_orchestra_integration():
-    """Initialize Orchestra AI integration with Roo"""
+def initialize_cherry_ai_integration():
+    """Initialize Cherry AI integration with Roo"""
     try:
         # Import Roo's hook system if available
         try:
@@ -817,12 +820,12 @@ def initialize_orchestra_integration():
             # Register mode enhancement hooks
             def on_mode_enter(mode_name: str):
                 """Hook called when entering a mode"""
-                integration = get_orchestra_integration()
+                integration = get_cherry_ai_integration()
                 if integration:
-                    logger.info(f"Orchestra AI enhancing {mode_name} mode")
+                    logger.info(f"Cherry AI enhancing {mode_name} mode")
             
             register_hook("mode_enter", on_mode_enter)
-            logger.info("✅ Orchestra hooks registered")
+            logger.info("✅ cherry_ai hooks registered")
         except ImportError:
             logger.warning("Roo hooks not available, running in standalone mode")
         
@@ -832,7 +835,7 @@ def initialize_orchestra_integration():
         
         return True
     except Exception as e:
-        logger.error(f"Failed to initialize Orchestra integration: {e}")
+        logger.error(f"Failed to initialize cherry_ai integration: {e}")
         return False
 
 
@@ -844,8 +847,8 @@ debug_enhancement = DebugModeEnhancement()
 
 # Export public API
 __all__ = [
-    "initialize_orchestra_integration",
-    "get_orchestra_integration",
+    "initialize_cherry_ai_integration",
+    "get_cherry_ai_integration",
     "code_enhancement",
     "architect_enhancement",
     "debug_enhancement"
@@ -854,7 +857,7 @@ __all__ = [
 
 def get_integration_status() -> Dict[str, Any]:
     """Get current integration status"""
-    integration = get_orchestra_integration()
+    integration = get_cherry_ai_integration()
     if integration:
         return {
             "available": True,
@@ -875,10 +878,10 @@ def get_integration_status() -> Dict[str, Any]:
         print("🔧 Starting comprehensive syntax error fixes...")
         print("=" * 50)
         
-        self.fix_orchestra_system_status()
+        self.fix_cherry_ai_system_status()
         self.fix_mobile_app_integration()
-        self.fix_auto_start_orchestra_roo()
-        self.fix_orchestra_ai_integration()
+        self.fix_auto_start_cherry_ai_roo()
+        self.fix_cherry_ai_ai_integration()
         
         print("\n" + "=" * 50)
         print(f"✅ Fixed {len(self.fixed_files)} files:")

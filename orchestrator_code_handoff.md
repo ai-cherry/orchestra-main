@@ -1,15 +1,15 @@
- # Code Agent Handoff: Orchestrator Landing Page Implementation
+ # Code Agent Handoff: conductor Landing Page Implementation
 
 ## Overview
-Implement the Orchestrator Landing Page based on the comprehensive architecture designed by the architect agent. This is a high-priority implementation that will serve as the primary entry point for the orchestration system.
+Implement the conductor Landing Page based on the comprehensive architecture designed by the architect agent. This is a high-priority implementation that will serve as the primary entry point for the coordination system.
 
 ## Architecture Documents
 Please review these documents created by the architect:
-- `orchestrator_landing_architecture.md` - Core architecture and patterns
-- `orchestrator_component_specifications.md` - Detailed component specs
-- `orchestrator_api_integration.md` - API contracts and WebSocket design
-- `orchestrator_implementation_guide.md` - Step-by-step implementation
-- `orchestrator_architecture_summary.md` - Executive summary
+- `conductor_landing_architecture.md` - Core architecture and patterns
+- `conductor_component_specifications.md` - Detailed component specs
+- `conductor_api_integration.md` - API contracts and WebSocket design
+- `conductor_implementation_guide.md` - Step-by-step implementation
+- `conductor_architecture_summary.md` - Executive summary
 
 ## Implementation Priority Order
 
@@ -17,7 +17,7 @@ Please review these documents created by the architect:
 1. **Create Landing Page Route**
    - Add route to `admin-ui/src/routes.tsx`
    - Update navigation in `Sidebar.tsx`
-   - Create `OrchestratorLandingPage.tsx`
+   - Create `conductorLandingPage.tsx`
 
 2. **Implement Base Layout**
    - Dark theme with #181111 background
@@ -37,8 +37,8 @@ Please review these documents created by the architect:
 ### Phase 2: State Management (Day 1-2)
 1. **Create Zustand Store**
    ```typescript
-   // admin-ui/src/store/orchestratorStore.ts
-   interface OrchestratorStore {
+   // admin-ui/src/store/conductorStore.ts
+   interface conductorStore {
      // Search state
      searchQuery: string;
      searchMode: 'creative' | 'deep' | 'super_deep';
@@ -91,14 +91,14 @@ Please review these documents created by the architect:
 ### Phase 4: API Integration (Day 3-4)
 1. **Create API Client**
    ```typescript
-   // admin-ui/src/services/orchestratorService.ts
-   export const orchestratorService = {
-     search: (query: SearchRequest) => api.post('/orchestrator/search', query),
-     getSuggestions: (context: SearchContext) => api.get('/orchestrator/suggestions'),
-     transcribeAudio: (audio: Blob) => api.post('/orchestrator/voice/transcribe', audio),
-     synthesizeSpeech: (text: string, voice: string) => api.post('/orchestrator/voice/synthesize', { text, voice }),
-     uploadFile: (file: File) => api.post('/orchestrator/files/upload', file),
-     getFileStatus: (id: string) => api.get(`/orchestrator/files/${id}/status`),
+   // admin-ui/src/services/conductorService.ts
+   export const conductorService = {
+     search: (query: SearchRequest) => api.post('/conductor/search', query),
+     getSuggestions: (context: SearchContext) => api.get('/conductor/suggestions'),
+     transcribeAudio: (audio: Blob) => api.post('/conductor/voice/transcribe', audio),
+     synthesizeSpeech: (text: string, voice: string) => api.post('/conductor/voice/synthesize', { text, voice }),
+     uploadFile: (file: File) => api.post('/conductor/files/upload', file),
+     getFileStatus: (id: string) => api.get(`/conductor/files/${id}/status`),
    };
    ```
 
@@ -133,9 +133,9 @@ Please review these documents created by the architect:
 ```
 admin-ui/src/
 ├── pages/
-│   └── OrchestratorLandingPage.tsx
+│   └── conductorLandingPage.tsx
 ├── components/
-│   └── orchestrator/
+│   └── conductor/
 │       ├── SearchInterface/
 │       │   ├── index.tsx
 │       │   ├── SearchInput.tsx
@@ -153,14 +153,14 @@ admin-ui/src/
 │           ├── SuggestionsPanel.tsx
 │           └── SuggestionChip.tsx
 ├── hooks/
-│   ├── useOrchestratorSearch.ts
+│   ├── useconductorSearch.ts
 │   ├── useVoiceRecording.ts
 │   └── useFileUpload.ts
 ├── services/
-│   ├── orchestratorService.ts
+│   ├── conductorService.ts
 │   └── websocketManager.ts
 └── store/
-    └── orchestratorStore.ts
+    └── conductorStore.ts
 ```
 
 ## Styling Guidelines
@@ -205,7 +205,7 @@ admin-ui/src/
 ```typescript
 // Use MSW (Mock Service Worker) for development
 const handlers = [
-  rest.post('/api/orchestrator/search', (req, res, ctx) => {
+  rest.post('/api/conductor/search', (req, res, ctx) => {
     return res(ctx.json({ results: [], suggestions: ['Example suggestion'] }));
   }),
   // ... other endpoints

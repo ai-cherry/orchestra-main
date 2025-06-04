@@ -114,7 +114,7 @@
 class CacheManager:
     """
     """
-    def __init__(self, dsn: str, prefix: str = "orchestra"):
+    def __init__(self, dsn: str, prefix: str = "cherry_ai"):
         """
         """
     async def get_cache(self, name: str = "default", **kwargs) -> PostgreSQLCache:

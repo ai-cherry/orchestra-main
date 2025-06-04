@@ -2,7 +2,7 @@
 
 ## Quick Start
 
-This guide provides step-by-step instructions for implementing the comprehensive version management system for the Orchestra platform.
+This guide provides step-by-step instructions for implementing the comprehensive version management system for the cherry_ai platform.
 
 ## Phase 1: Immediate Stabilization (Week 1)
 
@@ -11,7 +11,7 @@ This guide provides step-by-step instructions for implementing the comprehensive
 #### Step 1: Python Dependencies
 ```bash
 # Create a unified requirements lock file
-cd /root/orchestra-main
+cd /root/cherry_ai-main
 
 # Install pip-tools if not present
 pip install pip-tools
@@ -67,7 +67,7 @@ node scripts/lock-versions.js
 ```yaml
 # Create .versions.yaml at project root
 cat > .versions.yaml << 'EOF'
-# Orchestra Platform Version Registry
+# cherry_ai Platform Version Registry
 # Generated: 2025-01-06
 # Schema Version: 1.0.0
 

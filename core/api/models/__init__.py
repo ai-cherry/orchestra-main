@@ -1,1 +1,1 @@
-"""API models module for Orchestra AI."""
+"""API models module for Cherry AI."""

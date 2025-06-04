@@ -314,7 +314,7 @@ class WorkflowTask:
                         logger.warning(f"Circuit breaker {key} is open")
                 
                 # Log metrics
-                logger.info(f"Orchestrator metrics: {self.metrics}")
+                logger.info(f"conductor metrics: {self.metrics}")
                 
             except Exception:
 
@@ -371,10 +371,10 @@ class WorkflowTask:
         logger.info(f"Cancelled workflow {workflow_id}")
 
 # Singleton instance
-_orchestrator_instance: Optional[AgentOrchestrator] = None
+_conductor_instance: Optional[Agentconductor] = None
 
-def get_agent_orchestrator() -> AgentOrchestrator:
-    """Get or create the singleton orchestrator instance"""
+def get_agent_conductor() -> Agentconductor:
+    """Get or create the singleton conductor instance"""
     """Create a comprehensive search workflow using multiple agents"""
             "id": "personal_search",
             "agent_type": "personal",
@@ -412,7 +412,7 @@ def get_agent_orchestrator() -> AgentOrchestrator:
         "dependencies": ["personal_search"] + (["medical_search"] if include_medical else [])
     })
     
-    workflow = await orchestrator.create_workflow(
+    workflow = await conductor.create_workflow(
         name=f"Comprehensive Search: {search_query[:50]}",
         tasks=tasks,
         context={"user_id": user_id, "original_query": search_query}

@@ -1,9 +1,9 @@
 #!/bin/bash
-# Deploy Comprehensive AI Orchestrator to Vultr
+# Deploy Comprehensive AI conductor to Vultr
 
 set -e
 
-echo "🚀 Deploying Comprehensive AI Orchestrator to Vultr"
+echo "🚀 Deploying Comprehensive AI conductor to Vultr"
 echo "=================================================="
 
 # Check prerequisites
@@ -73,7 +73,7 @@ deploy_infrastructure() {
     
     # Create new __main__.py that imports our comprehensive deployment
     cat > __main__.py << 'EOF'
-"""Orchestra AI Comprehensive Infrastructure Deployment"""
+"""Cherry AI Comprehensive Infrastructure Deployment"""
 
 import os
 import sys
@@ -108,7 +108,7 @@ deploy_application() {
     echo "📦 Deploying application code..."
     
     # Create deployment package
-    tar -czf orchestrator-deploy.tar.gz \
+    tar -czf conductor-deploy.tar.gz \
         ai_components \
         scripts \
         requirements.txt \
@@ -118,25 +118,25 @@ deploy_application() {
     
     # Copy to master server
     echo "Copying code to master server..."
-    scp -o StrictHostKeyChecking=no orchestrator-deploy.tar.gz root@$MASTER_IP:/opt/
+    scp -o StrictHostKeyChecking=no conductor-deploy.tar.gz root@$MASTER_IP:/opt/
     
     # Deploy on master
     ssh -o StrictHostKeyChecking=no root@$MASTER_IP << 'ENDSSH'
 cd /opt
-tar -xzf orchestrator-deploy.tar.gz
-rm orchestrator-deploy.tar.gz
+tar -xzf conductor-deploy.tar.gz
+rm conductor-deploy.tar.gz
 
 # Install dependencies
 pip3 install -r requirements.txt
 
-# Start comprehensive orchestrator
-systemctl stop ai-orchestrator 2>/dev/null || true
-systemctl stop orchestrator-mcp 2>/dev/null || true
+# Start comprehensive conductor
+systemctl stop ai-conductor 2>/dev/null || true
+systemctl stop conductor-mcp 2>/dev/null || true
 
 # Update systemd service
-cat > /etc/systemd/system/comprehensive-orchestrator.service << 'EOF'
+cat > /etc/systemd/system/comprehensive-conductor.service << 'EOF'
 [Unit]
-Description=Comprehensive AI Orchestrator
+Description=Comprehensive AI conductor
 After=network.target
 
 [Service]
@@ -144,7 +144,7 @@ Type=simple
 User=root
 WorkingDirectory=/opt
 Environment="PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-ExecStart=/usr/bin/python3 /opt/ai_components/orchestration/comprehensive_orchestrator.py
+ExecStart=/usr/bin/python3 /opt/ai_components/coordination/comprehensive_conductor.py
 Restart=always
 RestartSec=10
 
@@ -153,20 +153,20 @@ WantedBy=multi-user.target
 EOF
 
 systemctl daemon-reload
-systemctl enable comprehensive-orchestrator
-systemctl start comprehensive-orchestrator
+systemctl enable comprehensive-conductor
+systemctl start comprehensive-conductor
 
 echo "✅ Application deployed and started"
 ENDSSH
     
     # Clean up
-    rm -f orchestrator-deploy.tar.gz
+    rm -f conductor-deploy.tar.gz
 }
 
 # Configure DNS (optional)
 configure_dns() {
-    if [ ! -z "$ORCHESTRATOR_DOMAIN" ]; then
-        echo "🌐 Configuring DNS for $ORCHESTRATOR_DOMAIN..."
+    if [ ! -z "$CONDUCTOR_DOMAIN" ]; then
+        echo "🌐 Configuring DNS for $CONDUCTOR_DOMAIN..."
         
         # This would typically use Vultr DNS API or your DNS provider
         echo "   Please configure your DNS to point to:"
@@ -200,10 +200,10 @@ main() {
     echo ""
     echo "🔧 Management:"
     echo "   SSH to master: ssh root@$MASTER_IP"
-    echo "   Check status: ssh root@$MASTER_IP 'systemctl status comprehensive-orchestrator'"
-    echo "   View logs: ssh root@$MASTER_IP 'journalctl -u comprehensive-orchestrator -f'"
+    echo "   Check status: ssh root@$MASTER_IP 'systemctl status comprehensive-conductor'"
+    echo "   View logs: ssh root@$MASTER_IP 'journalctl -u comprehensive-conductor -f'"
     echo ""
-    echo "⚡ The orchestrator will automatically:"
+    echo "⚡ The conductor will automatically:"
     echo "   - Monitor coding activities"
     echo "   - Coordinate AI agents (Roo, Factory AI)"
     echo "   - Scale infrastructure based on load"

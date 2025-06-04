@@ -4,7 +4,7 @@
         """Initialize PostgreSQL client with connection pool."""
         self.host = host or os.getenv("POSTGRES_HOST", "localhost")
         self.port = port or int(os.getenv("POSTGRES_PORT", "5432"))
-        self.database = database or os.getenv("POSTGRES_DB", "orchestra")
+        self.database = database or os.getenv("POSTGRES_DB", "cherry_ai")
         self.user = user or os.getenv("POSTGRES_USER", "postgres")
         self.password = password or os.getenv("POSTGRES_PASSWORD", "")
 
@@ -25,8 +25,8 @@
         )
 
     def _ensure_schema(self) -> None:
-        """Ensure orchestra schema exists."""
-                cur.execute("CREATE SCHEMA IF NOT EXISTS orchestra")
+        """Ensure cherry_ai schema exists."""
+                cur.execute("CREATE SCHEMA IF NOT EXISTS cherry_ai")
                 conn.commit()
 
     @contextmanager
@@ -47,7 +47,7 @@
 
     def get_agent(self, agent_id: Union[str, UUID]) -> Optional[Dict[str, Any]]:
         """Get agent by ID."""
-        query = "SELECT * FROM orchestra.agents WHERE id = %s"
+        query = "SELECT * FROM cherry_ai.agents WHERE id = %s"
 
         with self.get_connection() as conn:
             with conn.cursor() as cur:
@@ -86,7 +86,7 @@
 
     def delete_agent(self, agent_id: Union[str, UUID]) -> bool:
         """Delete agent."""
-        query = "DELETE FROM orchestra.agents WHERE id = %s"
+        query = "DELETE FROM cherry_ai.agents WHERE id = %s"
 
         with self.get_connection() as conn:
             with conn.cursor() as cur:
@@ -109,7 +109,7 @@
 
     def get_workflow(self, workflow_id: Union[str, UUID]) -> Optional[Dict[str, Any]]:
         """Get workflow by ID."""
-        query = "SELECT * FROM orchestra.workflows WHERE id = %s"
+        query = "SELECT * FROM cherry_ai.workflows WHERE id = %s"
 
         with self.get_connection() as conn:
             with conn.cursor() as cur:
@@ -181,7 +181,7 @@
         query = """
         """
         """Delete session."""
-        query = "DELETE FROM orchestra.sessions WHERE id = %s"
+        query = "DELETE FROM cherry_ai.sessions WHERE id = %s"
 
         with self.get_connection() as conn:
             with conn.cursor() as cur:
@@ -191,7 +191,7 @@
 
     def cleanup_expired_sessions(self) -> int:
         """Clean up expired sessions."""
-        query = "DELETE FROM orchestra.sessions WHERE expires_at < CURRENT_TIMESTAMP"
+        query = "DELETE FROM cherry_ai.sessions WHERE expires_at < CURRENT_TIMESTAMP"
 
         with self.get_connection() as conn:
             with conn.cursor() as cur:

@@ -1,6 +1,6 @@
 # Error Handling Strategy
 
-This document outlines the comprehensive error handling strategy implemented in AI-Cherry, building on the resilience improvements from the Orchestra system.
+This document outlines the comprehensive error handling strategy implemented in AI-Cherry, building on the resilience improvements from the cherry_ai system.
 
 ## Design Philosophy
 

@@ -1,22 +1,22 @@
 #!/usr/bin/env python3
-# Auto-generated Orchestra AI integration hook for Roo
+# Auto-generated Cherry AI integration hook for Roo
 
 import os
 import sys
 from pathlib import Path
 
-# Add Orchestra AI to Python path
-orchestra_path = Path(__file__).parent.parent.parent
-sys.path.insert(0, str(orchestra_path))
+# Add Cherry AI to Python path
+cherry_ai_path = Path(__file__).parent.parent.parent
+sys.path.insert(0, str(cherry_ai_path))
 
-# Import and initialize Orchestra integration
+# Import and initialize cherry_ai integration
 try:
-    from mcp_server.roo.orchestra_integration import orchestra_roo
-    print("🎭 Orchestra AI integration loaded for Roo")
+    from mcp_server.roo.cherry_ai_integration import cherry_ai_roo
+    print("🎭 Cherry AI integration loaded for Roo")
     
     # Make it available globally
     import builtins
-    builtins.orchestra_ai = orchestra_roo
+    builtins.cherry_ai_ai = cherry_ai_roo
     
 except Exception as e:
-    print(f"Warning: Could not load Orchestra AI integration: {e}")
+    print(f"Warning: Could not load Cherry AI integration: {e}")

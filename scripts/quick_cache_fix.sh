@@ -1,10 +1,10 @@
 #!/bin/bash
 # Quick script to fix cache issues on Vultr
 
-echo "🔧 Fixing Orchestra Admin cache issues..."
+echo "🔧 Fixing cherry_ai Admin cache issues..."
 
 # Update code
-cd /root/orchestra-main
+cd /root/cherry_ai-main
 git pull
 
 # Build with cache busting
@@ -12,7 +12,7 @@ cd admin-ui
 npm run build
 
 # Deploy new nginx config
-sudo cp /root/orchestra-main/scripts/nginx_orchestra_admin_nocache.conf /etc/nginx/sites-available/orchestra
+sudo cp /root/cherry_ai-main/scripts/nginx_cherry_ai_admin_nocache.conf /etc/nginx/sites-available/cherry_ai
 
 # Test nginx
 if sudo nginx -t; then
@@ -24,8 +24,8 @@ else
 fi
 
 # Deploy fresh build
-sudo rm -rf /var/www/orchestra-admin/*
-sudo cp -r dist/* /var/www/orchestra-admin/
+sudo rm -rf /var/www/cherry_ai-admin/*
+sudo cp -r dist/* /var/www/cherry_ai-admin/
 
 echo "✅ Cache fix applied! Test at https://cherry-ai.me"
 echo "🔒 Use incognito/private window to verify"

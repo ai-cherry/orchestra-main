@@ -141,7 +141,7 @@ vector_search("error handling patterns", "code_examples")
 
 **Examples**:
 ```python
-run_script("orchestra_status.py")
+run_script("cherry_ai_status.py")
 run_script("ai_code_reviewer.py", ["--check-file", "main.py"])
 ```
 

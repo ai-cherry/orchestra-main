@@ -16,7 +16,7 @@ class IntentCategory(Enum):
 @dataclass
 class Intent:
     """Parsed intent from natural language"""
-    """Main NLP processor for Orchestra AI"""
+    """Main NLP processor for Cherry AI"""
             "personal": {"focus": "individual productivity", "tone": "casual"},
             "payready": {"focus": "business operations", "tone": "professional"},
             "paragonrx": {"focus": "healthcare/pharmacy", "tone": "clinical"},

@@ -98,8 +98,8 @@ async def test_create_secret():
 
 @test("Switch Mode")
 async def test_switch_mode():
-    """Test switching orchestrator mode"""
-            "server": "orchestrator",
+    """Test switching conductor mode"""
+            "server": "conductor",
             "action": "switch_mode",
             "params": {"mode": "performance", "context": {"test": True}},
         }
@@ -113,7 +113,7 @@ async def test_switch_mode():
 @test("Run Workflow")
 async def test_run_workflow():
     """Test running a workflow"""
-            "server": "orchestrator",
+            "server": "conductor",
             "action": "run_workflow",
             "params": {"name": "code_review", "params": {"test": True}},
         }
@@ -124,10 +124,10 @@ async def test_run_workflow():
 
         return f"Started workflow: {data['workflow_id']}"
 
-@test("Get Orchestrator Status")
-async def test_orchestrator_status():
-    """Test getting orchestrator status"""
-            "server": "orchestrator",
+@test("Get conductor Status")
+async def test_conductor_status():
+    """Test getting conductor status"""
+            "server": "conductor",
             "action": "get_status",
             "params": {"include_workflows": True, "include_tasks": True},
         }

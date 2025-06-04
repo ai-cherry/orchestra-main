@@ -31,7 +31,7 @@
             """
                 """
             """
-            for table in ["sessions.sessions", "orchestra.agents", "orchestra.workflows"]:
+            for table in ["sessions.sessions", "cherry_ai.agents", "cherry_ai.workflows"]:
                 table_name = table.split(".")[-1]
                 await conn.execute(
                     f"""
@@ -167,7 +167,7 @@
 
     async def agent_get(self, agent_id: Union[str, uuid.UUID]) -> Optional[Dict[str, Any]]:
         """Get agent by ID."""
-            "SELECT * FROM orchestra.agents WHERE id = $1",
+            "SELECT * FROM cherry_ai.agents WHERE id = $1",
             agent_id if isinstance(agent_id, uuid.UUID) else uuid.UUID(agent_id),
         )
 
@@ -195,7 +195,7 @@
                 """
             """
         """Delete an agent."""
-            "DELETE FROM orchestra.agents WHERE id = $1",
+            "DELETE FROM cherry_ai.agents WHERE id = $1",
             agent_id if isinstance(agent_id, uuid.UUID) else uuid.UUID(agent_id),
         )
 
@@ -217,7 +217,7 @@
 
     async def workflow_get(self, workflow_id: Union[str, uuid.UUID]) -> Optional[Dict[str, Any]]:
         """Get workflow by ID."""
-            "SELECT * FROM orchestra.workflows WHERE id = $1",
+            "SELECT * FROM cherry_ai.workflows WHERE id = $1",
             workflow_id if isinstance(workflow_id, uuid.UUID) else uuid.UUID(workflow_id),
         )
 
@@ -273,9 +273,9 @@
         """Comprehensive health check."""
             "cache.entries",
             "sessions.sessions",
-            "orchestra.agents",
-            "orchestra.workflows",
-            "orchestra.audit_logs",
+            "cherry_ai.agents",
+            "cherry_ai.workflows",
+            "cherry_ai.audit_logs",
         ]:
             count = await self._manager.fetchval(f"SELECT COUNT(*) FROM {schema_table}")
             table_stats[schema_table] = count

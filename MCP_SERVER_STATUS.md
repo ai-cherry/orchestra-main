@@ -19,28 +19,28 @@
 Created and tested the following functions:
 - `get_all_agents()` - Returns list of available agents
 - `run_agent_task()` - Executes tasks on specific agents
-- `run_workflow()` - Runs orchestration workflows
+- `run_workflow()` - Runs coordination workflows
 
 ### 4. ✅ Test Script Created
-- Created `mcp_server/test_orchestrator.py` to verify functionality
+- Created `mcp_server/test_conductor.py` to verify functionality
 - All functions tested and working correctly
 - Test output shows successful execution
 
 ## Current MCP Server Capabilities
 
-The orchestrator MCP server now provides these tools:
+The conductor MCP server now provides these tools:
 1. **list_agents** - List all available agents
 2. **run_agent** - Run a specific agent with a task
-3. **switch_mode** - Switch orchestrator mode (autonomous/guided/assistant)
-4. **run_workflow** - Run an orchestration workflow
+3. **switch_mode** - Switch conductor mode (autonomous/guided/assistant)
+4. **run_workflow** - Run an coordination workflow
 5. **get_agent_status** - Get status and metrics for a specific agent
 
 ## How to Use
 
 ### For Testing:
 ```bash
-cd /root/orchestra-main/mcp_server
-python test_orchestrator.py
+cd /root/cherry_ai-main/mcp_server
+python test_conductor.py
 ```
 
 ### For Roo Integration:

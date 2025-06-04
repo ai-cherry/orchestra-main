@@ -4,7 +4,7 @@
     """Interface for retrieving secrets from environment variables or local files."""
         """
         """
-        self.project_id = project_id or os.environ.get("PROJECT_ID") or "orchestra-local"
+        self.project_id = project_id or os.environ.get("PROJECT_ID") or "cherry_ai-local"
         self.local_fallback_path = local_fallback_path
         self.cache_ttl_seconds = cache_ttl_seconds
         self._local_secrets: Dict[str, str] = {}

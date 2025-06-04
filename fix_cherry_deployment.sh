@@ -25,7 +25,7 @@ check_success() {
 
 # 1. Build the latest frontend
 echo -e "\n${YELLOW}Step 1: Building latest frontend...${NC}"
-cd /root/orchestra-main/admin-ui
+cd /root/cherry_ai-main/admin-ui
 
 # Install dependencies if needed
 if [ ! -d "node_modules" ]; then
@@ -74,7 +74,7 @@ sudo rm -rf "$NGINX_ROOT"/*
 check_success "Clear old files"
 
 echo "Copying new frontend build..."
-sudo cp -r /root/orchestra-main/admin-ui/dist/* "$NGINX_ROOT/"
+sudo cp -r /root/cherry_ai-main/admin-ui/dist/* "$NGINX_ROOT/"
 check_success "Deploy new frontend"
 
 # Set proper permissions
@@ -85,8 +85,8 @@ sudo chmod -R 755 "$NGINX_ROOT"
 echo -e "\n${YELLOW}Step 4: Setting up backend environment...${NC}"
 
 # Create environment file
-cat > /etc/orchestra.env << 'EOF'
-# Orchestra AI Backend Environment Configuration
+cat > /etc/cherry_ai.env << 'EOF'
+# Cherry AI Backend Environment Configuration
 ENVIRONMENT=production
 
 # Security
@@ -96,10 +96,10 @@ ACCESS_TOKEN_EXPIRE_MINUTES=720
 # Admin credentials
 ADMIN_USERNAME=admin
 ADMIN_PASSWORD=OrchAI_Admin2024!
-ADMIN_EMAIL=admin@orchestra.ai
+ADMIN_EMAIL=admin@cherry_ai.ai
 
 # Database (if using PostgreSQL)
-DATABASE_URL=postgresql://orchestra:orchestra@localhost/orchestra
+DATABASE_URL=postgresql://cherry_ai:cherry_ai@localhost/cherry_ai
 
 # Redis (if using)
 REDIS_URL=redis://localhost:6379
@@ -122,7 +122,7 @@ check_success "Environment file creation"
 
 # 5. Create Python virtual environment if it doesn't exist
 echo -e "\n${YELLOW}Step 5: Setting up Python environment...${NC}"
-cd /root/orchestra-main
+cd /root/cherry_ai-main
 
 if [ ! -d "venv" ]; then
     echo "Creating Python virtual environment..."
@@ -139,17 +139,17 @@ check_success "Python dependencies installation"
 # 6. Create systemd service for backend
 echo -e "\n${YELLOW}Step 6: Creating systemd service for backend...${NC}"
 
-cat > /etc/systemd/system/orchestra-backend.service << 'EOF'
+cat > /etc/systemd/system/cherry_ai-backend.service << 'EOF'
 [Unit]
-Description=Orchestra AI Backend (FastAPI)
+Description=Cherry AI Backend (FastAPI)
 After=network.target
 
 [Service]
 Type=simple
 User=root
-WorkingDirectory=/root/orchestra-main
-EnvironmentFile=/etc/orchestra.env
-ExecStart=/root/orchestra-main/venv/bin/python -m uvicorn agent.app.main:app --host 0.0.0.0 --port 8000 --workers 2
+WorkingDirectory=/root/cherry_ai-main
+EnvironmentFile=/etc/cherry_ai.env
+ExecStart=/root/cherry_ai-main/venv/bin/python -m uvicorn agent.app.main:app --host 0.0.0.0 --port 8000 --workers 2
 Restart=always
 RestartSec=10
 StandardOutput=journal
@@ -260,8 +260,8 @@ echo -e "\n${YELLOW}Step 8: Starting services...${NC}"
 sudo systemctl daemon-reload
 
 # Enable and start backend
-sudo systemctl enable orchestra-backend
-sudo systemctl restart orchestra-backend
+sudo systemctl enable cherry_ai-backend
+sudo systemctl restart cherry_ai-backend
 check_success "Backend service start"
 
 # Restart nginx
@@ -279,11 +279,11 @@ echo "3. Wait 2-3 minutes for propagation"
 echo -e "\n${YELLOW}Step 10: Checking service status...${NC}"
 
 # Check backend status
-if systemctl is-active --quiet orchestra-backend; then
+if systemctl is-active --quiet cherry_ai-backend; then
     echo -e "${GREEN}✓ Backend is running${NC}"
 else
     echo -e "${RED}✗ Backend is not running${NC}"
-    echo "Check logs with: journalctl -u orchestra-backend -f"
+    echo "Check logs with: journalctl -u cherry_ai-backend -f"
 fi
 
 # Check nginx status
@@ -317,9 +317,9 @@ echo "   - Clear CDN cache if using one"
 echo "   - Check nginx error logs: sudo tail -f /var/log/nginx/error.log"
 echo ""
 echo "📊 Monitoring commands:"
-echo "- Backend logs: journalctl -u orchestra-backend -f"
-echo "- Backend status: systemctl status orchestra-backend"
+echo "- Backend logs: journalctl -u cherry_ai-backend -f"
+echo "- Backend status: systemctl status cherry_ai-backend"
 echo "- Nginx logs: tail -f /var/log/nginx/access.log"
 echo ""
-echo "⚠️  IMPORTANT: Add your LLM API keys to /etc/orchestra.env"
-echo "   Then restart the backend: systemctl restart orchestra-backend"
+echo "⚠️  IMPORTANT: Add your LLM API keys to /etc/cherry_ai.env"
+echo "   Then restart the backend: systemctl restart cherry_ai-backend"

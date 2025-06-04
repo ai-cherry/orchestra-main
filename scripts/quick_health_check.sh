@@ -3,7 +3,7 @@
 
 set -euo pipefail
 
-PROJECT_ROOT="${PROJECT_ROOT:-/root/orchestra-main}"
+PROJECT_ROOT="${PROJECT_ROOT:-/root/cherry_ai-main}"
 LOG_FILE="$PROJECT_ROOT/logs/quick_health.log"
 
 # Ensure log directory exists

@@ -1,13 +1,13 @@
 #!/bin/bash
-# Start Comprehensive AI Orchestrator on Cloud Instance
+# Start Comprehensive AI conductor on Cloud Instance
 
 set -e
 
-echo "🚀 Starting AI Orchestrator on Cloud Instance"
+echo "🚀 Starting AI conductor on Cloud Instance"
 echo "==========================================="
 
 # Ensure we're in the right directory
-cd /root/orchestra-main
+cd /root/cherry_ai-main
 
 # Check if .env exists
 if [ ! -f ".env" ]; then
@@ -60,36 +60,36 @@ fi
 # Create logs directory
 mkdir -p logs
 
-# Stop any existing orchestrator
-if [ -f "orchestrator.pid" ]; then
-    OLD_PID=$(cat orchestrator.pid)
+# Stop any existing conductor
+if [ -f "conductor.pid" ]; then
+    OLD_PID=$(cat conductor.pid)
     if ps -p $OLD_PID > /dev/null 2>&1; then
-        echo "Stopping existing orchestrator..."
+        echo "Stopping existing conductor..."
         kill $OLD_PID 2>/dev/null || true
         sleep 2
     fi
 fi
 
-# Start the comprehensive orchestrator
-echo "🎯 Starting Comprehensive Orchestrator..."
-nohup python3 -u ai_components/orchestration/comprehensive_orchestrator.py \
-    > logs/orchestrator.log 2>&1 &
+# Start the comprehensive conductor
+echo "🎯 Starting Comprehensive conductor..."
+nohup python3 -u ai_components/coordination/comprehensive_conductor.py \
+    > logs/conductor.log 2>&1 &
 
-ORCHESTRATOR_PID=$!
-echo $ORCHESTRATOR_PID > orchestrator.pid
+CONDUCTOR_PID=$!
+echo $CONDUCTOR_PID > conductor.pid
 
 # Wait for startup
 sleep 5
 
 # Check if running
-if ps -p $ORCHESTRATOR_PID > /dev/null; then
-    echo "✅ Orchestrator started successfully!"
+if ps -p $CONDUCTOR_PID > /dev/null; then
+    echo "✅ conductor started successfully!"
     
-    # Start the existing AI orchestrator CLI for interaction
+    # Start the existing AI conductor CLI for interaction
     echo ""
     echo "🤖 Starting AI Assistant Interface..."
     echo "===================================="
-    echo "You can now interact with the AI orchestrator."
+    echo "You can now interact with the AI conductor."
     echo "It will monitor your coding activities and provide assistance."
     echo ""
     echo "Available commands:"
@@ -99,9 +99,9 @@ if ps -p $ORCHESTRATOR_PID > /dev/null; then
     echo ""
     
     # Run the enhanced CLI
-    python3 ai_components/orchestrator_cli_enhanced.py
+    python3 ai_components/conductor_cli_enhanced.py
 else
-    echo "❌ Failed to start orchestrator"
-    echo "Check logs/orchestrator.log for details"
+    echo "❌ Failed to start conductor"
+    echo "Check logs/conductor.log for details"
     exit 1
 fi

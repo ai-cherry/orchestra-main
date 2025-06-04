@@ -4,17 +4,17 @@
 region = config.require("vultr:region")
 
 # Create a VPC
-vpc = vultr.Vpc("orchestra-vpc",
+vpc = vultr.Vpc("cherry_ai-vpc",
     region=region,
-    description=f"Orchestra AI VPC - {environment}",
+    description=f"Cherry AI VPC - {environment}",
     v4_subnet="10.0.0.0",
     v4_subnet_mask=24
 )
 
 # Create a Kubernetes cluster
-k8s_cluster = vultr.Kubernetes("orchestra-k8s",
+k8s_cluster = vultr.Kubernetes("cherry_ai-k8s",
     region=region,
-    label=f"orchestra-{environment}",
+    label=f"cherry_ai-{environment}",
     version="v1.28.2",
     node_pools=[{
         "node_quantity": 3,
@@ -27,12 +27,12 @@ k8s_cluster = vultr.Kubernetes("orchestra-k8s",
 )
 
 # Create PostgreSQL database
-postgres = vultr.Database("orchestra-postgres",
+postgres = vultr.Database("cherry_ai-postgres",
     database_engine="pg",
     database_engine_version="15",
     region=region,
     plan="vultr-dbaas-startup-cc-1-55-2",
-    label=f"orchestra-postgres-{environment}"
+    label=f"cherry_ai-postgres-{environment}"
 )
 
 # Export outputs

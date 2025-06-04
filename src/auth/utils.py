@@ -1,11 +1,12 @@
-"""Authentication utilities for Orchestra AI"""
+"""Authentication utilities for Cherry AI"""
 
 import os
 import logging
 from passlib.context import CryptContext
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
-from typing import Optional, Dict, Any
+from typing import Optional
+from typing_extensions import Optional, Dict, Any
 
 logger = logging.getLogger(__name__)
 

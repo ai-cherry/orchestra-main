@@ -26,51 +26,51 @@ chmod 600 ~/.ssh/vultr_key
 ssh-keyscan -H $SERVER_IP >> ~/.ssh/known_hosts 2>/dev/null
 
 # Check if Docker image exists
-if [ ! -f "orchestra-api-minimal.tar.gz" ]; then
+if [ ! -f "cherry_ai-api-minimal.tar.gz" ]; then
     echo -e "${YELLOW}Building Docker image...${NC}"
-    docker build -f Dockerfile.minimal -t orchestra-api-minimal:latest .
-    docker save orchestra-api-minimal:latest | gzip > orchestra-api-minimal.tar.gz
+    docker build -f Dockerfile.minimal -t cherry_ai-api-minimal:latest .
+    docker save cherry_ai-api-minimal:latest | gzip > cherry_ai-api-minimal.tar.gz
 fi
 
 echo -e "${YELLOW}Copying Docker image to server...${NC}"
-scp -i ~/.ssh/vultr_key orchestra-api-minimal.tar.gz root@$SERVER_IP:/tmp/
+scp -i ~/.ssh/vultr_key cherry_ai-api-minimal.tar.gz root@$SERVER_IP:/tmp/
 
 echo -e "${YELLOW}Deploying on server...${NC}"
 ssh -i ~/.ssh/vultr_key root@$SERVER_IP << 'ENDSSH'
 set -e
 
 # Create directories
-mkdir -p /opt/orchestra/config
+mkdir -p /opt/cherry_ai/config
 
 # Load Docker image
-cd /opt/orchestra
-mv /tmp/orchestra-api-minimal.tar.gz .
-docker load < orchestra-api-minimal.tar.gz
+cd /opt/cherry_ai
+mv /tmp/cherry_ai-api-minimal.tar.gz .
+docker load < cherry_ai-api-minimal.tar.gz
 
 # Stop existing container
-docker stop orchestra-api 2>/dev/null || true
-docker rm orchestra-api 2>/dev/null || true
+docker stop cherry_ai-api 2>/dev/null || true
+docker rm cherry_ai-api 2>/dev/null || true
 
 # Run new container
 docker run -d \
-  --name orchestra-api \
+  --name cherry_ai-api \
   --restart unless-stopped \
   -p 8000:8000 \
-  -v /opt/orchestra/config:/app/core/orchestrator/src/config \
+  -v /opt/cherry_ai/config:/app/core/conductor/src/config \
   -e ENVIRONMENT=production \
   -e CORS_ORIGINS="*" \
-  orchestra-api-minimal:latest
+  cherry_ai-api-minimal:latest
 
 # Wait for container to start
 sleep 5
 
 # Check if running
-if docker ps | grep orchestra-api; then
-    echo "Orchestra API is running!"
+if docker ps | grep cherry_ai-api; then
+    echo "cherry_ai API is running!"
     curl -s http://localhost:8000/api/health | jq .
 else
-    echo "Failed to start Orchestra API"
-    docker logs orchestra-api
+    echo "Failed to start cherry_ai API"
+    docker logs cherry_ai-api
     exit 1
 fi
 ENDSSH

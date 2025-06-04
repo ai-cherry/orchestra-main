@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Orchestra Version Management System provides comprehensive dependency tracking, security scanning, automated updates, and health monitoring for all components in the platform. This guide covers installation, configuration, and daily usage.
+The cherry_ai Version Management System provides comprehensive dependency tracking, security scanning, automated updates, and health monitoring for all components in the platform. This guide covers installation, configuration, and daily usage.
 
 ## Table of Contents
 
@@ -425,12 +425,12 @@ class CustomScanner(DependencyScanner):
 
 3. **OWASP Dependency Check**:
    ```bash
-   dependency-check --project Orchestra --out . --scan .
+   dependency-check --project cherry_ai --out . --scan .
    ```
 
 ## Conclusion
 
-The Orchestra Version Management System provides comprehensive dependency management with a focus on security, stability, and automation. Regular use of these tools ensures:
+The cherry_ai Version Management System provides comprehensive dependency management with a focus on security, stability, and automation. Regular use of these tools ensures:
 
 - **Security**: Rapid vulnerability detection and patching
 - **Stability**: Controlled updates with testing and rollback

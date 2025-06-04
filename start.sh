@@ -7,7 +7,7 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m'
 
-echo -e "${BLUE}🚀 Orchestra AI - Docker Development Environment${NC}"
+echo -e "${BLUE}🚀 Cherry AI - Docker Development Environment${NC}"
 echo "================================================"
 
 # Function to check if Docker is running
@@ -56,7 +56,7 @@ case "${1:-menu}" in
 
     "shell"|"4")
         echo -e "${GREEN}🐚 Opening shell in main container...${NC}"
-        docker compose exec orchestra-dev /bin/bash
+        docker compose exec cherry_ai-dev /bin/bash
         ;;
 
     "logs"|"5")
@@ -83,7 +83,7 @@ case "${1:-menu}" in
 
     "test"|"8")
         echo -e "${GREEN}🧪 Running tests...${NC}"
-        docker compose exec orchestra-dev poetry run pytest
+        docker compose exec cherry_ai-dev poetry run pytest
         ;;
 
     "menu"|*)
@@ -92,7 +92,7 @@ case "${1:-menu}" in
             read -p "Select option: " choice
             case $choice in
                 1) $0 up ;;
-                2) docker compose up -d orchestra-dev redis postgres ;;
+                2) docker compose up -d cherry_ai-dev redis postgres ;;
                 3) docker compose down -v && docker compose up -d ;;
                 4) $0 shell ;;
                 5) $0 logs ;;

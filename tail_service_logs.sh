@@ -4,7 +4,7 @@ PROJECT_ID="cherry-ai-project"
 REGION="us-central1"
 
 # Default service
-SERVICE="${1:-ai-orchestra-minimal}"
+SERVICE="${1:-ai-cherry_ai-minimal}"
 LINES="${2:-50}"
 
 echo "=== Cloud Run Service Logs ==="

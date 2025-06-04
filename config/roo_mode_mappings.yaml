@@ -6,7 +6,7 @@ roo_modes:
     agent_id: roo_code_agent
     display_name: "💻 Developer"
     model: anthropic/claude-opus-4
-    role: "Expert Python/TypeScript developer for orchestration, Postgres, Weaviate, and Pulumi"
+    role: "Expert Python/TypeScript developer for coordination, Postgres, Weaviate, and Pulumi"
     capabilities:
       - code_generation
       - code_review
@@ -26,7 +26,7 @@ roo_modes:
     agent_id: roo_architect_agent
     display_name: "🏗 Architect"
     model: anthropic/claude-opus-4
-    role: "AI architect for modular, high-performance orchestration using PostgreSQL, Weaviate, and Pulumi on Vultr"
+    role: "AI architect for modular, high-performance coordination using PostgreSQL, Weaviate, and Pulumi on Vultr"
     capabilities:
       - system_design
       - architecture_review
@@ -53,7 +53,7 @@ roo_modes:
     agent_id: roo_debug_agent
     display_name: "🪲 Debugger"
     model: anthropic/claude-opus-4
-    role: "Systematic debugger for orchestration, Postgres, Weaviate, and MCP"
+    role: "Systematic debugger for coordination, Postgres, Weaviate, and MCP"
     capabilities:
       - error_analysis
       - root_cause_analysis
@@ -62,11 +62,11 @@ roo_modes:
     max_tokens: 4096
     temperature: 0.3
     
-  orchestrator:
-    agent_id: roo_orchestrator_agent
-    display_name: "🪃 Orchestrator"
+  conductor:
+    agent_id: roo_conductor_agent
+    display_name: "🪃 conductor"
     model: anthropic/claude-opus-4
-    role: "AI workflow orchestrator for task decomposition, agent coordination, and context management"
+    role: "AI workflow conductor for task decomposition, agent coordination, and context management"
     capabilities:
       - task_decomposition
       - agent_coordination

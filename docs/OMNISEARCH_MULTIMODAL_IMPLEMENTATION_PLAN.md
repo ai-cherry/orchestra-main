@@ -33,7 +33,7 @@ admin-ui/src/components/
 - **Sophia (PayReady)**: Financial report video synthesis, transaction visualizations
 - **Karen (ParagonRX)**: Clinical trial data visualization, medical imaging integration
 
-#### C. Agent Orchestration Integration
+#### C. Agent coordination Integration
 - Add new node types: `ImageGeneratorNode`, `VideoSynthesizerNode`, `SemanticSearchNode`
 - Create workflows for batch media generation
 - Enable pipeline processing for multimodal content
@@ -252,7 +252,7 @@ const AdvancedControls: React.FC = () => {
 
 #### 4.1 New Workflow Nodes
 ```typescript
-// components/orchestration/nodes/ImageGeneratorNode.tsx
+// components/coordination/nodes/ImageGeneratorNode.tsx
 export const ImageGeneratorNode = memo(({ data, selected }: NodeProps) => {
   return (
     <div className={`multimodal-node image-generator ${selected ? 'selected' : ''}`}>

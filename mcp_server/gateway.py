@@ -47,7 +47,7 @@ error_count = Counter("mcp_gateway_errors_total", "Total errors", ["server", "er
 # Initialize FastAPI app
 app = FastAPI(
     title="MCP Gateway",
-    description="Unified interface for AI Orchestra MCP servers",
+    description="Unified interface for AI cherry_ai MCP servers",
     version="2.0.0",
 )
 
@@ -148,7 +148,7 @@ async def root():
     """Gateway information"""
         "service": "MCP Gateway",
         "version": "2.0.0",
-        "description": "Unified interface for AI Orchestra MCP servers",
+        "description": "Unified interface for AI cherry_ai MCP servers",
         "servers": list(MCP_SERVERS.keys()),
         "endpoints": {
             "/health": "Overall system health",

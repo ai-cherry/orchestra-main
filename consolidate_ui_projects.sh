@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# UI Projects Consolidation Script for Orchestra AI
+# UI Projects Consolidation Script for Cherry AI
 # Safely consolidates multiple UI projects into the primary admin-ui
 
 set -e

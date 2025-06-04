@@ -2,7 +2,8 @@
 import logging
 import time
 import uuid
-from typing import Dict, List, Optional, Tuple, Any
+from typing import Dict, List, Optional
+from typing_extensions import Optional, Tuple, Any
 import json
 import random
 import datetime

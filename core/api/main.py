@@ -2,15 +2,15 @@
 """
     """
     """
-    logger.info("Starting Orchestra AI API...")
+    logger.info("Starting Cherry AI API...")
 
     try:
 
 
         pass
-        # Initialize Orchestra system
-        orchestra_system = OrchestraSystem()
-        await orchestra_system.initialize()
+        # Initialize cherry_ai system
+        cherry_ai_system = cherry_aiSystem()
+        await cherry_ai_system.initialize()
 
         # Register example workflows
         register_example_workflows()
@@ -77,32 +77,32 @@
         await agent_manager.start_all_agents()
         logger.info("Started all agents")
 
-        logger.info("Orchestra AI API started successfully")
+        logger.info("Cherry AI API started successfully")
 
     except Exception:
 
 
         pass
-        logger.error(f"Failed to start Orchestra AI API: {e}", exc_info=True)
+        logger.error(f"Failed to start Cherry AI API: {e}", exc_info=True)
         raise
 
     yield
 
     # Shutdown
-    logger.info("Shutting down Orchestra AI API...")
+    logger.info("Shutting down Cherry AI API...")
 
     try:
 
 
         pass
-        if orchestra_system:
-            await orchestra_system.shutdown()
+        if cherry_ai_system:
+            await cherry_ai_system.shutdown()
 
         # Stop all agents
         agent_manager = get_agent_manager()
         await agent_manager.stop_all_agents()
 
-        logger.info("Orchestra AI API shut down successfully")
+        logger.info("Cherry AI API shut down successfully")
 
     except Exception:
 
@@ -112,8 +112,8 @@
 
 # Create FastAPI application
 app = FastAPI(
-    title="Orchestra AI API",
-    description="AI orchestration platform with multi-agent collaboration",
+    title="Cherry AI API",
+    description="AI coordination platform with multi-agent collaboration",
     version="1.0.0",
     lifespan=lifespan,
 )
@@ -138,16 +138,16 @@ app.include_router(conversation.router, prefix="/api/v1")
 @app.get("/")
 async def root():
     """Root endpoint."""
-    return {"name": "Orchestra AI API", "version": "1.0.0", "status": "running"}
+    return {"name": "Cherry AI API", "version": "1.0.0", "status": "running"}
 
 # Health check endpoint
 @app.get("/health", response_model=HealthCheckResponse)
 async def health_check() -> HealthCheckResponse:
     """
     """
-        services_health["orchestra"] = {"status": "healthy", "initialized": True}
+        services_health["cherry_ai"] = {"status": "healthy", "initialized": True}
     else:
-        services_health["orchestra"] = {"status": "unhealthy", "initialized": False}
+        services_health["cherry_ai"] = {"status": "unhealthy", "initialized": False}
 
     # Check memory service
     try:

@@ -25,7 +25,7 @@ The Comprehensive AI Codebase Optimization, Cleanup, and Automation Framework ha
 - [x] Set up `.github/workflows/ai_codebase_hygiene.yml` - CI/CD integration
 
 ### ✅ Phase 2: Documentation
-- [x] Created `orchestration/ai_optimization_implementation_plan.md` - Detailed implementation plan
+- [x] Created `coordination/ai_optimization_implementation_plan.md` - Detailed implementation plan
 - [x] Created `docs/AI_OPTIMIZATION_FRAMEWORK_SUMMARY.md` - Comprehensive summary
 - [x] Created this status document
 
@@ -166,9 +166,9 @@ The success of this framework depends on team adoption and continuous refinement
 ## Resources
 
 - Framework Documentation: `docs/AI_OPTIMIZATION_FRAMEWORK_SUMMARY.md`
-- Implementation Plan: `orchestration/ai_optimization_implementation_plan.md`
+- Implementation Plan: `coordination/ai_optimization_implementation_plan.md`
 - Quick Start Guide: See "Usage Quick Start" section above
-- Support: Contact the orchestration team
+- Support: Contact the coordination team
 
 ---
 

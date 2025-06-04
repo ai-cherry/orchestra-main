@@ -47,7 +47,7 @@ class ServiceAccountInfo:
 class CredentialManager:
     """
     """
-    def __init__(self, env_prefix: str = "ORCHESTRA"):
+    def __init__(self, env_prefix: str = "cherry_ai"):
         """
         """
         """Load credentials from environment variables."""
@@ -139,8 +139,8 @@ class CredentialManager:
     # Store the project ID in an environment variable
     project_id = credential_manager.get_project_id()
     if project_id:
-        logger.info(f"Setting environment variable ORCHESTRA_PROJECT_ID={project_id}")
-        os.environ["ORCHESTRA_PROJECT_ID"] = project_id
+        logger.info(f"Setting environment variable cherry_ai_PROJECT_ID={project_id}")
+        os.environ["cherry_ai_PROJECT_ID"] = project_id
 
     logger.info("Credentials secured successfully")
 

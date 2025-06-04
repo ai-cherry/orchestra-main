@@ -117,9 +117,9 @@ docs/
 
 1. **README.md** - Simplify to:
    ```markdown
-   # AI Orchestra
+   # AI cherry_ai
 
-   AI agent orchestration system with SuperAGI integration.
+   AI agent coordination system with SuperAGI integration.
 
    ## Documentation
    - [Quick Start](docs/QUICK_START_OPTIMIZED.md) - Get running in 30 minutes

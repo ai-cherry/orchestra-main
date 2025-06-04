@@ -1,4 +1,4 @@
-## AI Orchestra Gateway Configuration
+## AI cherry_ai Gateway Configuration
 
 # This config sets up Portkey as our primary LLM gateway with Kong as a fallback option
 # Based on enterprise requirements for security, compliance, and performance
@@ -78,8 +78,8 @@ routing_rules:
     provider: "openai"
     model: "gpt-4o-mini"
 
-# Agent Orchestration Integration
-agent_orchestration:
+# Agent coordination Integration
+agent_coordination:
   # Map agent types to specific models
   agent_model_mapping:
     researcher: "anthropic/claude-3-opus-20240229"

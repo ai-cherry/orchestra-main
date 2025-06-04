@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Reconstruct critical files needed for Orchestra AI deployment"""
+"""Reconstruct critical files needed for Cherry AI deployment"""
 
 import os
 from pathlib import Path
@@ -12,6 +12,7 @@ def create_base_search():
 import logging
 from abc import ABC, abstractmethod
 from typing import Dict, Any, List, Optional
+from typing_extensions import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -45,6 +46,7 @@ def create_deep_search():
 import asyncio
 import logging
 from typing import Dict, List, Any, Optional
+from typing_extensions import Optional
 from datetime import datetime
 
 from .base_search import BaseSearcher
@@ -129,6 +131,7 @@ def create_super_deep_search():
 import asyncio
 import logging
 from typing import Dict, List, Any, Optional
+from typing_extensions import Optional
 
 from .deep_search import DeepSearcher
 from ..utils.circuit_breaker import circuit_breaker
@@ -165,6 +168,7 @@ def create_uncensored_search():
 
 import logging
 from typing import Dict, List, Any, Optional
+from typing_extensions import Optional
 
 from .base_search import BaseSearcher
 from ..utils.circuit_breaker import circuit_breaker
@@ -212,12 +216,13 @@ class UncensoredSearcher(BaseSearcher):
 def create_ingestion_controller():
     """Create file ingestion controller"""
     content = '''#!/usr/bin/env python3
-"""File ingestion controller for Orchestra AI"""
+"""File ingestion controller for Cherry AI"""
 
 import asyncio
 import logging
 from pathlib import Path
 from typing import Dict, Any, List, Optional
+from typing_extensions import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -319,7 +324,7 @@ class IngestionController:
 def create_api_main():
     """Create main API file"""
     content = '''#!/usr/bin/env python3
-"""Main API entry point for Orchestra AI"""
+"""Main API entry point for Cherry AI"""
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -334,13 +339,13 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Manage application lifecycle"""
-    logger.info("Starting Orchestra AI API...")
+    logger.info("Starting Cherry AI API...")
     yield
-    logger.info("Shutting down Orchestra AI API...")
+    logger.info("Shutting down Cherry AI API...")
 
 app = FastAPI(
-    title="Orchestra AI API",
-    description="Advanced AI orchestration system",
+    title="Cherry AI API",
+    description="Advanced AI coordination system",
     version="1.0.0",
     lifespan=lifespan
 )
@@ -362,7 +367,7 @@ ingestion_controller = IngestionController()
 async def root():
     """Root endpoint"""
     return {
-        "name": "Orchestra AI",
+        "name": "Cherry AI",
         "version": "1.0.0",
         "status": "operational"
     }
@@ -372,7 +377,7 @@ async def health_check():
     """Health check endpoint"""
     return {
         "status": "healthy",
-        "service": "orchestra-ai"
+        "service": "cherry_ai-ai"
     }
 
 @app.post("/search")
@@ -413,7 +418,7 @@ FILES_TO_CREATE = {
 
 def main():
     """Reconstruct critical files"""
-    print("🔧 Reconstructing critical files for Orchestra AI...")
+    print("🔧 Reconstructing critical files for Cherry AI...")
     
     created = 0
     failed = 0

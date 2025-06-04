@@ -241,7 +241,7 @@
                         s
                         for s in self.postgres.# TODO: Consider adding EXPLAIN ANALYZE for performance
 execute_query(
-                            "SELECT id FROM orchestra.sessions WHERE expires_at > CURRENT_TIMESTAMP"
+                            "SELECT id FROM cherry_ai.sessions WHERE expires_at > CURRENT_TIMESTAMP"
                         )
                     ]
                 ),

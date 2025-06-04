@@ -19,7 +19,7 @@ class Agent(BaseModel):
 class QueryRequest(BaseModel):
     """Query request model."""
     """Query response model."""
-    agent_id: str = "orchestrator-001"
+    agent_id: str = "conductor-001"
     timestamp: str
     tokens_used: int = 0
 
@@ -28,7 +28,7 @@ async def get_agents(api_key: str = Depends(verify_api_key)) -> List[Agent]:
     """Get list of all agents - REAL agents doing REAL work."""
 @router.post("/query", response_model=QueryResponse)
 async def process_query(request: QueryRequest, api_key: str = Depends(verify_api_key)) -> QueryResponse:
-    """Process a query through the orchestrator - actually run tasks on agents."""
+    """Process a query through the conductor - actually run tasks on agents."""
     if "cpu" in query_lower or "memory" in query_lower or "disk" in query_lower or "system" in query_lower:
         agent_id = "sys-001"
     elif "analyze" in query_lower or "count" in query_lower or "data" in query_lower:

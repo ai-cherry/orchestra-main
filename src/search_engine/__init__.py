@@ -1,5 +1,5 @@
 """
-Orchestra AI Search Engine
+Cherry AI Search Engine
 Provides multiple search strategies for different use cases.
 """
 

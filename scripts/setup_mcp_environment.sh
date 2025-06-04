@@ -1,7 +1,7 @@
 #!/bin/bash
 # Setup MCP environment and verify connections
 
-echo "🚀 Setting up MCP environment for AI Orchestrator"
+echo "🚀 Setting up MCP environment for AI conductor"
 echo "================================================"
 
 # Check if virtual environment exists
@@ -42,7 +42,7 @@ API_KEY=your-api-key
 # Database Configuration
 POSTGRES_HOST=localhost
 POSTGRES_PORT=5432
-POSTGRES_DB=orchestra
+POSTGRES_DB=cherry_ai
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=your-postgres-password
 
@@ -55,7 +55,7 @@ WEAVIATE_API_KEY=your-weaviate-api-key
 API_URL=http://localhost:8080
 
 # MCP Server Ports
-MCP_ORCHESTRATOR_PORT=8002
+CHERRY_AI_CONDUCTOR_PORT=8002
 MCP_MEMORY_PORT=8003
 MCP_WEAVIATE_DIRECT_PORT=8001
 MCP_DEPLOYMENT_PORT=8005
@@ -75,7 +75,7 @@ echo -e "\n📝 Creating MCP server launcher..."
 cat > scripts/start_mcp_servers.py << 'EOF'
 #!/usr/bin/env python3
 """
-Start MCP servers for AI Orchestrator
+Start MCP servers for AI conductor
 """
 import os
 import sys
@@ -112,7 +112,7 @@ async def main():
     
     # Server configurations from .mcp.json
     server_configs = [
-        ("orchestrator", "python", ["mcp_server/servers/orchestrator_server.py"]),
+        ("conductor", "python", ["mcp_server/servers/conductor_server.py"]),
         ("memory", "python", ["mcp_server/servers/memory_server.py"]),
         ("weaviate", "python", ["mcp_server/servers/weaviate_direct_mcp_server.py"]),
         ("deployment", "python", ["mcp_server/servers/deployment_server.py"]),
@@ -150,10 +150,10 @@ chmod +x scripts/start_mcp_servers.py
 
 # Run verification
 echo -e "\n🔍 Running final verification..."
-python scripts/verify_orchestrator_mcp_connection.py
+python scripts/verify_conductor_mcp_connection.py
 
 echo -e "\n✅ Setup complete!"
 echo "Next steps:"
 echo "1. Update .env with your actual credentials"
 echo "2. Start MCP servers: python scripts/start_mcp_servers.py"
-echo "3. Use the orchestrator CLI: python ai_components/orchestrator_cli_enhanced.py"
+echo "3. Use the conductor CLI: python ai_components/conductor_cli_enhanced.py"

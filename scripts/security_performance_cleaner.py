@@ -11,7 +11,8 @@ import asyncio
 import logging
 import subprocess
 from pathlib import Path
-from typing import Dict, List, Any, Optional, Set
+from typing import Dict, List, Any, Optional
+from typing_extensions import Optional, Set
 from datetime import datetime
 import ast
 import yaml

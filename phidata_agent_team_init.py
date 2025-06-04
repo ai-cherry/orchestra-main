@@ -113,9 +113,9 @@ def __init__(
                 # Handle registry tools
                 if tool_type.startswith("registry:"):
                     tool_id = tool_type.replace("registry:", "").strip()
-                    orchestra_tool = self.tools.get_tool(tool_id)
-                    if orchestra_tool and hasattr(orchestra_tool, "to_phidata_tool"):
-                        phidata_tool = orchestra_tool.to_phidata_tool(**tool_params)
+                    cherry_ai_tool = self.tools.get_tool(tool_id)
+                    if cherry_ai_tool and hasattr(cherry_ai_tool, "to_phidata_tool"):
+                        phidata_tool = cherry_ai_tool.to_phidata_tool(**tool_params)
                         if phidata_tool:
                             member_tools.append(phidata_tool)
                             logger.info(f"Added registry tool '{tool_id}' to member '{name}'")

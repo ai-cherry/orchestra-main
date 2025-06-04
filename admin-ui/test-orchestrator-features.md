@@ -1,4 +1,4 @@
-# Testing Orchestrator Phase 3 Features
+# Testing conductor Phase 3 Features
 
 ## Quick Start
 
@@ -8,8 +8,8 @@
    pnpm dev
    ```
 
-2. **Navigate to the Orchestrator page:**
-   - Open http://localhost:5173/orchestrator
+2. **Navigate to the conductor page:**
+   - Open http://localhost:5173/conductor
    - You should see the enhanced landing page with tabs
 
 ## Feature Testing Guide
@@ -131,7 +131,7 @@ websocketManager.emit('test', { data: 'test' }); // Send test event
 ### Monitoring Store State
 ```javascript
 // In browser console
-const store = useOrchestratorStore.getState();
+const store = useconductorStore.getState();
 console.log(store); // View entire state
 store.uploads; // Check file uploads
 store.isWebSocketConnected; // Check connection
@@ -140,7 +140,7 @@ store.isWebSocketConnected; // Check connection
 ### Testing File Progress
 ```javascript
 // Simulate file progress updates
-const store = useOrchestratorStore.getState();
+const store = useconductorStore.getState();
 const fileId = 'test-file-123';
 store.addUpload(new File(['test'], 'test.txt'));
 store.updateUploadProgress(fileId, 50);

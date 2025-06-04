@@ -1,3 +1,4 @@
+import os
 #!/usr/bin/env python3
 """
 """
@@ -226,7 +227,7 @@ async def main():
     # Check for API key
     if not os.getenv("ANTHROPIC_API_KEY"):
         logger.warning("No ANTHROPIC_API_KEY found. Some demos will fail.")
-        logger.warning("Set your API key: export ANTHROPIC_API_KEY='your-key-here'")
+        logger.warning("Set your API key: export ANTHROPIC_API_KEY= os.getenv('API_KEY')")
 
     # Run demos
     await demo_basic_monitoring()

@@ -26,16 +26,16 @@ This guide provides step-by-step instructions to deploy the authentication fix f
 ### 1. Build the Docker Image
 ```bash
 # The minimal Docker image has been built with:
-docker build -t orchestra-api-minimal:latest -f Dockerfile.minimal .
+docker build -t cherry_ai-api-minimal:latest -f Dockerfile.minimal .
 ```
 
 ### 2. Save and Transfer the Image
 ```bash
 # Save the Docker image
-docker save orchestra-api-minimal:latest | gzip > orchestra-api-minimal.tar.gz
+docker save cherry_ai-api-minimal:latest | gzip > cherry_ai-api-minimal.tar.gz
 
 # Transfer to your Vultr server
-scp orchestra-api-minimal.tar.gz root@YOUR_VULTR_IP:/tmp/
+scp cherry_ai-api-minimal.tar.gz root@YOUR_VULTR_IP:/tmp/
 ```
 
 ### 3. Deploy on Vultr Server
@@ -44,21 +44,21 @@ SSH into your Vultr server and run:
 ```bash
 # Load the Docker image
 cd /tmp
-docker load < orchestra-api-minimal.tar.gz
+docker load < cherry_ai-api-minimal.tar.gz
 
 # Stop existing backend (if any)
-docker stop orchestra-api || true
-docker rm orchestra-api || true
+docker stop cherry_ai-api || true
+docker rm cherry_ai-api || true
 
 # Run the new backend
 docker run -d \
-  --name orchestra-api \
+  --name cherry_ai-api \
   -p 8000:8000 \
   --restart always \
   -e JWT_SECRET_KEY="your-secret-key-here" \
   -e ADMIN_USERNAME="scoobyjava" \
   -e ADMIN_PASSWORD="Huskers1983$" \
-  orchestra-api-minimal:latest
+  cherry_ai-api-minimal:latest
 ```
 
 ### 4. Update Nginx Configuration
@@ -131,15 +131,15 @@ The backend supports these environment variables:
 - `JWT_SECRET_KEY`: Secret key for JWT token signing (required for production)
 - `ACCESS_TOKEN_EXPIRE_MINUTES`: Token expiration time (default: 720)
 - `ADMIN_USERNAME`: Admin username (default: "admin")
-- `ADMIN_PASSWORD`: Admin password (default: "orchestra-admin-2024")
-- `ADMIN_EMAIL`: Admin email (default: "admin@orchestra.ai")
+- `ADMIN_PASSWORD`: Admin password (default: "cherry_ai-admin-2024")
+- `ADMIN_EMAIL`: Admin email (default: "admin@cherry_ai.ai")
 
 ## Troubleshooting
 
 ### Container Won't Start
 Check logs:
 ```bash
-docker logs orchestra-api
+docker logs cherry_ai-api
 ```
 
 ### Authentication Fails

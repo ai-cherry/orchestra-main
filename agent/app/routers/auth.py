@@ -3,14 +3,14 @@
 router = APIRouter(prefix="/api", tags=["auth"])
 
 # Configuration
-SECRET_KEY = os.getenv("JWT_SECRET_KEY", "orchestra-admin-jwt-secret-key-change-in-production")
+SECRET_KEY = os.getenv("JWT_SECRET_KEY", "cherry_ai-admin-jwt-secret-key-change-in-production")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "720"))  # 12 hours default
 
 # Admin credentials from environment
 ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "admin")
-ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "orchestra-admin-2024")
-ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "admin@orchestra.ai")
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "cherry_ai-admin-2024")
+ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "admin@cherry_ai.ai")
 
 # Password hashing
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

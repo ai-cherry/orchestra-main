@@ -1,5 +1,5 @@
 {
-  "orchestra_integration": {
+  "cherry_ai_integration": {
     "enabled": true,
     "auto_start": true,
     "services": {
@@ -16,7 +16,7 @@
         "port": 8080
       },
       "mcp_servers": {
-        "orchestrator": {
+        "conductor": {
           "port": 8002
         },
         "memory": {

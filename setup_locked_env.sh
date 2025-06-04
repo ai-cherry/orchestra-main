@@ -13,7 +13,7 @@ NC='\033[0m' # No Color
 # Load version requirements
 source .versions.lock
 
-echo -e "${GREEN}🔒 Orchestra Locked Environment Setup${NC}"
+echo -e "${GREEN}🔒 cherry_ai Locked Environment Setup${NC}"
 echo "======================================"
 
 # Check Python version
@@ -34,7 +34,7 @@ if [ -d "venv" ]; then
     echo "Removing existing venv..."
     rm -rf venv
 fi
-python3.10 -m venv venv --prompt orchestra
+python3.10 -m venv venv --prompt cherry_ai
 source venv/bin/activate
 echo -e "${GREEN}✓ Virtual environment created${NC}"
 

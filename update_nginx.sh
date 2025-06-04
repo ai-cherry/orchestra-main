@@ -1,14 +1,14 @@
 #!/bin/bash
 # Update nginx configuration for Admin UI
 
-cat > /etc/nginx/sites-available/orchestra << 'NGINX'
+cat > /etc/nginx/sites-available/cherry_ai << 'NGINX'
 server {
     listen 80;
     server_name cherry-ai.me www.cherry-ai.me _;
 
     # Admin UI (default)
     location / {
-        root /var/www/orchestra-admin;
+        root /var/www/cherry_ai-admin;
         try_files $uri $uri/ /index.html;
         
         # Security headers

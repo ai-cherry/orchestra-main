@@ -1,7 +1,7 @@
-# Orchestra AI - Real Agents Update Summary
+# Cherry AI - Real Agents Update Summary
 
 ## Overview
-This document summarizes all updates made to transition Orchestra AI from mock data to real working agents.
+This document summarizes all updates made to transition Cherry AI from mock data to real working agents.
 
 ## Key Changes Made
 
@@ -15,7 +15,7 @@ This document summarizes all updates made to transition Orchestra AI from mock d
 ### 2. API Updates
 - **File**: `agent/app/routers/admin.py`
 - Updated to use real agents instead of mock data
-- Fixed response model to not default to "orchestrator-001"
+- Fixed response model to not default to "conductor-001"
 
 ### 3. Dependency Updates
 - **Files**:
@@ -24,30 +24,30 @@ This document summarizes all updates made to transition Orchestra AI from mock d
 
 ### 4. Deployment Scripts
 - **File**: `deploy_to_vultr.sh`
-  - Updated all paths from `/opt/orchestra` to `/root/orchestra-main`
+  - Updated all paths from `/opt/cherry_ai` to `/root/cherry_ai-main`
   - Updated systemd service configuration
   - Fixed Python environment setup
 
 ### 5. Systemd Service
-- **File**: `deployment/orchestra-api.service`
-  - Updated to point to `/root/orchestra-main`
-  - Renamed to "Orchestra AI Real Agents API"
+- **File**: `deployment/cherry_ai-api.service`
+  - Updated to point to `/root/cherry_ai-main`
+  - Renamed to "Cherry AI Real Agents API"
   - Added Redis dependency
 
 ### 6. GitHub Workflows
 - **File**: `.github/workflows/deploy-vultr.yml`
-  - Updated deployment paths to `/root/orchestra-main`
+  - Updated deployment paths to `/root/cherry_ai-main`
   - Fixed SSH key handling
-  - Updated service names to `orchestra-real`
+  - Updated service names to `cherry_ai-real`
 
 ### 7. Start/Stop Scripts
-- **Files**: `start_orchestra.sh`, `stop_orchestra.sh`
+- **Files**: `start_cherry_ai.sh`, `stop_cherry_ai.sh`
   - Simplified to work with real agents
   - Added Python version checking
   - Added dependency verification
 
 ### 8. Unified CLI
-- **File**: `scripts/orchestra.py`
+- **File**: `scripts/cherry_ai.py`
   - Complete rewrite for real agents
   - Added commands: status, start, stop, query, health
   - Integrated with real agent API
@@ -66,24 +66,24 @@ This document summarizes all updates made to transition Orchestra AI from mock d
 ## Server Configuration
 
 ### Production Server
-- **Location**: `/root/orchestra-main`
-- **Service**: `orchestra-real.service`
+- **Location**: `/root/cherry_ai-main`
+- **Service**: `cherry_ai-real.service`
 - **Port**: 8000
 - **API Key**: `4010007a9aa5443fc717b54e1fd7a463260965ec9e2fce297280cf86f1b3a4bd`
 
 ### Local Development
 ```bash
 # Start services
-python scripts/orchestra.py start
+python scripts/cherry_ai.py start
 
 # Check status
-python scripts/orchestra.py status
+python scripts/cherry_ai.py status
 
 # Query agents
-python scripts/orchestra.py query "What is the CPU usage?"
+python scripts/cherry_ai.py query "What is the CPU usage?"
 
 # Stop services
-python scripts/orchestra.py stop
+python scripts/cherry_ai.py stop
 ```
 
 ## Testing
@@ -100,16 +100,16 @@ python scripts/validate_syntax.py
 5. Add WebSocket support for real-time updates
 
 ## Migration Notes
-- All references to `/opt/orchestra` have been updated to `/root/orchestra-main`
+- All references to `/opt/cherry_ai` have been updated to `/root/cherry_ai-main`
 - Mock data has been completely removed
 - Real agents now provide actual system data
-- The old "orchestrator-001" agent ID is no longer used
+- The old "conductor-001" agent ID is no longer used
 
 ## Verification
 To verify everything is working:
 ```bash
 # Check health
-python scripts/orchestra.py health
+python scripts/cherry_ai.py health
 
 # Test real agents
 curl -X GET http://localhost:8000/api/agents \

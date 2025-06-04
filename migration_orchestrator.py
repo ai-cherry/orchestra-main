@@ -2,7 +2,7 @@
 #!/usr/bin/env python3
 """
 """
-    """Orchestrates the refactoring migration across all phases."""
+    """cherry_aites the refactoring migration across all phases."""
         self.backup_dir = self.workspace_root / ".migration_backups"
         self.state_file = self.workspace_root / ".migration_state.json"
         self.state = self._load_state()
@@ -252,15 +252,15 @@
             logger.info("Core directory reorganization would be implemented here")
             return True
         
-        # Task 2: Enhance orchestrator
-        def enhance_orchestrator():
-            logger.info("Orchestrator enhancement would be implemented here")
+        # Task 2: Enhance conductor
+        def enhance_conductor():
+            logger.info("conductor enhancement would be implemented here")
             return True
         
         # Execute tasks
         success = True
         success &= self._run_task("Reorganize Core Directory", reorganize_core_directory)
-        success &= self._run_task("Enhance Orchestrator", enhance_orchestrator)
+        success &= self._run_task("Enhance conductor", enhance_conductor)
         
         if success:
             self.state["current_phase"] = 3
@@ -376,7 +376,7 @@
         return True
 
 def main():
-    parser = argparse.ArgumentParser(description="Orchestra AI Migration Orchestrator")
+    parser = argparse.ArgumentParser(description="Cherry AI Migration conductor")
     parser.add_argument("--phase", type=int, choices=[1, 2, 3, 4, 5], help="Run specific phase")
     parser.add_argument("--all", action="store_true", help="Run all phases")
     parser.add_argument("--status", action="store_true", help="Show migration status")
@@ -384,16 +384,16 @@ def main():
     
     args = parser.parse_args()
     
-    orchestrator = MigrationOrchestrator()
+    conductor = Migrationconductor()
     
     if args.status:
-        orchestrator.status()
+        conductor.status()
     elif args.rollback:
-        orchestrator.rollback(args.rollback)
+        conductor.rollback(args.rollback)
     elif args.phase:
-        orchestrator.run_phase(args.phase)
+        conductor.run_phase(args.phase)
     elif args.all:
-        orchestrator.run_all_phases()
+        conductor.run_all_phases()
     else:
         parser.print_help()
 

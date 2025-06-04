@@ -15,7 +15,7 @@ This document summarizes the comprehensive remediation work completed for the Pu
 - **Issue**: Missing `cleanup()` and `rollback()` methods
 - **Solutions**:
   - Added `cleanup()` method to AsyncStateManager with checkpoint/rollback point management
-  - Added public `rollback()` method to EnhancedMigrationOrchestrator
+  - Added public `rollback()` method to EnhancedMigrationconductor
   - Implemented `rollback()` method in AsyncStateManager with state restoration
 - **Impact**: Full rollback capability now functional
 
@@ -142,7 +142,7 @@ This document summarizes the comprehensive remediation work completed for the Pu
 infrastructure/pulumi/migration/
 ├── src/
 │   ├── imports.ts                    # Centralized imports
-│   ├── orchestrator-enhanced.ts      # Main orchestrator
+│   ├── conductor-enhanced.ts      # Main conductor
 │   ├── state-manager-async.ts       # Async state management
 │   ├── retry-manager.ts             # Retry logic
 │   ├── resource-discovery.ts        # Resource discovery

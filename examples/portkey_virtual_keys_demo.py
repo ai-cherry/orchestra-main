@@ -9,7 +9,7 @@ import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from core.orchestrator.src.config.settings import get_settings
+from core.conductor.src.config.settings import get_settings
 from packages.shared.src.llm_client.portkey_client import PortkeyClient
 
 async def run_model(client: PortkeyClient, model: str, prompt: str) -> None:

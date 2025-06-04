@@ -1,7 +1,7 @@
 # TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """
-Configuration Files Audit Script for Orchestra AI
+Configuration Files Audit Script for Cherry AI
 Comprehensive audit of all configuration files for security, consistency, and validity.
 """
 
@@ -11,7 +11,8 @@ import json
 import yaml
 from pathlib import Path
 from typing import Dict, List, Set, Tuple, Any, Optional
-from collections import defaultdict
+from typing_extensions import Optional
+from collections.abc import defaultdict
 from datetime import datetime
 
 class ConfigurationAuditor:
@@ -238,7 +239,7 @@ class ConfigurationAuditor:
             # Check for consistent prefixing
             if not any(var_name.startswith(prefix) # TODO: Consider using list comprehension for better performance
  for prefix in 
-                      ["ORCHESTRA_", "PORTKEY_", "VULTR_", "POSTGRES_", "WEAVIATE_", "MCP_"]):
+                      ["cherry_ai_", "PORTKEY_", "VULTR_", "POSTGRES_", "WEAVIATE_", "MCP_"]):
                 issues.append("no_standard_prefix")
             
             if issues:

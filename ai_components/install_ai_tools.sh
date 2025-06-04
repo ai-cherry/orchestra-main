@@ -5,7 +5,7 @@
 set -e  # Exit on error
 
 echo "=========================================="
-echo "AI Orchestration Tools Installation Script"
+echo "AI coordination Tools Installation Script"
 echo "=========================================="
 
 # Color codes for output
@@ -34,7 +34,7 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 # Base directory
-BASE_DIR="/root/orchestra-main/ai_components"
+BASE_DIR="/root/cherry_ai-main/ai_components"
 cd $BASE_DIR
 
 # Create necessary directories
@@ -60,9 +60,9 @@ pip install -r requirements.txt
 print_status "Creating configuration files..."
 
 # Main configuration
-cat > configs/orchestrator_config.yaml << EOF
-# AI Orchestrator Configuration
-orchestrator:
+cat > configs/conductor_config.yaml << EOF
+# AI conductor Configuration
+conductor:
   workflow_timeout: 3600  # 1 hour
   max_parallel_tasks: 5
   checkpoint_interval: 300  # 5 minutes
@@ -109,7 +109,7 @@ cat > configs/.env.template << EOF
 # PostgreSQL Configuration
 POSTGRES_HOST=your_postgres_host
 POSTGRES_PORT=5432
-POSTGRES_DB=orchestrator_db
+POSTGRES_DB=conductor_db
 POSTGRES_USER=your_postgres_user
 POSTGRES_PASSWORD=your_postgres_password
 
@@ -264,10 +264,10 @@ EOF
 
 # Create MCP server integration
 print_status "Creating MCP server integration..."
-cat > ../mcp_server/orchestrator_mcp_server.py << 'EOF'
+cat > ../mcp_server/coordinator_server.py << 'EOF'
 #!/usr/bin/env python3
 """
-MCP Server for AI Orchestrator
+MCP Server for AI conductor
 Provides task management and context storage
 """
 
@@ -277,7 +277,7 @@ from typing import Dict, List, Optional
 from datetime import datetime
 import uuid
 
-app = FastAPI(title="AI Orchestrator MCP Server")
+app = FastAPI(title="AI conductor MCP Server")
 
 # In-memory task storage (replace with persistent storage in production)
 tasks = {}
@@ -303,7 +303,7 @@ class Task(TaskCreate):
 
 @app.get("/")
 async def root():
-    return {"message": "AI Orchestrator MCP Server", "version": "1.0.0"}
+    return {"message": "AI conductor MCP Server", "version": "1.0.0"}
 
 @app.post("/tasks", response_model=Task)
 async def create_task(task: TaskCreate):
@@ -358,12 +358,12 @@ if __name__ == "__main__":
 EOF
 
 # Create CLI tool
-print_status "Creating orchestrator CLI..."
-cat > orchestrator_cli.py << 'EOF'
+print_status "Creating conductor CLI..."
+cat > conductor_cli.py << 'EOF'
 #!/usr/bin/env python3
 """
-AI Orchestrator CLI
-Command-line interface for orchestrating AI tools
+AI conductor CLI
+Command-line interface for cherry_aiting AI tools
 """
 
 import click
@@ -372,16 +372,16 @@ import json
 from pathlib import Path
 import sys
 
-# Add orchestration module to path
+# Add coordination module to path
 sys.path.append(str(Path(__file__).parent))
 
-from orchestration.ai_orchestrator import (
-    WorkflowOrchestrator, TaskDefinition, AgentRole
+from coordination.ai_conductor import (
+    Workflowconductor, TaskDefinition, AgentRole
 )
 
 @click.group()
 def cli():
-    """AI Orchestrator CLI - Coordinate EigenCode, Cursor AI, and Roo Code"""
+    """AI conductor CLI - Coordinate EigenCode, Cursor AI, and Roo Code"""
     pass
 
 @cli.command()
@@ -392,9 +392,9 @@ def analyze(codebase, output):
     click.echo(f"Analyzing codebase at {codebase}...")
     
     async def run_analysis():
-        orchestrator = WorkflowOrchestrator()
+        conductor = Workflowconductor()
         workflow_id = f"analysis_{Path(codebase).name}"
-        context = await orchestrator.create_workflow(workflow_id)
+        context = await conductor.create_workflow(workflow_id)
         
         task = TaskDefinition(
             task_id="analyze",
@@ -403,7 +403,7 @@ def analyze(codebase, output):
             inputs={"codebase_path": codebase}
         )
         
-        result = await orchestrator.execute_workflow(workflow_id, [task])
+        result = await conductor.execute_workflow(workflow_id, [task])
         
         with open(output, 'w') as f:
             json.dump(result.results, f, indent=2)
@@ -423,9 +423,9 @@ def implement(analysis, focus):
         with open(analysis, 'r') as f:
             analysis_data = json.load(f)
         
-        orchestrator = WorkflowOrchestrator()
+        conductor = Workflowconductor()
         workflow_id = f"implementation_{focus}"
-        context = await orchestrator.create_workflow(workflow_id)
+        context = await conductor.create_workflow(workflow_id)
         
         task = TaskDefinition(
             task_id="implement",
@@ -437,7 +437,7 @@ def implement(analysis, focus):
             }
         )
         
-        result = await orchestrator.execute_workflow(workflow_id, [task])
+        result = await conductor.execute_workflow(workflow_id, [task])
         click.echo("Implementation complete!")
     
     asyncio.run(run_implementation())
@@ -449,9 +449,9 @@ def refine(stack):
     click.echo(f"Refining {stack} stack...")
     
     async def run_refinement():
-        orchestrator = WorkflowOrchestrator()
+        conductor = Workflowconductor()
         workflow_id = f"refinement_{stack}"
-        context = await orchestrator.create_workflow(workflow_id)
+        context = await conductor.create_workflow(workflow_id)
         
         task = TaskDefinition(
             task_id="refine",
@@ -460,24 +460,24 @@ def refine(stack):
             inputs={"technology_stack": stack}
         )
         
-        result = await orchestrator.execute_workflow(workflow_id, [task])
+        result = await conductor.execute_workflow(workflow_id, [task])
         click.echo("Refinement complete!")
     
     asyncio.run(run_refinement())
 
 @cli.command()
 @click.option('--config', '-c', default='workflow.json', help='Workflow configuration file')
-def orchestrate(config):
-    """Run full orchestration workflow from config file"""
-    click.echo(f"Running orchestration from {config}...")
+def cherry_aite(config):
+    """Run full coordination workflow from config file"""
+    click.echo(f"Running coordination from {config}...")
     
-    async def run_orchestration():
+    async def run_coordination():
         with open(config, 'r') as f:
             workflow_config = json.load(f)
         
-        orchestrator = WorkflowOrchestrator()
+        conductor = Workflowconductor()
         workflow_id = workflow_config.get('workflow_id', 'custom_workflow')
-        context = await orchestrator.create_workflow(workflow_id)
+        context = await conductor.create_workflow(workflow_id)
         
         # Create tasks from config
         tasks = []
@@ -492,16 +492,16 @@ def orchestrate(config):
             )
             tasks.append(task)
         
-        result = await orchestrator.execute_workflow(workflow_id, tasks)
-        click.echo("Orchestration complete!")
+        result = await conductor.execute_workflow(workflow_id, tasks)
+        click.echo("coordination complete!")
         click.echo(json.dumps(result.results, indent=2))
     
-    asyncio.run(run_orchestration())
+    asyncio.run(run_coordination())
 
 if __name__ == '__main__':
     cli()
 EOF
-chmod +x orchestrator_cli.py
+chmod +x conductor_cli.py
 
 # Create example workflow configuration
 print_status "Creating example workflow configuration..."
@@ -515,7 +515,7 @@ cat > configs/example_workflow.json << EOF
       "name": "Analyze Codebase",
       "agent": "analyzer",
       "inputs": {
-        "codebase_path": "/root/orchestra-main",
+        "codebase_path": "/root/cherry_ai-main",
         "focus_areas": ["performance", "scalability", "maintainability"]
       },
       "priority": 1
@@ -547,19 +547,19 @@ EOF
 
 # Create systemd service for MCP server
 print_status "Creating systemd service for MCP server..."
-cat > /etc/systemd/system/orchestrator-mcp.service << EOF
+cat > /etc/systemd/system/conductor-mcp.service << EOF
 [Unit]
-Description=AI Orchestrator MCP Server
+Description=AI conductor MCP Server
 After=network.target
 
 [Service]
 Type=simple
 User=root
-WorkingDirectory=/root/orchestra-main/mcp_server
-ExecStart=/usr/bin/python3 /root/orchestra-main/mcp_server/orchestrator_mcp_server.py
+WorkingDirectory=/root/cherry_ai-main/mcp_server
+ExecStart=/usr/bin/python3 /root/cherry_ai-main/mcp_server/coordinator_server.py
 Restart=always
 RestartSec=10
-Environment="PYTHONPATH=/root/orchestra-main"
+Environment="PYTHONPATH=/root/cherry_ai-main"
 
 [Install]
 WantedBy=multi-user.target
@@ -572,7 +572,7 @@ pip install fastapi uvicorn
 # Create documentation
 print_status "Creating documentation..."
 cat > README.md << 'EOF'
-# AI Orchestration System
+# AI coordination System
 
 This system coordinates between EigenCode, Cursor AI, and Roo Code to provide comprehensive code analysis, implementation, and refinement capabilities.
 
@@ -587,7 +587,7 @@ This system coordinates between EigenCode, Cursor AI, and Roo Code to provide co
 1. Copy `configs/.env.template` to `configs/.env` and fill in your API keys
 2. Ensure PostgreSQL is running and accessible
 3. Configure Weaviate Cloud and Airbyte Cloud connections
-4. Start the MCP server: `systemctl start orchestrator-mcp`
+4. Start the MCP server: `systemctl start conductor-mcp`
 
 ## Usage
 
@@ -595,29 +595,29 @@ This system coordinates between EigenCode, Cursor AI, and Roo Code to provide co
 
 ```bash
 # Analyze codebase
-./orchestrator_cli.py analyze --codebase /path/to/code --output analysis.json
+./conductor_cli.py analyze --codebase /path/to/code --output analysis.json
 
 # Implement changes based on analysis
-./orchestrator_cli.py implement --analysis analysis.json --focus performance
+./conductor_cli.py implement --analysis analysis.json --focus performance
 
 # Refine technology stack
-./orchestrator_cli.py refine --stack python_postgres_weaviate
+./conductor_cli.py refine --stack python_postgres_weaviate
 
-# Run full orchestration workflow
-./orchestrator_cli.py orchestrate --config configs/example_workflow.json
+# Run full coordination workflow
+./conductor_cli.py cherry_aite --config configs/example_workflow.json
 ```
 
 ### Python API
 
 ```python
-from orchestration.ai_orchestrator import WorkflowOrchestrator, TaskDefinition, AgentRole
+from coordination.ai_conductor import Workflowconductor, TaskDefinition, AgentRole
 
-# Create orchestrator
-orchestrator = WorkflowOrchestrator()
+# Create conductor
+conductor = Workflowconductor()
 
 # Define workflow
 workflow_id = "my_workflow"
-context = await orchestrator.create_workflow(workflow_id)
+context = await conductor.create_workflow(workflow_id)
 
 # Define tasks
 tasks = [
@@ -631,12 +631,12 @@ tasks = [
 ]
 
 # Execute workflow
-result = await orchestrator.execute_workflow(workflow_id, tasks)
+result = await conductor.execute_workflow(workflow_id, tasks)
 ```
 
 ## Configuration
 
-Edit `configs/orchestrator_config.yaml` to customize:
+Edit `configs/conductor_config.yaml` to customize:
 - Workflow timeouts
 - Parallel task limits
 - Agent-specific settings
@@ -644,8 +644,8 @@ Edit `configs/orchestrator_config.yaml` to customize:
 
 ## Monitoring
 
-- Logs are stored in `logs/orchestrator.log`
-- PostgreSQL stores all orchestration actions
+- Logs are stored in `logs/conductor.log`
+- PostgreSQL stores all coordination actions
 - Weaviate Cloud stores context and results
 - MCP server provides real-time task status
 
@@ -658,9 +658,9 @@ Edit `configs/orchestrator_config.yaml` to customize:
 
 ## Troubleshooting
 
-1. Check logs: `tail -f logs/orchestrator.log`
-2. Verify MCP server: `systemctl status orchestrator-mcp`
-3. Test database connection: `python3 -c "from orchestration.ai_orchestrator import DatabaseLogger; DatabaseLogger()"`
+1. Check logs: `tail -f logs/conductor.log`
+2. Verify MCP server: `systemctl status conductor-mcp`
+3. Test database connection: `python3 -c "from coordination.ai_conductor import DatabaseLogger; DatabaseLogger()"`
 4. Verify API keys are properly set in environment
 
 EOF
@@ -669,5 +669,5 @@ print_status "Installation complete!"
 print_warning "Note: EigenCode installation failed due to service unavailability (404 error)"
 print_status "Please:"
 print_status "1. Copy configs/.env.template to configs/.env and add your API keys"
-print_status "2. Start the MCP server: systemctl start orchestrator-mcp"
-print_status "3. Run './orchestrator_cli.py --help' to see available commands"
+print_status "2. Start the MCP server: systemctl start conductor-mcp"
+print_status "3. Run './conductor_cli.py --help' to see available commands"

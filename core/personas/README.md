@@ -1,6 +1,6 @@
 # Persona Configuration System
 
-This module provides a comprehensive system for managing AI personas in the orchestration system. It includes models for persona configuration, a manager for loading and managing personas from YAML files, and example personas for different use cases.
+This module provides a comprehensive system for managing AI personas in the coordination system. It includes models for persona configuration, a manager for loading and managing personas from YAML files, and example personas for different use cases.
 
 ## Features
 
@@ -98,7 +98,7 @@ active_technical = manager.list_personas(
 
 The `personas_detailed.yaml` file includes three example personas:
 
-### 1. Cherry - Strategic Orchestrator
+### 1. Cherry - Strategic conductor
 - **Focus**: High-level planning and system architecture
 - **Strengths**: Strategic thinking, delegation, systems thinking
 - **Use Cases**: Project planning, architecture design, workflow coordination

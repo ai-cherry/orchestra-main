@@ -1,7 +1,7 @@
-# AI Coding Agent Guide for Orchestra
+# AI Coding Agent Guide for cherry_ai
 
 ## Overview
-This guide helps AI coding agents understand and work with the Orchestra multi-agent system, which uses PostgreSQL for relational data and Weaviate for vector/semantic operations.
+This guide helps AI coding agents understand and work with the cherry_ai multi-agent system, which uses PostgreSQL for relational data and Weaviate for vector/semantic operations.
 
 ## System Architecture
 
@@ -10,10 +10,10 @@ This guide helps AI coding agents understand and work with the Orchestra multi-a
    - FastAPI-based REST API
    - Agent templates and configurations
    - Natural language processing
-   - Workflow orchestration
+   - Workflow coordination
 
 2. **MCP Servers** (`mcp_server/`)
-   - Orchestrator: Agent coordination
+   - conductor: Agent coordination
    - Memory: PostgreSQL/Weaviate operations
    - Tools: Tool discovery and execution
 
@@ -25,7 +25,7 @@ This guide helps AI coding agents understand and work with the Orchestra multi-a
 
 ### PostgreSQL (Relational Data)
 ```sql
--- Main tables in orchestra schema:
+-- Main tables in cherry_ai schema:
 - agents: Agent configurations and metadata
 - workflows: Workflow definitions and status
 - sessions: User sessions (replaces Redis)
@@ -188,7 +188,7 @@ results = db.search_knowledge(
 # PostgreSQL
 POSTGRES_HOST=localhost
 POSTGRES_PORT=5432
-POSTGRES_DB=orchestra
+POSTGRES_DB=cherry_ai
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=your_password
 
@@ -252,7 +252,7 @@ API_KEY=your_api_key
 ### Debug Commands
 ```bash
 # Check PostgreSQL
-psql -U postgres -d orchestra -c "\dt orchestra.*"
+psql -U postgres -d cherry_ai -c "\dt cherry_ai.*"
 
 # Check Weaviate
 curl http://localhost:8080/v1/meta

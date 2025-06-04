@@ -3,7 +3,7 @@
     "type": "roo_interaction",
     "mode": "code",
     "request": {
-      "code": "def test(): return 'Orchestra AI is working!'",
+      "code": "def test(): return 'Cherry AI is working!'",
       "language": "python"
     },
     "response": {

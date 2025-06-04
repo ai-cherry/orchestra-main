@@ -1,4 +1,4 @@
-# Advanced Features Roadmap for Orchestra AI
+# Advanced Features Roadmap for Cherry AI
 
 This document outlines when and why to consider the currently "Not Implemented" features.
 

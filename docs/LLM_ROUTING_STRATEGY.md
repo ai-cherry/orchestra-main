@@ -1,14 +1,14 @@
-# Orchestra LLM Routing Strategy
+# cherry_ai LLM Routing Strategy
 
 ## Executive Summary
 
-This document outlines a comprehensive strategy for implementing a unified LLM routing solution across the Orchestra project. After analyzing the current implementation, I recommend **Portkey** as the primary routing solution with **OpenRouter** as a secondary option for specific use cases.
+This document outlines a comprehensive strategy for implementing a unified LLM routing solution across the cherry_ai project. After analyzing the current implementation, I recommend **Portkey** as the primary routing solution with **OpenRouter** as a secondary option for specific use cases.
 
 ## Current State Analysis
 
 ### 1. Model Usage Across the Project
 
-The Orchestra project currently uses multiple LLM models across different components:
+The cherry_ai project currently uses multiple LLM models across different components:
 
 #### Backend Services (Python)
 - **Phidata/Agno Agents**: Using Portkey-configured models
@@ -274,7 +274,7 @@ class LLMRouter:
 1. **Update Phidata/Agno Agents**
 ```python
 # packages/agents/src/base_agent.py
-class OrchestraAgent:
+class cherry_aiAgent:
     def __init__(self, config: Dict[str, Any]):
         self.llm_router = LLMRouter(load_llm_config())
         self.use_case = config.get("use_case", "chat")
@@ -508,7 +508,7 @@ routing:
 
 ## Conclusion
 
-The recommended approach leverages Portkey's enterprise features while maintaining flexibility through OpenRouter integration. This hybrid strategy provides the best balance of reliability, performance, and cost-effectiveness for the Orchestra project's AI orchestration needs.            "model": response.model,
+The recommended approach leverages Portkey's enterprise features while maintaining flexibility through OpenRouter integration. This hybrid strategy provides the best balance of reliability, performance, and cost-effectiveness for the cherry_ai project's AI coordination needs.            "model": response.model,
             "usage": response.usage.dict() if response.usage else {},
             "latency_ms": (asyncio.get_event_loop().time() - start_time) * 1000,
             "provider": provider
@@ -520,7 +520,7 @@ The recommended approach leverages Portkey's enterprise features while maintaini
 1. **Update Phidata/Agno Agents**
 ```python
 # packages/agents/src/base_agent.py
-class OrchestraAgent:
+class cherry_aiAgent:
     def __init__(self, config: Dict[str, Any]):
         self.llm_router = LLMRouter(load_llm_config())
         self.use_case = config.get("use_case", "chat")
@@ -754,4 +754,4 @@ routing:
 
 ## Conclusion
 
-The recommended approach leverages Portkey's enterprise features while maintaining flexibility through OpenRouter integration. This hybrid strategy provides the best balance of reliability, performance, and cost-effectiveness for the Orchestra project's AI orchestration needs.
+The recommended approach leverages Portkey's enterprise features while maintaining flexibility through OpenRouter integration. This hybrid strategy provides the best balance of reliability, performance, and cost-effectiveness for the cherry_ai project's AI coordination needs.

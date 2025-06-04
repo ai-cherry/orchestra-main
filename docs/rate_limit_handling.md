@@ -1,10 +1,10 @@
 # Rate Limit Handling with Automatic Fallbacks
 
-This guide explains how to configure Orchestra's LLM client to automatically handle rate limits by falling back to free models and implementing semantic caching.
+This guide explains how to configure cherry_ai's LLM client to automatically handle rate limits by falling back to free models and implementing semantic caching.
 
 ## Overview of Rate Limit Strategies
 
-Orchestra provides two complementary approaches to handle rate limits:
+cherry_ai provides two complementary approaches to handle rate limits:
 
 1. **Direct OpenRouter Fallbacks**: Configure OpenRouter to automatically fall back to free models when your primary model hits rate limits.
 2. **Portkey-Enhanced Routing**: Use Portkey's advanced routing capabilities for more sophisticated fallback strategies, load balancing, and semantic caching.
@@ -129,7 +129,7 @@ response = await llm_client.generate_chat_completion(
 Use the monitoring API to check your credit balance and usage:
 
 ```python
-from core.orchestrator.src.services.llm.providers import get_llm_provider
+from core.conductor.src.services.llm.providers import get_llm_provider
 
 async def check_credits():
     provider = get_llm_provider("portkey")

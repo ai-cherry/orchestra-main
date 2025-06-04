@@ -1,8 +1,8 @@
-# Cursor AI Optimization Guide for AI Orchestra
+# Cursor AI Optimization Guide for AI cherry_ai
 
 ## Overview
 
-This guide provides specific prompts, workflows, and best practices for leveraging Cursor AI to maximize productivity in the AI Orchestra project. Think of Cursor as your lazy but brilliant intern who needs precise instructions.
+This guide provides specific prompts, workflows, and best practices for leveraging Cursor AI to maximize productivity in the AI cherry_ai project. Think of Cursor as your lazy but brilliant intern who needs precise instructions.
 
 ## Table of Contents
 
@@ -23,12 +23,12 @@ First, ensure Cursor understands your project structure:
 ```bash
 # Create a .cursorrules file in your project root
 cat > .cursorrules << 'EOF'
-# AI Orchestra Project Rules for Cursor
+# AI cherry_ai Project Rules for Cursor
 
 ## Project Context
 - Python 3.10 (NOT 3.11+) - system constraint
 - Pulumi for infrastructure (Python SDK)
-- SuperAGI for agent orchestration
+- SuperAGI for agent coordination
 - MCP for natural language data access
 -
 ## Code Standards
@@ -129,14 +129,14 @@ Include proper tool definitions and memory configuration.
 ### 4. API Endpoint Development
 
 ```
-Add a FastAPI endpoint to orchestra_api that:
+Add a FastAPI endpoint to cherry_ai_api that:
 - Accepts natural language queries
 - Routes to appropriate MCP servers
 - Implements rate limiting and authentication
 - Returns structured JSON responses with metadata
 - Includes OpenAPI documentation
 
-Follow the existing router pattern in orchestra_api/routers/.
+Follow the existing router pattern in cherry_ai_api/routers/.
 ```
 
 ## Agent Mode Automation
@@ -299,7 +299,7 @@ Add a new router for [FEATURE_NAME] that:
 - Has comprehensive logging
 - Returns consistent JSON structure
 
-Follow orchestra_api/routers/ patterns
+Follow cherry_ai_api/routers/ patterns
 ```
 
 ## Troubleshooting Cursor

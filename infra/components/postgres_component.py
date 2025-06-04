@@ -4,8 +4,8 @@
         config={
             "droplet_id": "existing-droplet-id",  # ID of existing droplet
             "droplet_name": "ubuntu-s-2vcpu-8gb-160gb-intel-sfo2-01",  # Name for reference
-            "db_name": "orchestrator",
-            "db_user": "orchestrator",
+            "db_name": "conductor",
+            "db_user": "conductor",
             "db_password": "...",  # Pulumi config key
             "ssh_private_key": "...",  # Pulumi config key
             "allowed_hosts": ["10.120.0.0/16"],  # VPC CIDR
@@ -16,21 +16,21 @@
 """
     """
     """
-        super().__init__("orchestra:postgres:Component", name, None, opts)
+        super().__init__("cherry_ai:postgres:Component", name, None, opts)
 
         self.config = config
         self.droplet_id = config.get("droplet_id")
         self.droplet_name = config.get("droplet_name", "app-node")
-        self.db_name = config.get("db_name", "orchestrator")
-        self.db_user = config.get("db_user", "orchestrator")
+        self.db_name = config.get("db_name", "conductor")
+        self.db_user = config.get("db_user", "conductor")
         self.db_password = config.get("db_password")
         self.ssh_private_key = config.get("ssh_private_key")
         self.allowed_hosts = config.get("allowed_hosts", ["10.120.0.0/16"])
         self.python_packages = config.get(
             "python_packages", ["superagi", "autogen", "weaviate-client", "psycopg2-binary", "langfuse"]
         )
-        self.venv_path = config.get("venv_path", "/opt/orchestra/venv")
-        self.app_path = config.get("app_path", "/opt/orchestra")
+        self.venv_path = config.get("venv_path", "/opt/cherry_ai/venv")
+        self.app_path = config.get("app_path", "/opt/cherry_ai")
 
         # Get existing droplet by ID
         self.droplet = do.get_droplet(id=self.droplet_id)
@@ -138,7 +138,7 @@
                 
                 # Add VPC network access to pg_hba.conf
                 cat >> /etc/postgresql/16/main/pg_hba.conf << 'EOF'
-# Allow connections from VPC network for Orchestra
+# Allow connections from VPC network for cherry_ai
 """
                 """
                 sed -i "s/#listen_addresses = 'localhost'/listen_addresses = '*'/" /etc/postgresql/16/main/postgresql.conf
@@ -166,7 +166,7 @@
                 """
                 if [ ! -d """
                 """
-                    git clone https://github.com/ai-cherry/orchestra-main.git """
+                    git clone https://github.com/ai-cherry/cherry_ai-main.git """
                 """
                     cd """
                 """
@@ -185,12 +185,12 @@
             connection=connection,
             create=Output.concat(
                 """
-                echo "Creating systemd service for orchestrator..."
+                echo "Creating systemd service for conductor..."
                 
                 # Create systemd service file
-                cat > /etc/systemd/system/orchestra-api.service << 'EOF'
+                cat > /etc/systemd/system/cherry_ai-api.service << 'EOF'
 [Unit]
-Description=Orchestra AI API
+Description=Cherry AI API
 After=network.target postgresql.service
 
 [Service]
@@ -270,7 +270,7 @@ EOF
                 ),
                 do.FirewallInboundRuleArgs(
                     protocol="tcp",
-                    port_range="8080",  # Orchestra API
+                    port_range="8080",  # cherry_ai API
                     source_addresses=["0.0.0.0/0", "::/0"],
                 ),
                 do.FirewallInboundRuleArgs(

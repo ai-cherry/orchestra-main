@@ -61,14 +61,14 @@ def check_critical_files():
 
     critical_paths = [
         # Core configuration
-        ("core/orchestrator/src/config/personas.yaml", "Persona configurations"),
+        ("core/conductor/src/config/personas.yaml", "Persona configurations"),
         # Core modules for Patrick's experience
         ("packages/shared/src/memory/memory_manager.py", "Memory management"),
         ("packages/shared/src/llm_client", "LLM integration"),
-        ("core/orchestrator/src/personas", "Persona management"),
+        ("core/conductor/src/personas", "Persona management"),
         # API endpoints
         (
-            "core/orchestrator/src/api/endpoints/interaction.py",
+            "core/conductor/src/api/endpoints/interaction.py",
             "API interaction endpoint",
         ),
     ]
@@ -89,7 +89,7 @@ def check_api_configuration():
     print(f"\n{Colors.BOLD}Checking API configuration...{Colors.ENDC}")
 
     # Check for the main API entrypoint
-    api_app_path = Path("core/orchestrator/src/api/app.py")
+    api_app_path = Path("core/conductor/src/api/app.py")
     if not api_app_path.exists():
         print(f"  {Colors.RED}✗ API app.py not found{Colors.ENDC}")
         return False
@@ -129,7 +129,7 @@ def check_hardcoded_references():
 
     # Files to check for hardcoded references
     files_to_check = [
-        "core/orchestrator/src/api/endpoints/interaction.py",
+        "core/conductor/src/api/endpoints/interaction.py",
         "packages/shared/src/memory/memory_manager.py",
     ]
 
@@ -171,7 +171,7 @@ def check_hardcoded_references():
 
 def main():
     """Run all quick checks."""
-    print(f"{Colors.BOLD}Orchestrator Quick Check Tool{Colors.ENDC}")
+    print(f"{Colors.BOLD}conductor Quick Check Tool{Colors.ENDC}")
     print(f"{Colors.BLUE}Running rapid checks for Patrick's experience...{Colors.ENDC}\n")
 
     # Run all checks

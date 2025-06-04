@@ -25,7 +25,7 @@ check_success() {
 
 # 1. Fix TypeScript configuration to allow build with errors
 echo -e "\n${YELLOW}Step 1: Configuring TypeScript for production build...${NC}"
-cd /root/orchestra-main/admin-ui
+cd /root/cherry_ai-main/admin-ui
 
 # Update tsconfig.json to be more lenient
 cat > tsconfig.json << 'EOF'
@@ -109,7 +109,7 @@ echo -e "\n${YELLOW}Step 3: Applying quick fixes for critical errors...${NC}"
 sed -i "s|import('@tanstack/router-devtools')|import('@tanstack/react-router-devtools')|g" src/routes/__root.tsx || true
 
 # Fix the ReactFlow type issue
-sed -i 's/const { project } = useReactFlow();/const reactFlowInstance = useReactFlow();/g' src/components/orchestration/AgentCanvas.tsx || true
+sed -i 's/const { project } = useReactFlow();/const reactFlowInstance = useReactFlow();/g' src/components/coordination/AgentCanvas.tsx || true
 
 # 4. Build with error suppression
 echo -e "\n${YELLOW}Step 4: Building frontend (ignoring TS errors)...${NC}"
@@ -243,31 +243,31 @@ check_success "Nginx configuration"
 
 # 8. Set up backend
 echo -e "\n${YELLOW}Step 8: Setting up backend service...${NC}"
-cd /root/orchestra-main
+cd /root/cherry_ai-main
 
 # Create minimal environment for backend
-cat > /etc/orchestra.env << 'EOF'
+cat > /etc/cherry_ai.env << 'EOF'
 ENVIRONMENT=production
 JWT_SECRET_KEY=your-secret-key-here-change-me
 ACCESS_TOKEN_EXPIRE_MINUTES=720
 ADMIN_USERNAME=admin
 ADMIN_PASSWORD=OrchAI_Admin2024!
-ADMIN_EMAIL=admin@orchestra.ai
+ADMIN_EMAIL=admin@cherry_ai.ai
 CORS_ORIGINS=["https://cherry-ai.me","https://www.cherry-ai.me","http://localhost:5173"]
 EOF
 
 # Create systemd service
-cat > /etc/systemd/system/orchestra-backend.service << 'EOF'
+cat > /etc/systemd/system/cherry_ai-backend.service << 'EOF'
 [Unit]
-Description=Orchestra AI Backend
+Description=Cherry AI Backend
 After=network.target
 
 [Service]
 Type=simple
 User=root
-WorkingDirectory=/root/orchestra-main
-EnvironmentFile=/etc/orchestra.env
-ExecStart=/root/orchestra-main/venv/bin/python -m uvicorn agent.app.main:app --host 0.0.0.0 --port 8000
+WorkingDirectory=/root/cherry_ai-main
+EnvironmentFile=/etc/cherry_ai.env
+ExecStart=/root/cherry_ai-main/venv/bin/python -m uvicorn agent.app.main:app --host 0.0.0.0 --port 8000
 Restart=always
 RestartSec=10
 
@@ -276,8 +276,8 @@ WantedBy=multi-user.target
 EOF
 
 systemctl daemon-reload
-systemctl enable orchestra-backend
-systemctl restart orchestra-backend
+systemctl enable cherry_ai-backend
+systemctl restart cherry_ai-backend
 check_success "Backend service"
 
 # 9. Final verification
@@ -285,7 +285,7 @@ echo -e "\n${YELLOW}Step 9: Verifying deployment...${NC}"
 sleep 3
 
 echo -e "\n${BLUE}Service Status:${NC}"
-systemctl is-active orchestra-backend && echo -e "${GREEN}✓ Backend running${NC}" || echo -e "${RED}✗ Backend not running${NC}"
+systemctl is-active cherry_ai-backend && echo -e "${GREEN}✓ Backend running${NC}" || echo -e "${RED}✗ Backend not running${NC}"
 systemctl is-active nginx && echo -e "${GREEN}✓ Nginx running${NC}" || echo -e "${RED}✗ Nginx not running${NC}"
 
 echo -e "\n${GREEN}========================================"
@@ -299,5 +299,5 @@ echo "📝 Note: TypeScript errors were bypassed for deployment."
 echo "   The site should work, but consider fixing TS errors later."
 echo ""
 echo "🔧 To add LLM API keys:"
-echo "   1. Edit /etc/orchestra.env"
-echo "   2. Run: systemctl restart orchestra-backend"
+echo "   1. Edit /etc/cherry_ai.env"
+echo "   2. Run: systemctl restart cherry_ai-backend"

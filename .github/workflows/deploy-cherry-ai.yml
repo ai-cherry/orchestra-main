@@ -24,8 +24,8 @@ jobs:
     
     - name: Build Docker image
       run: |
-        docker build -f Dockerfile.minimal -t orchestra-api-minimal:latest .
-        docker save orchestra-api-minimal:latest | gzip > orchestra-api-minimal.tar.gz
+        docker build -f Dockerfile.minimal -t cherry_ai-api-minimal:latest .
+        docker save cherry_ai-api-minimal:latest | gzip > cherry_ai-api-minimal.tar.gz
     
     - name: Setup SSH
       run: |
@@ -36,7 +36,7 @@ jobs:
     
     - name: Copy Docker image to server
       run: |
-        scp -i ~/.ssh/vultr_key orchestra-api-minimal.tar.gz root@45.32.69.157:/tmp/
+        scp -i ~/.ssh/vultr_key cherry_ai-api-minimal.tar.gz root@45.32.69.157:/tmp/
     
     - name: Deploy to server
       run: |
@@ -44,27 +44,27 @@ jobs:
         set -e
         
         # Load Docker image
-        cd /opt/orchestra
-        mv /tmp/orchestra-api-minimal.tar.gz .
-        docker load < orchestra-api-minimal.tar.gz
+        cd /opt/cherry_ai
+        mv /tmp/cherry_ai-api-minimal.tar.gz .
+        docker load < cherry_ai-api-minimal.tar.gz
         
         # Stop existing container
-        docker stop orchestra-api 2>/dev/null || true
-        docker rm orchestra-api 2>/dev/null || true
+        docker stop cherry_ai-api 2>/dev/null || true
+        docker rm cherry_ai-api 2>/dev/null || true
         
         # Run new container
         docker run -d \
-          --name orchestra-api \
+          --name cherry_ai-api \
           --restart unless-stopped \
           -p 8000:8000 \
-          -v /opt/orchestra/config:/app/core/orchestrator/src/config \
+          -v /opt/cherry_ai/config:/app/core/conductor/src/config \
           -e ENVIRONMENT=production \
           -e CORS_ORIGINS="*" \
-          orchestra-api-minimal:latest
+          cherry_ai-api-minimal:latest
         
         # Wait and check
         sleep 5
-        docker ps | grep orchestra-api
+        docker ps | grep cherry_ai-api
         curl -s http://localhost:8000/api/health | jq .
         ENDSSH
     

@@ -7,6 +7,7 @@ Professional financial advisor and analytical specialist focused on data-driven 
 
 import logging
 from typing import Dict, List, Any, Optional
+from typing_extensions import Optional
 from datetime import datetime
 
 try:

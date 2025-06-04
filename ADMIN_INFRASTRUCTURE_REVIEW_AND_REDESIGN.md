@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-This document presents a comprehensive architectural review of the current admin website infrastructure and proposes a robust, scalable, and change-resilient modernization strategy. The analysis reveals critical gaps in the current implementation that contribute to system fragility, including incomplete orchestration capabilities, stub implementations, and lack of proper state management.
+This document presents a comprehensive architectural review of the current admin website infrastructure and proposes a robust, scalable, and change-resilient modernization strategy. The analysis reveals critical gaps in the current implementation that contribute to system fragility, including incomplete coordination capabilities, stub implementations, and lack of proper state management.
 
 ## 1. Current State Analysis
 
@@ -11,7 +11,7 @@ This document presents a comprehensive architectural review of the current admin
 The current system consists of:
 - **Frontend**: React 18 + Vite 5 + TanStack Router/Query + Tailwind CSS
 - **Backend**: FastAPI-based agent services with stub implementations
-- **Orchestration**: Minimal workflow runner with placeholder functions
+- **coordination**: Minimal workflow runner with placeholder functions
 - **Deployment**: Direct server deployment via SSH with manual builds
 - **State Management**: Client-side only (Zustand), no server-side state persistence
 
@@ -67,7 +67,7 @@ The current system consists of:
                 ┌────────────────────────┼────────────────────┐
                 │                        │                    │
      ┌──────────▼─────────┐   ┌─────────▼──────┐   ┌────────▼────────┐
-     │  Orchestrator      │   │  Agent Service │   │  Auth Service   │
+     │  conductor      │   │  Agent Service │   │  Auth Service   │
      │  Service           │   │  Cluster       │   │  (Keycloak)     │
      └──────────┬─────────┘   └────────────────┘   └─────────────────┘
                 │
@@ -92,7 +92,7 @@ The current system consists of:
 #### Phase 2: Service Decomposition (Weeks 5-8)
 - Extract authentication service
 - Implement API Gateway
-- Create orchestrator service
+- Create conductor service
 - Set up message queue
 
 #### Phase 3: Resilience & Scaling (Weeks 9-12)
@@ -109,10 +109,10 @@ The current system consists of:
 
 ## 3. Detailed Component Design
 
-### 3.1 Orchestrator Service
+### 3.1 conductor Service
 
 ```python
-# orchestrator/core/workflow_engine.py
+# conductor/core/workflow_engine.py
 from typing import Dict, List, Optional
 from dataclasses import dataclass
 from enum import Enum
@@ -140,7 +140,7 @@ class Task:
 
 class WorkflowEngine:
     """
-    Enterprise-grade workflow orchestration engine with:
+    Enterprise-grade workflow coordination engine with:
     - Dependency graph execution
     - Parallel task execution
     - State persistence
@@ -361,7 +361,7 @@ groups:
 1. **Approval**: Review and approve strategy
 2. **Team Formation**: Assign dedicated team
 3. **Environment Setup**: Create development environment
-4. **Proof of Concept**: Implement orchestrator service
+4. **Proof of Concept**: Implement conductor service
 5. **Stakeholder Communication**: Regular updates
 
 ## Conclusion
@@ -403,7 +403,7 @@ This comprehensive redesign addresses all identified pain points while providing
                 ┌────────────────────────┼────────────────────┐
                 │                        │                    │
      ┌──────────▼─────────┐   ┌─────────▼──────┐   ┌────────▼────────┐
-     │  Orchestrator      │   │  Agent Service │   │  Auth Service   │
+     │  conductor      │   │  Agent Service │   │  Auth Service   │
      │  Service           │   │  Cluster       │   │  (Keycloak)     │
      └──────────┬─────────┘   └────────────────┘   └─────────────────┘
                 │
@@ -428,7 +428,7 @@ This comprehensive redesign addresses all identified pain points while providing
 #### Phase 2: Service Decomposition (Weeks 5-8)
 - Extract authentication service
 - Implement API Gateway
-- Create orchestrator service
+- Create conductor service
 - Set up message queue
 
 #### Phase 3: Resilience & Scaling (Weeks 9-12)
@@ -445,10 +445,10 @@ This comprehensive redesign addresses all identified pain points while providing
 
 ## 3. Detailed Component Design
 
-### 3.1 Orchestrator Service
+### 3.1 conductor Service
 
 ```python
-# orchestrator/core/workflow_engine.py
+# conductor/core/workflow_engine.py
 from typing import Dict, List, Optional
 from dataclasses import dataclass
 from enum import Enum
@@ -476,7 +476,7 @@ class Task:
 
 class WorkflowEngine:
     """
-    Enterprise-grade workflow orchestration engine with:
+    Enterprise-grade workflow coordination engine with:
     - Dependency graph execution
     - Parallel task execution
     - State persistence
@@ -697,7 +697,7 @@ groups:
 1. **Approval**: Review and approve strategy
 2. **Team Formation**: Assign dedicated team
 3. **Environment Setup**: Create development environment
-4. **Proof of Concept**: Implement orchestrator service
+4. **Proof of Concept**: Implement conductor service
 5. **Stakeholder Communication**: Regular updates
 
 ## Conclusion

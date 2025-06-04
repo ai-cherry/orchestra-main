@@ -1,6 +1,6 @@
 """
 """
-router = APIRouter(prefix="/api/orchestration", tags=["orchestration"])
+router = APIRouter(prefix="/api/coordination", tags=["coordination"])
 
 # Pydantic models for requests/responses
 
@@ -252,7 +252,7 @@ async def create_comprehensive_search(
 @router.get("/system/metrics")
 async def get_system_metrics() -> Dict[str, Any]:
     """Get overall system performance metrics"""
-        "orchestrator": orchestrator_metrics,
+        "conductor": conductor_metrics,
         "routing": {
             "total_queries": routing_analytics.get("total_queries_routed", 0),
             "query_distribution": routing_analytics.get("query_type_distribution", {}),
@@ -281,16 +281,16 @@ async def get_system_health() -> Dict[str, Any]:
         health_status["components"]["llm_router"] = f"unhealthy: {str(e)}"
         health_status["status"] = "degraded"
     
-    # Check orchestrator
+    # Check conductor
     try:
 
         pass
-        orchestrator = get_agent_orchestrator()
-        health_status["components"]["orchestrator"] = "healthy"
+        conductor = get_agent_conductor()
+        health_status["components"]["conductor"] = "healthy"
     except Exception:
 
         pass
-        health_status["components"]["orchestrator"] = f"unhealthy: {str(e)}"
+        health_status["components"]["conductor"] = f"unhealthy: {str(e)}"
         health_status["status"] = "degraded"
     
     # Check agents

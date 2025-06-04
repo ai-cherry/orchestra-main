@@ -2,20 +2,20 @@
 
 ## Executive Summary
 
-This document provides a comprehensive analysis of the Model Context Protocol (MCP) servers in the Orchestra AI project. The analysis covers architecture, performance metrics, error patterns, stability issues, and provides specific recommendations for enhancements.
+This document provides a comprehensive analysis of the Model Context Protocol (MCP) servers in the Cherry AI project. The analysis covers architecture, performance metrics, error patterns, stability issues, and provides specific recommendations for enhancements.
 
 ## Current Architecture Overview
 
 ### MCP Server Components
 
-1. **Orchestrator Server** (`orchestrator_server.py`)
+1. **conductor Server** (`conductor_server.py`)
    - **Purpose**: Manages agent coordination and workflow execution
    - **Port**: 8002
    - **Dependencies**: PostgreSQL for agent metadata
    - **Key Features**:
      - Agent listing and execution
      - Mode switching (autonomous, guided, assistant)
-     - Workflow orchestration
+     - Workflow coordination
      - Session management
 
 2. **Memory Server** (`memory_server.py`)
@@ -56,7 +56,7 @@ This document provides a comprehensive analysis of the Model Context Protocol (M
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                  │
 │  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐ │
-│  │  Orchestrator   │  │     Memory      │  │     Tools       │ │
+│  │  conductor   │  │     Memory      │  │     Tools       │ │
 │  │   Server        │  │     Server      │  │     Server      │ │
 │  │   Port: 8002    │  │   Port: 8003    │  │   Port: 8006    │ │
 │  └────────┬────────┘  └────────┬────────┘  └────────┬────────┘ │
@@ -417,7 +417,7 @@ start_server_enhanced() {
 # Parallel server startup
 if [ "$PARALLEL_STARTUP" = true ]; then
     start_server_enhanced "memory" "$MEMORY_SERVER_CMD" 8003 "$MEMORY_HEALTH_URL" &
-    start_server_enhanced "orchestrator" "$ORCHESTRATOR_CMD" 8002 "$ORCHESTRATOR_HEALTH_URL" &
+    start_server_enhanced "conductor" "$CONDUCTOR_CMD" 8002 "$CONDUCTOR_HEALTH_URL" &
     start_server_enhanced "tools" "$TOOLS_CMD" 8006 "$TOOLS_HEALTH_URL" &
     start_server_enhanced "weaviate-direct" "$WEAVIATE_CMD" 8001 "$WEAVIATE_HEALTH_URL" &
     
@@ -550,7 +550,7 @@ class MCPGateway:
     def __init__(self):
         self.app = FastAPI(title="MCP Gateway")
         self.servers = {
-            "orchestrator": "http://localhost:8002",
+            "conductor": "http://localhost:8002",
             "memory": "http://localhost:8003",
             "tools": "http://localhost:8006",
             "weaviate": "http://localhost:8001"

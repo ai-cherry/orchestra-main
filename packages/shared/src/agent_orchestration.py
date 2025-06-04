@@ -3,7 +3,7 @@ This module implements the "middle management" tier of domain expert agents that
 specialized worker agents. These domain experts can manage context, delegate tasks, and
 aggregate results while communicating through the unified gateway adapter.
 """
-    """Defines the roles that agents can play in the orchestration system."""
+    """Defines the roles that agents can play in the coordination system."""
     COORDINATOR = "coordinator"
     RESEARCHER = "researcher"
     EXECUTOR = "executor"
@@ -29,7 +29,7 @@ aggregate results while communicating through the unified gateway adapter.
     ERROR_HANDLER = "error_handler"
 
 class BaseAgent:
-    """Base class for all agents in the orchestration system."""
+    """Base class for all agents in the coordination system."""
         """Initialize the base agent."""
         """Initialize the agent with required services."""
             logger.error(f"Failed to initialize agent {self.agent_id}: {str(e)}")
@@ -447,12 +447,12 @@ class DomainExpertAgent(BaseAgent):
             context={"role": self.role.value, "capabilities": list(self.capabilities)},
         )
 
-class AgentOrchestrator:
+class Agentconductor:
     """
     """
-        """Initialize the agent orchestrator."""
-        """Initialize the orchestrator and domain experts."""
-            logger.error(f"Failed to initialize orchestrator: {str(e)}")
+        """Initialize the agent conductor."""
+        """Initialize the conductor and domain experts."""
+            logger.error(f"Failed to initialize conductor: {str(e)}")
             return False
 
     async def _initialize_domain_experts(self) -> None:

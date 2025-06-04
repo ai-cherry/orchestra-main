@@ -1,6 +1,6 @@
-# Workload Identity Federation for AI Orchestra
+# Workload Identity Federation for AI cherry_ai
 
-This document serves as the definitive guide for implementing and using Workload Identity Federation (WIF) in the AI Orchestra project. It provides comprehensive instructions for setup, usage, verification, and troubleshooting.
+This document serves as the definitive guide for implementing and using Workload Identity Federation (WIF) in the AI cherry_ai project. It provides comprehensive instructions for setup, usage, verification, and troubleshooting.
 
 ## Table of Contents
 
@@ -16,7 +16,7 @@ This document serves as the definitive guide for implementing and using Workload
 ## Overview
 
 Workload Identity Federation (WIF) allows external identities (like GitHub Actions) to act as
-The AI Orchestra project uses WIF for all deployments to
+The AI cherry_ai project uses WIF for all deployments to
 ## Benefits
 
 Using Workload Identity Federation provides several advantages over traditional service account keys:
@@ -29,7 +29,7 @@ Using Workload Identity Federation provides several advantages over traditional 
 
 ## Setup Process
 
-The AI Orchestra project provides a unified script for setting up Workload Identity Federation:
+The AI cherry_ai project provides a unified script for setting up Workload Identity Federation:
 
 ### Prerequisites
 

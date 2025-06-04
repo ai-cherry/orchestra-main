@@ -12,7 +12,7 @@ This roadmap guides the transition from the current Paperspace development envir
 
 ### Target (DigitalOcean)
 - **Vector Node**: 68.183.170.81 - Weaviate v1.30+ with Agents runtime
-- **App Node**: 159.65.79.26 - PostgreSQL 16 + pgvector, Orchestrator, MCP servers
+- **App Node**: 159.65.79.26 - PostgreSQL 16 + pgvector, conductor, MCP servers
 - **Status**: Production-ready, fully deployed
 
 ## Phase 1: Parallel Setup (Days 1-3)
@@ -25,24 +25,24 @@ chmod +x setup_do_dev_environment.sh
 
 # Verify connections
 ssh do-vector "docker ps"
-ssh do-app "psql -U orchestrator -c '\l'"
+ssh do-app "psql -U conductor -c '\l'"
 ```
 
 ### Day 2: Code Sync & Dependencies
 ```bash
 # Sync codebase to App node
 rsync -avz --exclude venv --exclude .git \
-  /home/paperspace/orchestra-main/ \
-  root@159.65.79.26:/opt/orchestra/
+  /home/paperspace/cherry_ai-main/ \
+  root@159.65.79.26:/opt/cherry_ai/
 
 # Install dependencies on App node
-ssh do-app "cd /opt/orchestra && source venv/bin/activate && pip install -r requirements/base.txt"
+ssh do-app "cd /opt/cherry_ai && source venv/bin/activate && pip install -r requirements/base.txt"
 ```
 
 ### Day 3: Data Migration
 ```bash
 # Run migration script from Paperspace
-cd /home/paperspace/orchestra-main
+cd /home/paperspace/cherry_ai-main
 source venv/bin/activate
 export WEAVIATE_ENDPOINT=http://68.183.170.81:8080
 python scripts/migrate_dragonfly_to_weaviate.py
@@ -50,30 +50,30 @@ python scripts/migrate_dragonfly_to_weaviate.py
 
 ## Phase 2: Service Deployment (Days 4-5)
 
-### Deploy Orchestrator Services
+### Deploy conductor Services
 ```bash
 # SSH to App node
 ssh do-app
 
 # Setup environment
-cat > /opt/orchestra/.env << EOF
+cat > /opt/cherry_ai/.env << EOF
 WEAVIATE_ENDPOINT=http://10.120.0.3:8080
-POSTGRES_DSN=postgresql://orchestrator:dev-password-123@localhost/orchestrator
-PYTHONPATH=/opt/orchestra
+POSTGRES_DSN=postgresql://conductor:dev-password-123@localhost/conductor
+PYTHONPATH=/opt/cherry_ai
 EOF
 
 # Create systemd service
-cat > /etc/systemd/system/orchestra-api.service << 'EOF'
+cat > /etc/systemd/system/cherry_ai-api.service << 'EOF'
 [Unit]
-Description=Orchestra AI API
+Description=Cherry AI API
 After=network.target postgresql.service
 
 [Service]
 Type=simple
 User=root
-WorkingDirectory=/opt/orchestra
-EnvironmentFile=/opt/orchestra/.env
-ExecStart=/opt/orchestra/venv/bin/python -m uvicorn core.api.main:app --host 0.0.0.0 --port 8080
+WorkingDirectory=/opt/cherry_ai
+EnvironmentFile=/opt/cherry_ai/.env
+ExecStart=/opt/cherry_ai/venv/bin/python -m uvicorn core.api.main:app --host 0.0.0.0 --port 8080
 Restart=always
 
 [Install]
@@ -81,17 +81,17 @@ WantedBy=multi-user.target
 EOF
 
 systemctl daemon-reload
-systemctl enable orchestra-api
-systemctl start orchestra-api
+systemctl enable cherry_ai-api
+systemctl start cherry_ai-api
 ```
 
 ### Deploy MCP Servers
 ```bash
 # On App node
-cd /opt/orchestra
+cd /opt/cherry_ai
 docker run -d --name mcp-server \
   --network host \
-  -v /opt/orchestra/mcp_server:/app \
+  -v /opt/cherry_ai/mcp_server:/app \
   -e KUBECONFIG=/root/.kube/config \
   ghcr.io/openai/mcp:latest
 ```
@@ -106,20 +106,20 @@ Host do-app-dev
     HostName 159.65.79.26
     User root
     ForwardAgent yes
-    RemoteCommand cd /opt/orchestra && source venv/bin/activate && exec bash
+    RemoteCommand cd /opt/cherry_ai && source venv/bin/activate && exec bash
 ```
 
 ### Development Commands Cheatsheet
 ```bash
 # Local (Paperspace) → Remote (DO)
-alias do-sync='rsync -avz --exclude venv /home/paperspace/orchestra-main/ root@159.65.79.26:/opt/orchestra/'
-alias do-logs='ssh do-app journalctl -u orchestra-api -f'
-alias do-restart='ssh do-app systemctl restart orchestra-api'
+alias do-sync='rsync -avz --exclude venv /home/paperspace/cherry_ai-main/ root@159.65.79.26:/opt/cherry_ai/'
+alias do-logs='ssh do-app journalctl -u cherry_ai-api -f'
+alias do-restart='ssh do-app systemctl restart cherry_ai-api'
 
 # Add to ~/.bashrc
-echo "alias do-sync='rsync -avz --exclude venv /home/paperspace/orchestra-main/ root@159.65.79.26:/opt/orchestra/'" >> ~/.bashrc
-echo "alias do-logs='ssh do-app journalctl -u orchestra-api -f'" >> ~/.bashrc
-echo "alias do-restart='ssh do-app systemctl restart orchestra-api'" >> ~/.bashrc
+echo "alias do-sync='rsync -avz --exclude venv /home/paperspace/cherry_ai-main/ root@159.65.79.26:/opt/cherry_ai/'" >> ~/.bashrc
+echo "alias do-logs='ssh do-app journalctl -u cherry_ai-api -f'" >> ~/.bashrc
+echo "alias do-restart='ssh do-app systemctl restart cherry_ai-api'" >> ~/.bashrc
 ```
 
 ## Phase 4: Validation & Cutover (Day 8)
@@ -134,7 +134,7 @@ curl -I http://159.65.79.26:8080/health
 curl -I http://68.183.170.81:8080/v1/.well-known/ready
 
 # Check latency
-python /opt/orchestra/monitor_latency.py
+python /opt/cherry_ai/monitor_latency.py
 ```
 
 ### Performance Benchmarks
@@ -147,7 +147,7 @@ python /opt/orchestra/monitor_latency.py
 ### Make DigitalOcean Primary
 1. **Update Git remote**:
    ```bash
-   git remote add do-origin git@github.com:your-org/orchestra-main.git
+   git remote add do-origin git@github.com:your-org/cherry_ai-main.git
    git config --global push.default current
    ```
 
@@ -156,7 +156,7 @@ python /opt/orchestra/monitor_latency.py
    # .github/workflows/deploy.yml
    - name: Deploy to DigitalOcean
      run: |
-       ssh do-app "cd /opt/orchestra && git pull && systemctl restart orchestra-api"
+       ssh do-app "cd /opt/cherry_ai && git pull && systemctl restart cherry_ai-api"
    ```
 
 3. **Archive Paperspace snapshot**:
@@ -164,7 +164,7 @@ python /opt/orchestra/monitor_latency.py
    # Create final backup
    tar -czf paperspace_final_backup_$(date +%Y%m%d).tar.gz \
      --exclude venv --exclude .git \
-     /home/paperspace/orchestra-main/
+     /home/paperspace/cherry_ai-main/
 
    # Upload to DO Spaces or S3
    ```
@@ -199,7 +199,7 @@ If issues arise:
 do-sync && do-restart
 
 # Development on Paperspace
-cd /home/paperspace/orchestra-main
+cd /home/paperspace/cherry_ai-main
 # ... make changes ...
 
 # Test on DigitalOcean
@@ -237,7 +237,7 @@ cp node_exporter-1.7.0.linux-amd64/node_exporter /usr/local/bin/
 - Code synced to App node
 
 ✅ Phase 2 Complete when:
-- Orchestra API responding on port 8080
+- cherry_ai API responding on port 8080
 - MCP servers running
 - Data migration successful
 
@@ -277,7 +277,7 @@ cp node_exporter-1.7.0.linux-amd64/node_exporter /usr/local/bin/
 1. **Enable automated backups**:
    ```bash
    # Add to crontab on App node
-   0 2 * * * pg_dump orchestrator | gzip > /backups/postgres_$(date +\%Y\%m\%d).sql.gz
+   0 2 * * * pg_dump conductor | gzip > /backups/postgres_$(date +\%Y\%m\%d).sql.gz
    0 3 * * * curl -X POST http://localhost:8080/api/backup/weaviate
    ```
 
@@ -290,4 +290,4 @@ cp node_exporter-1.7.0.linux-amd64/node_exporter /usr/local/bin/
 3. **Configure monitoring dashboards**:
    - Grafana: Monitor system metrics
    - Langfuse: Track LLM usage
-   - Custom dashboard for Orchestra metrics
+   - Custom dashboard for cherry_ai metrics

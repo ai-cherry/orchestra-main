@@ -1,4 +1,4 @@
-"""Authentication module for Orchestra AI"""
+"""Authentication module for Cherry AI"""
 
 from .utils import create_admin_user, verify_password, get_password_hash
 

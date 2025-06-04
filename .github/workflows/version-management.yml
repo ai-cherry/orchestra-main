@@ -236,7 +236,7 @@ jobs:
       - name: Configure git
         run: |
           git config --global user.name "Version Bot"
-          git config --global user.email "version-bot@orchestra.ai"
+          git config --global user.email "version-bot@cherry_ai.ai"
       
       - name: Install dependencies
         run: |

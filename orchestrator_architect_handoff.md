@@ -1,7 +1,7 @@
-# Architect Agent Handoff: Orchestrator Landing Page
+# Architect Agent Handoff: conductor Landing Page
 
 ## Context
-The Orchestrator requires a sophisticated landing page that serves as the primary entry point. The user has provided an HTML design featuring a dark theme with red accents, multi-modal input capabilities, and advanced features like voice processing and file management.
+The conductor requires a sophisticated landing page that serves as the primary entry point. The user has provided an HTML design featuring a dark theme with red accents, multi-modal input capabilities, and advanced features like voice processing and file management.
 
 ## Objective
 Design a comprehensive component architecture that:
@@ -12,7 +12,7 @@ Design a comprehensive component architecture that:
 
 ## Current State Analysis
 - **Tech Stack**: React 18.3.1, TypeScript, TanStack Router, Zustand, Tailwind CSS
-- **Existing Routes**: Dashboard at '/', Orchestration at '/orchestration'
+- **Existing Routes**: Dashboard at '/', coordination at '/coordination'
 - **State Management**: Zustand stores for auth, persona, workflow
 - **Component Library**: Radix UI components with custom styling
 
@@ -53,7 +53,7 @@ Design a comprehensive component architecture that:
 
 ### Component Hierarchy
 ```
-OrchestratorLandingPage/
+conductorLandingPage/
 ├── Header/
 │   ├── Logo
 │   ├── Navigation
@@ -81,7 +81,7 @@ OrchestratorLandingPage/
 
 ### State Architecture
 ```typescript
-interface OrchestratorLandingState {
+interface conductorLandingState {
   search: {
     query: string;
     mode: 'creative' | 'deep' | 'super_deep';

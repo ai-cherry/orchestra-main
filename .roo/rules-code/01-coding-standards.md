@@ -156,7 +156,7 @@ subprocess.run(["rm", "-rf", "/tmp/specific_file"], check=True)
 logger.error(f"Operation failed: {error}")
 
 # DO: Integrate into existing modules
-# In scripts/orchestra.py: add_cleanup_command()
+# In scripts/cherry_ai.py: add_cleanup_command()
 
 # DO: Managed temporary files
 @transient_file(lifetime_hours=4)
@@ -169,7 +169,7 @@ def create_temp_file(data: str) -> Path:
 ### Module Extension
 - Check existing modules before creating new ones
 - Extend `core.utils` for utilities
-- Add to `scripts/orchestra.py` for CLI commands
+- Add to `scripts/cherry_ai.py` for CLI commands
 - Use `services/` for new service components
 
 ### Testing
@@ -231,3 +231,7 @@ if __name__ == "__main__":
 - Log execution times for slow operations
 - Monitor memory usage for data processing
 - Profile before optimizing
+
+## Permitted Technologies
+- **Docker / docker-compose**: Allowed for local development and service coordination. Use official Python 3.10 base images (e.g., `python:3.10-slim`). Minimize layers, use non-root users, and follow security best practices. Multi-stage builds are recommended for production images.
+- **Redis**: Allowed for general-purpose caching (key-value with TTLs) and semantic caching (using Redis Stack or vector search modules). Configure for performance and resource limits. Use for hot/warm cache layers, not as a primary database.

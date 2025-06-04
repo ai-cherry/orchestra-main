@@ -1,8 +1,9 @@
-"""LLM client for Orchestra AI"""
+"""LLM client for Cherry AI"""
 
 import os
 import logging
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, Optional
+from typing_extensions import Optional, List
 
 logger = logging.getLogger(__name__)
 

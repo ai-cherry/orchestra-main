@@ -24,7 +24,7 @@ echo
 echo "[$(check_key DATABASE_URL)] PostgreSQL Database"
 echo "[$(check_key ANTHROPIC_API_KEY)] At least one AI API key (Anthropic/OpenAI/etc)"
 echo
-echo "Status: Your AI orchestration is FULLY FUNCTIONAL locally! ✅"
+echo "Status: Your AI coordination is FULLY FUNCTIONAL locally! ✅"
 echo
 
 echo "☁️  PRODUCTION DEPLOYMENT REQUIREMENTS"
@@ -50,7 +50,7 @@ echo "🔹 Data Pipeline Integration (Optional):"
 echo "[$(check_key AIRBYTE_API_KEY)] AIRBYTE_API_KEY - Connect to Airbyte"
 echo "[$(check_key AIRBYTE_API_URL)] AIRBYTE_API_URL - Airbyte endpoint"
 echo "[$(check_key AIRBYTE_WORKSPACE_ID)] AIRBYTE_WORKSPACE_ID - Airbyte workspace"
-echo "   └─ Without these: No automated data pipelines (not needed for AI orchestration)"
+echo "   └─ Without these: No automated data pipelines (not needed for AI coordination)"
 echo
 
 echo
@@ -65,7 +65,7 @@ fi
 
 if [ "$local_ready" = true ]; then
     echo "✅ Local Development: READY"
-    echo "   Your AI orchestration system is fully functional!"
+    echo "   Your AI coordination system is fully functional!"
 else
     echo "⚠️  Local Development: Missing core requirements"
 fi
@@ -89,5 +89,5 @@ if [ "$local_ready" = true ]; then
 else
     echo "1. Ensure PostgreSQL is running"
     echo "2. Add at least one AI API key to .env"
-    echo "3. Run: ./scripts/test_orchestrator_demo.py"
+    echo "3. Run: ./scripts/test_conductor_demo.py"
 fi

@@ -1,6 +1,6 @@
-# Testing Strategy for AI Orchestration System
+# Testing Strategy for AI coordination System
 
-This document outlines the testing approach for the AI orchestration system, providing guidance on test organization, mocking strategies, and best practices.
+This document outlines the testing approach for the AI coordination system, providing guidance on test organization, mocking strategies, and best practices.
 
 ## Testing Layers
 
@@ -18,7 +18,7 @@ Tests are organized by type and functionality:
 tests/
 ├── test_agents/         # Tests for agent components
 ├── test_api/            # Tests for API endpoints
-├── test_core/           # Tests for core orchestration
+├── test_core/           # Tests for core coordination
 ├── test_personas/       # Tests for persona management
 ├── test_services/       # Tests for service components
 │   └── test_llm/        # Tests for LLM-specific services
@@ -39,7 +39,7 @@ The unified service registry makes testing easier by allowing dependency replace
 
 ```python
 # Replace a service with a mock for testing
-from core.orchestrator.src.services.unified_registry import register, get
+from core.conductor.src.services.unified_registry import register, get
 from unittest.mock import MagicMock
 
 def test_with_mock_service():
@@ -72,7 +72,7 @@ def test_llm_agent():
     }
 
     # Patch the provider factory
-    with patch("core.orchestrator.src.services.llm.providers.get_llm_provider",
+    with patch("core.conductor.src.services.llm.providers.get_llm_provider",
                return_value=mock_provider):
         # Create agent and test
         agent = LLMAgent()
@@ -96,7 +96,7 @@ def test_event_subscriber():
         captured_events.append(event_data)
 
     # Subscribe capture to events
-    from core.orchestrator.src.services.unified_event_bus import subscribe
+    from core.conductor.src.services.unified_event_bus import subscribe
     handler_id = subscribe("test_event", event_capture)
 
     # Trigger component that publishes events
@@ -116,7 +116,7 @@ Common fixtures are defined in `conftest.py`:
 @pytest.fixture
 def service_registry():
     """Provide a clean service registry for each test."""
-    from core.orchestrator.src.services.unified_registry import get_service_registry
+    from core.conductor.src.services.unified_registry import get_service_registry
     registry = get_service_registry()
     # Clean state before test
     registry.close_all()
@@ -163,7 +163,7 @@ def test_with_environment(monkeypatch):
     monkeypatch.setenv("DEFAULT_LLM_MODEL", "test-model")
 
     # Import the component (after environment is set)
-    from core.orchestrator.src.services.llm.providers import get_llm_provider
+    from core.conductor.src.services.llm.providers import get_llm_provider
 
     # Test component with the environment settings
     provider = get_llm_provider()
@@ -172,10 +172,10 @@ def test_with_environment(monkeypatch):
 
 ## Test Support Utilities
 
-The `core/orchestrator/src/config/test_support.py` module provides utilities for testing:
+The `core/conductor/src/config/test_support.py` module provides utilities for testing:
 
 ```python
-from core.orchestrator.src.config.test_support import (
+from core.conductor.src.config.test_support import (
     create_test_context,
     create_test_agent,
     mock_external_services
@@ -206,7 +206,7 @@ For testing async components, use pytest-asyncio:
 async def test_async_component():
     """Test asynchronous component."""
     # Import async component
-    from core.orchestrator.src.services.unified_event_bus import publish_async
+    from core.conductor.src.services.unified_event_bus import publish_async
 
     # Test async operations
     result = await publish_async("test_event", {"test": True})

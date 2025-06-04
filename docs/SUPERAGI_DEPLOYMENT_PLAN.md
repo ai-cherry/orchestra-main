@@ -1,4 +1,4 @@
-# SuperAGI Deployment Plan for AI Orchestra
+# SuperAGI Deployment Plan for AI cherry_ai
 
 ## Overview
 
@@ -7,7 +7,7 @@ This document details the complete deployment plan for SuperAGI on Google Kubern
 ## Current Architecture
 
 ### Components
-1. **SuperAGI Core**: Multi-agent orchestration system (3 replicas, auto-scaling 2-10)
+1. **SuperAGI Core**: Multi-agent coordination system (3 replicas, auto-scaling 2-10)
 2. **DragonflyDB**: Redis-compatible in-memory cache (20Gi storage)
 3. **MongoDB**: Document store for agent data (100Gi storage)
 4. **Weaviate**: Vector database for semantic search (50Gi storage)
@@ -70,7 +70,7 @@ class IngressComponent(ComponentResource):
         service_name: str,
         opts: Optional[ResourceOptions] = None
     ):
-        super().__init__("orchestra:ingress:Component", name, None, opts)
+        super().__init__("cherry_ai:ingress:Component", name, None, opts)
 
         self.namespace = config.get("namespace", "superagi")
         self.domain = config.get("domain", "cherry-ai.me")
@@ -211,7 +211,7 @@ ingress_config = {
 }
 
 ingress_component = IngressComponent(
-    "orchestra-ingress",
+    "cherry_ai-ingress",
     config=ingress_config,
     service_name="superagi",
     opts=ResourceOptions(provider=k8s_provider, depends_on=[superagi_component]),

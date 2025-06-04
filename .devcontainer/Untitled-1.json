@@ -27,9 +27,9 @@
         "errorHighlighting": true
       }
     },
-    "orchestrator": {
-      "name": "🪃 Orchestrator",
-      "description": "Strategic workflow orchestration",
+    "conductor": {
+      "name": "🪃 conductor",
+      "description": "Strategic workflow coordination",
       "toolAccess": ["read", "browser", "command", "mcp"],
       "filePermissions": ["*"],
       "specialFeatures": {

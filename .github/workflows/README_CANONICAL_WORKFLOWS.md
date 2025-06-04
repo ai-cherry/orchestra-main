@@ -1,7 +1,7 @@
 # GitHub Workflows - Unified Vultr Architecture
 
 ## Overview
-Orchestra AI uses a simplified GitHub Actions workflow that syncs code directly to the production Vultr server where all development and deployment occur.
+Cherry AI uses a simplified GitHub Actions workflow that syncs code directly to the production Vultr server where all development and deployment occur.
 
 ## Active Workflows
 

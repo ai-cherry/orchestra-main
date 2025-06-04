@@ -116,7 +116,7 @@ Before using AI tools (Cursor, Copilot, etc.):
 
 ```bash
 # Check current state
-python scripts/orchestra.py services status
+python scripts/cherry_ai.py services status
 python scripts/config_validator.py --verbose
 
 # Document what exists
@@ -237,7 +237,7 @@ make pre-commit-run
 git add -A && git commit -m "checkpoint: before AI coding session"
 
 # Document current state
-python scripts/orchestra.py services status > pre-ai-status.txt
+python scripts/cherry_ai.py services status > pre-ai-status.txt
 pip freeze > pre-ai-requirements.txt
 
 # Run full validation
@@ -291,7 +291,7 @@ Watch for these warning signs:
 5. **Duplicate services**
    - New monitoring when we have health_monitor.py
    - New validators when we have config_validator.py
-   - New CLI tools when we have orchestra.py
+   - New CLI tools when we have cherry_ai.py
 
 ## 📝 Documentation Standards
 

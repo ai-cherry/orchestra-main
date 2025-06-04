@@ -3,6 +3,7 @@
 import os
 import logging
 from typing import Dict, Any, List, Optional
+from typing_extensions import Optional
 import weaviate
 
 logger = logging.getLogger(__name__)

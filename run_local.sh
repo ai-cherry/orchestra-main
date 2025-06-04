@@ -1,5 +1,5 @@
 #!/bin/bash
-# run_local.sh - Script to run the AI Orchestra API locally
+# run_local.sh - Script to run the AI cherry_ai API locally
 
 set -e
 
@@ -60,7 +60,7 @@ log "INFO" "Checking dependencies..."
 poetry install --no-interaction
 
 # Run the application
-log "INFO" "Starting AI Orchestra API..."
+log "INFO" "Starting AI cherry_ai API..."
 log "INFO" "API will be available at http://localhost:8000"
 log "INFO" "Press Ctrl+C to stop the server"
 

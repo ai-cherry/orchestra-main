@@ -1,6 +1,6 @@
-# Orchestra Production Deployment Guide
+# cherry_ai Production Deployment Guide
 
-This guide provides a comprehensive overview of the deployment process for Orchestra to production environments. It details the steps involved, scripts available, and recommendations for a successful deployment.
+This guide provides a comprehensive overview of the deployment process for cherry_ai to production environments. It details the steps involved, scripts available, and recommendations for a successful deployment.
 
 ## Table of Contents
 
@@ -16,7 +16,7 @@ This guide provides a comprehensive overview of the deployment process for Orche
 
 ## Overview
 
-Deploying Orchestra to production involves several steps to ensure a reliable, secure, and well-monitored environment. The process follows a dev → prod progression to minimize risks:
+Deploying cherry_ai to production involves several steps to ensure a reliable, secure, and well-monitored environment. The process follows a dev → prod progression to minimize risks:
 
 1. Develop and test in a development environment
 2. Verify the system works as expected with pre-deployment checks
@@ -28,19 +28,19 @@ Deploying Orchestra to production involves several steps to ensure a reliable, s
 
 ## Architecture Overview
 
-Orchestra uses a two-service deployment architecture:
+cherry_ai uses a two-service deployment architecture:
 
-1. **Orchestra API Service** (`orchestrator-api-{env}`):
+1. **cherry_ai API Service** (`conductor-api-{env}`):
 
-   - Primary backend service implementing the Orchestra orchestration logic
+   - Primary backend service implementing the cherry_ai coordination logic
    - Provides API endpoints for agent interaction, including the `/phidata/chat` endpoint
    - Connects to PostgreSQL and Redis for data persistence and caching
    - Manages LLM provider integration, agent coordination, and memory systems
 
 2. **Phidata Agent UI Service** (`phidata-agent-ui-{env}`):
    - Frontend UI service using the official Phidata Agent UI container image (`phidata/agent_ui:1.0.0`)
-   - Serves as a placeholder UI for interacting with the Orchestra backend
-   - Connects to the Orchestra API using the `PHIDATA_API_URL` environment variable
+   - Serves as a placeholder UI for interacting with the cherry_ai backend
+   - Connects to the cherry_ai API using the `PHIDATA_API_URL` environment variable
    - Runs as a separate
 This separation of concerns allows for:
 
@@ -66,7 +66,7 @@ We've created several scripts to automate and streamline the deployment process:
    - Configures IAM permissions for service accounts
 
 3. **`deploy_to_production.sh`**
-   - Orchestrates the full production deployment process
+   - cherry_aites the full production deployment process
    - Guides you through all necessary steps
    - Handles Pulumi workspace and configuration
 
@@ -163,13 +163,13 @@ After deployment, verify both services:
    ```
 
    - Visit this URL in your web browser to confirm the Phidata Agent UI is working
-   - Test sending messages through the UI to verify it connects to the Orchestra API
+   - Test sending messages through the UI to verify it connects to the cherry_ai API
 
 3. **Logs**: Review recent logs for any errors
 
    ```bash
    # API logs
-   gcloud logging read "resource.type=cloud_run_revision AND resource.labels.service_name=orchestrator-api-prod" --limit=10
+   gcloud logging read "resource.type=cloud_run_revision AND resource.labels.service_name=conductor-api-prod" --limit=10
 
    # UI logs
    gcloud logging read "resource.type=cloud_run_revision AND resource.labels.service_name=phidata-agent-ui-prod" --limit=10
@@ -187,7 +187,7 @@ The deployment script sets up basic monitoring and alerting for:
 For more advanced monitoring:
 
 1. Open the 2. Navigate to Monitoring → Dashboards
-3. Create custom dashboards for Orchestra metrics
+3. Create custom dashboards for cherry_ai metrics
 4. Set up additional alerting policies as needed
 
 ## Cleanup Plan
@@ -198,7 +198,7 @@ After successful production deployment, follow the prioritized cleanup plan:
 
 - Remove redundant diagnostic scripts
   - `diagnose_environment.py`
-  - `diagnose_orchestrator.py`
+  - `diagnose_conductor.py`
   - `diagnose_patrick_issues.py`
 - Remove older setup scripts
   - `setup.sh`
@@ -241,11 +241,11 @@ If you encounter issues:
 
 1. Check the logs for specific error messages
 2. Review the [Troubleshooting Guide](./TROUBLESHOOTING_GUIDE.md)
-3. Look for similar issues in [Orchestra Deployment Steps](./ORCHESTRA_DEPLOYMENT_STEPS.md)
+3. Look for similar issues in [cherry_ai Deployment Steps](./cherry_ai_DEPLOYMENT_STEPS.md)
 
 ## Conclusion
 
-By following this guide and using the provided scripts, you can deploy Orchestra to production with confidence. The automated verification, configuration management, and monitoring setup help ensure a reliable and maintainable production environment.
+By following this guide and using the provided scripts, you can deploy cherry_ai to production with confidence. The automated verification, configuration management, and monitoring setup help ensure a reliable and maintainable production environment.
 
 Remember to:
 

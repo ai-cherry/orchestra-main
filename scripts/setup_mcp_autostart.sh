@@ -9,9 +9,9 @@ echo "=== MCP Auto-Start Setup ==="
 # First, fix PostgreSQL permissions
 echo "Fixing PostgreSQL permissions..."
 sudo -u postgres psql << EOF
-CREATE USER orchestrator WITH PASSWORD 'orch3str4_2024' CREATEDB;
-ALTER USER orchestrator WITH PASSWORD 'orch3str4_2024';
-GRANT ALL PRIVILEGES ON DATABASE orchestrator TO orchestrator;
+CREATE USER conductor WITH PASSWORD 'orch3str4_2024' CREATEDB;
+ALTER USER conductor WITH PASSWORD 'orch3str4_2024';
+GRANT ALL PRIVILEGES ON DATABASE conductor TO conductor;
 \q
 EOF
 
@@ -19,24 +19,24 @@ EOF
 echo "Creating Memory MCP service..."
 sudo tee /etc/systemd/system/mcp-memory.service > /dev/null << 'EOF'
 [Unit]
-Description=Orchestra MCP Memory Server
+Description=cherry_ai MCP Memory Server
 After=postgresql.service network.target
 Wants=postgresql.service
 
 [Service]
 Type=simple
 User=root
-WorkingDirectory=/root/orchestra-main
-Environment="PATH=/root/orchestra-main/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+WorkingDirectory=/root/cherry_ai-main
+Environment="PATH=/root/cherry_ai-main/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 Environment="POSTGRES_HOST=localhost"
 Environment="POSTGRES_PORT=5432"
-Environment="POSTGRES_DB=orchestrator"
-Environment="POSTGRES_USER=orchestrator"
+Environment="POSTGRES_DB=conductor"
+Environment="POSTGRES_USER=conductor"
 Environment="POSTGRES_PASSWORD=orch3str4_2024"
 Environment="WEAVIATE_HOST=localhost"
 Environment="WEAVIATE_PORT=8080"
 Environment="MCP_MEMORY_PORT=8003"
-ExecStart=/root/orchestra-main/venv/bin/python /root/orchestra-main/mcp_server/servers/memory_server.py
+ExecStart=/root/cherry_ai-main/venv/bin/python /root/cherry_ai-main/mcp_server/servers/memory_server.py
 Restart=always
 RestartSec=10
 
@@ -44,22 +44,22 @@ RestartSec=10
 WantedBy=multi-user.target
 EOF
 
-# Create systemd service for Orchestrator MCP
-echo "Creating Orchestrator MCP service..."
-sudo tee /etc/systemd/system/mcp-orchestrator.service > /dev/null << 'EOF'
+# Create systemd service for conductor MCP
+echo "Creating conductor MCP service..."
+sudo tee /etc/systemd/system/mcp-conductor.service > /dev/null << 'EOF'
 [Unit]
-Description=Orchestra MCP Orchestrator Server
+Description=cherry_ai MCP conductor Server
 After=network.target
 
 [Service]
 Type=simple
 User=root
-WorkingDirectory=/root/orchestra-main
-Environment="PATH=/root/orchestra-main/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+WorkingDirectory=/root/cherry_ai-main
+Environment="PATH=/root/cherry_ai-main/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 Environment="API_URL=http://localhost:8080"
 Environment="API_KEY=4010007a9aa5443fc717b54e1fd7a463260965ec9e2fce297280cf86f1b3a4bd"
-Environment="MCP_ORCHESTRATOR_PORT=8002"
-ExecStart=/root/orchestra-main/venv/bin/python /root/orchestra-main/mcp_server/servers/orchestrator_server.py
+Environment="CHERRY_AI_CONDUCTOR_PORT=8002"
+ExecStart=/root/cherry_ai-main/venv/bin/python /root/cherry_ai-main/mcp_server/servers/conductor_server.py
 Restart=always
 RestartSec=10
 
@@ -71,16 +71,16 @@ EOF
 echo "Creating Tools MCP service..."
 sudo tee /etc/systemd/system/mcp-tools.service > /dev/null << 'EOF'
 [Unit]
-Description=Orchestra MCP Tools Server
+Description=cherry_ai MCP Tools Server
 After=network.target
 
 [Service]
 Type=simple
 User=root
-WorkingDirectory=/root/orchestra-main
-Environment="PATH=/root/orchestra-main/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+WorkingDirectory=/root/cherry_ai-main
+Environment="PATH=/root/cherry_ai-main/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 Environment="MCP_TOOLS_PORT=8006"
-ExecStart=/root/orchestra-main/venv/bin/python /root/orchestra-main/mcp_server/servers/tools_server.py
+ExecStart=/root/cherry_ai-main/venv/bin/python /root/cherry_ai-main/mcp_server/servers/tools_server.py
 Restart=always
 RestartSec=10
 
@@ -92,19 +92,19 @@ EOF
 echo "Creating Weaviate Direct MCP service..."
 sudo tee /etc/systemd/system/mcp-weaviate.service > /dev/null << 'EOF'
 [Unit]
-Description=Orchestra MCP Weaviate Direct Server
+Description=cherry_ai MCP Weaviate Direct Server
 After=network.target
 
 [Service]
 Type=simple
 User=root
-WorkingDirectory=/root/orchestra-main
-Environment="PATH=/root/orchestra-main/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+WorkingDirectory=/root/cherry_ai-main
+Environment="PATH=/root/cherry_ai-main/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 Environment="MCP_WEAVIATE_DIRECT_PORT=8001"
 Environment="WEAVIATE_HOST=localhost"
 Environment="WEAVIATE_PORT=8080"
 Environment="WEAVIATE_GRPC_PORT=50051"
-ExecStart=/root/orchestra-main/venv/bin/python /root/orchestra-main/mcp_server/servers/weaviate_direct_mcp_server.py
+ExecStart=/root/cherry_ai-main/venv/bin/python /root/cherry_ai-main/mcp_server/servers/weaviate_direct_mcp_server.py
 Restart=always
 RestartSec=10
 
@@ -119,14 +119,14 @@ sudo systemctl daemon-reload
 # Enable all services
 echo "Enabling MCP services..."
 sudo systemctl enable mcp-memory.service
-sudo systemctl enable mcp-orchestrator.service
+sudo systemctl enable mcp-conductor.service
 sudo systemctl enable mcp-tools.service
 sudo systemctl enable mcp-weaviate.service
 
 # Start all services
 echo "Starting MCP services..."
 sudo systemctl start mcp-memory.service
-sudo systemctl start mcp-orchestrator.service
+sudo systemctl start mcp-conductor.service
 sudo systemctl start mcp-tools.service
 sudo systemctl start mcp-weaviate.service
 
@@ -135,7 +135,7 @@ echo "=== MCP Auto-Start Setup Complete ==="
 echo ""
 echo "Services created:"
 echo "  - mcp-memory.service"
-echo "  - mcp-orchestrator.service"
+echo "  - mcp-conductor.service"
 echo "  - mcp-tools.service"
 echo "  - mcp-weaviate.service"
 echo ""

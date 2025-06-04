@@ -3,7 +3,7 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from core.orchestrator.src.services.memory_service import HashRecord, MemoryService
+from core.conductor.src.services.memory_service import HashRecord, MemoryService
 
 @pytest.fixture
 def mock_memory_manager():

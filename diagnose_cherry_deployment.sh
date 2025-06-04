@@ -25,7 +25,7 @@ check_service() {
 # 1. Check system services
 echo -e "\n${BLUE}1. System Services Status:${NC}"
 check_service nginx
-check_service orchestra-backend || echo "  (Backend service might not exist yet)"
+check_service cherry_ai-backend || echo "  (Backend service might not exist yet)"
 
 # 2. Check nginx configuration
 echo -e "\n${BLUE}2. Nginx Configuration:${NC}"
@@ -98,23 +98,23 @@ fi
 
 # 5. Check environment configuration
 echo -e "\n${BLUE}5. Environment Configuration:${NC}"
-if [ -f "/etc/orchestra.env" ]; then
-    echo -e "${GREEN}✓ /etc/orchestra.env exists${NC}"
+if [ -f "/etc/cherry_ai.env" ]; then
+    echo -e "${GREEN}✓ /etc/cherry_ai.env exists${NC}"
     echo -n "  Contains API keys: "
-    if grep -q "API_KEY" /etc/orchestra.env; then
+    if grep -q "API_KEY" /etc/cherry_ai.env; then
         echo "Yes"
     else
         echo -e "${YELLOW}No API keys found${NC}"
     fi
 else
-    echo -e "${RED}✗ /etc/orchestra.env not found${NC}"
+    echo -e "${RED}✗ /etc/cherry_ai.env not found${NC}"
 fi
 
 # 6. Check Python environment
 echo -e "\n${BLUE}6. Python Environment:${NC}"
-if [ -d "/root/orchestra-main/venv" ]; then
+if [ -d "/root/cherry_ai-main/venv" ]; then
     echo -e "${GREEN}✓ Virtual environment exists${NC}"
-    source /root/orchestra-main/venv/bin/activate 2>/dev/null
+    source /root/cherry_ai-main/venv/bin/activate 2>/dev/null
     echo "  Python version: $(python --version 2>&1)"
     echo -n "  FastAPI installed: "
     if python -c "import fastapi" 2>/dev/null; then
@@ -137,8 +137,8 @@ else
 fi
 
 echo -e "\nBackend service logs (if exists):"
-if systemctl status orchestra-backend &>/dev/null; then
-    journalctl -u orchestra-backend -n 5 --no-pager | sed 's/^/  /'
+if systemctl status cherry_ai-backend &>/dev/null; then
+    journalctl -u cherry_ai-backend -n 5 --no-pager | sed 's/^/  /'
 else
     echo "  Service not configured"
 fi
@@ -171,7 +171,7 @@ if ! pgrep -f "uvicorn.*agent.app.main" > /dev/null; then
     ISSUES+=("Backend API is not running")
 fi
 
-if [ ! -f "/etc/orchestra.env" ]; then
+if [ ! -f "/etc/cherry_ai.env" ]; then
     ISSUES+=("Environment configuration missing")
 fi
 

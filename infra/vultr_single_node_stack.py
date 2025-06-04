@@ -7,7 +7,7 @@ env = config.require("env")
 ssh_keys = config.get("ssh_key_ids")
 
 server = VultrServerComponent(
-    "orchestra-vultr",
+    "cherry_ai-vultr",
     {
         "plan": config.get("plan") or "vhp-16c-64gb",
         "region": config.get("region") or "ewr",

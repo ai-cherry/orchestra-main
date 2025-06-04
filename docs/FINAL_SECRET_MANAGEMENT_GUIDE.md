@@ -1,8 +1,8 @@
-# Final Secret Management Guide - Orchestra AI
+# Final Secret Management Guide - Cherry AI
 
 ## 🎯 Overview
 
-Orchestra AI now uses **Pulumi as the single source of truth** for all secrets. This guide documents the complete setup after migrating from GitHub Secrets and Google
+Cherry AI now uses **Pulumi as the single source of truth** for all secrets. This guide documents the complete setup after migrating from GitHub Secrets and Google
 ## 🏗️ Architecture
 
 ```
@@ -60,7 +60,7 @@ Orchestra AI now uses **Pulumi as the single source of truth** for all secrets. 
 1. **Initial Setup** (one time):
 ```bash
 # Set Pulumi passphrase
-export PULUMI_CONFIG_PASSPHRASE="orchestra-dev-123"
+export PULUMI_CONFIG_PASSPHRASE="cherry_ai-dev-123"
 
 # Generate .env from Pulumi
 python scripts/generate_env_from_pulumi.py
@@ -72,7 +72,7 @@ source .env
 2. **Start Development**:
 ```bash
 # Everything is ready!
-./start_orchestra.sh
+./start_cherry_ai.sh
 ```
 
 ### Adding New Secrets
@@ -126,7 +126,7 @@ source .env
 - Git history cleanup script available: `scripts/clean_git_history.sh`
 
 ### Access Control
-- Pulumi passphrase: `orchestra-dev-123` (for dev)
+- Pulumi passphrase: `cherry_ai-dev-123` (for dev)
 - Pulumi cloud RBAC for team access
 - Service-specific API key permissions
 
@@ -198,7 +198,7 @@ Then in workflows:
 
 ### "Wrong passphrase" error
 ```bash
-export PULUMI_CONFIG_PASSPHRASE="orchestra-dev-123"
+export PULUMI_CONFIG_PASSPHRASE="cherry_ai-dev-123"
 ```
 
 ### Missing secret in .env

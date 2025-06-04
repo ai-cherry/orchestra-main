@@ -1,11 +1,11 @@
-# Orchestrator Landing Page Implementation Status
+# conductor Landing Page Implementation Status
 
 ## ✅ Phase 1: Core Components (COMPLETED)
 
 ### 1. Landing Page Route
-- ✅ Added route to `routes.tsx` at `/orchestrator`
+- ✅ Added route to `routes.tsx` at `/conductor`
 - ✅ Updated navigation in `Sidebar.tsx` with Search icon
-- ✅ Created `OrchestratorLandingPage.tsx`
+- ✅ Created `conductorLandingPage.tsx`
 
 ### 2. Base Layout
 - ✅ Dark theme implemented with #181111 background
@@ -22,28 +22,28 @@
 ## ✅ Phase 2: State Management (COMPLETED)
 
 ### 1. Zustand Store
-- ✅ Created `orchestratorStore.ts` with complete state management
+- ✅ Created `conductorStore.ts` with complete state management
 - ✅ Search state (query, mode, suggestions, results)
 - ✅ Voice state (recording, transcription, voice selection)
 - ✅ File state (uploads, downloads, progress tracking)
 - ✅ All actions implemented
 
 ### 2. Store Integration
-- ✅ Connected to OrchestratorLandingPage
+- ✅ Connected to conductorLandingPage
 - ✅ State properly managed through Zustand
 - ✅ Suggestions loaded from API (with fallback)
 
 ## 🚧 Phase 3: Advanced Features (PARTIALLY COMPLETED)
 
 ### 1. Styling
-- ✅ Created `orchestrator.css` with custom dark theme
+- ✅ Created `conductor.css` with custom dark theme
 - ✅ All color variables properly defined
-- ✅ Custom component classes (orchestrator-card, orchestrator-btn-primary, etc.)
+- ✅ Custom component classes (conductor-card, conductor-btn-primary, etc.)
 - ✅ Responsive design considerations
 - ✅ Accessibility improvements
 
 ### 2. API Service
-- ✅ Created `orchestratorService.ts` with all endpoints
+- ✅ Created `conductorService.ts` with all endpoints
 - ✅ Mock implementations for development
 - ✅ Type-safe API contracts
 - ✅ Progress callback support
@@ -100,9 +100,9 @@
 admin-ui/
 ├── src/
 │   ├── pages/
-│   │   └── OrchestratorLandingPage.tsx
+│   │   └── conductorLandingPage.tsx
 │   ├── components/
-│   │   └── orchestrator/
+│   │   └── conductor/
 │   │       ├── README.md
 │   │       └── SearchInterface/
 │   │           ├── index.tsx
@@ -110,11 +110,11 @@ admin-ui/
 │   │           ├── InputModeSelector.tsx
 │   │           └── SearchModeSelector.tsx
 │   ├── store/
-│   │   └── orchestratorStore.ts
+│   │   └── conductorStore.ts
 │   ├── services/
-│   │   └── orchestratorService.ts
+│   │   └── conductorService.ts
 │   └── styles/
-│       └── orchestrator.css
+│       └── conductor.css
 ```
 
 ## Commands to Test
@@ -124,7 +124,7 @@ admin-ui/
 cd admin-ui
 pnpm dev
 
-# Navigate to http://localhost:5173/orchestrator
+# Navigate to http://localhost:5173/conductor
 ```
 
 ## Known Issues

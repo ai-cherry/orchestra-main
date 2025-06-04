@@ -1,7 +1,7 @@
 # Factory AI Droid Integration - System Architecture Design
 
 ## Executive Summary
-This document presents a detailed system architecture for integrating Factory AI Droids with the existing Orchestra project. The design follows hexagonal architecture principles, ensures hot-swappable modules, and maintains full compatibility with the Roo coder system while achieving the target 40% performance improvement.
+This document presents a detailed system architecture for integrating Factory AI Droids with the existing cherry_ai project. The design follows hexagonal architecture principles, ensures hot-swappable modules, and maintains full compatibility with the Roo coder system while achieving the target 40% performance improvement.
 
 ## Architecture Overview
 
@@ -21,15 +21,15 @@ graph TB
         MG[MCP Gateway]
     end
     
-    subgraph "Orchestration Layer"
-        HO[Hybrid Orchestrator]
+    subgraph "coordination Layer"
+        HO[Hybrid conductor]
         TR[Task Router]
         CM[Context Manager]
     end
     
     subgraph "Service Layer"
         subgraph "MCP Servers"
-            OS[Orchestrator Server]
+            OS[conductor Server]
             MS[Memory Server]
             WS[Weaviate Server]
             DS[Deployment Server]
@@ -192,7 +192,7 @@ class FactoryBridgeGateway:
 # factory_config/droid_mappings.yaml
 droid_mappings:
   architect:
-    mcp_server: orchestrator
+    mcp_server: conductor
     capabilities:
       - system_design
       - architecture_planning
@@ -833,7 +833,7 @@ class FactoryAIStack(pulumi.ComponentResource):
 
 ## Conclusion
 
-This architecture provides a robust, scalable integration of Factory AI Droids with the existing Orchestra project. The design ensures:
+This architecture provides a robust, scalable integration of Factory AI Droids with the existing cherry_ai project. The design ensures:
 
 1. **Zero disruption** to existing Roo functionality
 2. **Hot-swappable modules** for easy maintenance

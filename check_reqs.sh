@@ -1,7 +1,7 @@
 #!/bin/bash
 # check_reqs.sh: Find unused and missing requirements
 set -e
-source ~/orchestra-main/venv/bin/activate
+source ~/cherry_ai-main/venv/bin/activate
 
 # Install pip-check-reqs if not already installed
 if ! pip show pip-check-reqs > /dev/null 2>&1; then

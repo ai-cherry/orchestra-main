@@ -1,0 +1,1009 @@
+{
+  "timestamp": "2025-06-03T06:45:09.645325",
+  "summary": {
+    "total_domain_files": 140,
+    "cross_domain_issues": 37,
+    "shared_components": 0,
+    "refactoring_tasks": 83
+  },
+  "domains": {
+    "Personal": {
+      "file_count": 101,
+      "top_files": [
+        {
+          "path": "agent/app/services/specialized_agents.py",
+          "score": 60,
+          "type": ".py"
+        },
+        {
+          "path": "core/conductor/src/services/conversation_service.py",
+          "score": 49,
+          "type": ".py"
+        },
+        {
+          "path": "core/conductor/src/services/base_conductor.py",
+          "score": 44,
+          "type": ".py"
+        },
+        {
+          "path": "core/business/workflows/examples.py",
+          "score": 44,
+          "type": ".py"
+        },
+        {
+          "path": "core/conductor/src/services/enhanced_agent_conductor.py",
+          "score": 41,
+          "type": ".py"
+        }
+      ],
+      "dependency_count": 356,
+      "issues": 22
+    },
+    "PayReady": {
+      "file_count": 9,
+      "top_files": [
+        {
+          "path": "workflows/pay_ready_etl_flow.py",
+          "score": 18,
+          "type": ".py"
+        },
+        {
+          "path": "services/pay_ready/entity_resolver.py",
+          "score": 16,
+          "type": ".py"
+        },
+        {
+          "path": "services/pay_ready/memory_manager.py",
+          "score": 14,
+          "type": ".py"
+        },
+        {
+          "path": "services/pay_ready/etl_conductor.py",
+          "score": 12,
+          "type": ".py"
+        },
+        {
+          "path": "agent/app/services/natural_language_processor.py",
+          "score": 6,
+          "type": ".py"
+        }
+      ],
+      "dependency_count": 88,
+      "issues": 8
+    },
+    "ParagonRX": {
+      "file_count": 30,
+      "top_files": [
+        {
+          "path": "core/health_monitor.py",
+          "score": 48,
+          "type": ".py"
+        },
+        {
+          "path": "core/conductor/src/api/endpoints/health.py",
+          "score": 23,
+          "type": ".py"
+        },
+        {
+          "path": "core/infrastructure/connectivity/base.py",
+          "score": 16,
+          "type": ".py"
+        },
+        {
+          "path": "core/main.py",
+          "score": 13,
+          "type": ".py"
+        },
+        {
+          "path": "core/llm/unified_router.py",
+          "score": 11,
+          "type": ".py"
+        }
+      ],
+      "dependency_count": 220,
+      "issues": 7
+    }
+  },
+  "refactoring_checklist": [
+    {
+      "category": "Database",
+      "domain": "PayReady",
+      "action": "Migrate 6 tables to domain-specific schema",
+      "items": [
+        "pay_ready",
+        "pay_ready",
+        "pay_ready",
+        "pay_ready",
+        "pay_ready",
+        "pay_ready"
+      ]
+    },
+    {
+      "category": "Database",
+      "domain": "Personal",
+      "action": "Migrate 2 tables to domain-specific schema",
+      "items": [
+        "user_preferences",
+        "user_search_history"
+      ]
+    },
+    {
+      "category": "API",
+      "domain": "Personal",
+      "action": "Move 2 endpoints to domain API",
+      "items": [
+        "POST /personal/search",
+        "POST /personal/learn-preference"
+      ]
+    },
+    {
+      "category": "API",
+      "domain": "PayReady",
+      "action": "Move 2 endpoints to domain API",
+      "items": [
+        "POST /payready/analyze",
+        "POST /payready/market-analysis"
+      ]
+    },
+    {
+      "category": "API",
+      "domain": "ParagonRX",
+      "action": "Move 6 endpoints to domain API",
+      "items": [
+        "POST /paragon/search-trials",
+        "POST /paragon/setup-alert",
+        "GET /system/health",
+        "POST /healthcheck",
+        "GET /health/status",
+        "GET /health"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "Personal",
+      "action": "Move 9 files from agent/app/routers",
+      "target": "domains/Personal/services/",
+      "items": [
+        "agent/app/routers/llm.py",
+        "agent/app/routers/data_ingestion.py",
+        "agent/app/routers/natural_language.py",
+        "agent/app/routers/llm_coordination.py",
+        "agent/app/routers/suggestions.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "Personal",
+      "action": "Move 3 files from agent/app/services",
+      "target": "domains/Personal/services/",
+      "items": [
+        "agent/app/services/specialized_agents.py",
+        "agent/app/services/audit_log.py",
+        "agent/app/services/agent_conductor.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "Personal",
+      "action": "Move 1 files from ai_components/claude",
+      "target": "domains/Personal/services/",
+      "items": [
+        "ai_components/claude/claude_analyzer.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "Personal",
+      "action": "Move 6 files from ai_components/coordination",
+      "target": "domains/Personal/services/",
+      "items": [
+        "ai_components/coordination/vultr_autoscaling.py",
+        "ai_components/coordination/roo_mcp_adapter.py",
+        "ai_components/coordination/intelligent_cache.py",
+        "ai_components/coordination/mode_transition_manager.py",
+        "ai_components/coordination/ai_conductor.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "Personal",
+      "action": "Move 1 files from ai_components/tests",
+      "target": "domains/Personal/services/",
+      "items": [
+        "ai_components/tests/test_roo_integration.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "Personal",
+      "action": "Move 2 files from ai_components/agents",
+      "target": "domains/Personal/services/",
+      "items": [
+        "ai_components/agents/cursor_ai_enhanced.py",
+        "ai_components/agents/claude_integration.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "Personal",
+      "action": "Move 3 files from ai_components/design",
+      "target": "domains/Personal/services/",
+      "items": [
+        "ai_components/design/dalle_integration.py",
+        "ai_components/design/recraft_integration.py",
+        "ai_components/design/design_conductor.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "Personal",
+      "action": "Move 1 files from core",
+      "target": "domains/Personal/services/",
+      "items": [
+        "core/env_config.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "Personal",
+      "action": "Move 2 files from core/memory",
+      "target": "domains/Personal/services/",
+      "items": [
+        "core/memory/config.py",
+        "core/memory/example_usage.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "Personal",
+      "action": "Move 1 files from core/infrastructure/deployment",
+      "target": "domains/Personal/services/",
+      "items": [
+        "core/infrastructure/deployment/base.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "Personal",
+      "action": "Move 1 files from core/utils",
+      "target": "domains/Personal/services/",
+      "items": [
+        "core/utils/pydantic_validators.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "Personal",
+      "action": "Move 1 files from core/api/models",
+      "target": "domains/Personal/services/",
+      "items": [
+        "core/api/models/requests.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "Personal",
+      "action": "Move 1 files from core/api/endpoints",
+      "target": "domains/Personal/services/",
+      "items": [
+        "core/api/endpoints/conversation.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "Personal",
+      "action": "Move 3 files from core/conductor/examples",
+      "target": "domains/Personal/services/",
+      "items": [
+        "core/conductor/examples/llm_client.py",
+        "core/conductor/examples/llm_demo.py",
+        "core/conductor/examples/persona_client.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "Personal",
+      "action": "Move 1 files from core/conductor/src",
+      "target": "domains/Personal/services/",
+      "items": [
+        "core/conductor/src/main_simple.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "Personal",
+      "action": "Move 1 files from core/conductor/src/memory",
+      "target": "domains/Personal/services/",
+      "items": [
+        "core/conductor/src/memory/integration.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "Personal",
+      "action": "Move 1 files from core/conductor/src/memory/lifecycle",
+      "target": "domains/Personal/services/",
+      "items": [
+        "core/conductor/src/memory/lifecycle/importance_scorer.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "Personal",
+      "action": "Move 1 files from core/conductor/src/memory/retrieval",
+      "target": "domains/Personal/services/",
+      "items": [
+        "core/conductor/src/memory/retrieval/query_classifier.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "Personal",
+      "action": "Move 4 files from core/conductor/src/core",
+      "target": "domains/Personal/services/",
+      "items": [
+        "core/conductor/src/core/agents.py",
+        "core/conductor/src/core/conductor.py",
+        "core/conductor/src/core/main.py",
+        "core/conductor/src/core/memory.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "Personal",
+      "action": "Move 1 files from core/conductor/src/api/dependencies",
+      "target": "domains/Personal/services/",
+      "items": [
+        "core/conductor/src/api/dependencies/prompt_builder.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "Personal",
+      "action": "Move 6 files from core/conductor/src/api/endpoints",
+      "target": "domains/Personal/services/",
+      "items": [
+        "core/conductor/src/api/endpoints/interaction.py",
+        "core/conductor/src/api/endpoints/monitoring.py",
+        "core/conductor/src/api/endpoints/llm_interaction.py",
+        "core/conductor/src/api/endpoints/phidata_chat.py",
+        "core/conductor/src/api/endpoints/auth.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "Personal",
+      "action": "Move 1 files from core/conductor/src/api/middleware",
+      "target": "domains/Personal/services/",
+      "items": [
+        "core/conductor/src/api/middleware/persona_loader.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "Personal",
+      "action": "Move 8 files from core/conductor/src/agents",
+      "target": "domains/Personal/services/",
+      "items": [
+        "core/conductor/src/agents/persona_agent.py",
+        "core/conductor/src/agents/simplified_agent_registry.py",
+        "core/conductor/src/agents/llm_agent.py",
+        "core/conductor/src/agents/messaging_agent.py",
+        "core/conductor/src/agents/__init__.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "Personal",
+      "action": "Move 2 files from core/conductor/src/agents/examples",
+      "target": "domains/Personal/services/",
+      "items": [
+        "core/conductor/src/agents/examples/agent_usage_example.py",
+        "core/conductor/src/agents/examples/pubsub_agent_example.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "Personal",
+      "action": "Move 2 files from core/conductor/src/agents/memory",
+      "target": "domains/Personal/services/",
+      "items": [
+        "core/conductor/src/agents/memory/models.py",
+        "core/conductor/src/agents/memory/layered_memory.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "Personal",
+      "action": "Move 1 files from core/conductor/src/agents/teams",
+      "target": "domains/Personal/services/",
+      "items": [
+        "core/conductor/src/agents/teams/coordinator.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "Personal",
+      "action": "Move 2 files from core/conductor/src/resilience",
+      "target": "domains/Personal/services/",
+      "items": [
+        "core/conductor/src/resilience/incident_reporter.py",
+        "core/conductor/src/resilience/tasks.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "Personal",
+      "action": "Move 2 files from core/conductor/src/personas",
+      "target": "domains/Personal/services/",
+      "items": [
+        "core/conductor/src/personas/loader.py",
+        "core/conductor/src/personas/enhanced_persona_manager.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "Personal",
+      "action": "Move 1 files from core/conductor/src/llm",
+      "target": "domains/Personal/services/",
+      "items": [
+        "core/conductor/src/llm/litellm_client.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "Personal",
+      "action": "Move 2 files from core/conductor/src/config",
+      "target": "domains/Personal/services/",
+      "items": [
+        "core/conductor/src/config/models.py",
+        "core/conductor/src/config/personas.yaml"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "Personal",
+      "action": "Move 1 files from core/conductor/src/tools",
+      "target": "domains/Personal/services/",
+      "items": [
+        "core/conductor/src/tools/registry.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "Personal",
+      "action": "Move 6 files from core/conductor/src/services",
+      "target": "domains/Personal/services/",
+      "items": [
+        "core/conductor/src/services/interaction_service.py",
+        "core/conductor/src/services/enhanced_agent_conductor.py",
+        "core/conductor/src/services/conversation_service.py",
+        "core/conductor/src/services/agent_conductor.py",
+        "core/conductor/src/services/base_conductor.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "Personal",
+      "action": "Move 1 files from core/conductor/src/services/llm",
+      "target": "domains/Personal/services/",
+      "items": [
+        "core/conductor/src/services/llm/providers.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "Personal",
+      "action": "Move 1 files from core/agents",
+      "target": "domains/Personal/services/",
+      "items": [
+        "core/agents/retriever_agent.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "Personal",
+      "action": "Move 1 files from core/business/workflows",
+      "target": "domains/Personal/services/",
+      "items": [
+        "core/business/workflows/examples.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "Personal",
+      "action": "Move 1 files from core/business/llm",
+      "target": "domains/Personal/services/",
+      "items": [
+        "core/business/llm/provider.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "Personal",
+      "action": "Move 3 files from core/personas",
+      "target": "domains/Personal/services/",
+      "items": [
+        "core/personas/models.py",
+        "core/personas/personas_detailed.yaml",
+        "core/personas/test_models.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "Personal",
+      "action": "Move 2 files from core/data_ingestion/deduplication",
+      "target": "domains/Personal/services/",
+      "items": [
+        "core/data_ingestion/deduplication/duplicate_resolver.py",
+        "core/data_ingestion/deduplication/audit_logger.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "Personal",
+      "action": "Move 1 files from core/data_ingestion/interfaces",
+      "target": "domains/Personal/services/",
+      "items": [
+        "core/data_ingestion/interfaces/parser.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "Personal",
+      "action": "Move 1 files from core/data_ingestion/parsers",
+      "target": "domains/Personal/services/",
+      "items": [
+        "core/data_ingestion/parsers/slack_parser.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "Personal",
+      "action": "Move 2 files from core/data_ingestion/storage",
+      "target": "domains/Personal/services/",
+      "items": [
+        "core/data_ingestion/storage/postgres_adapter.py",
+        "core/data_ingestion/storage/weaviate_adapter.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "Personal",
+      "action": "Move 2 files from core/monitoring",
+      "target": "domains/Personal/services/",
+      "items": [
+        "core/monitoring/claude_monitor.py",
+        "core/monitoring/monitored_litellm_client.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "Personal",
+      "action": "Move 1 files from core/persistency",
+      "target": "domains/Personal/services/",
+      "items": [
+        "core/persistency/mode_config_persistence.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "Personal",
+      "action": "Move 2 files from core/services/agents",
+      "target": "domains/Personal/services/",
+      "items": [
+        "core/services/agents/examples.py",
+        "core/services/agents/base.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "Personal",
+      "action": "Move 2 files from core/auth",
+      "target": "domains/Personal/services/",
+      "items": [
+        "core/auth/__init__.py",
+        "core/auth/simple_auth.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "Personal",
+      "action": "Move 1 files from factory_integration",
+      "target": "domains/Personal/services/",
+      "items": [
+        "factory_integration/cache_manager.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "Personal",
+      "action": "Move 1 files from factory_integration/tests",
+      "target": "domains/Personal/services/",
+      "items": [
+        "factory_integration/tests/test_cache_manager.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "Personal",
+      "action": "Move 1 files from factory_integration/config",
+      "target": "domains/Personal/services/",
+      "items": [
+        "factory_integration/config/context.yaml"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "PayReady",
+      "action": "Move 1 files from agent/app/services",
+      "target": "domains/PayReady/services/",
+      "items": [
+        "agent/app/services/natural_language_processor.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "PayReady",
+      "action": "Move 5 files from services/pay_ready",
+      "target": "domains/PayReady/services/",
+      "items": [
+        "services/pay_ready/etl_conductor.py",
+        "services/pay_ready/entity_resolver.py",
+        "services/pay_ready/__init__.py",
+        "services/pay_ready/memory_manager.py",
+        "services/pay_ready/query_agent.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "PayReady",
+      "action": "Move 1 files from core/memory/implementations/storage",
+      "target": "domains/PayReady/services/",
+      "items": [
+        "core/memory/implementations/storage/postgresql.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "PayReady",
+      "action": "Move 1 files from core/infrastructure/connectivity",
+      "target": "domains/PayReady/services/",
+      "items": [
+        "core/infrastructure/connectivity/dragonfly.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "PayReady",
+      "action": "Move 1 files from workflows",
+      "target": "domains/PayReady/services/",
+      "items": [
+        "workflows/pay_ready_etl_flow.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "ParagonRX",
+      "action": "Move 1 files from agent/tests",
+      "target": "domains/ParagonRX/services/",
+      "items": [
+        "agent/tests/test_personas_admin.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "ParagonRX",
+      "action": "Move 1 files from agent/app",
+      "target": "domains/ParagonRX/services/",
+      "items": [
+        "agent/app/main.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "ParagonRX",
+      "action": "Move 3 files from agent/app/routers",
+      "target": "domains/ParagonRX/services/",
+      "items": [
+        "agent/app/routers/automation.py",
+        "agent/app/routers/personas_admin.py",
+        "agent/app/routers/system.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "ParagonRX",
+      "action": "Move 2 files from agent/app/services",
+      "target": "domains/ParagonRX/services/",
+      "items": [
+        "agent/app/services/system_health.py",
+        "agent/app/services/automation.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "ParagonRX",
+      "action": "Move 1 files from ai_components",
+      "target": "domains/ParagonRX/services/",
+      "items": [
+        "ai_components/conductor_cli_enhanced.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "ParagonRX",
+      "action": "Move 1 files from ai_components/coordination",
+      "target": "domains/ParagonRX/services/",
+      "items": [
+        "ai_components/coordination/unified_api_router.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "ParagonRX",
+      "action": "Move 1 files from ai_components/cursor_ai",
+      "target": "domains/ParagonRX/services/",
+      "items": [
+        "ai_components/cursor_ai/cursor_integration_enhanced.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "ParagonRX",
+      "action": "Move 4 files from core",
+      "target": "domains/ParagonRX/services/",
+      "items": [
+        "core/health_monitor.py",
+        "core/config.py",
+        "core/main.py",
+        "core/llm_types.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "ParagonRX",
+      "action": "Move 1 files from core/memory",
+      "target": "domains/ParagonRX/services/",
+      "items": [
+        "core/memory/interfaces.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "ParagonRX",
+      "action": "Move 2 files from core/infrastructure/connectivity",
+      "target": "domains/ParagonRX/services/",
+      "items": [
+        "core/infrastructure/connectivity/mongodb.py",
+        "core/infrastructure/connectivity/base.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "ParagonRX",
+      "action": "Move 1 files from core/api",
+      "target": "domains/ParagonRX/services/",
+      "items": [
+        "core/api/main.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "ParagonRX",
+      "action": "Move 1 files from core/api/models",
+      "target": "domains/ParagonRX/services/",
+      "items": [
+        "core/api/models/responses.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "ParagonRX",
+      "action": "Move 1 files from core/conductor/src",
+      "target": "domains/ParagonRX/services/",
+      "items": [
+        "core/conductor/src/main.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "ParagonRX",
+      "action": "Move 1 files from core/conductor/src/api",
+      "target": "domains/ParagonRX/services/",
+      "items": [
+        "core/conductor/src/api/app.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "ParagonRX",
+      "action": "Move 2 files from core/conductor/src/api/dependencies",
+      "target": "domains/ParagonRX/services/",
+      "items": [
+        "core/conductor/src/api/dependencies/cache.py",
+        "core/conductor/src/api/dependencies/memory.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "ParagonRX",
+      "action": "Move 1 files from core/conductor/src/api/endpoints",
+      "target": "domains/ParagonRX/services/",
+      "items": [
+        "core/conductor/src/api/endpoints/health.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "ParagonRX",
+      "action": "Move 1 files from core/data_ingestion/interfaces",
+      "target": "domains/ParagonRX/services/",
+      "items": [
+        "core/data_ingestion/interfaces/storage.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "ParagonRX",
+      "action": "Move 1 files from core/llm",
+      "target": "domains/ParagonRX/services/",
+      "items": [
+        "core/llm/unified_router.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "ParagonRX",
+      "action": "Move 2 files from core/config",
+      "target": "domains/ParagonRX/services/",
+      "items": [
+        "core/config/unified_config.py",
+        "core/config/__init__.py"
+      ]
+    },
+    {
+      "category": "Files",
+      "domain": "ParagonRX",
+      "action": "Move 2 files from core/services/memory",
+      "target": "domains/ParagonRX/services/",
+      "items": [
+        "core/services/memory/unified_memory.py",
+        "core/services/memory/base.py"
+      ]
+    },
+    {
+      "category": "Dependencies",
+      "domain": "ParagonRX",
+      "action": "Resolve 7 cross-domain references to Personal",
+      "severity": "high",
+      "items": [
+        "/root/cherry_ai-main/agent/app/main.py",
+        "/root/cherry_ai-main/ai_components/coordination/unified_api_router.py",
+        "/root/cherry_ai-main/ai_components/cursor_ai/cursor_integration_enhanced.py"
+      ]
+    },
+    {
+      "category": "Dependencies",
+      "domain": "Personal",
+      "action": "Resolve 8 cross-domain references to PayReady",
+      "severity": "high",
+      "items": [
+        "/root/cherry_ai-main/agent/app/routers/llm_coordination.py",
+        "/root/cherry_ai-main/agent/app/routers/llm_coordination.py",
+        "/root/cherry_ai-main/agent/app/services/specialized_agents.py"
+      ]
+    },
+    {
+      "category": "Dependencies",
+      "domain": "Personal",
+      "action": "Resolve 14 cross-domain references to ParagonRX",
+      "severity": "high",
+      "items": [
+        "/root/cherry_ai-main/agent/app/routers/llm_coordination.py",
+        "/root/cherry_ai-main/agent/app/routers/llm_coordination.py",
+        "/root/cherry_ai-main/agent/app/routers/llm_coordination.py"
+      ]
+    },
+    {
+      "category": "Dependencies",
+      "domain": "PayReady",
+      "action": "Resolve 6 cross-domain references to Personal",
+      "severity": "high",
+      "items": [
+        "/root/cherry_ai-main/agent/app/services/natural_language_processor.py",
+        "/root/cherry_ai-main/agent/app/services/natural_language_processor.py",
+        "/root/cherry_ai-main/agent/app/services/natural_language_processor.py"
+      ]
+    },
+    {
+      "category": "Dependencies",
+      "domain": "PayReady",
+      "action": "Resolve 2 cross-domain references to ParagonRX",
+      "severity": "high",
+      "items": [
+        "/root/cherry_ai-main/agent/app/services/natural_language_processor.py",
+        "/root/cherry_ai-main/core/infrastructure/connectivity/dragonfly.py"
+      ]
+    }
+  ],
+  "cross_domain_dependencies": [
+    {
+      "file": "/root/cherry_ai-main/agent/app/main.py",
+      "from_domain": "ParagonRX",
+      "references": "Personal",
+      "keyword": "user",
+      "severity": "high"
+    },
+    {
+      "file": "/root/cherry_ai-main/agent/app/routers/llm_coordination.py",
+      "from_domain": "Personal",
+      "references": "PayReady",
+      "keyword": "pay",
+      "severity": "high"
+    },
+    {
+      "file": "/root/cherry_ai-main/agent/app/routers/llm_coordination.py",
+      "from_domain": "Personal",
+      "references": "PayReady",
+      "keyword": "payready",
+      "severity": "high"
+    },
+    {
+      "file": "/root/cherry_ai-main/agent/app/routers/llm_coordination.py",
+      "from_domain": "Personal",
+      "references": "ParagonRX",
+      "keyword": "paragon",
+      "severity": "high"
+    },
+    {
+      "file": "/root/cherry_ai-main/agent/app/routers/llm_coordination.py",
+      "from_domain": "Personal",
+      "references": "ParagonRX",
+      "keyword": "medical",
+      "severity": "high"
+    },
+    {
+      "file": "/root/cherry_ai-main/agent/app/routers/llm_coordination.py",
+      "from_domain": "Personal",
+      "references": "ParagonRX",
+      "keyword": "health",
+      "severity": "high"
+    },
+    {
+      "file": "/root/cherry_ai-main/agent/app/routers/suggestions.py",
+      "from_domain": "Personal",
+      "references": "ParagonRX",
+      "keyword": "health",
+      "severity": "high"
+    },
+    {
+      "file": "/root/cherry_ai-main/agent/app/services/specialized_agents.py",
+      "from_domain": "Personal",
+      "references": "PayReady",
+      "keyword": "pay",
+      "severity": "high"
+    },
+    {
+      "file": "/root/cherry_ai-main/agent/app/services/specialized_agents.py",
+      "from_domain": "Personal",
+      "references": "PayReady",
+      "keyword": "payready",
+      "severity": "high"
+    },
+    {
+      "file": "/root/cherry_ai-main/agent/app/services/specialized_agents.py",
+      "from_domain": "Personal",
+      "references": "ParagonRX",
+      "keyword": "paragon",
+      "severity": "high"
+    }
+  ],
+  "recommendations": [
+    {
+      "priority": "HIGH",
+      "issue": "High cross-domain coupling",
+      "action": "Create domain interfaces to reduce direct dependencies"
+    }
+  ]
+}

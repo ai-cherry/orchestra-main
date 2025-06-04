@@ -1,7 +1,7 @@
-# Orchestra AI Cleanup and Optimization Plan
+# Cherry AI Cleanup and Optimization Plan
 
 ## Overview
-This document outlines conflicts, redundancies, and optimization opportunities identified in the Orchestra AI codebase, with specific actions to address each issue.
+This document outlines conflicts, redundancies, and optimization opportunities identified in the Cherry AI codebase, with specific actions to address each issue.
 
 ## 1. OpenRouter Integration Enhancement
 
@@ -63,7 +63,7 @@ This document outlines conflicts, redundancies, and optimization opportunities i
 2. **Update Context Files**:
    - `ai_context_reviewer.py`: Remove MongoDB/Redis references
    - `ai_context_debugger.py`: Remove MongoDB/DragonflyDB references
-   - `tools/orchestra_cli.py`: Remove Redis health checks
+   - `tools/cherry_ai_cli.py`: Remove Redis health checks
 
 3. **Update Environment Variables**:
    - Remove from `.env.example`: `MONGODB_URI`, `REDIS_HOST`, `REDIS_PORT`, `REDIS_PASSWORD`
@@ -84,7 +84,7 @@ This document outlines conflicts, redundancies, and optimization opportunities i
    {user?.username || user?.email || 'User'}
    ```
 
-3. **Fix ReactNode type issues in orchestration nodes**:
+3. **Fix ReactNode type issues in coordination nodes**:
    ```typescript
    // Ensure all data properties are typed correctly
    interface NodeData {
@@ -160,7 +160,7 @@ esac
 Multiple LLM configuration files:
 - `config/litellm_config.yaml`
 - `core/business/llm/provider.py`
-- `core/orchestrator/src/services/llm/providers.py`
+- `core/conductor/src/services/llm/providers.py`
 - `.roo/scripts/portkey-router.js`
 
 ### Recommended Action

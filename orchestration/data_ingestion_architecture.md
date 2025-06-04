@@ -20,7 +20,7 @@ A high-performance, modular data ingestion system designed for processing large 
 │                    Application Layer                          │
 │  ┌─────────────┐  ┌──────────────┐  ┌──────────────────┐   │
 │  │  Upload     │  │  Processing  │  │  Query           │   │
-│  │  Service    │  │  Orchestrator│  │  Engine          │   │
+│  │  Service    │  │  conductor│  │  Engine          │   │
 │  └─────────────┘  └──────────────┘  └──────────────────┘   │
 └─────────────────────────────────────────────────────────────┘
                               │
@@ -357,7 +357,7 @@ object_storage = vultr.ObjectStorage("data-ingestion-storage",
 │                    Application Layer                          │
 │  ┌─────────────┐  ┌──────────────┐  ┌──────────────────┐   │
 │  │  Upload     │  │  Processing  │  │  Query           │   │
-│  │  Service    │  │  Orchestrator│  │  Engine          │   │
+│  │  Service    │  │  conductor│  │  Engine          │   │
 │  └─────────────┘  └──────────────┘  └──────────────────┘   │
 └─────────────────────────────────────────────────────────────┘
                               │

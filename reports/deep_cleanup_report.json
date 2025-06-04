@@ -1,0 +1,45 @@
+{
+  "total_files": 197,
+  "delete": 13,
+  "update": 65,
+  "keep": 119,
+  "files": {
+    "delete": [
+      "gcp_auth_commands.txt",
+      "scripts/mcp/deploy_to_cloud_run.sh",
+      "docs/VERTEX_GEMINI_INTEGRATION_GUIDE.md",
+      "docs/gcp_auth_implementation_summary.md",
+      "docs/gcp_authentication.md",
+      "docs/creating_gcp_service_account.md",
+      "docs/service_account_key_auth.md",
+      "docs/GEMINI_GCP_ASSISTANT.md",
+      "agent/core/alloydb_to_bigquery_export.py",
+      "packages/agents/src/phidata/wrapper.py",
+      "packages/phidata/README_CLOUDSQL_PGVECTOR.md",
+      "examples/register_phidata_postgres_agent.py",
+      "mcp_server/adapters/gemini_adapter.py"
+    ],
+    "update": [
+      "run_integration_tests.sh",
+      "quick-deploy.sh",
+      "start_mcp_system.sh",
+      "execute_cleanup.sh",
+      "run_connection_tests.sh",
+      "implementation_plan.sh",
+      "memory_management_improvements.py",
+      "scripts/setup_claude_code.sh",
+      "scripts/setup_github_secrets.sh",
+      "scripts/final_environment_status.sh",
+      "scripts/quick_verify_superagi.sh",
+      "scripts/setup_claude_code_enhanced.sh",
+      "scripts/deploy_cherry_ai.sh",
+      "docs/memory_integration_guide.md",
+      "docs/SECURE_CREDENTIAL_MANAGEMENT.md",
+      "docs/memory_system_usage_examples.md",
+      "docs/memory_data_separation_guide.md",
+      "docs/IMPLEMENTATION_RECOMMENDATIONS.md",
+      "docs/CLAUDE_4_MCP_INTEGRATION.md",
+      "docs/STARTUP_PROCESS_STABILIZATION.md"
+    ]
+  }
+}

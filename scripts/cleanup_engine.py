@@ -10,6 +10,7 @@ from datetime import datetime, timedelta, timezone
 import sys
 import re
 from typing import Dict, List, Tuple, Any, Optional
+from typing_extensions import Optional
 
 # --- Configuration ---
 # Critical directories (relative to project root) that should largely be ignored

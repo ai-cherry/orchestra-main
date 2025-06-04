@@ -20,7 +20,7 @@
         """Build PostgreSQL DSN from environment variables."""
         host = os.getenv("POSTGRES_HOST", "localhost")
         port = os.getenv("POSTGRES_PORT", "5432")
-        database = os.getenv("POSTGRES_DB", "orchestra")
+        database = os.getenv("POSTGRES_DB", "cherry_ai")
         user = os.getenv("POSTGRES_USER", "postgres")
         password = os.getenv("POSTGRES_PASSWORD", "")
 
@@ -59,9 +59,9 @@
                 },
             )
 
-            # Ensure orchestra schema exists
+            # Ensure cherry_ai schema exists
             async with self._pool.acquire() as conn:
-                await conn.execute("CREATE SCHEMA IF NOT EXISTS orchestra")
+                await conn.execute("CREATE SCHEMA IF NOT EXISTS cherry_ai")
                 await conn.execute("CREATE SCHEMA IF NOT EXISTS cache")
                 await conn.execute("CREATE SCHEMA IF NOT EXISTS sessions")
 

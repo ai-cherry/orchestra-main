@@ -15,7 +15,7 @@
             settings = Settings()
 
             assert settings.environment == Environment.DEV
-            assert settings.app_name == "Orchestra AI"
+            assert settings.app_name == "Cherry AI"
             assert settings.debug is False
             assert settings.api.port == 8080
 

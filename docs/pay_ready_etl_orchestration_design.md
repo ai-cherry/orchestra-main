@@ -1,7 +1,7 @@
-# Pay Ready (Sophia) Domain - ETL & AI Orchestration Design
+# Pay Ready (Sophia) Domain - ETL & AI coordination Design
 
 ## Overview
-This document outlines the architecture for integrating Airbyte Cloud, Weaviate Cloud, Prefect, and GitHub Actions into the Orchestra AI system, specifically for the Pay Ready (Sophia) domain while maintaining modularity with Personal and Paragon domains.
+This document outlines the architecture for integrating Airbyte Cloud, Weaviate Cloud, Prefect, and GitHub Actions into the Cherry AI system, specifically for the Pay Ready (Sophia) domain while maintaining modularity with Personal and Paragon domains.
 
 ## Domain Separation Strategy
 
@@ -132,7 +132,7 @@ PAY_READY_SCHEMA = {
 ### 1. ETL Pipeline Components
 
 ```python
-# services/pay_ready/etl_orchestrator.py
+# services/pay_ready/etl_conductor.py
 from typing import Dict, List, Optional
 from datetime import datetime
 import asyncio
@@ -140,8 +140,8 @@ from prefect import flow, task
 from shared.database.unified_postgresql_enhanced import get_unified_postgresql_enhanced
 from services.weaviate_service import WeaviateService
 
-class PayReadyETLOrchestrator:
-    """Orchestrates ETL operations for Pay Ready domain"""
+class PayReadyETLconductor:
+    """cherry_aites ETL operations for Pay Ready domain"""
     
     def __init__(self):
         self.domain = "pay_ready"
@@ -263,7 +263,7 @@ class PayReadyEntityResolver:
         return await self._create_new_person(name, email, source_system, source_id)
 ```
 
-### 3. Workflow Orchestration with Prefect
+### 3. Workflow coordination with Prefect
 
 ```python
 # workflows/pay_ready_etl_flow.py
@@ -284,36 +284,36 @@ async def pay_ready_etl_pipeline(
 ):
     """Main ETL pipeline for Pay Ready domain"""
     
-    orchestrator = PayReadyETLOrchestrator()
-    await orchestrator.initialize()
+    conductor = PayReadyETLconductor()
+    await conductor.initialize()
     
     # Phase 1: Trigger Airbyte syncs in parallel
     sync_jobs = await asyncio.gather(*[
-        orchestrator.trigger_airbyte_sync(source)
+        conductor.trigger_airbyte_sync(source)
         for source in sources
     ])
     
     # Phase 2: Wait for syncs to complete
     await asyncio.gather(*[
-        orchestrator.wait_for_sync(job_id)
+        conductor.wait_for_sync(job_id)
         for job_id in sync_jobs
     ])
     
     # Phase 3: Process new data in parallel
     processing_results = await asyncio.gather(*[
-        orchestrator.process_new_data(source)
+        conductor.process_new_data(source)
         for source in sources
     ])
     
     # Phase 4: Entity resolution
-    entity_resolver = PayReadyEntityResolver(orchestrator.postgres)
+    entity_resolver = PayReadyEntityResolver(conductor.postgres)
     await entity_resolver.run_resolution_batch()
     
     # Phase 5: Vector enrichment with Weaviate Transformation Agent
-    await orchestrator.run_vector_enrichment()
+    await conductor.run_vector_enrichment()
     
     # Phase 6: Update analytics and cache
-    await orchestrator.update_analytics_cache()
+    await conductor.update_analytics_cache()
     
     return {
         "sources_synced": sources,
@@ -322,17 +322,17 @@ async def pay_ready_etl_pipeline(
     }
 
 @task(retries=2)
-async def process_gong_calls(orchestrator, batch_size: int = 50):
+async def process_gong_calls(conductor, batch_size: int = 50):
     """Process Gong call transcripts"""
-    new_calls = await orchestrator.fetch_new_gong_calls(batch_size)
+    new_calls = await conductor.fetch_new_gong_calls(batch_size)
     
     for call in new_calls:
         # Chunk transcript
-        segments = orchestrator.chunk_transcript(call['transcript'])
+        segments = conductor.chunk_transcript(call['transcript'])
         
         # Vectorize and store
         for segment in segments:
-            await orchestrator.store_vector(
+            await conductor.store_vector(
                 collection="PayReadyGongCallSegment",
                 data={
                     "text": segment['text'],
@@ -340,8 +340,8 @@ async def process_gong_calls(orchestrator, batch_size: int = 50):
                     "speaker": segment['speaker'],
                     "start_time": segment['start_time'],
                     "call_date": call['date'],
-                    "unified_person_id": await orchestrator.resolve_person(segment['speaker']),
-                    "unified_company_id": await orchestrator.resolve_company(call['account'])
+                    "unified_person_id": await conductor.resolve_person(segment['speaker']),
+                    "unified_company_id": await conductor.resolve_company(call['account'])
                 }
             )
 ```
@@ -514,8 +514,8 @@ async def get_interaction_timeline(
     sources: List[str] = Query(["all"])
 ):
     """Get unified timeline of customer interactions"""
-    orchestrator = PayReadyOrchestrator()
-    return await orchestrator.get_timeline(
+    conductor = PayReadyconductor()
+    return await conductor.get_timeline(
         customer_id=customer_id,
         company_id=company_id,
         date_range=(start_date, end_date),
@@ -603,7 +603,7 @@ async def health_check():
 
 ## Next Steps
 
-1. Implement core ETL orchestrator service
+1. Implement core ETL conductor service
 2. Set up Airbyte Cloud connections
 3. Configure Weaviate schema and agents
 4. Deploy Prefect flows

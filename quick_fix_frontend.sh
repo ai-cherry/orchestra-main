@@ -13,7 +13,7 @@ NC='\033[0m'
 
 # 1. Build the latest frontend
 echo -e "\n${YELLOW}Building latest frontend...${NC}"
-cd /root/orchestra-main/admin-ui
+cd /root/cherry_ai-main/admin-ui
 
 # Quick build (skip if node_modules exists)
 if [ ! -d "node_modules" ]; then

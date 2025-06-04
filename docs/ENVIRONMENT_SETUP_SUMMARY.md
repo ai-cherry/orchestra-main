@@ -47,7 +47,7 @@
 ## File Structure
 
 ```
-orchestra-main/
+cherry_ai-main/
 ├── docs/
 │   ├── INFRASTRUCTURE_GUIDE.md      # Complete infrastructure reference
 │   ├── DEVELOPMENT_GUIDE.md         # Local development guide

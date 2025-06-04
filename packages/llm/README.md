@@ -8,7 +8,7 @@ This package provides integration between Phidata/Agno LLM models and Portkey, e
 - **Portkey Integration**: Leverage Portkey's gateway URL and authentication headers
 - **Provider Support**: Implementations for OpenAI, Anthropic, and OpenRouter
 - **Automatic Configuration**: Dynamic configuration from environment variables
-- **Dependency Injection**: Seamless integration with the Orchestra system
+- **Dependency Injection**: Seamless integration with the cherry_ai system
 
 ## Directory Structure
 
@@ -57,7 +57,7 @@ PREFERRED_LLM_PROVIDER=openrouter  # Options: openai, anthropic, openrouter
 You can use the model factories directly:
 
 ```python
-from core.orchestrator.src.config.settings import Settings
+from core.conductor.src.config.settings import Settings
 from packages.llm.src.models.openai import create_openai_model
 from packages.llm.src.models.anthropic import create_anthropic_model
 from packages.llm.src.models.openrouter import create_openrouter_model
@@ -88,7 +88,7 @@ The models are automatically available through dependency injection:
 
 ```python
 from fastapi import Depends
-from core.orchestrator.src.api.dependencies.llm import get_llm_client
+from core.conductor.src.api.dependencies.llm import get_llm_client
 
 async def my_endpoint(llm_model=Depends(get_llm_client)):
     """The LLM model will be injected automatically."""

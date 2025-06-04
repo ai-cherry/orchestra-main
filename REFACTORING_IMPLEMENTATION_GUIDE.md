@@ -1,8 +1,8 @@
-# Orchestra AI: Complete Refactoring Implementation Guide
+# Cherry AI: Complete Refactoring Implementation Guide
 
 ## **🎯 Executive Summary**
 
-This guide provides a complete, step-by-step implementation plan for refactoring Orchestra AI. The plan addresses critical technical debt while introducing strategic enhancements to transform the codebase into a maintainable, performant, and scalable system.
+This guide provides a complete, step-by-step implementation plan for refactoring Cherry AI. The plan addresses critical technical debt while introducing strategic enhancements to transform the codebase into a maintainable, performant, and scalable system.
 
 **Key Metrics**: 
 - ~40% code reduction through deduplication
@@ -26,7 +26,7 @@ source venv/bin/activate  # Linux/Mac
 # OR
 venv\Scripts\activate     # Windows
 
-# Install orchestrator dependencies
+# Install conductor dependencies
 pip install click rich asyncio
 ```
 
@@ -40,8 +40,8 @@ git stash  # If needed
 git checkout -b refactoring-implementation
 git push -u origin refactoring-implementation
 
-# Make orchestrator executable
-chmod +x scripts/refactoring_orchestrator.py
+# Make conductor executable
+chmod +x scripts/refactoring_conductor.py
 ```
 
 ---
@@ -54,16 +54,16 @@ chmod +x scripts/refactoring_orchestrator.py
 
 #### **Preview Phase 1**
 ```bash
-python scripts/refactoring_orchestrator.py preview --phase 1
+python scripts/refactoring_conductor.py preview --phase 1
 ```
 
 #### **Execute Phase 1**
 ```bash
 # Dry run first
-python scripts/refactoring_orchestrator.py execute --phase 1 --dry-run
+python scripts/refactoring_conductor.py execute --phase 1 --dry-run
 
 # Execute if preview looks good
-python scripts/refactoring_orchestrator.py execute --phase 1
+python scripts/refactoring_conductor.py execute --phase 1
 ```
 
 #### **Tasks in Phase 1:**
@@ -84,8 +84,8 @@ python scripts/refactoring_orchestrator.py execute --phase 1
 
 #### **Validation Phase 1**
 ```bash
-python scripts/refactoring_orchestrator.py validate
-python scripts/refactoring_orchestrator.py status
+python scripts/refactoring_conductor.py validate
+python scripts/refactoring_conductor.py status
 ```
 
 ---
@@ -96,9 +96,9 @@ python scripts/refactoring_orchestrator.py status
 
 #### **Preview & Execute Phase 2**
 ```bash
-python scripts/refactoring_orchestrator.py preview --phase 2
-python scripts/refactoring_orchestrator.py execute --phase 2 --dry-run
-python scripts/refactoring_orchestrator.py execute --phase 2
+python scripts/refactoring_conductor.py preview --phase 2
+python scripts/refactoring_conductor.py execute --phase 2 --dry-run
+python scripts/refactoring_conductor.py execute --phase 2
 ```
 
 #### **Tasks in Phase 2:**
@@ -110,7 +110,7 @@ python scripts/refactoring_orchestrator.py execute --phase 2
 
 2. **Deploy Unified Database** (45 min)
    - ✅ Single interface for PostgreSQL + Weaviate
-   - ✅ Follows Orchestra AI database rules
+   - ✅ Follows Cherry AI database rules
    - ✅ Connection pooling and health monitoring
    - ✅ Hybrid operations support
 
@@ -136,7 +136,7 @@ python scripts/refactoring_orchestrator.py execute --phase 2
    - ✅ Improves navigation and maintainability
    - ✅ Follows clean architecture principles
 
-2. **Enhance Orchestrator** (120 min)
+2. **Enhance conductor** (120 min)
    - ✅ Implements dependency injection
    - ✅ Improves service lifecycle management
    - ✅ Adds proper error boundaries
@@ -159,7 +159,7 @@ core/
 │   ├── metrics.py
 │   ├── health.py
 │   └── __init__.py
-└── orchestrator/
+└── conductor/
     ├── enhanced/
     └── legacy/ (for compatibility)
 ```
@@ -206,8 +206,8 @@ scripts/
 │   ├── health.py          # Replaces 8+ health check scripts
 │   ├── database.py        # Replaces 12+ DB scripts
 │   └── validation.py      # Replaces 10+ validation scripts
-├── orchestrator.py        # Enhanced main CLI
-└── refactoring_orchestrator.py  # This script
+├── conductor.py        # Enhanced main CLI
+└── refactoring_conductor.py  # This script
 ```
 
 ---
@@ -222,10 +222,10 @@ scripts/
 ### **Rollback Procedures**
 ```bash
 # View available rollback points
-python scripts/refactoring_orchestrator.py status
+python scripts/refactoring_conductor.py status
 
 # Rollback to specific phase
-python scripts/refactoring_orchestrator.py rollback phase-1-foundation
+python scripts/refactoring_conductor.py rollback phase-1-foundation
 
 # Manual rollback if needed
 git stash list
@@ -235,7 +235,7 @@ git stash apply stash@{n}
 ### **Validation at Each Step**
 ```bash
 # Continuous validation
-python scripts/refactoring_orchestrator.py validate
+python scripts/refactoring_conductor.py validate
 
 # Manual tests
 python -m pytest tests/ -v
@@ -281,13 +281,13 @@ python -c "from core.llm.unified_router import get_llm_router; print('Router OK'
 ### **Real-time Status Monitoring**
 ```bash
 # Check overall progress
-python scripts/refactoring_orchestrator.py status
+python scripts/refactoring_conductor.py status
 
 # Detailed phase information
-python scripts/refactoring_orchestrator.py preview
+python scripts/refactoring_conductor.py preview
 
 # Validate system health
-python scripts/refactoring_orchestrator.py validate
+python scripts/refactoring_conductor.py validate
 ```
 
 ### **Performance Benchmarks**
@@ -372,7 +372,7 @@ git checkout main  # Back to main branch
 
 ### **Phase 3 Success**
 - [ ] Core directory reorganized
-- [ ] Orchestrator enhanced
+- [ ] conductor enhanced
 - [ ] Clean architecture implemented
 - [ ] Navigation improved
 
@@ -425,16 +425,16 @@ Once all phases are complete:
 - **Discussion**: Use team channels for questions
 
 ### **Escalation Path**
-1. **Check logs**: `python scripts/refactoring_orchestrator.py status`
-2. **Validate system**: `python scripts/refactoring_orchestrator.py validate`
-3. **Rollback if needed**: `python scripts/refactoring_orchestrator.py rollback <point>`
+1. **Check logs**: `python scripts/refactoring_conductor.py status`
+2. **Validate system**: `python scripts/refactoring_conductor.py validate`
+3. **Rollback if needed**: `python scripts/refactoring_conductor.py rollback <point>`
 4. **Manual intervention**: Contact architecture team
 
 ---
 
 **🚀 Ready to begin? Start with:**
 ```bash
-python scripts/refactoring_orchestrator.py preview --phase 1
+python scripts/refactoring_conductor.py preview --phase 1
 ```
 
-This refactoring will transform Orchestra AI into a world-class, maintainable codebase that supports rapid development and reliable operations. The investment in refactoring today will pay dividends in development velocity, system reliability, and team satisfaction for years to come.
+This refactoring will transform Cherry AI into a world-class, maintainable codebase that supports rapid development and reliable operations. The investment in refactoring today will pay dividends in development velocity, system reliability, and team satisfaction for years to come.

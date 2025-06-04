@@ -1,6 +1,6 @@
 """
 """
-    """Test LLM Orchestration API endpoints"""
+    """Test LLM coordination API endpoints"""
         async with AsyncClient(app=app, base_url="http://test") as ac:
             yield ac
     
@@ -20,7 +20,7 @@
             mock_router.return_value = mock_instance
             
             response = await client.post(
-                "/api/orchestration/test-routing",
+                "/api/coordination/test-routing",
                 json={
                     "query": "Write a creative story",
                     "force_query_type": "creative_search"
@@ -51,7 +51,7 @@
             })
             mock_router.return_value = mock_instance
             
-            response = await client.get("/api/orchestration/routing-analytics")
+            response = await client.get("/api/coordination/routing-analytics")
             
             assert response.status_code == 200
             data = response.json()
@@ -61,7 +61,7 @@
     @pytest.mark.asyncio
     async def test_query_types_endpoint(self, client):
         """Test the query types endpoint"""
-        response = await client.get("/api/orchestration/query-types")
+        response = await client.get("/api/coordination/query-types")
         
         assert response.status_code == 200
         data = response.json()
@@ -80,7 +80,7 @@
             })
             mock_get_agent.return_value = mock_agent
             
-            response = await client.get("/api/orchestration/agents")
+            response = await client.get("/api/coordination/agents")
             
             assert response.status_code == 200
             data = response.json()
@@ -93,7 +93,7 @@
             mock_process.return_value = {"result": "success"}
             
             response = await client.post(
-                "/api/orchestration/agents/personal/execute",
+                "/api/coordination/agents/personal/execute",
                 json={
                     "agent_type": "personal",
                     "task": {"type": "search", "query": "test"}
@@ -116,7 +116,7 @@
             mock_get_agent.return_value = mock_agent
             
             response = await client.post(
-                "/api/orchestration/personal/search",
+                "/api/coordination/personal/search",
                 json={
                     "user_id": "user123",
                     "query": "test query",
@@ -143,7 +143,7 @@
             mock_get_agent.return_value = mock_agent
             
             response = await client.post(
-                "/api/orchestration/payready/analyze",
+                "/api/coordination/payready/analyze",
                 json={
                     "listing_data": {
                         "id": "apt123",
@@ -176,7 +176,7 @@
             mock_get_agent.return_value = mock_agent
             
             response = await client.post(
-                "/api/orchestration/paragon/search-trials",
+                "/api/coordination/paragon/search-trials",
                 json={
                     "conditions": ["chronic pain"],
                     "phases": ["Phase 3", "Phase 4"]
@@ -197,11 +197,11 @@
             mock_workflow.tasks = {"task1": Mock()}
             mock_workflow.created_at.isoformat.return_value = "2024-01-01T00:00:00"
             
-            mock_orchestrator.create_workflow = AsyncMock(return_value=mock_workflow)
-            mock_get_orch.return_value = mock_orchestrator
+            mock_conductor.create_workflow = AsyncMock(return_value=mock_workflow)
+            mock_get_orch.return_value = mock_conductor
             
             response = await client.post(
-                "/api/orchestration/workflows",
+                "/api/coordination/workflows",
                 json={
                     "name": "Test Workflow",
                     "tasks": [
@@ -223,7 +223,7 @@
     @pytest.mark.asyncio
     async def test_execute_workflow_endpoint(self, client):
         """Test workflow execution endpoint"""
-            response = await client.post("/api/orchestration/workflows/workflow123/execute")
+            response = await client.post("/api/coordination/workflows/workflow123/execute")
             
             assert response.status_code == 200
             data = response.json()
@@ -238,9 +238,9 @@
                 "progress": 50.0,
                 "tasks": {}
             })
-            mock_get_orch.return_value = mock_orchestrator
+            mock_get_orch.return_value = mock_conductor
             
-            response = await client.get("/api/orchestration/workflows/workflow123/status")
+            response = await client.get("/api/coordination/workflows/workflow123/status")
             
             assert response.status_code == 200
             data = response.json()
@@ -253,14 +253,14 @@
                     mock_agent.get_status = AsyncMock(return_value={"status": "idle"})
                     mock_get_agent.return_value = mock_agent
                     
-                    response = await client.get("/api/orchestration/system/health")
+                    response = await client.get("/api/coordination/system/health")
                     
                     assert response.status_code == 200
                     data = response.json()
                     assert data["status"] in ["healthy", "degraded"]
                     assert "components" in data
                     assert "llm_router" in data["components"]
-                    assert "orchestrator" in data["components"]
+                    assert "conductor" in data["components"]
 
 class TestErrorHandling:
     """Test error handling in API endpoints"""
@@ -270,7 +270,7 @@ class TestErrorHandling:
     @pytest.mark.asyncio
     async def test_invalid_agent_type(self, client):
         """Test error handling for invalid agent type"""
-            "/api/orchestration/agents/invalid_type/execute",
+            "/api/coordination/agents/invalid_type/execute",
             json={"agent_type": "invalid_type", "task": {}}
         )
         
@@ -282,9 +282,9 @@ class TestErrorHandling:
         """Test error handling for non-existent workflow"""
                 side_effect=ValueError("Workflow not found")
             )
-            mock_get_orch.return_value = mock_orchestrator
+            mock_get_orch.return_value = mock_conductor
             
-            response = await client.get("/api/orchestration/workflows/nonexistent/status")
+            response = await client.get("/api/coordination/workflows/nonexistent/status")
             
             assert response.status_code == 404
     
@@ -296,7 +296,7 @@ class TestErrorHandling:
             mock_router.return_value = mock_instance
             
             response = await client.post(
-                "/api/orchestration/test-routing",
+                "/api/coordination/test-routing",
                 json={"query": "Test query"}
             )
             

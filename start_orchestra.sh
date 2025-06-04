@@ -1,13 +1,13 @@
 #!/bin/bash
-# Start Orchestra AI Services with Real Agents
+# Start Cherry AI Services with Real Agents
 
 set -e
 
-echo "🚀 Starting Orchestra AI Services..."
+echo "🚀 Starting Cherry AI Services..."
 
 # Check if we're in the correct directory
 if [ ! -f "agent/app/main.py" ]; then
-    echo "❌ Error: Not in Orchestra root directory"
+    echo "❌ Error: Not in cherry_ai root directory"
     echo "Please run from the project root directory"
     exit 1
 fi
@@ -43,12 +43,12 @@ echo "🌐 Starting API server..."
 nohup python -m uvicorn agent.app.main:app --host 0.0.0.0 --port 8000 > api.log 2>&1 &
 API_PID=$!
 
-echo "✅ Orchestra AI started!"
+echo "✅ Cherry AI started!"
 echo "   API PID: $API_PID"
 echo "   API URL: http://localhost:8000"
 echo "   API Docs: http://localhost:8000/docs"
 echo ""
 echo "📋 To view logs: tail -f api.log"
-echo "🛑 To stop: ./stop_orchestra.sh"
+echo "🛑 To stop: ./stop_cherry_ai.sh"
 echo ""
 echo "🔑 Default API Key: 4010007a9aa5443fc717b54e1fd7a463260965ec9e2fce297280cf86f1b3a4bd"

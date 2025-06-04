@@ -4,7 +4,7 @@
 
 set -e
 
-echo "🧪 Verifying Orchestra AI Testing Setup..."
+echo "🧪 Verifying Cherry AI Testing Setup..."
 echo "============================================"
 
 # Colors for output
@@ -15,7 +15,7 @@ NC='\033[0m' # No Color
 
 # Check if we're in the right directory
 if [ ! -f "requirements.txt" ]; then
-    echo -e "${RED}❌ Error: Not in the Orchestra AI project root directory${NC}"
+    echo -e "${RED}❌ Error: Not in the Cherry AI project root directory${NC}"
     echo "Please run this script from the project root."
     exit 1
 fi

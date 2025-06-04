@@ -1,6 +1,6 @@
 # PromptBuilder Module
 
-The PromptBuilder module is a powerful component for creating dynamic, persona-driven prompts in the AI Orchestration System. It transforms basic persona configurations into rich, tailored prompts that capture each persona's unique traits, communication style, and knowledge.
+The PromptBuilder module is a powerful component for creating dynamic, persona-driven prompts in the AI coordination System. It transforms basic persona configurations into rich, tailored prompts that capture each persona's unique traits, communication style, and knowledge.
 
 ## Overview
 
@@ -26,7 +26,7 @@ PromptBuilder
 └── TraitsProcessor
 ```
 
-- **PromptBuilder**: Core class that orchestrates prompt creation
+- **PromptBuilder**: Core class that cherry_aites prompt creation
 - **Formatters**: Transform prompts based on specific criteria
 - **Templates**: Pre-defined prompt structures for different personas
 - **TraitsProcessor**: Converts persona traits into actionable directives
@@ -67,7 +67,7 @@ The module provides dependencies for use in FastAPI applications:
 
 ```python
 from fastapi import Depends
-from core.orchestrator.src.api.dependencies.prompt_builder import build_prompt_for_persona
+from core.conductor.src.api.dependencies.prompt_builder import build_prompt_for_persona
 
 @router.post("/interact")
 async def interact(

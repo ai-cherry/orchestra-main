@@ -29,7 +29,7 @@ class BaseConfig(BaseModel, ABC):
     """Database configuration for PostgreSQL and Weaviate"""
     postgresql_host: str = Field(default="localhost", env="POSTGRESQL_HOST")
     postgresql_port: int = Field(default=5432, env="POSTGRESQL_PORT")
-    postgresql_database: str = Field(default="orchestra", env="POSTGRESQL_DATABASE")
+    postgresql_database: str = Field(default="cherry_ai", env="POSTGRESQL_DATABASE")
     postgresql_username: str = Field(default="postgres", env="POSTGRESQL_USERNAME")
     postgresql_password: str = Field(default="", env="POSTGRESQL_PASSWORD")
     postgresql_ssl_mode: str = Field(default="prefer", env="POSTGRESQL_SSL_MODE")
@@ -166,26 +166,26 @@ class BaseConfig(BaseModel, ABC):
         valid_backends = ["postgresql", "weaviate", "hybrid"]
         return self.backend in valid_backends
 
-class OrchestrationConfig(BaseConfig):
-    """Orchestration system configuration"""
-    max_concurrent_agents: int = Field(default=10, env="ORCHESTRATION_MAX_CONCURRENT_AGENTS")
-    agent_timeout: int = Field(default=300, env="ORCHESTRATION_AGENT_TIMEOUT")
-    agent_retry_attempts: int = Field(default=3, env="ORCHESTRATION_AGENT_RETRY_ATTEMPTS")
+class coordinationConfig(BaseConfig):
+    """coordination system configuration"""
+    max_concurrent_agents: int = Field(default=10, env="COORDINATION_MAX_CONCURRENT_AGENTS")
+    agent_timeout: int = Field(default=300, env="COORDINATION_AGENT_TIMEOUT")
+    agent_retry_attempts: int = Field(default=3, env="COORDINATION_AGENT_RETRY_ATTEMPTS")
     
     # Workflow Configuration
-    max_workflow_steps: int = Field(default=100, env="ORCHESTRATION_MAX_WORKFLOW_STEPS")
-    workflow_timeout: int = Field(default=1800, env="ORCHESTRATION_WORKFLOW_TIMEOUT")
+    max_workflow_steps: int = Field(default=100, env="COORDINATION_MAX_WORKFLOW_STEPS")
+    workflow_timeout: int = Field(default=1800, env="COORDINATION_WORKFLOW_TIMEOUT")
     
     # Event Processing
-    event_queue_size: int = Field(default=1000, env="ORCHESTRATION_EVENT_QUEUE_SIZE")
-    event_processing_interval: int = Field(default=1, env="ORCHESTRATION_EVENT_PROCESSING_INTERVAL")
+    event_queue_size: int = Field(default=1000, env="COORDINATION_EVENT_QUEUE_SIZE")
+    event_processing_interval: int = Field(default=1, env="COORDINATION_EVENT_PROCESSING_INTERVAL")
     
     # Resource Limits
-    max_memory_usage: str = Field(default="1GB", env="ORCHESTRATION_MAX_MEMORY_USAGE")
-    max_cpu_usage: float = Field(default=0.8, env="ORCHESTRATION_MAX_CPU_USAGE")
+    max_memory_usage: str = Field(default="1GB", env="COORDINATION_MAX_MEMORY_USAGE")
+    max_cpu_usage: float = Field(default=0.8, env="COORDINATION_MAX_CPU_USAGE")
     
     def validate_config(self) -> bool:
-        """Validate orchestration configuration"""
+        """Validate coordination configuration"""
     """
     """
         env_file=".env",
@@ -201,9 +201,9 @@ class OrchestrationConfig(BaseConfig):
     testing: bool = Field(default=False, env="TESTING")
     
     # Project Information
-    project_name: str = Field(default="Orchestra AI", env="PROJECT_NAME")
+    project_name: str = Field(default="Cherry AI", env="PROJECT_NAME")
     project_version: str = Field(default="1.0.0", env="PROJECT_VERSION")
-    project_description: str = Field(default="AI Orchestration Platform", env="PROJECT_DESCRIPTION")
+    project_description: str = Field(default="AI coordination Platform", env="PROJECT_DESCRIPTION")
     
     # Configuration Sections
     database: DatabaseConfig = Field(default_factory=DatabaseConfig)
@@ -211,7 +211,7 @@ class OrchestrationConfig(BaseConfig):
     api: APIConfig = Field(default_factory=APIConfig)
     monitoring: MonitoringConfig = Field(default_factory=MonitoringConfig)
     memory: MemoryConfig = Field(default_factory=MemoryConfig)
-    orchestration: OrchestrationConfig = Field(default_factory=OrchestrationConfig)
+    coordination: coordinationConfig = Field(default_factory=coordinationConfig)
     
     # Feature Flags
     enable_mcp_integration: bool = Field(default=True, env="ENABLE_MCP_INTEGRATION")
@@ -241,17 +241,17 @@ class OrchestrationConfig(BaseConfig):
         }
 
 # Global configuration instance
-_config_instance: Optional[UnifiedOrchestraConfig] = None
+_config_instance: Optional[Unifiedcherry_aiConfig] = None
 
 @lru_cache(maxsize=1)
-def get_config() -> UnifiedOrchestraConfig:
+def get_config() -> Unifiedcherry_aiConfig:
     """
     """
     """
     """
     """
     """
-def save_config_to_file(config: UnifiedOrchestraConfig, file_path: Path, format: str = "yaml") -> None:
+def save_config_to_file(config: Unifiedcherry_aiConfig, file_path: Path, format: str = "yaml") -> None:
     """
     """
     if format.lower() == "yaml":
@@ -263,7 +263,7 @@ def save_config_to_file(config: UnifiedOrchestraConfig, file_path: Path, format:
     else:
         raise ValueError(f"Unsupported format: {format}")
 
-def load_config_from_file(file_path: Path) -> UnifiedOrchestraConfig:
+def load_config_from_file(file_path: Path) -> Unifiedcherry_aiConfig:
     """
     """
         raise FileNotFoundError(f"Configuration file not found: {file_path}")
@@ -286,14 +286,14 @@ def get_database_config() -> DatabaseConfig:
     """Get API configuration"""
     """Get monitoring configuration"""
     """Get memory configuration"""
-    """Get orchestration configuration"""
-    "UnifiedOrchestraConfig",
+    """Get coordination configuration"""
+    "Unifiedcherry_aiConfig",
     "DatabaseConfig",
     "LLMConfig", 
     "APIConfig",
     "MonitoringConfig",
     "MemoryConfig",
-    "OrchestrationConfig",
+    "coordinationConfig",
     "Environment",
     "LogLevel",
     "get_config",
@@ -303,5 +303,5 @@ def get_database_config() -> DatabaseConfig:
     "get_api_config",
     "get_monitoring_config",
     "get_memory_config",
-    "get_orchestration_config"
+    "get_coordination_config"
 ] 

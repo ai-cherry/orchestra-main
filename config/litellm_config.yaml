@@ -1,4 +1,4 @@
-# LiteLLM Configuration for Orchestra
+# LiteLLM Configuration for cherry_ai
 # This configuration sets up model providers, routing, caching, monitoring, and logging
 # Last updated: 2025-05-23
 #
@@ -244,7 +244,7 @@ budget_manager:
   # Enable budget tracking
   is_enabled: true
   # Project identifiers
-  project_id: "orchestra"
+  project_id: "cherry_ai"
   # Budget in USD
   max_budget: 100.0
   # Per-model budgets

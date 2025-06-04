@@ -1,8 +1,9 @@
-"""Unified database interface for Orchestra AI"""
+"""Unified database interface for Cherry AI"""
 
 import os
 import logging
 from typing import Dict, Any, List, Optional
+from typing_extensions import Optional
 from sqlalchemy import create_engine, text
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
@@ -14,7 +15,7 @@ class UnifiedDatabase:
     """Unified interface for database operations"""
     
     def __init__(self):
-        self.database_url = os.getenv("DATABASE_URL", "postgresql://localhost/orchestra")
+        self.database_url = os.getenv("DATABASE_URL", "postgresql://localhost/cherry_ai")
         self.engine = None
         self.async_engine = None
         self._init_engines()

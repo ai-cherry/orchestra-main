@@ -191,7 +191,7 @@ scrape_configs:
 Each server exposes enhanced health endpoints:
 
 ```bash
-# Orchestrator
+# conductor
 curl http://localhost:8002/health
 
 # Memory

@@ -142,8 +142,8 @@
           "run_tests"
         ]
       },
-      "orchestrator": {
-        "agent_id": "roo_orchestrator_agent",
+      "conductor": {
+        "agent_id": "roo_conductor_agent",
         "capabilities": [
           "task_decomposition",
           "agent_coordination",
@@ -287,7 +287,7 @@
           "multiple",
           "workflow",
           "pipeline",
-          "orchestrate"
+          "cherry_aite"
         ],
         "direct_model_keywords": [
           "completion",

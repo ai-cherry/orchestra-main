@@ -1,13 +1,13 @@
-# Orchestra AI Project Structure
+# Cherry AI Project Structure
 
 ## 🏗️ Directory Overview
 
 ```
-orchestra-main/
+cherry_ai-main/
 ├── scripts/                    # ALL automation tools go here
 │   ├── config_validator.py     # Comprehensive config validation
 │   ├── health_monitor.py       # Service health monitoring
-│   ├── orchestra.py            # Unified CLI interface
+│   ├── cherry_ai.py            # Unified CLI interface
 │   ├── ai_code_reviewer.py     # AI code consistency checker
 │   ├── check_venv.py           # Virtual environment validation
 │   └── check_dependencies.py   # Dependency checking
@@ -26,7 +26,7 @@ orchestra-main/
 ├── mcp-servers/               # MCP server implementations
 │   ├── secret_manager.py      # Port 8002
 │   └── │
-├── core/orchestrator/         # Core orchestration logic
+├── core/conductor/         # Core coordination logic
 │   └── src/
 │       ├── api/               # API endpoints
 │       │   └── app.py        # Main FastAPI app (port 8080)
@@ -58,14 +58,14 @@ All automation tools MUST go in the `scripts/` directory:
 | Script                | Purpose                                    | Usage                                                |
 | --------------------- | ------------------------------------------ | ---------------------------------------------------- |
 | `config_validator.py` | Validates YAML, env vars, | `health_monitor.py`   | Dynamic health checks, replaces sleep      | `python scripts/health_monitor.py --monitor`         |
-| `orchestra.py`        | Unified CLI for all operations             | `python scripts/orchestra.py services status`        |
+| `cherry_ai.py`        | Unified CLI for all operations             | `python scripts/cherry_ai.py services status`        |
 | `ai_code_reviewer.py` | Checks for AI anti-patterns                | `python scripts/ai_code_reviewer.py --check-changes` |
 
 ### **2. Service Ports**
 
 Fixed port assignments - DO NOT duplicate:
 
-- **8002**: MCP - **8080**: Core Orchestrator / MongoDB
+- **8002**: MCP - **8080**: Core conductor / MongoDB
 - **3000**: Admin UI
 - **6379**: Redis (if running)
 
@@ -73,7 +73,7 @@ Fixed port assignments - DO NOT duplicate:
 
 - `requirements/base.txt` - Core Python dependencies
 - `mcp-servers/*.yaml` - MCP server configs
-- `core/orchestrator/src/config/*.yaml` - Service configs
+- `core/conductor/src/config/*.yaml` - Service configs
 - NO Docker files, NO Poetry files, NO Pipfile
 
 ### **4. Makefile Targets**

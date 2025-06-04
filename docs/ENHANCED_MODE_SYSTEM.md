@@ -1,6 +1,6 @@
-# Enhanced Mode System for AI Orchestra
+# Enhanced Mode System for AI cherry_ai
 
-This document outlines the improved mode system for the AI Orchestra project, including optimized model assignments, enhanced mode permissions, and workflow orchestration capabilities.
+This document outlines the improved mode system for the AI cherry_ai project, including optimized model assignments, enhanced mode permissions, and workflow coordination capabilities.
 
 ## Overview
 
@@ -8,7 +8,7 @@ The Enhanced Mode System introduces several key improvements:
 
 1. **Optimized Model Assignments**: Each mode is now paired with the most suitable AI model
 2. **Enhanced Access Controls**: Expanded write capabilities for analysis-focused modes
-3. **Workflow Orchestration**: Predefined sequences of mode transitions for common tasks
+3. **Workflow coordination**: Predefined sequences of mode transitions for common tasks
 4. **Context Retention**: Better state management between mode transitions
 5. **Automatic Suggestions**: Smart recommendations for the next mode to use
 
@@ -23,7 +23,7 @@ We've optimized the AI model assignments based on each mode's primary function:
 | 💻 Code         | GPT-4          | 128K tokens    | Implementation-focused with strong coding abilities |
 | 🪲 Debug        | GPT-4          | 128K tokens    | Error analysis and runtime diagnostics              |
 | 🏗 Architect    | Gemini 1.5 Pro | 1M+ tokens     | System design with large context awareness          |
-| 🪃 Orchestrator | Gemini 1.5 Pro | 1M+ tokens     | Comprehensive code review and analysis              |
+| 🪃 conductor | Gemini 1.5 Pro | 1M+ tokens     | Comprehensive code review and analysis              |
 | 🕵️ Reviewer     | Gemini 1.5 Pro | 1M+ tokens     | Quality assurance and documentation                 |
 | 🧠 Strategy     | Claude 3 Opus  | 200K tokens    | Planning and roadmapping                            |
 | ❓ Ask          | Claude 3 Opus  | 100K tokens    | Research and information gathering                  |
@@ -40,7 +40,7 @@ The following modes now have expanded write access to specific file patterns:
   - `config/*.yaml` files
   - `docs/*` files
 
-- **🪃 Orchestrator**: Can now perform automated fixes to code issues
+- **🪃 conductor**: Can now perform automated fixes to code issues
 
   - `.py` files (for automated fixes)
   - `.md` files (for documentation updates)
@@ -63,7 +63,7 @@ The following modes now have expanded write access to specific file patterns:
   - `docs/*` files
   - `README.*` files
 
-## Workflow Orchestration
+## Workflow coordination
 
 The system now supports predefined workflows - sequences of mode transitions designed for specific development tasks. Each workflow defines a series of steps with specific tasks to accomplish.
 
@@ -74,7 +74,7 @@ The system now supports predefined workflows - sequences of mode transitions des
    - Step 1: Strategy (Planning)
    - Step 2: Architect (Design)
    - Step 3: Code (Implementation)
-   - Step 4: Orchestrator (Review)
+   - Step 4: conductor (Review)
    - Step 5: Debug (Testing)
    - Step 6: Creative (Documentation)
 
@@ -82,18 +82,18 @@ The system now supports predefined workflows - sequences of mode transitions des
 
    - Step 1: Debug (Analysis)
    - Step 2: Code (Fix Implementation)
-   - Step 3: Orchestrator (Review)
+   - Step 3: conductor (Review)
 
 3. **Refactoring Workflow**
 
-   - Step 1: Orchestrator (Analysis)
+   - Step 1: conductor (Analysis)
    - Step 2: Architect (Design)
    - Step 3: Code (Implementation)
    - Step 4: Debug (Testing)
    - Step 5: Creative (Documentation)
 
 4. **Security Audit Workflow**
-   - Step 1: Orchestrator (Analysis)
+   - Step 1: conductor (Analysis)
    - Step 2: Debug (Verification)
    - Step 3: Code (Implementation)
    - Step 4: Reviewer (Validation)
@@ -124,14 +124,14 @@ For developing new API endpoints or services:
 2. **🏗 Architect**: Design the API structure, database schema, and data flow
 3. **💻 Code**: Implement the FastAPI endpoints, data models, and services
 4. **🪲 Debug**: Test the API endpoints for edge cases and error handling
-5. **🪃 Orchestrator**: Review the implementation for quality and security
+5. **🪃 conductor**: Review the implementation for quality and security
 6. **🎨 Creative**: Create API documentation and usage examples
 
 ###
 For setting up or modifying
 1. **🏗 Architect**: Design the infrastructure components and dependencies
 2. **💻 Code**: Implement the Pulumi/Python code for the infrastructure
-3. **🪃 Orchestrator**: Review for security best practices and compliance
+3. **🪃 conductor**: Review for security best practices and compliance
 4. **🪲 Debug**: Test deployments in a staging environment
 5. **🕵️ Reviewer**: Validate the infrastructure against requirements
 
@@ -144,7 +144,7 @@ For integrating new AI models or capabilities:
 3. **🏗 Architect**: Design the integration points and data flow
 4. **💻 Code**: Implement the model integration and service endpoints
 5. **🪲 Debug**: Test the model performance and error cases
-6. **🪃 Orchestrator**: Review for optimizations and best practices
+6. **🪃 conductor**: Review for optimizations and best practices
 7. **🕵️ Reviewer**: Validate model behavior against requirements
 
 ## Best Practices for Mode Transitions
@@ -165,7 +165,7 @@ The mode system configuration is defined in `config/mode_definitions.yaml`. You 
 
 ## Future Mode Recommendations
 
-Based on analysis of the AI Orchestra project, we recommend considering these additional modes:
+Based on analysis of the AI cherry_ai project, we recommend considering these additional modes:
 
 1. **📊 MLOps Mode**: Specialized in AI model deployment, versioning, and monitoring
 

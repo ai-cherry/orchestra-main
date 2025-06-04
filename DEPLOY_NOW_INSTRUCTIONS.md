@@ -15,7 +15,7 @@ For example, if your IP is 45.32.123.456:
 
 ## What This Will Do
 
-1. **Copy Docker image** (orchestra-api-minimal.tar.gz) to your server
+1. **Copy Docker image** (cherry_ai-api-minimal.tar.gz) to your server
 2. **Install Docker and nginx** if not already installed
 3. **Load the Docker image** with:
    - Fixed authentication system

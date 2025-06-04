@@ -99,10 +99,21 @@ When asked to create functionality:
 - Complex patterns (metaclasses, multiple inheritance)
 - Heavy dependencies for simple tasks
 - Direct database connections (use UnifiedDatabase)
-- MongoDB/Redis/DragonflyDB usage
+- MongoDB usage
 - Standalone cleanup/utility scripts without integration
 - Temporary files without lifecycle management
 - One-off scripts for tasks that could be CLI commands
+
+## Permitted with Guidelines
+- **Docker / docker-compose**: Allowed for local development environment setup and service orchestration.
+    - Dockerfiles should be multi-stage where appropriate.
+    - Use official Python 3.10 base images (e.g., `python:3.10-slim`).
+    - Minimize layers and follow security best practices (e.g., non-root users).
+    - Ensure `docker-compose.yml` clearly defines all services and their configurations.
+- **Redis**: Allowed, primarily for:
+    - General-purpose caching (key-value with TTLs).
+    - Semantic caching (leveraging Redis's vector search capabilities if available, e.g., via Redis Stack or appropriate modules).
+    - Configure appropriately for performance, resource limits, and persistence needs (e.g. for warm caches).
 
 ## Required Patterns
 - ✅ Integrate utilities into existing modules

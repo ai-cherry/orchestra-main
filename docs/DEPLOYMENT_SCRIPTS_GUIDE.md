@@ -1,4 +1,4 @@
-# AI Orchestra Deployment Scripts Guide
+# AI cherry_ai Deployment Scripts Guide
 =====================================
 
 ## ⚠️ IMPORTANT: Script Consolidation Notice
@@ -7,15 +7,15 @@ We have identified duplication in deployment scripts. **DO NOT** create new depl
 
 ## Recommended Scripts to Use
 
-### 1. `deploy_orchestra.sh` - Primary Deployment Script
-**Purpose**: Deploy the complete AI Orchestra stack (includes SuperAGI)
+### 1. `deploy_cherry_ai.sh` - Primary Deployment Script
+**Purpose**: Deploy the complete AI cherry_ai stack (includes SuperAGI)
 **Use This For**:
 - New deployments
 - Production deployments
 - Full infrastructure setup
 
 ```bash
-ENVIRONMENT=prod ./scripts/deploy_orchestra.sh
+ENVIRONMENT=prod ./scripts/deploy_cherry_ai.sh
 ```
 
 ### 2. `deploy/deploy_stack.sh` - Single-node Vultr stack
@@ -39,8 +39,8 @@ cp deploy/.env.compose.example deploy/.env.compose
 
 ## Scripts to AVOID (Duplicates)
 
-- ❌ `deploy_superagi.sh` - Duplicates functionality of deploy_orchestra.sh
-- ❌ `deploy_optimized_infrastructure.sh` - Use deploy_orchestra.sh instead
+- ❌ `deploy_superagi.sh` - Duplicates functionality of deploy_cherry_ai.sh
+- ❌ `deploy_optimized_infrastructure.sh` - Use deploy_cherry_ai.sh instead
 - ❌ Creating new deployment scripts - Use existing ones!
 
 ## Decision Tree (Simplified)
@@ -52,7 +52,7 @@ Need to deploy?
 │  └─ YES → Use deploy_with_managed_services.sh
 │
 └─ Need full infrastructure?
-   └─ YES → Use deploy_orchestra.sh
+   └─ YES → Use deploy_cherry_ai.sh
 ```
 
 ## Best Practices
@@ -69,7 +69,7 @@ Need to deploy?
 
 3. **Use environment variables for configuration**
    ```bash
-   ENVIRONMENT=prod REGION=us-east1 ./scripts/deploy_orchestra.sh
+   ENVIRONMENT=prod REGION=us-east1 ./scripts/deploy_cherry_ai.sh
    ```
 
 ## Cleanup Recommendation
@@ -77,8 +77,8 @@ Need to deploy?
 Consider removing these duplicate scripts:
 ```bash
 # These scripts duplicate functionality
-rm scripts/deploy_superagi.sh  # Duplicates deploy_orchestra.sh
-rm scripts/deploy_optimized_infrastructure.sh  # Duplicates deploy_orchestra.sh
+rm scripts/deploy_superagi.sh  # Duplicates deploy_cherry_ai.sh
+rm scripts/deploy_optimized_infrastructure.sh  # Duplicates deploy_cherry_ai.sh
 ```
 
 ## If You Need Custom Deployment
@@ -88,15 +88,15 @@ Instead of creating a new script:
 1. **Add options to existing scripts**:
    ```bash
    # Good: Add flag to existing script
-   ./scripts/deploy_orchestra.sh --skip-monitoring
+   ./scripts/deploy_cherry_ai.sh --skip-monitoring
 
-   # Bad: Create deploy_orchestra_no_monitoring.sh
+   # Bad: Create deploy_cherry_ai_no_monitoring.sh
    ```
 
 2. **Use configuration files**:
    ```bash
    # Good: Use config file
-   ./scripts/deploy_orchestra.sh --config=configs/minimal.yaml
+   ./scripts/deploy_cherry_ai.sh --config=configs/minimal.yaml
 
    # Bad: Create deploy_minimal.sh
    ```

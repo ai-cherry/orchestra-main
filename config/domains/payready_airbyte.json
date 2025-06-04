@@ -5,7 +5,7 @@
       "name": "PayReady_postgres_to_weaviate",
       "source": {
         "type": "postgres",
-        "database": "orchestra_db",
+        "database": "cherry_ai_db",
         "schema": "payready_domain",
         "tables": [
           "payready_events",
@@ -50,7 +50,7 @@
       },
       "destination": {
         "type": "postgres",
-        "database": "orchestra_db",
+        "database": "cherry_ai_db",
         "schema": "payready_domain",
         "table": "payready_raw_events"
       },

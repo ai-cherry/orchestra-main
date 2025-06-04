@@ -16,14 +16,14 @@ except Exception:
 
     pass
     # Fallback if agent.app.core.config is not available (e.g. running script standalone)
-    PG_USER = os.getenv("POSTGRES_USER", "orchestrator")
+    PG_USER = os.getenv("POSTGRES_USER", "conductor")
     PG_PASSWORD = os.getenv("POSTGRES_PASSWORD", "orch3str4_2024")
     PG_HOST = os.getenv("POSTGRES_HOST", "localhost")
     PG_PORT = os.getenv("POSTGRES_PORT", "5432")
-    PG_DB = os.getenv("POSTGRES_DB", "orchestrator")
+    PG_DB = os.getenv("POSTGRES_DB", "conductor")
     DATABASE_URL = f"postgresql+psycopg://{PG_USER}:{PG_PASSWORD}@{PG_HOST}:{PG_PORT}/{PG_DB}"
     # Final fallback if individual vars also not set, using a placeholder that will likely fail but shows intent
-    if PG_USER == "orchestrator" and PG_HOST == "localhost" and os.getenv("DATABASE_URL") is None:
+    if PG_USER == "conductor" and PG_HOST == "localhost" and os.getenv("DATABASE_URL") is None:
         DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+psycopg://user:pass@host:5432/db") # Ensure port is numeric here
 
 print(f"[shared.database.core] Using DATABASE_URL: {DATABASE_URL}") # For debugging startup

@@ -52,14 +52,14 @@
 
 ## Phase 2: Core Services Implementation (Week 2)
 
-### Task 2.1: ETL Orchestrator Service
+### Task 2.1: ETL conductor Service
 **Owner**: Backend Engineer
 **Dependencies**: Phase 1 complete
 **Inputs**:
 - Service architecture design
 - Database schemas
 **Outputs**:
-- PayReadyETLOrchestrator class
+- PayReadyETLconductor class
 - Airbyte API integration
 - Data processing methods
 **Checkpoint**: Unit tests passing
@@ -255,7 +255,7 @@
 ```mermaid
 graph TD
     %% Phase 1
-    T1.1[Database Schema] --> T2.1[ETL Orchestrator]
+    T1.1[Database Schema] --> T2.1[ETL conductor]
     T1.1 --> T2.2[Entity Resolution]
     T1.1 --> T2.3[Memory Manager]
     

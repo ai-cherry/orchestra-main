@@ -4,7 +4,7 @@ This document describes how to use the provided scripts to map GitHub organizati
 
 ## Overview
 
-The Orchestra project uses GitHub organization-level secrets for storing sensitive credentials that are shared across multiple repositories. This approach provides:
+The cherry_ai project uses GitHub organization-level secrets for storing sensitive credentials that are shared across multiple repositories. This approach provides:
 
 - **Centralized management** of credentials
 - **Consistent access** across repositories
@@ -82,7 +82,7 @@ Arguments:
 Example for CI/CD pipeline:
 
 ```bash
-./scripts/update_github_org_secrets_ci.sh --org orchestra-project --yes
+./scripts/update_github_org_secrets_ci.sh --org cherry_ai-project --yes
 ```
 
 ## Security Note

@@ -1,4 +1,4 @@
-"""Personas module for Orchestra AI."""
+"""Personas module for Cherry AI."""
     "PersonaConfig",
     "PersonaManager",
     "PersonaProcessor",

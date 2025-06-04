@@ -10,10 +10,10 @@ openapi: 3.0.0
 info:
   title: Factory Bridge API
   version: 1.0.0
-  description: API Gateway for Factory AI integration with Orchestra
+  description: API Gateway for Factory AI integration with cherry_ai
 
 servers:
-  - url: https://api.factory.orchestra.ai/v1
+  - url: https://api.factory.cherry_ai.ai/v1
     description: Production server
   - url: http://localhost:8090/v1
     description: Development server
@@ -324,11 +324,11 @@ class FactoryMCPAdapter(ABC):
             raise
 
 # Specific adapter implementations
-class OrchestratorAdapter(FactoryMCPAdapter):
-    """Adapter for Orchestrator MCP server with Architect Droid"""
+class conductorAdapter(FactoryMCPAdapter):
+    """Adapter for conductor MCP server with Architect Droid"""
     
     async def process_request(self, request: Dict[str, Any]) -> Dict[str, Any]:
-        """Process orchestration request"""
+        """Process coordination request"""
         # Translate MCP request to Factory format
         factory_request = self.translator.mcp_to_factory(
             request,
@@ -336,7 +336,7 @@ class OrchestratorAdapter(FactoryMCPAdapter):
             context_requirements=['system_design', 'architecture']
         )
         
-        # Add orchestrator-specific enhancements
+        # Add conductor-specific enhancements
         factory_request['optimization_hints'] = {
             'prefer_modular_design': True,
             'target_platform': 'vultr',
@@ -354,7 +354,7 @@ class OrchestratorAdapter(FactoryMCPAdapter):
         
         # Enhance with MCP-specific data
         mcp_response['mcp_metadata'] = {
-            'server': 'orchestrator',
+            'server': 'conductor',
             'droid_used': 'architect',
             'execution_time_ms': factory_response.get('execution_time_ms', 0)
         }
@@ -458,7 +458,7 @@ class MessageTranslator:
     def _map_operation(self, mcp_method: str) -> str:
         """Map MCP method to Factory operation"""
         mapping = {
-            'orchestrate': 'design_system',
+            'cherry_aite': 'design_system',
             'generate_code': 'generate',
             'debug_issue': 'diagnose',
             'deploy': 'validate_deployment',

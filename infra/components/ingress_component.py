@@ -1,7 +1,7 @@
 """
 """
     """Configure ingress with SSL for cherry-ai.me"""
-        super().__init__("orchestra:ingress:Component", name, None, opts)
+        super().__init__("cherry_ai:ingress:Component", name, None, opts)
 
         self.namespace = config.get("namespace", "superagi")
         self.domain = config.get("domain", "cherry-ai.me")

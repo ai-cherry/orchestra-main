@@ -1,12 +1,12 @@
-# AI Orchestra Infrastructure Optimization Guide
+# AI cherry_ai Infrastructure Optimization Guide
 
-This guide provides a comprehensive overview of the infrastructure optimizations implemented for the AI Orchestra project based on the recent audit. It includes instructions for deploying the changes and best practices for maintaining the infrastructure.
+This guide provides a comprehensive overview of the infrastructure optimizations implemented for the AI cherry_ai project based on the recent audit. It includes instructions for deploying the changes and best practices for maintaining the infrastructure.
 
 ## Table of Contents
 
 - [Overview](#overview)
 - [Security Improvements](#security-improvements)
-- [Container Orchestration](#container-orchestration)
+- [Container coordination](#container-coordination)
 - [Development Environment](#development-environment)
 - [Dependency Management](#dependency-management)
 - [Infrastructure as Code](#infrastructure-as-code)
@@ -18,9 +18,9 @@ This guide provides a comprehensive overview of the infrastructure optimizations
 
 ## Overview
 
-The AI Orchestra infrastructure has been optimized to improve security, scalability, maintainability, and developer experience. The changes include:
+The AI cherry_ai infrastructure has been optimized to improve security, scalability, maintainability, and developer experience. The changes include:
 
-1. **Security Improvements**: Removed hardcoded credentials, implemented 2. **Container Orchestration**: Optimized Docker builds with multi-stage builds and resource limits.
+1. **Security Improvements**: Removed hardcoded credentials, implemented 2. **Container coordination**: Optimized Docker builds with multi-stage builds and resource limits.
 3. **Development Environment**: Enhanced setup scripts and configuration for consistent environments.
 4. **Dependency Management**: Improved Poetry configuration and dependency organization.
 5. **Infrastructure as Code**: Modularized Pulumi configuration with variables and best practices.
@@ -39,11 +39,11 @@ We've implemented a comprehensive credential management system using
 
 - `secure_credential_manager.sh`: CLI tool for credential management
 - `core/security/credential_manager.py`: Python module for credential access
-- `core/orchestrator/src/api/dependencies/credentials.py`: FastAPI dependencies
+- `core/conductor/src/api/dependencies/credentials.py`: FastAPI dependencies
 - `pulumi/modules/secure-credentials/main.py`: Infrastructure for credential management
 - `setup_secure_credentials.sh`: Script to set up the credential management system
 
-## Container Orchestration
+## Container coordination
 
 ### Docker Optimization
 
@@ -220,4 +220,4 @@ Follow these steps to implement the infrastructure optimizations:
 
 ## Conclusion
 
-By implementing these infrastructure optimizations, the AI Orchestra project will have a more secure, scalable, and maintainable infrastructure. The changes address the findings from the recent audit and implement best practices for cloud-native applications.
+By implementing these infrastructure optimizations, the AI cherry_ai project will have a more secure, scalable, and maintainable infrastructure. The changes address the findings from the recent audit and implement best practices for cloud-native applications.

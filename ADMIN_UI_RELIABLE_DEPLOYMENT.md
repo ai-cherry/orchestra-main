@@ -96,7 +96,7 @@ sudo tail -50 /var/log/nginx/error.log
 
 3. **Deployment not accessible**
    - Check nginx: `systemctl status nginx`
-   - Verify files: `ls -la /var/www/orchestra-admin/`
+   - Verify files: `ls -la /var/www/cherry_ai-admin/`
    - Test locally: `curl http://localhost/admin/`
 
 ## 🔄 Rollback Process
@@ -108,9 +108,9 @@ If a deployment goes wrong:
 # The script will automatically restore backup
 
 # Manual rollback
-sudo rm -rf /var/www/orchestra-admin
-sudo cp -r /var/www/orchestra-admin-backup /var/www/orchestra-admin
-sudo chown -R www-data:www-data /var/www/orchestra-admin
+sudo rm -rf /var/www/cherry_ai-admin
+sudo cp -r /var/www/cherry_ai-admin-backup /var/www/cherry_ai-admin
+sudo chown -R www-data:www-data /var/www/cherry_ai-admin
 sudo systemctl reload nginx
 ```
 

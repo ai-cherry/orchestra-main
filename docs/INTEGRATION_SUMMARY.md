@@ -1,7 +1,7 @@
-# Orchestra AI Integration Summary
+# Cherry AI Integration Summary
 
 ## Overview
-This document summarizes the comprehensive Portkey integration, OpenRouter optimization, and codebase cleanup completed for the Orchestra AI Admin UI.
+This document summarizes the comprehensive Portkey integration, OpenRouter optimization, and codebase cleanup completed for the Cherry AI Admin UI.
 
 ## 🎯 What Was Accomplished
 
@@ -155,7 +155,7 @@ Per `docs/CLEANUP_AND_OPTIMIZATION_PLAN.md`:
 ## 📞 Support Resources
 
 - **Live Site**: https://cherry-ai.me
-- **GitHub**: https://github.com/ai-cherry/orchestra-main
+- **GitHub**: https://github.com/ai-cherry/cherry_ai-main
 - **Portkey Dashboard**: https://app.portkey.ai
 - **Virtual Keys**: https://app.portkey.ai/virtual-keys
 

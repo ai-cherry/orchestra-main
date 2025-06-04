@@ -9,7 +9,7 @@ NC='\033[0m' # No Color
 
 SERVER_IP="45.32.69.157"
 
-echo -e "${GREEN}AI Orchestra Deployment to cherry-ai.me${NC}"
+echo -e "${GREEN}AI cherry_ai Deployment to cherry-ai.me${NC}"
 echo "========================================"
 echo -e "${YELLOW}Server IP: $SERVER_IP${NC}"
 echo ""
@@ -23,7 +23,7 @@ echo "1. Get your SSH private key from GitHub secrets (SSH_PRIVATE_KEY)"
 echo "2. Save it to a file: ~/.ssh/vultr_key"
 echo "3. Set permissions: chmod 600 ~/.ssh/vultr_key"
 echo "4. Run deployment with key:"
-echo "   scp -i ~/.ssh/vultr_key orchestra-api-minimal.tar.gz root@$SERVER_IP:/tmp/"
+echo "   scp -i ~/.ssh/vultr_key cherry_ai-api-minimal.tar.gz root@$SERVER_IP:/tmp/"
 echo ""
 echo -e "${GREEN}Option 2: Use password authentication${NC}"
 echo "Run the deployment and enter your root password when prompted:"

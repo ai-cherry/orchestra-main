@@ -15,5 +15,5 @@ jobs:
         username: root
         key: ${{ secrets.VULTR_SSH_KEY }}
         script: |
-          cd /root/orchestra-main
+          cd /root/cherry_ai-main
           ./deploy.sh

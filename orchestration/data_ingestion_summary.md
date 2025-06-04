@@ -31,10 +31,10 @@ A comprehensive, high-performance data ingestion system designed to handle large
 
 ### Phase 1: Foundation (Weeks 1-2)
 ✅ Created architecture documents:
-- [`data_ingestion_workflow.md`](orchestration/data_ingestion_workflow.md:1) - Workflow design
-- [`data_ingestion_architecture.md`](orchestration/data_ingestion_architecture.md:1) - System architecture
-- [`data_ingestion_implementation_plan.md`](orchestration/data_ingestion_implementation_plan.md:1) - Implementation details
-- [`data_ingestion_mcp_context.md`](orchestration/data_ingestion_mcp_context.md:1) - MCP integration
+- [`data_ingestion_workflow.md`](coordination/data_ingestion_workflow.md:1) - Workflow design
+- [`data_ingestion_architecture.md`](coordination/data_ingestion_architecture.md:1) - System architecture
+- [`data_ingestion_implementation_plan.md`](coordination/data_ingestion_implementation_plan.md:1) - Implementation details
+- [`data_ingestion_mcp_context.md`](coordination/data_ingestion_mcp_context.md:1) - MCP integration
 
 ### Phase 2: Core Development (Weeks 3-6)
 - [ ] Implement parser modules for each source
@@ -82,11 +82,11 @@ A comprehensive, high-performance data ingestion system designed to handle large
 
 ## Integration Points
 
-### Existing Orchestra Components
+### Existing cherry_ai Components
 1. **LLM Intelligent Router** - Query understanding
 2. **Specialized Agents** - Complex parsing tasks
 3. **Memory Manager** - Context persistence
-4. **Agent Orchestrator** - Workflow coordination
+4. **Agent conductor** - Workflow coordination
 
 ### New Components
 1. **Data Ingestion API** - Upload and query endpoints
@@ -168,12 +168,12 @@ A comprehensive, high-performance data ingestion system designed to handle large
 ## Technical Contacts
 
 - **Architecture**: Review this document and related files
-- **Implementation**: See [`data_ingestion_implementation_plan.md`](orchestration/data_ingestion_implementation_plan.md:1)
-- **MCP Integration**: See [`data_ingestion_mcp_context.md`](orchestration/data_ingestion_mcp_context.md:1)
-- **Workflow**: See [`data_ingestion_workflow.md`](orchestration/data_ingestion_workflow.md:1)
+- **Implementation**: See [`data_ingestion_implementation_plan.md`](coordination/data_ingestion_implementation_plan.md:1)
+- **MCP Integration**: See [`data_ingestion_mcp_context.md`](coordination/data_ingestion_mcp_context.md:1)
+- **Workflow**: See [`data_ingestion_workflow.md`](coordination/data_ingestion_workflow.md:1)
 
 ## Conclusion
 
 This data ingestion system provides a robust, scalable solution for importing and querying data from multiple enterprise sources. The modular architecture ensures easy extension for new data sources, while the performance optimizations guarantee fast query responses even at scale.
 
-The system integrates seamlessly with the existing Orchestra platform, leveraging its LLM routing, agent orchestration, and memory management capabilities while adding powerful data ingestion and search functionality.
+The system integrates seamlessly with the existing cherry_ai platform, leveraging its LLM routing, agent coordination, and memory management capabilities while adding powerful data ingestion and search functionality.

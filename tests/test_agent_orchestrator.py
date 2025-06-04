@@ -20,8 +20,8 @@
         assert task.retry_count == 0
         assert task.max_retries == 3
 
-class TestAgentOrchestrator:
-    """Test agent orchestrator functionality"""
+class TestAgentconductor:
+    """Test agent conductor functionality"""
         """Test workflow creation"""
                 "id": "task1",
                 "agent_type": "personal",
@@ -36,7 +36,7 @@ class TestAgentOrchestrator:
             }
         ]
         
-        workflow = await orchestrator.create_workflow("Test Workflow", tasks)
+        workflow = await conductor.create_workflow("Test Workflow", tasks)
         
         assert workflow.name == "Test Workflow"
         assert len(workflow.tasks) == 2
@@ -46,7 +46,7 @@ class TestAgentOrchestrator:
         assert workflow.tasks["task2"].dependencies == ["task1"]
     
     @pytest.mark.asyncio
-    async def test_validate_dependencies_with_cycle(self, orchestrator):
+    async def test_validate_dependencies_with_cycle(self, conductor):
         """Test that cyclic dependencies are detected"""
                 "id": "task1",
                 "agent_type": "personal",
@@ -62,10 +62,10 @@ class TestAgentOrchestrator:
         ]
         
         with pytest.raises(ValueError, match="cycles"):
-            await orchestrator.create_workflow("Cyclic Workflow", tasks)
+            await conductor.create_workflow("Cyclic Workflow", tasks)
     
     @pytest.mark.asyncio
-    async def test_build_execution_plan(self, orchestrator):
+    async def test_build_execution_plan(self, conductor):
         """Test building parallel execution plan"""
             id="test",
             name="Test",
@@ -77,7 +77,7 @@ class TestAgentOrchestrator:
             }
         )
         
-        plan = orchestrator._build_execution_plan(workflow)
+        plan = conductor._build_execution_plan(workflow)
         
         # First batch should have parallel tasks
         assert len(plan[0]) == 2
@@ -92,7 +92,7 @@ class TestAgentOrchestrator:
         assert plan[2][0] == "task4"
     
     @pytest.mark.asyncio
-    async def test_execute_single_task_success(self, orchestrator):
+    async def test_execute_single_task_success(self, conductor):
         """Test successful task execution"""
         workflow = Workflow(id="test", name="Test", tasks={})
         task = WorkflowTask(
@@ -102,12 +102,12 @@ class TestAgentOrchestrator:
         )
         
         # Mock agent
-        with patch('agent.app.services.agent_orchestrator.get_specialized_agent') as mock_get_agent:
+        with patch('agent.app.services.agent_conductor.get_specialized_agent') as mock_get_agent:
             mock_agent = Mock()
             mock_agent.process_task = AsyncMock(return_value={"result": "success"})
             mock_get_agent.return_value = mock_agent
             
-            await orchestrator._execute_single_task(workflow, task)
+            await conductor._execute_single_task(workflow, task)
             
             assert task.status == TaskStatus.COMPLETED
             assert task.result == {"result": "success"}
@@ -115,7 +115,7 @@ class TestAgentOrchestrator:
             assert task.completed_at is not None
     
     @pytest.mark.asyncio
-    async def test_execute_single_task_with_retry(self, orchestrator):
+    async def test_execute_single_task_with_retry(self, conductor):
         """Test task execution with retry on failure"""
         workflow = Workflow(id="test", name="Test", tasks={})
         task = WorkflowTask(
@@ -126,21 +126,21 @@ class TestAgentOrchestrator:
         )
         
         # Mock agent that fails once then succeeds
-        with patch('agent.app.services.agent_orchestrator.get_specialized_agent') as mock_get_agent:
+        with patch('agent.app.services.agent_conductor.get_specialized_agent') as mock_get_agent:
             mock_agent = Mock()
             mock_agent.process_task = AsyncMock(
                 side_effect=[Exception("First failure"), {"result": "success"}]
             )
             mock_get_agent.return_value = mock_agent
             
-            await orchestrator._execute_single_task(workflow, task)
+            await conductor._execute_single_task(workflow, task)
             
             assert task.status == TaskStatus.COMPLETED
             assert task.retry_count == 1
             assert mock_agent.process_task.call_count == 2
     
     @pytest.mark.asyncio
-    async def test_execute_single_task_circuit_breaker(self, orchestrator):
+    async def test_execute_single_task_circuit_breaker(self, conductor):
         """Test circuit breaker prevents execution"""
         workflow = Workflow(id="test", name="Test", tasks={})
         task = WorkflowTask(
@@ -151,16 +151,16 @@ class TestAgentOrchestrator:
         
         # Open circuit breaker
         breaker_key = f"{task.agent_type.value}:search"
-        orchestrator.circuit_breakers[breaker_key] = CircuitBreaker()
-        orchestrator.circuit_breakers[breaker_key].is_open = True
+        conductor.circuit_breakers[breaker_key] = CircuitBreaker()
+        conductor.circuit_breakers[breaker_key].is_open = True
         
-        await orchestrator._execute_single_task(workflow, task)
+        await conductor._execute_single_task(workflow, task)
         
         assert task.status == TaskStatus.FAILED
         assert task.error == "Circuit breaker open"
     
     @pytest.mark.asyncio
-    async def test_create_checkpoint(self, orchestrator):
+    async def test_create_checkpoint(self, conductor):
         """Test checkpoint creation"""
             id="test",
             name="Test",
@@ -175,7 +175,7 @@ class TestAgentOrchestrator:
             }
         )
         
-        await orchestrator._create_checkpoint(workflow)
+        await conductor._create_checkpoint(workflow)
         
         assert len(workflow.checkpoints) == 1
         checkpoint = workflow.checkpoints[0]
@@ -184,7 +184,7 @@ class TestAgentOrchestrator:
         assert checkpoint["task_states"]["task1"]["result"] == {"data": "result"}
     
     @pytest.mark.asyncio
-    async def test_workflow_execution_end_to_end(self, orchestrator):
+    async def test_workflow_execution_end_to_end(self, conductor):
         """Test complete workflow execution"""
                 "id": "task1",
                 "agent_type": "personal",
@@ -199,10 +199,10 @@ class TestAgentOrchestrator:
             }
         ]
         
-        workflow = await orchestrator.create_workflow("Test Workflow", tasks)
+        workflow = await conductor.create_workflow("Test Workflow", tasks)
         
         # Mock agents
-        with patch('agent.app.services.agent_orchestrator.get_specialized_agent') as mock_get_agent:
+        with patch('agent.app.services.agent_conductor.get_specialized_agent') as mock_get_agent:
             mock_agent = Mock()
             mock_agent.process_task = AsyncMock(
                 side_effect=[
@@ -213,7 +213,7 @@ class TestAgentOrchestrator:
             mock_get_agent.return_value = mock_agent
             
             # Execute workflow
-            result = await orchestrator.execute_workflow(workflow.id)
+            result = await conductor.execute_workflow(workflow.id)
             
             assert result["status"] == "completed"
             assert result["results"]["task1"] == {"result": "result1"}
@@ -221,20 +221,20 @@ class TestAgentOrchestrator:
             assert workflow.status == WorkflowStatus.COMPLETED
     
     @pytest.mark.asyncio
-    async def test_cancel_workflow(self, orchestrator):
+    async def test_cancel_workflow(self, conductor):
         """Test workflow cancellation"""
             "Test",
             [{"id": "task1", "agent_type": "personal", "data": {}, "dependencies": []}]
         )
         workflow.status = WorkflowStatus.RUNNING
         
-        await orchestrator.cancel_workflow(workflow.id)
+        await conductor.cancel_workflow(workflow.id)
         
         assert workflow.status == WorkflowStatus.CANCELLED
         assert workflow.tasks["task1"].status == TaskStatus.SKIPPED
     
     @pytest.mark.asyncio
-    async def test_get_workflow_status(self, orchestrator):
+    async def test_get_workflow_status(self, conductor):
         """Test getting workflow status"""
             "Test",
             [
@@ -245,7 +245,7 @@ class TestAgentOrchestrator:
         
         workflow.tasks["task1"].status = TaskStatus.COMPLETED
         
-        status = await orchestrator.get_workflow_status(workflow.id)
+        status = await conductor.get_workflow_status(workflow.id)
         
         assert status["workflow_id"] == workflow.id
         assert status["name"] == "Test"
@@ -261,7 +261,7 @@ class TestWorkflowCreation:
                     tasks={}
                 )
             )
-            mock_get.return_value = mock_orchestrator
+            mock_get.return_value = mock_conductor
             
             workflow = await create_comprehensive_search_workflow(
                 user_id="user123",
@@ -273,7 +273,7 @@ class TestWorkflowCreation:
             assert workflow.name == "Comprehensive Search"
             
             # Check that create_workflow was called with correct tasks
-            call_args = mock_orchestrator.create_workflow.call_args
+            call_args = mock_conductor.create_workflow.call_args
             tasks = call_args[0][1]  # Second positional argument
             
             # Should have personal search task
@@ -288,8 +288,8 @@ class TestWorkflowCreation:
             assert "medical_search" in analysis_task["dependencies"]
 
 @pytest.mark.asyncio
-async def test_singleton_orchestrator():
-    """Test that orchestrator is a singleton"""
+async def test_singleton_conductor():
+    """Test that conductor is a singleton"""
     """Test inter-agent message processing"""
                 "type": "task_completed",
                 "workflow_id": "test",
@@ -297,13 +297,13 @@ async def test_singleton_orchestrator():
                 "result": {"shared_data": {"key": "value"}}
             }
             
-            await orchestrator.message_queue.put(message)
+            await conductor.message_queue.put(message)
             
             # Process one message
-            await orchestrator._message_processor()
+            await conductor._message_processor()
             
             # Check shared context was updated
-            assert orchestrator.shared_context["key"] == "value"
+            assert conductor.shared_context["key"] == "value"
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

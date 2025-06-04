@@ -1,1 +1,1 @@
-"""Utility modules for Orchestra AI"""
+"""Utility modules for Cherry AI"""

@@ -1,8 +1,8 @@
-# Portkey Integration Guide for Orchestra AI Admin UI
+# Portkey Integration Guide for Cherry AI Admin UI
 
 ## Overview
 
-The Orchestra AI Admin UI now includes full integration with Portkey, providing unified access to multiple AI providers through a single API gateway. This integration enables image generation, smart search, and multimodal capabilities across the admin interface.
+The Cherry AI Admin UI now includes full integration with Portkey, providing unified access to multiple AI providers through a single API gateway. This integration enables image generation, smart search, and multimodal capabilities across the admin interface.
 
 ## Features Integrated
 
@@ -157,7 +157,7 @@ If you're currently using direct API keys:
 - **Portkey Dashboard**: https://app.portkey.ai
 - **Virtual Keys**: https://app.portkey.ai/virtual-keys
 - **Documentation**: https://portkey.ai/docs
-- **GitHub Issues**: https://github.com/ai-cherry/orchestra-main/issues
+- **GitHub Issues**: https://github.com/ai-cherry/cherry_ai-main/issues
 
 ## Future Enhancements
 

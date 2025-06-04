@@ -24,7 +24,7 @@ class ServiceSettings(BaseSettings):
 class MongoDBSettings(ServiceSettings):
     """MongoDB configuration."""
     uri: SecretStr = Field(..., env="MONGODB_URI")
-    database: str = Field(default="orchestra", env="MONGODB_DATABASE")
+    database: str = Field(default="cherry_ai", env="MONGODB_DATABASE")
     max_pool_size: int = Field(default=100, env="MONGODB_MAX_POOL_SIZE")
     min_pool_size: int = Field(default=10, env="MONGODB_MIN_POOL_SIZE")
 
@@ -102,7 +102,7 @@ class FeatureFlags(BaseSettings):
 
 class Settings(BaseSettings):
     """Main application settings."""
-    app_name: str = Field(default="Orchestra AI", env="APP_NAME")
+    app_name: str = Field(default="Cherry AI", env="APP_NAME")
     app_version: str = Field(default="0.1.0", env="APP_VERSION")
     environment: Environment = Field(default=Environment.DEV, env="ENVIRONMENT")
     debug: bool = Field(default=False, env="DEBUG")

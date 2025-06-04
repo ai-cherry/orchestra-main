@@ -76,7 +76,7 @@ class EnhancedCursorAIAgent:
         }
     
     async def execute(self, task: TaskDefinition, context: WorkflowContext) -> Dict:
-        """Execute task based on inputs - compatible with orchestrator"""
+        """Execute task based on inputs - compatible with conductor"""
         """Comprehensive project analysis replacing EigenCode functionality"""
         cache_key = f"analyze_{codebase_path}_{hash(json.dumps(options, sort_keys=True))}"
         if cached := self._get_from_cache(cache_key):
@@ -210,7 +210,7 @@ class EnhancedCursorAIAgent:
             raise
     
     async def implement_changes(self, specification: Dict, requirements: Dict = None) -> Dict:
-        """Implement changes based on specification - orchestrator compatible"""
+        """Implement changes based on specification - conductor compatible"""
         """Refactor existing code based on goals"""
                 "code_path": code_path,
                 "goals": refactoring_goals,
@@ -447,7 +447,7 @@ class EnhancedCursorAIAgent:
         """Analyze codebase architecture"""
             "pattern": "modular monorepo",
             "layers": ["presentation", "business", "data"],
-            "components": ["orchestrator", "agents", "infrastructure"],
+            "components": ["conductor", "agents", "infrastructure"],
             "coupling": "loose",
             "cohesion": "high"
         }
@@ -560,7 +560,7 @@ def get_enhanced_cursor_ai() -> EnhancedCursorAIAgent:
 
         pass
         analysis = await cursor_ai.analyze_project(
-            "/root/orchestra-main",
+            "/root/cherry_ai-main",
             {
                 "depth": "comprehensive",
                 "include_metrics": True,

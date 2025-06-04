@@ -1,6 +1,6 @@
-# AI Orchestra Credential Integration Guide
+# AI cherry_ai Credential Integration Guide
 
-This guide explains how to integrate the secure credential management system into your AI Orchestra application code. It provides examples for different components and use cases.
+This guide explains how to integrate the secure credential management system into your AI cherry_ai application code. It provides examples for different components and use cases.
 
 ## Table of Contents
 
@@ -18,7 +18,7 @@ This guide explains how to integrate the secure credential management system int
 
 ## Overview
 
-The AI Orchestra secure credential management system provides a unified way to access credentials across different environments and components. It uses
+The AI cherry_ai secure credential management system provides a unified way to access credentials across different environments and components. It uses
 - Environment-specific credentials (dev, staging, prod)
 - Credential caching for performance
 - Automatic credential rotation
@@ -43,7 +43,7 @@ For FastAPI routes, use the dependency injection system to access credentials:
 
 ```python
 from fastapi import Depends, FastAPI
-from core.orchestrator.src.api.dependencies.credentials import (
+from core.conductor.src.api.dependencies.credentials import (
     get_vertex_ai_credentials,
     get_gemini_credentials,
     get_redis_credentials,
@@ -177,7 +177,7 @@ from typing import Any, Dict, Optional
 
 class MemoryManager:
     """
-    Memory manager for AI Orchestra.
+    Memory manager for AI cherry_ai.
 
     Manages access to different memory storage backends.
     """
@@ -290,7 +290,7 @@ from typing import List, Dict, Any, Optional
 
 class LLMManager:
     """
-    LLM Manager for AI Orchestra.
+    LLM Manager for AI cherry_ai.
 
     Manages access to different LLM providers.
     """
@@ -459,7 +459,7 @@ jobs:
 
       # Deploy to       - name: Deploy to         uses: google-github-actions/deploy-cloudrun@v1
         with:
-          service: ai-orchestra
+          service: ai-cherry_ai
           region: us-central1
           image: gcr.io/${{ secrets.```
 
@@ -474,7 +474,7 @@ secure_credentials = ComponentResource( {
   region      = var.region
   env         = var.env
   github_org  = "ai-cherry"
-  github_repo = "orchestra-main"
+  github_repo = "cherry_ai-main"
 }
 
 # Use the outputs

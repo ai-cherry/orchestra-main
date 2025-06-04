@@ -582,8 +582,8 @@ class ContentAnalyzerAgent(WebScrapingAgent):
             "reading_time_minutes": len(content.split()) / 200,  # Average reading speed
         }
 
-class WebScrapingOrchestrator:
-    """Main orchestrator for the web scraping AI agent team."""
+class WebScrapingconductor:
+    """Main conductor for the web scraping AI agent team."""
             host=config.get("redis_host", "localhost"),
             port=config.get("redis_port", 6379),
             db=config.get("redis_db", 0),
@@ -612,7 +612,7 @@ class WebScrapingOrchestrator:
         logger.info(f"Initialized {len(self.agents)} specialized agents")
 
     async def start(self):
-        """Start the orchestrator and all agents."""
+        """Start the conductor and all agents."""
         logger.info("Starting Web Scraping AI Agent Team")
 
         # Start agent workers
@@ -628,7 +628,7 @@ class WebScrapingOrchestrator:
         await asyncio.gather(*tasks)
 
     async def stop(self):
-        """Stop the orchestrator."""
+        """Stop the conductor."""
         logger.info("Stopping Web Scraping AI Agent Team")
 
     async def submit_task(self, task: ScrapingTask) -> str:
@@ -742,11 +742,11 @@ class WebScrapingOrchestrator:
                 agent.is_busy = False
                 await agent.update_status("error")
 
-# Integration with Orchestra AI MCP Server
+# Integration with Cherry AI MCP Server
 class WebScrapingMCPServer:
     """MCP server for web scraping agent team integration."""
     async def handle_search_request(self, query: str, engine: str = "google", max_results: int = 10) -> str:
-        """Handle search request from Orchestra AI."""
+        """Handle search request from Cherry AI."""
             task_id=f"search_{int(time.time())}",
             url="",
             task_type="search",
@@ -755,11 +755,11 @@ class WebScrapingMCPServer:
             parameters={"query": query, "engine": engine, "max_results": max_results},
         )
 
-        task_id = await self.orchestrator.submit_task(task)
+        task_id = await self.conductor.submit_task(task)
 
         # Wait for result (simplified - would use proper async waiting in production)
         for _ in range(30):  # Wait up to 30 seconds
-            result = await self.orchestrator.get_result(task_id)
+            result = await self.conductor.get_result(task_id)
             if result:
                 return f"Search completed: {len(result.extracted_links)} results found"
             await asyncio.sleep(1)
@@ -767,7 +767,7 @@ class WebScrapingMCPServer:
         return "Search request submitted - check back for results"
 
     async def handle_scrape_request(self, url: str, strategy: str = "fast_static") -> str:
-        """Handle scraping request from Orchestra AI."""
+        """Handle scraping request from Cherry AI."""
             task_id=f"scrape_{int(time.time())}",
             url=url,
             task_type="scrape",
@@ -776,7 +776,7 @@ class WebScrapingMCPServer:
             parameters={},
         )
 
-        task_id = await self.orchestrator.submit_task(task)
+        task_id = await self.conductor.submit_task(task)
         return f"Scraping task {task_id} submitted for {url}"
 
 # Example usage and configuration
@@ -793,11 +793,11 @@ async def main():
         "openai_api_key": "your_openai_api_key",
     }
 
-    # Initialize orchestrator
-    orchestrator = WebScrapingOrchestrator(config)
+    # Initialize conductor
+    conductor = WebScrapingconductor(config)
 
     # Start in background
-    asyncio.create_task(orchestrator.start())
+    asyncio.create_task(conductor.start())
 
     # Example search task
     search_task = ScrapingTask(
@@ -813,7 +813,7 @@ async def main():
         },
     )
 
-    await orchestrator.submit_task(search_task)
+    await conductor.submit_task(search_task)
 
     # Example scraping task
     scrape_task = ScrapingTask(
@@ -825,21 +825,21 @@ async def main():
         parameters={},
     )
 
-    await orchestrator.submit_task(scrape_task)
+    await conductor.submit_task(scrape_task)
 
     # Wait a bit for processing
     await asyncio.sleep(10)
 
     # Check results
-    search_result = await orchestrator.get_result("test_search_1")
+    search_result = await conductor.get_result("test_search_1")
     if search_result:
         print(f"Search result: {search_result.extracted_content[:200]}...")
 
-    scrape_result = await orchestrator.get_result("test_scrape_1")
+    scrape_result = await conductor.get_result("test_scrape_1")
     if scrape_result:
         print(f"Scrape result quality: {scrape_result.quality_score}")
 
-    await orchestrator.stop()
+    await conductor.stop()
 
 if __name__ == "__main__":
     asyncio.run(main())

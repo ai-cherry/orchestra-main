@@ -1,7 +1,7 @@
-# Orchestrator Landing Page Architecture
+# conductor Landing Page Architecture
 
 ## Overview
-This document outlines the architecture for implementing a sophisticated landing page that serves as the primary entry point for the Orchestrator system. The page will feature multi-modal input capabilities, real-time processing, and seamless integration with existing services.
+This document outlines the architecture for implementing a sophisticated landing page that serves as the primary entry point for the conductor system. The page will feature multi-modal input capabilities, real-time processing, and seamless integration with existing services.
 
 ## Technical Stack
 - **Frontend**: React 18.3.1 + TypeScript
@@ -17,7 +17,7 @@ This document outlines the architecture for implementing a sophisticated landing
 
 ### 1. Core Components
 
-#### OrchestratorLandingPage
+#### conductorLandingPage
 - Main container component
 - Manages global state and context
 - Handles route integration
@@ -48,9 +48,9 @@ This document outlines the architecture for implementing a sophisticated landing
 
 ### 2. Service Layer
 
-#### OrchestratorService
+#### conductorService
 ```typescript
-interface OrchestratorService {
+interface conductorService {
   // Search operations
   search(query: SearchQuery): Promise<SearchResult>;
   getSuggestions(context: SearchContext): Promise<Suggestion[]>;
@@ -106,13 +106,13 @@ interface LandingPageStore {
 ### 4. API Integration
 
 #### Endpoints
-- `POST /api/orchestrator/search` - Multi-modal search
-- `GET /api/orchestrator/suggestions` - Get suggestions
-- `POST /api/orchestrator/voice/transcribe` - Voice to text
-- `POST /api/orchestrator/voice/synthesize` - Text to voice
-- `POST /api/orchestrator/files/upload` - File upload
-- `GET /api/orchestrator/files/{id}/status` - File status
-- `GET /api/orchestrator/files/{id}/download` - File download
+- `POST /api/conductor/search` - Multi-modal search
+- `GET /api/conductor/suggestions` - Get suggestions
+- `POST /api/conductor/voice/transcribe` - Voice to text
+- `POST /api/conductor/voice/synthesize` - Text to voice
+- `POST /api/conductor/files/upload` - File upload
+- `GET /api/conductor/files/{id}/status` - File status
+- `GET /api/conductor/files/{id}/download` - File download
 
 ### 5. Performance Optimizations
 

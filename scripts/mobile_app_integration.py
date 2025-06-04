@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
-"""Mobile App Integration for Orchestra AI"""
+"""Mobile App Integration for Cherry AI"""
 
 from pathlib import Path
 import json
 
 
 class MobileAppIntegration:
-    """Setup mobile app integration for Orchestra AI"""
+    """Setup mobile app integration for Cherry AI"""
     
     def __init__(self):
-        self.base_dir = Path("/root/orchestra-main")
+        self.base_dir = Path("/root/cherry_ai-main")
         self.mobile_api_created = False
     
     def create_mobile_api(self):
@@ -18,7 +18,8 @@ class MobileAppIntegration:
         mobile_api_content = """
 from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional
+from typing_extensions import Optional, Any
 from datetime import datetime
 import jwt
 
@@ -136,14 +137,14 @@ async def websocket_endpoint(websocket: WebSocket, device_id: str):
         
         # Create Android SDK
         android_sdk_content = """
-package com.orchestra.ai.sdk
+package com.cherry_ai.ai.sdk
 
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import okhttp3.OkHttpClient
 import java.util.concurrent.TimeUnit
 
-class OrchestraAISDK(private val apiKey: String, private val baseUrl: String = "https://cherry-ai.me") {
+class cherry_aiAISDK(private val apiKey: String, private val baseUrl: String = "https://cherry-ai.me") {
     
     private val client = OkHttpClient.Builder()
         .connectTimeout(30, TimeUnit.SECONDS)
@@ -162,7 +163,7 @@ class OrchestraAISDK(private val apiKey: String, private val baseUrl: String = "
         .addConverterFactory(GsonConverterFactory.create())
         .build()
     
-    private val api = retrofit.create(OrchestraAPI::class.java)
+    private val api = retrofit.create(cherry_aiAPI::class.java)
     
     suspend fun search(query: String, mode: String = "normal"): SearchResponse {
         return api.search(SearchRequest(query, mode))
@@ -179,7 +180,7 @@ class OrchestraAISDK(private val apiKey: String, private val baseUrl: String = "
 """
         
         # Save Android SDK
-        android_sdk_path = self.base_dir / "mobile" / "android" / "OrchestraAISDK.kt"
+        android_sdk_path = self.base_dir / "mobile" / "android" / "cherry_aiAISDK.kt"
         android_sdk_path.parent.mkdir(parents=True, exist_ok=True)
         android_sdk_path.write_text(android_sdk_content)
         
@@ -189,7 +190,7 @@ class OrchestraAISDK(private val apiKey: String, private val baseUrl: String = "
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Orchestra AI Analytics Dashboard</title>
+    <title>Cherry AI Analytics Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
@@ -232,7 +233,7 @@ class OrchestraAISDK(private val apiKey: String, private val baseUrl: String = "
 </head>
 <body>
     <div class="dashboard">
-        <h1>Orchestra AI Analytics Dashboard</h1>
+        <h1>Cherry AI Analytics Dashboard</h1>
         
         <div class="metric-grid">
             <div class="metric-card">

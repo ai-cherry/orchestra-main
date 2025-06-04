@@ -1,8 +1,8 @@
-# Orchestra AI - Real Agents System
+# Cherry AI - Real Agents System
 
 ## Overview
 
-Orchestra AI now features **REAL working agents** that perform actual system monitoring, data analysis, and service checks. No more mock data!
+Cherry AI now features **REAL working agents** that perform actual system monitoring, data analysis, and service checks. No more mock data!
 
 ## Real Agents
 
@@ -38,8 +38,8 @@ Orchestra AI now features **REAL working agents** that perform actual system mon
 ### Local Development
 ```bash
 # Clone the repository
-git clone https://github.com/ai-cherry/orchestra-main.git
-cd orchestra-main
+git clone https://github.com/ai-cherry/cherry_ai-main.git
+cd cherry_ai-main
 
 # Create virtual environment
 python -m venv venv
@@ -56,9 +56,9 @@ python -m uvicorn agent.app.main:app --host 0.0.0.0 --port 8000
 ```
 
 ### Production Deployment
-The real agents are deployed at `/root/orchestra-main` on the production server.
+The real agents are deployed at `/root/cherry_ai-main` on the production server.
 
-Service configuration: `/etc/systemd/system/orchestra-real.service`
+Service configuration: `/etc/systemd/system/cherry_ai-real.service`
 
 ## API Endpoints
 
@@ -146,7 +146,7 @@ Response:
 Environment variables in `.env`:
 ```bash
 # API Configuration
-ORCHESTRA_API_KEY=<your-secure-api-key>
+cherry_ai_API_KEY=<your-secure-api-key>
 
 # Redis Configuration
 REDIS_URL=redis://localhost:6379
@@ -159,12 +159,12 @@ OPENAI_API_KEY=<your-openai-key>
 
 ### Check Service Status
 ```bash
-systemctl status orchestra-real
+systemctl status cherry_ai-real
 ```
 
 ### View Logs
 ```bash
-journalctl -u orchestra-real -f
+journalctl -u cherry_ai-real -f
 ```
 
 ### Test Agents Locally

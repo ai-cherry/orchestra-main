@@ -97,4 +97,4 @@ Infrastructure as Code must use Pulumi with Python for Vultr.
 Use `config/` directory for configurations. Validate with `scripts/config_validator.py`.
 
 ## Automation:
-New automation tasks should be integrated into `scripts/orchestra.py` or existing scheduled jobs, not as new standalone cron entries without registration.
+New automation tasks should be integrated into `scripts/cherry_ai.py` or existing scheduled jobs, not as new standalone cron entries without registration.

@@ -3,7 +3,7 @@
 # Start MCP Servers for AI Coding Assistance
 # This script starts all necessary MCP servers for use with Cursor/AI coders
 
-echo "🚀 Starting Orchestra MCP Servers for AI Coding..."
+echo "🚀 Starting cherry_ai MCP Servers for AI Coding..."
 
 # Colors for output
 GREEN='\033[0;32m'
@@ -46,10 +46,10 @@ python -c "from shared.database import UnifiedDatabase; db = UnifiedDatabase(); 
 # Start MCP servers in background
 echo -e "${GREEN}Starting MCP servers...${NC}"
 
-# Orchestrator Server
-echo -e "${BLUE}Starting Orchestrator Server (port 8002)...${NC}"
-nohup python mcp_server/servers/orchestrator_server.py > /tmp/mcp_orchestrator.log 2>&1 &
-echo $! > /tmp/mcp_orchestrator.pid
+# conductor Server
+echo -e "${BLUE}Starting conductor Server (port 8002)...${NC}"
+nohup python mcp_server/servers/conductor_server.py > /tmp/mcp_conductor.log 2>&1 &
+echo $! > /tmp/mcp_conductor.pid
 sleep 2
 
 # Memory Server
@@ -70,10 +70,10 @@ sleep 3
 
 SERVERS_OK=true
 if ! lsof -Pi :8002 -sTCP:LISTEN -t >/dev/null ; then
-    echo -e "${RED}❌ Orchestrator Server failed to start${NC}"
+    echo -e "${RED}❌ conductor Server failed to start${NC}"
     SERVERS_OK=false
 else
-    echo -e "${GREEN}✅ Orchestrator Server running on port 8002${NC}"
+    echo -e "${GREEN}✅ conductor Server running on port 8002${NC}"
 fi
 
 if ! lsof -Pi :8003 -sTCP:LISTEN -t >/dev/null ; then
@@ -93,7 +93,7 @@ fi
 if [ "$SERVERS_OK" = true ]; then
     echo -e "\n${GREEN}🎉 All MCP servers started successfully!${NC}"
     echo -e "\n${BLUE}Server logs available at:${NC}"
-    echo "  - Orchestrator: /tmp/mcp_orchestrator.log"
+    echo "  - conductor: /tmp/mcp_conductor.log"
     echo "  - Memory: /tmp/mcp_memory.log"
     echo "  - Tools: /tmp/mcp_tools.log"
     echo -e "\n${BLUE}To stop servers, run:${NC}"

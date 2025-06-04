@@ -2,7 +2,7 @@
 """
 """
     print(f"Error importing MCP components: {e}")
-    print("Make sure unified_mcp_orchestrator.py, workflow manager, and cline_integration.py are available.")
+    print("Make sure unified_mcp_conductor.py, workflow manager, and cline_integration.py are available.")
     sys.exit(1)
 
 def parse_args() -> Dict[str, Any]:
@@ -117,8 +117,8 @@ def handle_workflow_command(args: Dict[str, Any]) -> None:
             print(f"Available tools: {', '.join(t.value for t in AITool)}")
             sys.exit(1)
 
-    orchestrator = UnifiedWorkflowOrchestrator()
-    result = orchestrator.execute_workflow(workflow_name, tool=tool)
+    conductor = UnifiedWorkflowconductor()
+    result = conductor.execute_workflow(workflow_name, tool=tool)
     print(result)
 
 def handle_cross_tool_command(args: Dict[str, Any]) -> None:
@@ -145,8 +145,8 @@ def handle_cross_tool_command(args: Dict[str, Any]) -> None:
             print(f"Available tools: {', '.join(t.value for t in AITool)}")
             sys.exit(1)
 
-    orchestrator = UnifiedWorkflowOrchestrator()
-    result = orchestrator.execute_cross_tool_workflow(workflow_name, tools=tools)
+    conductor = UnifiedWorkflowconductor()
+    result = conductor.execute_cross_tool_workflow(workflow_name, tools=tools)
     print(result)
 
 def handle_server_commands(args: Dict[str, Any]) -> None:

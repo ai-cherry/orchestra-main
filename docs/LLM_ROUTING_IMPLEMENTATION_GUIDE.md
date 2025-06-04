@@ -1,6 +1,6 @@
 # LLM Routing Implementation Guide
 
-This guide provides practical implementation steps for the Orchestra LLM routing strategy.
+This guide provides practical implementation steps for the cherry_ai LLM routing strategy.
 
 ## Quick Start
 

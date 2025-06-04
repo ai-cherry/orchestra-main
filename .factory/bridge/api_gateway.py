@@ -1,3 +1,4 @@
+import os
 """
 """
     """Available Factory AI Droid types."""
@@ -250,9 +251,9 @@ gateway: Optional[FactoryBridgeGateway] = None
 @app.on_event("startup")
 async def startup_event():
     """Initialize gateway on startup."""
-        factory_api_key="your-api-key",
+        factory_api_key= os.getenv('API_KEY'),
         mcp_servers={
-            DroidType.ARCHITECT: "http://localhost:8001/mcp/orchestrator",
+            DroidType.ARCHITECT: "http://localhost:8001/mcp/conductor",
             DroidType.CODE: "http://localhost:8002/mcp/tools",
             DroidType.DEBUG: "http://localhost:8002/mcp/tools",
             DroidType.RELIABILITY: "http://localhost:8003/mcp/deployment",

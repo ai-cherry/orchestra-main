@@ -3,7 +3,7 @@
 """
     """Print a colorized header for the CLI."""
     print(f"\n{Fore.CYAN}============================================={Style.RESET_ALL}")
-    print(f"{Fore.CYAN}{Style.BRIGHT}  AI Orchestra Mode Switcher{Style.RESET_ALL}")
+    print(f"{Fore.CYAN}{Style.BRIGHT}  AI cherry_ai Mode Switcher{Style.RESET_ALL}")
     print(f"{Fore.CYAN}============================================={Style.RESET_ALL}\n")
 
 def print_modes(manager: ModeManager, current_slug: Optional[str] = None):
@@ -192,7 +192,7 @@ def interactive_mode_switcher(manager: ModeManager):
 
 def main():
     """Main entry point for the mode switcher CLI."""
-        description="AI Orchestra Mode Switcher - Manage Roo's operation modes and workflows"
+        description="AI cherry_ai Mode Switcher - Manage Roo's operation modes and workflows"
     )
 
     parser.add_argument("--switch", "-s", help="Switch to the specified mode", metavar="MODE")

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Reconstruct remaining critical files for Orchestra AI"""
+"""Reconstruct remaining critical files for Cherry AI"""
 
 from pathlib import Path
 
@@ -11,6 +11,7 @@ def create_document_parser():
 import logging
 from pathlib import Path
 from typing import Dict, Any, Optional
+from typing_extensions import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -114,6 +115,7 @@ def create_audio_transcriber():
 import logging
 from pathlib import Path
 from typing import Dict, Any, Optional
+from typing_extensions import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -158,6 +160,7 @@ def create_video_processor():
 import logging
 from pathlib import Path
 from typing import Dict, Any, Optional
+from typing_extensions import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -264,6 +267,7 @@ def create_image_gen_controller():
 
 import logging
 from typing import Dict, Any, Optional
+from typing_extensions import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -310,6 +314,7 @@ def create_video_gen_controller():
 
 import logging
 from typing import Dict, Any, Optional
+from typing_extensions import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -357,6 +362,7 @@ def create_operator_mode_coordinator():
 import asyncio
 import logging
 from typing import Dict, Any, List, Optional
+from typing_extensions import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -425,13 +431,14 @@ def create_operator_manager():
 import asyncio
 import logging
 from typing import Dict, Any, List, Optional
+from typing_extensions import Optional
 from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
 
 class OperatorManager:
-    """Manage operator mode for multi-agent orchestration"""
+    """Manage operator mode for multi-agent coordination"""
     
     def __init__(self):
         self.agents = {}
@@ -481,6 +488,7 @@ def create_agent_supervisor():
 
 import logging
 from typing import Dict, Any, List, Optional
+from typing_extensions import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -533,7 +541,8 @@ def create_agent_task_queue():
 import asyncio
 import logging
 from typing import Dict, Any, List, Optional
-from collections import deque
+from typing_extensions import Optional
+from collections.abc import deque
 
 logger = logging.getLogger(__name__)
 

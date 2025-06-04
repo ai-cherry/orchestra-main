@@ -1,10 +1,10 @@
-# Orchestra AI Data Ingestion Guide
+# Cherry AI Data Ingestion Guide
 
 ---
 
 ## Overview
 
-This guide covers the advanced, modular data ingestion and processing system for Orchestra AI. It details architecture, onboarding, API usage, extensibility, and troubleshooting.
+This guide covers the advanced, modular data ingestion and processing system for Cherry AI. It details architecture, onboarding, API usage, extensibility, and troubleshooting.
 
 ---
 
@@ -31,7 +31,7 @@ flowchart TD
 
 - **Modular Processors:** CSV, JSON, XML, PDF, Parquet, Avro, etc.
 - **API Connectors:** REST, GraphQL, WebSocket, gRPC, custom.
-- **Ingestion Pipeline:** Orchestrates routing, enrichment, validation, monitoring.
+- **Ingestion Pipeline:** cherry_aites routing, enrichment, validation, monitoring.
 - **UnifiedMemory:** Multi-tier storage (cache, vector, persistent, cloud).
 - **API Layer:** RESTful and GraphQL endpoints, webhooks, event triggers.
 - **Background Tasks:** Async ingestion, progress tracking, cancellation.

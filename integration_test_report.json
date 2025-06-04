@@ -1,0 +1,84 @@
+{
+  "auth_tests": [
+    {
+      "test": "discovery_no_auth",
+      "status": "FAIL",
+      "message": "Expected 401, got 200"
+    },
+    {
+      "test": "discovery_with_auth",
+      "status": "PASS",
+      "message": "Discovery works with authentication"
+    }
+  ],
+  "discovery_tests": [
+    {
+      "test": "auth_redundancy",
+      "status": "PASS",
+      "message": "All configs use consistent single-user auth"
+    }
+  ],
+  "routing_tests": [
+    {
+      "test": "route_roo_code_analysis",
+      "status": "FAIL",
+      "message": "Incomplete routing response"
+    },
+    {
+      "test": "route_factory-debug_error_analysis",
+      "status": "FAIL",
+      "message": "Incomplete routing response"
+    },
+    {
+      "test": "route_cursor_code_completion",
+      "status": "FAIL",
+      "message": "Incomplete routing response"
+    }
+  ],
+  "performance_tests": [
+    {
+      "test": "rate_limiting",
+      "status": "PASS",
+      "message": "No rate limiting in development mode (50 requests)"
+    },
+    {
+      "test": "response_time",
+      "status": "PASS",
+      "message": "Average response time: 0.45ms"
+    }
+  ],
+  "conflicts": [
+    {
+      "type": "endpoint_conflict",
+      "severity": "MEDIUM",
+      "message": "Multiple health endpoints defined",
+      "details": [
+        {
+          "file": "mcp_server/servers/web_scraping_mcp_server.py",
+          "method": "get",
+          "path": "/health"
+        },
+        {
+          "file": "mcp_server/servers/memory_mcp_server.py",
+          "method": "get",
+          "path": "/health"
+        },
+        {
+          "file": "mcp_server/servers/coordinator_server.py",
+          "method": "get",
+          "path": "/health"
+        },
+        {
+          "file": "mcp_server/servers/cherry_ai_memory_mcp_server.py",
+          "method": "get",
+          "path": "/health"
+        },
+        {
+          "file": "mcp_server/servers/weaviate_direct_mcp_server.py",
+          "method": "get",
+          "path": "/mcp/weaviate_direct/health"
+        }
+      ]
+    }
+  ]
+}

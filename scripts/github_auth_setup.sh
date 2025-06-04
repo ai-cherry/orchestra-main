@@ -39,7 +39,7 @@ echo
 REPO=$(gh repo view --json nameWithOwner -q .nameWithOwner 2>/dev/null || echo "")
 if [ -z "$REPO" ]; then
     echo "⚠️  Not in a GitHub repository. Please specify the repository:"
-    echo "Format: owner/repo (e.g., myusername/orchestra-main)"
+    echo "Format: owner/repo (e.g., myusername/cherry_ai-main)"
     read -r REPO
 fi
 
@@ -115,7 +115,7 @@ if [ -f .env ]; then
     echo
     echo "🔸 AIRBYTE_API_KEY/URL/WORKSPACE_ID - For data pipeline integration"
     echo "   Priority: LOW - Only if using Airbyte for ETL"
-    echo "   Not needed for core AI orchestration"
+    echo "   Not needed for core AI coordination"
     echo
     echo "🔸 PULUMI_CONFIG_PASSPHRASE - For infrastructure state encryption"
     echo "   Priority: MEDIUM if using Pulumi for deployment"
@@ -126,7 +126,7 @@ if [ -f .env ]; then
     echo "   Local file state works fine for development"
     echo
     echo "✅ For local development: These are NOT required!"
-    echo "✅ Your AI orchestration is fully functional without them!"
+    echo "✅ Your AI coordination is fully functional without them!"
     
 else
     echo "❌ .env file not found!"

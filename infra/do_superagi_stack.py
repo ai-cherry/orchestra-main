@@ -85,7 +85,7 @@ run_superagi = command.remote.Command(
         weaviate_api_key=weaviate_api_key,
     ).apply(
         lambda args: f"""
-Environment="PYTHONPATH=/opt/orchestra"
+Environment="PYTHONPATH=/opt/cherry_ai"
 Environment="DRAGONFLY_URI={args['dragonfly_uri']}"
 Environment="MONGO_URI={args['mongo_uri']}"
 Environment="WEAVIATE_URL={args['weaviate_url']}"
@@ -99,8 +99,8 @@ EOF
 
 # Start the service
 systemctl daemon-reload
-systemctl enable orchestra-api
-systemctl start orchestra-api
+systemctl enable cherry_ai-api
+systemctl start cherry_ai-api
 """
         protocol="tcp",
         port_range="8080",  # SuperAGI

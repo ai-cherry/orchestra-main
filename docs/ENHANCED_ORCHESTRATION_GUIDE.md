@@ -1,8 +1,8 @@
-# Enhanced AI Orchestration System Guide
+# Enhanced AI coordination System Guide
 
 ## Overview
 
-The AI Orchestration System has been significantly enhanced to operate without EigenCode while providing even more powerful capabilities through the integration of enhanced Cursor AI and Claude (including Claude Max). This guide covers the complete enhanced system.
+The AI coordination System has been significantly enhanced to operate without EigenCode while providing even more powerful capabilities through the integration of enhanced Cursor AI and Claude (including Claude Max). This guide covers the complete enhanced system.
 
 ## Table of Contents
 
@@ -21,7 +21,7 @@ The AI Orchestration System has been significantly enhanced to operate without E
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                   Enhanced AI Orchestration                   │
+│                   Enhanced AI coordination                   │
 ├─────────────────────────────────────────────────────────────┤
 │                                                               │
 │  ┌─────────────┐  ┌──────────────┐  ┌──────────────┐       │
@@ -31,7 +31,7 @@ The AI Orchestration System has been significantly enhanced to operate without E
 │  └──────┬──────┘  └──────┬───────┘  └──────┬───────┘       │
 │         │                 │                  │                │
 │  ┌──────┴─────────────────┴──────────────────┴──────┐       │
-│  │          Enhanced Workflow Orchestrator           │       │
+│  │          Enhanced Workflow conductor           │       │
 │  │  - Parallel execution                             │       │
 │  │  - Circuit breakers                              │       │
 │  │  - Advanced caching                              │       │
@@ -88,7 +88,7 @@ The AI Orchestration System has been significantly enhanced to operate without E
 - Claude 3 Haiku
 - Claude Max (enterprise)
 
-### 3. Enhanced Orchestrator (`ai_components/orchestration/ai_orchestrator_enhanced.py`)
+### 3. Enhanced conductor (`ai_components/coordination/ai_conductor_enhanced.py`)
 
 **Enhancements:**
 - Parallel task execution with optimal worker pools
@@ -165,7 +165,7 @@ tasks = [
 ]
 
 # Execute in parallel
-results = await orchestrator.execute_workflow(workflow_id, tasks)
+results = await conductor.execute_workflow(workflow_id, tasks)
 ```
 
 ## Deployment Guide
@@ -196,7 +196,7 @@ results = await orchestrator.execute_workflow(workflow_id, tasks)
 
 2. **Deploy Enhanced System**
    ```bash
-   python scripts/deploy_enhanced_orchestration.py
+   python scripts/deploy_enhanced_coordination.py
    ```
 
 3. **Validate Deployment**
@@ -206,11 +206,11 @@ results = await orchestrator.execute_workflow(workflow_id, tasks)
 
 4. **Start Services**
    ```bash
-   # Start orchestrator
-   python ai_components/orchestration/ai_orchestrator_enhanced.py
+   # Start conductor
+   python ai_components/coordination/ai_conductor_enhanced.py
    
    # Start CLI
-   python ai_components/orchestrator_cli_enhanced.py
+   python ai_components/conductor_cli_enhanced.py
    ```
 
 ## Usage Examples
@@ -218,12 +218,12 @@ results = await orchestrator.execute_workflow(workflow_id, tasks)
 ### Example 1: Complete Project Analysis and Optimization
 
 ```python
-from ai_components.orchestration.ai_orchestrator_enhanced import (
-    EnhancedWorkflowOrchestrator, TaskDefinition, AgentRole, TaskPriority
+from ai_components.coordination.ai_conductor_enhanced import (
+    EnhancedWorkflowconductor, TaskDefinition, AgentRole, TaskPriority
 )
 
 async def analyze_and_optimize_project():
-    orchestrator = EnhancedWorkflowOrchestrator()
+    conductor = EnhancedWorkflowconductor()
     workflow_id = "project_optimization"
     
     tasks = [
@@ -272,7 +272,7 @@ async def analyze_and_optimize_project():
         )
     ]
     
-    result = await orchestrator.execute_workflow(workflow_id, tasks)
+    result = await conductor.execute_workflow(workflow_id, tasks)
     return result
 ```
 
@@ -395,7 +395,7 @@ The system automatically handles the migration:
 2. **Database Connection Failed**
    ```bash
    # Check PostgreSQL
-   psql -h localhost -U postgres -d orchestrator
+   psql -h localhost -U postgres -d conductor
    ```
 
 3. **Performance Issues**
@@ -422,9 +422,9 @@ logging.basicConfig(level=logging.DEBUG)
 
 ## Conclusion
 
-The enhanced AI Orchestration System provides a powerful, scalable, and reliable platform for AI-driven development. With Cursor AI as the primary tool and Claude for deep insights, the system exceeds the original EigenCode-based design while maintaining full compatibility and adding significant new capabilities.
+The enhanced AI coordination System provides a powerful, scalable, and reliable platform for AI-driven development. With Cursor AI as the primary tool and Claude for deep insights, the system exceeds the original EigenCode-based design while maintaining full compatibility and adding significant new capabilities.
 
 For questions or support, refer to:
 - System Status: `docs/SYSTEM_STATUS_REPORT.md`
 - Strategic Plan: `docs/STRATEGIC_PIVOT_PLAN.md`
-- Original Guide: `AI_ORCHESTRATOR_GUIDE.md`
+- Original Guide: `AI_CONDUCTOR_GUIDE.md`

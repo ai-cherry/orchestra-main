@@ -1,7 +1,7 @@
 # Factory AI Droid Integration Plan
 
 ## Executive Summary
-This plan details the integration of Factory AI Droid system into our existing Orchestra project, ensuring compatibility with Roo coder while enhancing our AI coding capabilities.
+This plan details the integration of Factory AI Droid system into our existing cherry_ai project, ensuring compatibility with Roo coder while enhancing our AI coding capabilities.
 
 ## Integration Objectives
 1. **Preserve Existing Functionality**: Maintain all Roo coder features and MCP servers
@@ -12,7 +12,7 @@ This plan details the integration of Factory AI Droid system into our existing O
 ## Current State Analysis
 
 ### Existing Infrastructure
-- **MCP Servers**: 5 active servers (orchestrator, memory, weaviate, deployment, tools)
+- **MCP Servers**: 5 active servers (conductor, memory, weaviate, deployment, tools)
 - **Roo Modes**: 10 specialized modes with specific models and roles
 - **Tech Stack**: PostgreSQL, Weaviate, Pulumi, Vultr
 - **Context Management**: MCP-based with vector store integration
@@ -27,7 +27,7 @@ This plan details the integration of Factory AI Droid system into our existing O
 ### 1. Dual-System Approach
 ```
 ┌─────────────────────────────────────────────────┐
-│                Orchestra Project                 │
+│                cherry_ai Project                 │
 ├─────────────────────┬───────────────────────────┤
 │    Roo System       │      Factory AI System    │
 ├─────────────────────┼───────────────────────────┤
@@ -55,7 +55,7 @@ class FactoryAIDroidAdapter:
 
 ### 3. Configuration Structure
 ```
-orchestra-main/
+cherry_ai-main/
 ├── .roo/                    # Existing Roo configuration
 ├── .factory/                # New Factory AI configuration
 │   ├── config.yaml          # Main Factory config
@@ -81,13 +81,13 @@ orchestra-main/
 ```yaml
 # .factory/config.yaml
 version: "1.0"
-project_name: "Orchestra AI with Factory Droids"
+project_name: "Cherry AI with Factory Droids"
 integration_mode: "hybrid"
 
 droids:
   architect:
     model: "anthropic/claude-opus-4"
-    mcp_server: "orchestrator"
+    mcp_server: "conductor"
     capabilities:
       - system_design
       - pulumi_iac
@@ -205,11 +205,11 @@ class UnifiedContextManager:
 
 ### Phase 4: Workflow Integration
 
-#### 4.1 Hybrid Workflow Orchestrator
+#### 4.1 Hybrid Workflow conductor
 ```python
-# factory_integration/hybrid_orchestrator.py
-class HybridOrchestrator:
-    """Orchestrates workflows across Roo modes and Factory droids"""
+# factory_integration/hybrid_conductor.py
+class Hybridconductor:
+    """cherry_aites workflows across Roo modes and Factory droids"""
     
     def __init__(self):
         self.roo_modes = self._load_roo_modes()
@@ -238,7 +238,7 @@ class HybridOrchestrator:
 3. Monitor performance and compatibility
 
 ### Step 3: Full Integration
-1. Enable hybrid orchestration
+1. Enable hybrid coordination
 2. Implement automatic task routing
 3. Optimize based on performance metrics
 

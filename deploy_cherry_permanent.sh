@@ -26,7 +26,7 @@ check_success() {
 
 # 1. Build frontend with cache-busting
 echo -e "\n${YELLOW}Step 1: Building frontend with cache-busting...${NC}"
-cd /root/orchestra-main/admin-ui
+cd /root/cherry_ai-main/admin-ui
 
 # Add timestamp to build for cache busting
 export VITE_BUILD_TIME=$(date +%s)
@@ -182,8 +182,8 @@ check_success "Nginx configuration"
 echo -e "\n${YELLOW}Step 5: Setting up backend for 24/7 operation...${NC}"
 
 # Create comprehensive environment file
-cat > /etc/orchestra.env << 'EOF'
-# Orchestra AI Backend Environment
+cat > /etc/cherry_ai.env << 'EOF'
+# Cherry AI Backend Environment
 ENVIRONMENT=production
 
 # Security
@@ -193,10 +193,10 @@ ACCESS_TOKEN_EXPIRE_MINUTES=720
 # Admin credentials
 ADMIN_USERNAME=admin
 ADMIN_PASSWORD=OrchAI_Admin2024!
-ADMIN_EMAIL=admin@orchestra.ai
+ADMIN_EMAIL=admin@cherry_ai.ai
 
 # Database
-DATABASE_URL=postgresql://orchestra:orchestra@localhost/orchestra
+DATABASE_URL=postgresql://cherry_ai:cherry_ai@localhost/cherry_ai
 
 # Redis
 REDIS_URL=redis://localhost:6379
@@ -216,9 +216,9 @@ PROMETHEUS_PORT=9090
 EOF
 
 # Create systemd service with auto-restart
-cat > /etc/systemd/system/orchestra-backend.service << 'EOF'
+cat > /etc/systemd/system/cherry_ai-backend.service << 'EOF'
 [Unit]
-Description=Orchestra AI Backend API
+Description=Cherry AI Backend API
 After=network.target
 Wants=network-online.target
 StartLimitIntervalSec=0
@@ -226,15 +226,15 @@ StartLimitIntervalSec=0
 [Service]
 Type=simple
 User=root
-WorkingDirectory=/root/orchestra-main
-EnvironmentFile=/etc/orchestra.env
-ExecStartPre=/bin/bash -c 'cd /root/orchestra-main && source venv/bin/activate && pip install -r requirements.txt'
-ExecStart=/root/orchestra-main/venv/bin/python -m uvicorn agent.app.main:app --host 0.0.0.0 --port 8000 --workers 2
+WorkingDirectory=/root/cherry_ai-main
+EnvironmentFile=/etc/cherry_ai.env
+ExecStartPre=/bin/bash -c 'cd /root/cherry_ai-main && source venv/bin/activate && pip install -r requirements.txt'
+ExecStart=/root/cherry_ai-main/venv/bin/python -m uvicorn agent.app.main:app --host 0.0.0.0 --port 8000 --workers 2
 Restart=always
 RestartSec=10
 StandardOutput=journal
 StandardError=journal
-SyslogIdentifier=orchestra-backend
+SyslogIdentifier=cherry_ai-backend
 
 # Restart conditions
 RestartPreventExitStatus=0
@@ -251,14 +251,14 @@ EOF
 # 6. Create health check script
 echo -e "\n${YELLOW}Step 6: Setting up health monitoring...${NC}"
 
-cat > /usr/local/bin/orchestra-health-check.sh << 'EOF'
+cat > /usr/local/bin/cherry_ai-health-check.sh << 'EOF'
 #!/bin/bash
 # Health check and auto-recovery script
 
 # Check if backend is responding
 if ! curl -f -s http://localhost:8000/health > /dev/null 2>&1; then
     echo "Backend health check failed, restarting..."
-    systemctl restart orchestra-backend
+    systemctl restart cherry_ai-backend
     sleep 10
 fi
 
@@ -274,16 +274,16 @@ if [ -d /var/cache/nginx ]; then
 fi
 EOF
 
-chmod +x /usr/local/bin/orchestra-health-check.sh
+chmod +x /usr/local/bin/cherry_ai-health-check.sh
 
 # Add to crontab for regular checks
-(crontab -l 2>/dev/null; echo "*/5 * * * * /usr/local/bin/orchestra-health-check.sh") | crontab -
+(crontab -l 2>/dev/null; echo "*/5 * * * * /usr/local/bin/cherry_ai-health-check.sh") | crontab -
 
 # 7. Set up log rotation
 echo -e "\n${YELLOW}Step 7: Configuring log rotation...${NC}"
 
-cat > /etc/logrotate.d/orchestra << 'EOF'
-/var/log/orchestra/*.log {
+cat > /etc/logrotate.d/cherry_ai << 'EOF'
+/var/log/cherry_ai/*.log {
     daily
     missingok
     rotate 14
@@ -293,7 +293,7 @@ cat > /etc/logrotate.d/orchestra << 'EOF'
     create 0640 root root
     sharedscripts
     postrotate
-        systemctl reload orchestra-backend > /dev/null 2>&1 || true
+        systemctl reload cherry_ai-backend > /dev/null 2>&1 || true
     endscript
 }
 EOF
@@ -302,14 +302,14 @@ EOF
 echo -e "\n${YELLOW}Step 8: Starting all services...${NC}"
 
 # Create log directory
-mkdir -p /var/log/orchestra
+mkdir -p /var/log/cherry_ai
 
 # Reload systemd
 systemctl daemon-reload
 
 # Enable and start services
-systemctl enable orchestra-backend
-systemctl restart orchestra-backend
+systemctl enable cherry_ai-backend
+systemctl restart cherry_ai-backend
 check_success "Backend service start"
 
 systemctl restart nginx
@@ -340,7 +340,7 @@ sleep 5
 
 # Check services
 echo -e "\n${BLUE}Service Status:${NC}"
-systemctl is-active orchestra-backend && echo -e "${GREEN}✓ Backend is running${NC}" || echo -e "${RED}✗ Backend failed${NC}"
+systemctl is-active cherry_ai-backend && echo -e "${GREEN}✓ Backend is running${NC}" || echo -e "${RED}✗ Backend failed${NC}"
 systemctl is-active nginx && echo -e "${GREEN}✓ Nginx is running${NC}" || echo -e "${RED}✗ Nginx failed${NC}"
 
 # Test endpoints
@@ -363,10 +363,10 @@ echo "📋 Access your site:"
 echo "   URL: https://cherry-ai.me"
 echo "   Login: admin / OrchAI_Admin2024!"
 echo ""
-echo "⚠️  IMPORTANT: Add your LLM API keys to /etc/orchestra.env"
-echo "   Then run: systemctl restart orchestra-backend"
+echo "⚠️  IMPORTANT: Add your LLM API keys to /etc/cherry_ai.env"
+echo "   Then run: systemctl restart cherry_ai-backend"
 echo ""
 echo "📊 Monitor services:"
-echo "   - Logs: journalctl -u orchestra-backend -f"
-echo "   - Status: systemctl status orchestra-backend"
-echo "   - Health: tail -f /var/log/syslog | grep orchestra-health"
+echo "   - Logs: journalctl -u cherry_ai-backend -f"
+echo "   - Status: systemctl status cherry_ai-backend"
+echo "   - Health: tail -f /var/log/syslog | grep cherry_ai-health"

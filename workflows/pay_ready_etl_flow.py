@@ -9,13 +9,13 @@ async def initialize_services() -> Dict[str, Any]:
     """Initialize and return all required services."""
     logger.info("Initializing Pay Ready ETL services")
 
-    orchestrator = PayReadyETLOrchestrator()
-    await orchestrator.initialize()
+    conductor = PayReadyETLconductor()
+    await conductor.initialize()
 
     return {
-        "orchestrator": orchestrator,
-        "entity_resolver": orchestrator.entity_resolver,
-        "memory_manager": orchestrator.memory_manager,
+        "conductor": conductor,
+        "entity_resolver": conductor.entity_resolver,
+        "memory_manager": conductor.memory_manager,
     }
 
 @task(
@@ -24,7 +24,7 @@ async def initialize_services() -> Dict[str, Any]:
     retries=3,
     retry_delay_seconds=60,
 )
-async def trigger_source_sync(orchestrator: PayReadyETLOrchestrator, source: str) -> Dict[str, Any]:
+async def trigger_source_sync(conductor: PayReadyETLconductor, source: str) -> Dict[str, Any]:
     """Trigger sync for a specific source."""
     logger.info(f"Triggering sync for {source}")
 
@@ -33,7 +33,7 @@ async def trigger_source_sync(orchestrator: PayReadyETLOrchestrator, source: str
 
         pass
         source_type = SourceType(source)
-        job_id = await orchestrator.trigger_airbyte_sync(source_type)
+        job_id = await conductor.trigger_airbyte_sync(source_type)
 
         return {"source": source, "job_id": job_id, "status": "triggered", "timestamp": datetime.utcnow().isoformat()}
     except Exception:
@@ -55,7 +55,7 @@ async def trigger_source_sync(orchestrator: PayReadyETLOrchestrator, source: str
     retry_delay_seconds=30,
 )
 async def wait_for_sync_completion(
-    orchestrator: PayReadyETLOrchestrator, sync_info: Dict[str, Any], timeout_minutes: int = 60
+    conductor: PayReadyETLconductor, sync_info: Dict[str, Any], timeout_minutes: int = 60
 ) -> Dict[str, Any]:
     """Wait for a sync job to complete."""
     if sync_info["status"] == "failed":
@@ -67,7 +67,7 @@ async def wait_for_sync_completion(
 
     logger.info(f"Waiting for {source} sync job {job_id}")
 
-    success = await orchestrator.wait_for_sync(job_id, timeout_minutes)
+    success = await conductor.wait_for_sync(job_id, timeout_minutes)
 
     sync_info.update({"status": "completed" if success else "failed", "completed_at": datetime.utcnow().isoformat()})
 
@@ -75,7 +75,7 @@ async def wait_for_sync_completion(
 
 @task(name="Process Source Data", description="Process new data from a source", retries=2, retry_delay_seconds=60)
 async def process_source_data(
-    orchestrator: PayReadyETLOrchestrator, source: str, batch_size: int = 100
+    conductor: PayReadyETLconductor, source: str, batch_size: int = 100
 ) -> Dict[str, Any]:
     """Process new data from a source."""
     logger.info(f"Processing data from {source}")
@@ -85,7 +85,7 @@ async def process_source_data(
 
         pass
         source_type = SourceType(source)
-        records_processed = await orchestrator.process_new_data(source_type, batch_size)
+        records_processed = await conductor.process_new_data(source_type, batch_size)
 
         return {
             "source": source,
@@ -128,7 +128,7 @@ async def run_entity_resolution(entity_resolver: PayReadyEntityResolver) -> Dict
         return {"status": "failed", "error": str(e), "timestamp": datetime.utcnow().isoformat()}
 
 @task(name="Update Analytics Cache", description="Update analytics and warm caches", retries=1, retry_delay_seconds=30)
-async def update_analytics_cache(orchestrator: PayReadyETLOrchestrator) -> Dict[str, Any]:
+async def update_analytics_cache(conductor: PayReadyETLconductor) -> Dict[str, Any]:
     """Update analytics cache and warm memory caches."""
     logger.info("Updating analytics cache")
 
@@ -136,10 +136,10 @@ async def update_analytics_cache(orchestrator: PayReadyETLOrchestrator) -> Dict[
 
 
         pass
-        await orchestrator.update_analytics_cache()
+        await conductor.update_analytics_cache()
 
         # Get memory stats
-        memory_stats = await orchestrator.memory_manager.get_memory_stats()
+        memory_stats = await conductor.memory_manager.get_memory_stats()
 
         return {"status": "success", "memory_stats": memory_stats, "timestamp": datetime.utcnow().isoformat()}
     except Exception:
@@ -230,23 +230,23 @@ async def pay_ready_etl_pipeline(
 
     # Initialize services
     services = await initialize_services()
-    orchestrator = services["orchestrator"]
+    conductor = services["conductor"]
     entity_resolver = services["entity_resolver"]
     memory_manager = services["memory_manager"]
 
     # Phase 1: Trigger syncs in parallel
     logger.info(f"Phase 1: Triggering syncs for {len(sources)} sources")
-    sync_tasks = [trigger_source_sync.submit(orchestrator, source) for source in sources]
+    sync_tasks = [trigger_source_sync.submit(conductor, source) for source in sources]
     sync_results = await asyncio.gather(*[task.result() for task in sync_tasks])
 
     # Phase 2: Wait for syncs to complete
     logger.info("Phase 2: Waiting for syncs to complete")
-    wait_tasks = [wait_for_sync_completion.submit(orchestrator, sync_info) for sync_info in sync_results]
+    wait_tasks = [wait_for_sync_completion.submit(conductor, sync_info) for sync_info in sync_results]
     completed_syncs = await asyncio.gather(*[task.result() for task in wait_tasks])
 
     # Phase 3: Process data in parallel
     logger.info("Phase 3: Processing new data")
-    process_tasks = [process_source_data.submit(orchestrator, source, batch_size) for source in sources]
+    process_tasks = [process_source_data.submit(conductor, source, batch_size) for source in sources]
     processing_results = await asyncio.gather(*[task.result() for task in process_tasks])
 
     # Phase 4: Entity resolution
@@ -255,7 +255,7 @@ async def pay_ready_etl_pipeline(
 
     # Phase 5: Update analytics and flush vectors
     logger.info("Phase 5: Updating analytics and flushing vectors")
-    analytics_task = update_analytics_cache.submit(orchestrator)
+    analytics_task = update_analytics_cache.submit(conductor)
     flush_task = flush_pending_vectors.submit(memory_manager)
 
     analytics_result = await analytics_task.result()
@@ -300,18 +300,18 @@ async def pay_ready_incremental_sync(source: str, batch_size: int = 100) -> Dict
 
     # Initialize services
     services = await initialize_services()
-    orchestrator = services["orchestrator"]
+    conductor = services["conductor"]
 
     # Trigger sync
-    sync_result = await trigger_source_sync(orchestrator, source)
+    sync_result = await trigger_source_sync(conductor, source)
 
     if sync_result["status"] == "triggered":
         # Wait for completion
-        sync_result = await wait_for_sync_completion(orchestrator, sync_result)
+        sync_result = await wait_for_sync_completion(conductor, sync_result)
 
         # Process data
         if sync_result["status"] == "completed":
-            process_result = await process_source_data(orchestrator, source, batch_size)
+            process_result = await process_source_data(conductor, source, batch_size)
 
             # Flush vectors
             await services["memory_manager"].flush_pending_vectors()

@@ -14,7 +14,7 @@ DOCS_PATH = DOCS_DIR / "ENHANCED_MODE_SYSTEM.md"
 def print_header():
     """Print the tool header."""
     print(f"\n{Fore.CYAN}============================================={Style.RESET_ALL}")
-    print(f"{Fore.CYAN}{Style.BRIGHT}  AI Orchestra Mode System Initializer{Style.RESET_ALL}")
+    print(f"{Fore.CYAN}{Style.BRIGHT}  AI cherry_ai Mode System Initializer{Style.RESET_ALL}")
     print(f"{Fore.CYAN}============================================={Style.RESET_ALL}\n")
 
 def check_file_exists(path: Path) -> bool:
@@ -131,7 +131,7 @@ def verify_model_assignments():
         # Expected model assignments
         expected_assignments = {
             "architect": "gemini-1.5-pro",
-            "orchestrator": "gemini-1.5-pro",
+            "conductor": "gemini-1.5-pro",
             "reviewer": "gemini-1.5-pro",
             "code": "gpt-4",
             "debug": "gpt-4",
@@ -189,7 +189,7 @@ def verify_enhanced_access_permissions():
             "code",
             "debug",
             "architect",
-            "orchestrator",
+            "conductor",
             "reviewer",
             "strategy",
             "creative",
@@ -283,7 +283,7 @@ def print_usage_instructions():
 
 def main():
     """Main function for the mode system initializer."""
-        description="AI Orchestra Mode System Initializer - Set up the enhanced mode system"
+        description="AI cherry_ai Mode System Initializer - Set up the enhanced mode system"
     )
 
     parser.add_argument(

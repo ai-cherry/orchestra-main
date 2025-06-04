@@ -24,7 +24,7 @@ def execute_roo_workflow(workflow_def):
 
         # Execute the workflow
         logger.info(f"Executing workflow: {workflow_def.get('workflow_id')}")
-        # result = manager.orchestrate_workflow(main_task, subtasks) # Would fail if manager is None
+        # result = manager.cherry_aite_workflow(main_task, subtasks) # Would fail if manager is None
         result = "SubtaskManager functionality commented out due to missing definition."  # Placeholder result
 
         # Save the result to a file

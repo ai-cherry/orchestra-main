@@ -5,7 +5,7 @@ set -euo pipefail
 API_URL="https://cherry-ai.me"
 API_KEY="4010007a9aa5443fc717b54e1fd7a463260965ec9e2fce297280cf86f1b3a4bd"
 ADMIN_UI_DIR="$(dirname "$0")/../admin-ui"
-WEB_ROOT="/var/www/orchestra-admin"
+WEB_ROOT="/var/www/cherry_ai-admin"
 BACKEND_PORT=8001
 
 # --- 1. Write .env for Admin UI ---
@@ -22,8 +22,8 @@ sudo mkdir -p "$WEB_ROOT"
 sudo rsync -a --delete dist/ "$WEB_ROOT/"
 
 # --- 4. Restart backend and nginx ---
-sudo systemctl restart orchestra-real || true
-sudo systemctl restart orchestra-api || true
+sudo systemctl restart cherry_ai-real || true
+sudo systemctl restart cherry_ai-api || true
 sudo systemctl reload nginx
 
 # --- 5. Verify /api/agents returns real data ---

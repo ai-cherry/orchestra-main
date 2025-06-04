@@ -1,5 +1,5 @@
 #!/bin/bash
-# Ensure required services are running for Orchestra AI
+# Ensure required services are running for Cherry AI
 
 echo "🔍 Checking required services..."
 
@@ -13,13 +13,13 @@ else
 fi
 
 # Test PostgreSQL connection
-if PGPASSWORD=orch3str4_2024 psql -h localhost -U orchestrator -d orchestrator -c "SELECT 1;" >/dev/null 2>&1; then
+if PGPASSWORD=orch3str4_2024 psql -h localhost -U conductor -d conductor -c "SELECT 1;" >/dev/null 2>&1; then
     echo "✅ PostgreSQL connection working"
 else
     echo "🔧 Fixing PostgreSQL permissions..."
     sudo -u postgres psql << EOF >/dev/null 2>&1
-ALTER USER orchestrator WITH PASSWORD 'orch3str4_2024';
-GRANT ALL PRIVILEGES ON DATABASE orchestrator TO orchestrator;
+ALTER USER conductor WITH PASSWORD 'orch3str4_2024';
+GRANT ALL PRIVILEGES ON DATABASE conductor TO conductor;
 EOF
     echo "✅ PostgreSQL permissions fixed"
 fi
@@ -38,7 +38,7 @@ fi
 # Clean up failed MCP systemd services
 echo ""
 echo "🧹 Cleaning up MCP systemd services (not needed)..."
-for service in mcp-memory mcp-orchestrator mcp-tools mcp-weaviate; do
+for service in mcp-memory mcp-conductor mcp-tools mcp-weaviate; do
     if systemctl is-enabled --quiet $service 2>/dev/null; then
         sudo systemctl stop $service 2>/dev/null
         sudo systemctl disable $service 2>/dev/null

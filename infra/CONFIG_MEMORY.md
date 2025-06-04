@@ -1,6 +1,6 @@
-# AI Orchestra Memory Layer Configuration
+# AI cherry_ai Memory Layer Configuration
 
-This document describes the structure, configuration, and best practices for memory management in the AI Orchestra system.
+This document describes the structure, configuration, and best practices for memory management in the AI cherry_ai system.
 
 ## Memory Layer Architecture
 
@@ -38,4 +38,4 @@ All memory layers are parameterized via Pulumi config and environment variables.
 
 ---
 
-For further details, see the code in [`core/orchestrator/src/memory/layered_memory.py`](core/orchestrator/src/memory/layered_memory.py) and infrastructure definitions in [`infra/components/database_component.py`](infra/components/database_component.py).
+For further details, see the code in [`core/conductor/src/memory/layered_memory.py`](core/conductor/src/memory/layered_memory.py) and infrastructure definitions in [`infra/components/database_component.py`](infra/components/database_component.py).

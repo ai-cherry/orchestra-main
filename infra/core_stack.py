@@ -8,12 +8,12 @@
         provider = self.config.get("provider", "digitalocean")
 
         if provider == "paperspace":
-            self.esc_env_name = "orchestra-ai/dev-paperspace"
+            self.esc_env_name = "cherry_ai-ai/dev-paperspace"
             self.is_paperspace = True
             # Standardized environment prefix
             self.env_prefix = "PAPERSPACE"
         else:
-            self.esc_env_name = f"orchestra-ai/{env}-app-config"
+            self.esc_env_name = f"cherry_ai-ai/{env}-app-config"
             self.is_paperspace = False
 
         # Export ESC environment name for application use

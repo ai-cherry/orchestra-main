@@ -18,7 +18,7 @@ All Roo and MCP configurations have been successfully validated and are ready fo
 | 🏗 Architect | architect.json | anthropic/claude-opus-4 | openrouter | ✅ |
 | 💻 Developer | code.json | google/gemini-2.5-flash-preview-05-20 | openrouter | ✅ |
 | 🪲 Debugger | debug.json | openai/gpt-4.1 | openrouter | ✅ |
-| 🪃 Orchestrator | orchestrator.json | anthropic/claude-sonnet-4 | openrouter | ✅ |
+| 🪃 conductor | conductor.json | anthropic/claude-sonnet-4 | openrouter | ✅ |
 | 🧠 Strategist | strategy.json | anthropic/claude-opus-4 | openrouter | ✅ |
 | 🔍 Researcher | research.json | anthropic/claude-sonnet-4 | openrouter | ✅ |
 | 📊 Analytics | analytics.json | google/gemini-2.5-flash-preview-05-20 | openrouter | ✅ |
@@ -42,9 +42,9 @@ Each mode has its corresponding rules directory populated with instruction files
 **Configured Servers:**
 1. **memory-bank**: Docker-based persistent memory storage
 2. **portkey-router**: Model routing and management
-3. **orchestra-mcp**: Project-specific integration
+3. **conductor-mcp**: Project-specific integration
    - Command: `python`
-   - Script: `mcp_server/servers/orchestrator_server.py`
+   - Script: `mcp_server/servers/conductor_server.py`
    - Tools: context, vector, db, deploy, monitor
 
 ### 4. ✅ Legacy Files Handled
@@ -73,7 +73,7 @@ Each mode has its corresponding rules directory populated with instruction files
    ```bash
    .roo/scripts/start_mcp.sh
    # Or manually:
-   python mcp_server/servers/orchestrator_server.py
+   python mcp_server/servers/conductor_server.py
    ```
 4. **Reopen Roo**
 5. **Test functionality**:
@@ -99,4 +99,4 @@ If issues arise:
 
 ---
 
-**Configuration validated and ready for AI-assisted orchestration workflows.** 
+**Configuration validated and ready for AI-assisted coordination workflows.** 

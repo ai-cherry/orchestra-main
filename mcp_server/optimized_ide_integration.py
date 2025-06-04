@@ -56,7 +56,7 @@ class FastIDEIntegration:
     """Optimized IDE integration for single-developer projects."""
     def __init__(self, storage_path: str = "./.mcp_memory"):
         """Initialize with a simple memory store."""
-        self.ide_context = LightweightIDEContext("/workspaces/orchestra-main")
+        self.ide_context = LightweightIDEContext("/workspaces/cherry_ai-main")
         self.update_interval = 2.0  # seconds
         self.last_update = 0
 
@@ -94,8 +94,8 @@ def simulate_coding_session():
     integration.memory_store.set(
         "project_info",
         {
-            "name": "AI Orchestra",
-            "description": "Framework for orchestrating multiple AI tools",
+            "name": "AI cherry_ai",
+            "description": "Framework for cherry_aiting multiple AI tools",
         },
     )
 

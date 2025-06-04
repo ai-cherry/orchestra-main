@@ -23,7 +23,7 @@ NC='\033[0m' # No Color
 
 # Print header
 echo -e "${BLUE}======================================================${NC}"
-echo -e "${BLUE}${BOLD}   Orchestra Automated Pre-Deployment Verification   ${NC}"
+echo -e "${BLUE}${BOLD}   cherry_ai Automated Pre-Deployment Verification   ${NC}"
 echo -e "${BLUE}======================================================${NC}"
 
 # Function to run a step and handle errors
@@ -200,9 +200,9 @@ echo -e "${YELLOW}⚠️  This step requires manual verification and cannot be a
 
 # Get the UI URL from Pulumi output if possible
 ui_url=""
-if command -v pulumi &> /dev/null && [ -d "infra/orchestra-pulumi" ]; then
+if command -v pulumi &> /dev/null && [ -d "infra/cherry_ai-pulumi" ]; then
   echo -e "${YELLOW}Attempting to get UI URL from Pulumi output...${NC}"
-  pulumi_output=$(pulumi -chdir="infra/orchestra-pulumi" output -json service_urls 2>/dev/null || echo '{}')
+  pulumi_output=$(pulumi -chdir="infra/cherry_ai-pulumi" output -json service_urls 2>/dev/null || echo '{}')
   ui_url=$(echo $pulumi_output | jq -r '.ui // empty' 2>/dev/null)
 
   if [ -n "$ui_url" ] && [ "$ui_url" != "null" ]; then
@@ -222,7 +222,7 @@ if command -v pulumi &> /dev/null && [ -d "infra/orchestra-pulumi" ]; then
     echo -e "${YELLOW}Could not get UI URL from Pulumi output.${NC}"
   fi
 else
-  echo -e "${YELLOW}Pulumi not found or infra/orchestra-pulumi directory not found.${NC}"
+  echo -e "${YELLOW}Pulumi not found or infra/cherry_ai-pulumi directory not found.${NC}"
   echo -e "${YELLOW}You will need to manually obtain the UI URL.${NC}"
 fi
 

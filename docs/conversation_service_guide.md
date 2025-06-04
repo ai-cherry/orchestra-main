@@ -2,7 +2,7 @@
 
 ## Overview
 
-The ConversationService is a core component of the AI Orchestration System, providing a modern, asynchronous API for managing conversations. This service handles the entire conversation lifecycle including starting sessions, recording messages, tracking state, and retrieving history.
+The ConversationService is a core component of the AI coordination System, providing a modern, asynchronous API for managing conversations. This service handles the entire conversation lifecycle including starting sessions, recording messages, tracking state, and retrieving history.
 
 ## Key Features
 
@@ -26,7 +26,7 @@ The ConversationService follows these architectural principles:
 
 ```python
 from fastapi import APIRouter
-from core.orchestrator.src.services.conversation_service import get_conversation_service
+from core.conductor.src.services.conversation_service import get_conversation_service
 
 router = APIRouter()
 
@@ -161,8 +161,8 @@ See the OpenAPI documentation at `/api/docs` for full details on request/respons
 The ConversationService has a comprehensive test suite using pytest-asyncio. Run tests with:
 
 ```bash
-cd /workspaces/orchestra-main
-pytest tests/core/orchestrator/services/test_conversation_service.py -v
+cd /workspaces/cherry_ai-main
+pytest tests/core/conductor/services/test_conversation_service.py -v
 ```
 
 ## Best Practices

@@ -21,7 +21,7 @@ I've completed a comprehensive review and fixed the mode configuration issue. Th
 - 🏗 **Architect** → anthropic/claude-opus-4
 - 💻 **Code** → google/gemini-2.5-flash-preview-05-20
 - 🪲 **Debug** → openai/gpt-4.1
-- 🪃 **Orchestrator** → anthropic/claude-sonnet-4
+- 🪃 **conductor** → anthropic/claude-sonnet-4
 - 🧠 **Strategy** → anthropic/claude-opus-4
 - 🔍 **Research** → anthropic/claude-sonnet-4
 - 📊 **Analytics** → google/gemini-2.5-flash-preview-05-20
@@ -32,11 +32,11 @@ I've completed a comprehensive review and fixed the mode configuration issue. Th
 ### ✅ MCP Servers Configured:
 - **memory-bank** - Docker-based memory storage
 - **portkey-router** - Model routing
-- **orchestra-mcp** - Project-specific tools (fixed and tested)
+- **conductor-mcp** - Project-specific tools (fixed and tested)
 
 ### ✅ Settings:
 - **Default mode:** code
-- **Boomerang default:** orchestrator
+- **Boomerang default:** conductor
 - **All custom instructions** included in customModes section
 
 ## Ready to Open Roo!
@@ -45,7 +45,7 @@ Everything is now properly configured. When you open Roo:
 
 1. You should see all 10 custom modes available
 2. Each mode will use the correct OpenRouter model
-3. MCP servers will be available (orchestra-mcp is fixed and working)
+3. MCP servers will be available (conductor-mcp is fixed and working)
 4. All custom instructions are in place
 
 ## Important Reminders
@@ -53,7 +53,7 @@ Everything is now properly configured. When you open Roo:
 - **No UI settings needed** - Everything is in the `.roomodes` file
 - **OpenRouter API key** must be set in your environment
 - **Virtual environment** should be activated for Python tools
-- The MCP orchestrator server will be started automatically by Roo
+- The MCP conductor server will be started automatically by Roo
 
 ## Quick Test After Opening
 

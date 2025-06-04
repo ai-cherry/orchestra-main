@@ -1,8 +1,8 @@
-# Symphony Orchestrator - Unified Automated System Guide
+# Symphony conductor - Unified Automated System Guide
 
 ## Overview
 
-The Symphony Orchestrator is a comprehensive automated system that manages all cleanup, maintenance, and optimization tasks for Project Symphony without requiring manual intervention. It orchestrates all the AI Optimization Framework components automatically in the background.
+The Symphony conductor is a comprehensive automated system that manages all cleanup, maintenance, and optimization tasks for Project Symphony without requiring manual intervention. It cherry_aites all the AI Optimization Framework components automatically in the background.
 
 ## Quick Start
 
@@ -10,23 +10,23 @@ The Symphony Orchestrator is a comprehensive automated system that manages all c
 
 ```bash
 # Make setup script executable and run it
-chmod +x scripts/setup_symphony_orchestrator.sh
-./scripts/setup_symphony_orchestrator.sh
+chmod +x scripts/setup_symphony_conductor.sh
+./scripts/setup_symphony_conductor.sh
 ```
 
 This single command will:
 1. Install required dependencies
 2. Set up all necessary directories
 3. Create a systemd service
-4. Start the orchestrator automatically
+4. Start the conductor automatically
 5. Enable it to run on system startup
 
 ## Architecture
 
 ### Core Components
 
-1. **Symphony Orchestrator** (`scripts/symphony_orchestrator.py`)
-   - Central orchestration engine
+1. **Symphony conductor** (`scripts/symphony_conductor.py`)
+   - Central coordination engine
    - Task scheduling and dependency management
    - Health monitoring and reporting
    - Automatic retry and failure handling
@@ -50,7 +50,7 @@ This single command will:
 
 ### Task Scheduling
 
-The orchestrator uses cron-like expressions to schedule tasks:
+The conductor uses cron-like expressions to schedule tasks:
 
 ```json
 {
@@ -65,7 +65,7 @@ The orchestrator uses cron-like expressions to schedule tasks:
 
 ### Dependency Management
 
-Tasks can depend on other tasks. The orchestrator ensures dependencies are met before running a task:
+Tasks can depend on other tasks. The conductor ensures dependencies are met before running a task:
 
 ```json
 {
@@ -90,7 +90,7 @@ Failed tasks are automatically retried with configurable delays:
 
 ### Main Configuration File
 
-Location: `config/orchestrator_config.json`
+Location: `config/conductor_config.json`
 
 ```json
 {
@@ -129,40 +129,40 @@ Uses standard cron expressions:
 
 ```bash
 # Check status
-sudo systemctl status symphony-orchestrator
+sudo systemctl status symphony-conductor
 
 # Stop service
-sudo systemctl stop symphony-orchestrator
+sudo systemctl stop symphony-conductor
 
 # Start service
-sudo systemctl start symphony-orchestrator
+sudo systemctl start symphony-conductor
 
 # Restart service
-sudo systemctl restart symphony-orchestrator
+sudo systemctl restart symphony-conductor
 
 # View logs
-sudo journalctl -u symphony-orchestrator -f
+sudo journalctl -u symphony-conductor -f
 ```
 
 ### Manual Operations
 
 ```bash
-# Check orchestrator status
-python scripts/symphony_orchestrator.py status
+# Check conductor status
+python scripts/symphony_conductor.py status
 
 # Run a specific task manually
-python scripts/symphony_orchestrator.py run --task inventory_scan
+python scripts/symphony_conductor.py run --task inventory_scan
 
 # View detailed logs
-tail -f logs/symphony_orchestrator.log
+tail -f logs/symphony_conductor.log
 ```
 
 ## Monitoring
 
 ### Log Files
 
-- Main orchestrator log: `logs/symphony_orchestrator.log`
-- Systemd log: `logs/orchestrator_systemd.log`
+- Main conductor log: `logs/symphony_conductor.log`
+- Systemd log: `logs/conductor_systemd.log`
 - Task-specific logs: `logs/automation/[task_name].log`
 - Cleanup actions: `cleanup_actions.log`
 
@@ -179,7 +179,7 @@ tail -f logs/symphony_orchestrator.log
 ./scripts/quick_health_check.sh
 
 # Check specific metrics
-python scripts/symphony_orchestrator.py status | jq '.recent_results'
+python scripts/symphony_conductor.py status | jq '.recent_results'
 ```
 
 ## Task Details
@@ -227,7 +227,7 @@ python scripts/symphony_orchestrator.py status | jq '.recent_results'
 
 ### Adding New Tasks
 
-1. Edit `config/orchestrator_config.json`
+1. Edit `config/conductor_config.json`
 2. Add new task definition:
 ```json
 {
@@ -239,12 +239,12 @@ python scripts/symphony_orchestrator.py status | jq '.recent_results'
   "enabled": true
 }
 ```
-3. Restart orchestrator: `sudo systemctl restart symphony-orchestrator`
+3. Restart conductor: `sudo systemctl restart symphony-conductor`
 
 ### Modifying Schedules
 
 1. Edit the task's `schedule` field in config
-2. Restart orchestrator to apply changes
+2. Restart conductor to apply changes
 3. Check status to verify new schedule
 
 ### Disabling Tasks
@@ -255,10 +255,10 @@ Set `"enabled": false` for any task you want to disable temporarily.
 
 ### Common Issues
 
-1. **Orchestrator not starting**
+1. **conductor not starting**
    ```bash
    # Check systemd logs
-   sudo journalctl -u symphony-orchestrator -n 50
+   sudo journalctl -u symphony-conductor -n 50
    
    # Check if port is in use
    sudo lsof -i :8080
@@ -270,7 +270,7 @@ Set `"enabled": false` for any task you want to disable temporarily.
    tail -f logs/automation/[task_name].log
    
    # Run task manually to debug
-   python scripts/symphony_orchestrator.py run --task [task_name]
+   python scripts/symphony_conductor.py run --task [task_name]
    ```
 
 3. **High resource usage**
@@ -283,17 +283,17 @@ Set `"enabled": false` for any task you want to disable temporarily.
 
 ```bash
 # Stop service
-sudo systemctl stop symphony-orchestrator
+sudo systemctl stop symphony-conductor
 
 # Clear state
-rm orchestrator_state.json
-rm orchestrator.pid
+rm conductor_state.json
+rm conductor.pid
 
 # Clear logs (optional)
-rm logs/symphony_orchestrator.log
+rm logs/symphony_conductor.log
 
 # Start fresh
-sudo systemctl start symphony-orchestrator
+sudo systemctl start symphony-conductor
 ```
 
 ## Security Considerations
@@ -327,7 +327,7 @@ sudo systemctl start symphony-orchestrator
 
 ## Integration with CI/CD
 
-The orchestrator integrates with the GitHub Actions workflow:
+The conductor integrates with the GitHub Actions workflow:
 
 1. **Weekly Reports**: Generated by GitHub Actions
 2. **PR Comments**: Cleanup analysis on pull requests
@@ -343,6 +343,6 @@ The orchestrator integrates with the GitHub Actions workflow:
 
 ## Conclusion
 
-The Symphony Orchestrator provides a hands-off solution for maintaining code quality and cleanliness. Once set up, it runs continuously in the background, keeping your codebase optimized without manual intervention.
+The Symphony conductor provides a hands-off solution for maintaining code quality and cleanliness. Once set up, it runs continuously in the background, keeping your codebase optimized without manual intervention.
 
 For additional help or customization, refer to the individual component documentation or contact the development team.

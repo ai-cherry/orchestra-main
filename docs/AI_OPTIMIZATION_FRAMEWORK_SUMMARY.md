@@ -217,7 +217,7 @@ python scripts/cleanup_engine.py cleanup_inventory.json --execute
 
 ## Resources
 
-- Implementation Plan: `orchestration/ai_optimization_implementation_plan.md`
+- Implementation Plan: `coordination/ai_optimization_implementation_plan.md`
 - Original Framework: (comprehensive document provided)
 - GitHub Actions: `.github/workflows/ai_codebase_hygiene.yml`
 - Automation Registry: `config/automation_registry.yaml`
@@ -226,4 +226,4 @@ python scripts/cleanup_engine.py cleanup_inventory.json --execute
 
 The AI Codebase Optimization Framework provides a comprehensive approach to maintaining code quality, performance, and cleanliness in an AI-assisted development environment. By following these guidelines and using the provided tools, Project Symphony can maintain a high-quality, performant, and manageable codebase.
 
-For questions or improvements, please consult the orchestration team or submit a PR with proposed changes.
+For questions or improvements, please consult the coordination team or submit a PR with proposed changes.

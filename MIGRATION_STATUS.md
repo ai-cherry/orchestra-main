@@ -1,11 +1,11 @@
-# Orchestra AI Infrastructure Status
+# Cherry AI Infrastructure Status
 
 The migration to a Vultr-based stack is complete. All previous DigitalOcean and Paperspace resources have been shut down.
 
 ## Current Server
 - **Specs:** 16 vCPU / 64 GB RAM / 320 GB NVMe
 - **OS:** Ubuntu 24.04 LTS
-- **Services:** Docker Compose stack running Weaviate 1.30 (Agents & ACORN), PostgreSQL 16 + pgvector, Orchestrator & MCP, Langfuse, optional Redis.
+- **Services:** Docker Compose stack running Weaviate 1.30 (Agents & ACORN), PostgreSQL 16 + pgvector, conductor & MCP, Langfuse, optional Redis.
 
 ## Automation
 - Nightly snapshots of the `/data` volume are created via `scripts/snapshot.sh` at 03:00 UTC using the Vultr CLI.

@@ -1,8 +1,8 @@
-# Orchestra AI Core - Modular Architecture
+# Cherry AI Core - Modular Architecture
 
 ## Overview
 
-This is a clean, modular implementation of the Orchestra AI core system, designed with elegance and maintainability in mind. The architecture follows best practices for separation of concerns, dependency injection, and event-driven communication.
+This is a clean, modular implementation of the Cherry AI core system, designed with elegance and maintainability in mind. The architecture follows best practices for separation of concerns, dependency injection, and event-driven communication.
 
 ## Architecture
 
@@ -86,10 +86,10 @@ await event_bus.publish("core.initialized", {"services": [...]})
 ### Basic Setup
 
 ```python
-from core.main import get_orchestra_core
+from core.main import get_cherry_ai_core
 
 # Initialize and run the core
-core = get_orchestra_core()
+core = get_cherry_ai_core()
 await core.run()
 ```
 
@@ -100,7 +100,7 @@ from core.services.memory.unified_memory import get_memory_service
 
 # Store data
 item_id = await memory_service.store(
-    content={"message": "Hello, Orchestra!"},
+    content={"message": "Hello, cherry_ai!"},
     metadata={"user": "alice"},
     layer=MemoryLayer.SHORT_TERM
 )
@@ -154,7 +154,7 @@ SECRET_KEY=your-secret-key
 
 # PostgreSQL
 MONGODB_URI=mongodb://localhost:27017
-MONGODB_DATABASE=orchestra
+MONGODB_DATABASE=cherry_ai
 
 # DragonflyDB
 DRAGONFLY_URI=redis://localhost:6379

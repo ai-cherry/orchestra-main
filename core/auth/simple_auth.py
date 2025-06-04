@@ -1,5 +1,5 @@
 """Simple API key authentication for single-user deployment."""
-API_KEY = os.getenv("ORCHESTRA_API_KEY", "")
+API_KEY = os.getenv("cherry_ai_API_KEY", "")
 
 # API Key header
 api_key_header = APIKeyHeader(name="X-API-Key", auto_error=False)

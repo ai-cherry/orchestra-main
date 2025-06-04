@@ -192,7 +192,7 @@ if stats['utilization'] > 0.8:
 # PostgreSQL connection
 POSTGRES_HOST=localhost
 POSTGRES_PORT=5432
-POSTGRES_DB=orchestra
+POSTGRES_DB=cherry_ai
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=your_password
 

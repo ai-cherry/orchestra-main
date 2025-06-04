@@ -1,4 +1,4 @@
-"""Workflow module for Orchestra AI."""
+"""Workflow module for Cherry AI."""
     "Task",
     "TaskDefinition",
     "TaskPriority",

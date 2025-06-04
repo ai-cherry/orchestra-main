@@ -10,7 +10,7 @@
 - ✅ `mcp_server/servers/memory_server.py` - Main MCP memory server
 - ✅ `mcp_server/servers/enhanced_memory_server.py` - Enhanced version
 - ✅ `mcp_server/servers/memory_mcp_server.py` - MCP-specific memory server
-- ✅ `mcp_server/servers/orchestra_memory_mcp_server.py` - Orchestra-specific memory server
+- ✅ `mcp_server/servers/cherry_ai_memory_mcp_server.py` - cherry_ai-specific memory server
 - ✅ `mcp_server/memory/base.py` - Base memory abstractions
 - ✅ `mcp_server/memory/langchain_memory.py` - LangChain integration
 
@@ -67,9 +67,9 @@ MCP servers can now:
 
 To test MCP functionality in Cursor:
 ```
-@orchestra-memory search_memories "MCP test"
-@orchestra-memory search_knowledge "test pattern"
-@orchestra-memory store_memory "New important information"
+@cherry_ai-memory search_memories "MCP test"
+@cherry_ai-memory search_knowledge "test pattern"
+@cherry_ai-memory store_memory "New important information"
 ```
 
 ## Conclusion

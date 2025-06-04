@@ -70,7 +70,7 @@ echo -e "${BLUE}                     Coverage Analysis                          
 echo -e "${BLUE}==================================================================${NC}"
 
 # Run tests with coverage
-pytest tests/ --verbose --cov=core.orchestrator --cov=packages.shared --cov-report=term-missing
+pytest tests/ --verbose --cov=core.conductor --cov=packages.shared --cov-report=term-missing
 
 # Run tests for key modules
 echo -e "\n${YELLOW}Checking specific modules coverage...${NC}"
@@ -79,13 +79,13 @@ echo -e "\n${YELLOW}Checking specific modules coverage...${NC}"
 echo -e "${BLUE}==================================================================${NC}"
 echo -e "${BLUE}             Coverage for /interact endpoint                      ${NC}"
 echo -e "${BLUE}==================================================================${NC}"
-pytest tests/test_interaction.py --cov=core.orchestrator.src.api.endpoints.interaction -v
+pytest tests/test_interaction.py --cov=core.conductor.src.api.endpoints.interaction -v
 
 # Check persona loading
 echo -e "${BLUE}==================================================================${NC}"
 echo -e "${BLUE}            Coverage for persona loading                          ${NC}"
 echo -e "${BLUE}==================================================================${NC}"
-pytest tests/core/config/test_loader.py --cov=core.orchestrator.src.config.loader -v
+pytest tests/core/config/test_loader.py --cov=core.conductor.src.config.loader -v
 
 # Check memory manager
 echo -e "${BLUE}==================================================================${NC}"
@@ -97,7 +97,7 @@ pytest tests/shared/memory/ --cov=packages.shared.src.memory -v
 echo -e "${BLUE}==================================================================${NC}"
 echo -e "${BLUE}            Coverage for agent registration                       ${NC}"
 echo -e "${BLUE}==================================================================${NC}"
-pytest tests/ --cov=core.orchestrator.src.agents -v
+pytest tests/ --cov=core.conductor.src.agents -v
 
 echo -e "\n${GREEN}Testing completed!${NC}"
 echo -e "${YELLOW}If you see any low coverage areas, consider adding more tests to increase coverage.${NC}"

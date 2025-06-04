@@ -2,7 +2,7 @@
 """
 """
     """LiteLLM gateway for unified LLM access"""
-        super().__init__("orchestra:llm:LiteLLM", name, {}, opts)
+        super().__init__("cherry_ai:llm:LiteLLM", name, {}, opts)
 
         namespace = config["namespace"]
         image = config.get("image", "ghcr.io/berriai/litellm:main-latest")

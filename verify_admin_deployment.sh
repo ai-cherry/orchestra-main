@@ -8,11 +8,11 @@ echo "================================"
 
 # Check deployed files
 echo -e "\n📁 Deployed Files:"
-ls -la /var/www/orchestra-admin/assets/*.js 2>/dev/null | tail -3
+ls -la /var/www/cherry_ai-admin/assets/*.js 2>/dev/null | tail -3
 
 # Get version from JavaScript
 echo -e "\n📌 Version Check:"
-VERSION_JS=$(ls -t /var/www/orchestra-admin/assets/index-*.js 2>/dev/null | head -1)
+VERSION_JS=$(ls -t /var/www/cherry_ai-admin/assets/index-*.js 2>/dev/null | head -1)
 if [ -f "$VERSION_JS" ]; then
     VERSION_HASH=$(basename "$VERSION_JS" | grep -oE '[0-9]{13}')
     if [ ! -z "$VERSION_HASH" ]; then

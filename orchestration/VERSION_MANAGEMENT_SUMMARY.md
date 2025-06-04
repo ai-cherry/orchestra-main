@@ -2,12 +2,12 @@
 
 ## Overview
 
-This document summarizes the comprehensive version management system designed for the Orchestra platform. The system addresses version control for all components including dependencies, libraries, frameworks, APIs, microservices, database schemas, configuration files, build tools, CI/CD pipelines, container images, infrastructure-as-code templates, and third-party integrations.
+This document summarizes the comprehensive version management system designed for the cherry_ai platform. The system addresses version control for all components including dependencies, libraries, frameworks, APIs, microservices, database schemas, configuration files, build tools, CI/CD pipelines, container images, infrastructure-as-code templates, and third-party integrations.
 
 ## Key Deliverables
 
 ### 1. Architecture Document
-**File**: [`orchestration/version_management_architecture.md`](./version_management_architecture.md)
+**File**: [`coordination/version_management_architecture.md`](./version_management_architecture.md)
 
 Comprehensive architecture covering:
 - Centralized version registry design
@@ -22,7 +22,7 @@ Comprehensive architecture covering:
 - Version health monitoring
 
 ### 2. Audit Report
-**File**: [`orchestration/version_management_report.md`](./version_management_report.md)
+**File**: [`coordination/version_management_report.md`](./version_management_report.md)
 
 Current state analysis including:
 - Complete inventory of all versioned components
@@ -34,12 +34,12 @@ Current state analysis including:
 - Prioritized recommendations
 
 ### 3. Implementation Tools
-**File**: [`orchestration/version_management_implementation.py`](./version_management_implementation.py)
+**File**: [`coordination/version_management_implementation.py`](./version_management_implementation.py)
 
 Python implementation providing:
 - `VersionScanner`: Automated component discovery
 - `DependencyGraph`: Dependency relationship management
-- `VersionManager`: Central orchestration
+- `VersionManager`: Central coordination
 - CLI tools for scanning, reporting, and locking versions
 - Update priority calculation
 - Conflict detection algorithms
@@ -93,16 +93,16 @@ Python implementation providing:
 ### 1. Initialize Version Management
 ```bash
 # Install the version management tool
-cd /root/orchestra-main
-chmod +x orchestration/version_management_implementation.py
+cd /root/cherry_ai-main
+chmod +x coordination/version_management_implementation.py
 
 # Initialize version tracking
-python orchestration/version_management_implementation.py init
+python coordination/version_management_implementation.py init
 ```
 
 ### 2. Generate Current State Report
 ```bash
 # Scan all components
-python orchestration/version_management_implementation.py scan
+python coordination/version_management_implementation.py scan
 
 # Generate comprehensive report

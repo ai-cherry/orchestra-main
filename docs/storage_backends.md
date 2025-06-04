@@ -1,10 +1,10 @@
 # Storage Backends Documentation
 
-This document provides information about the storage backends implemented in the Orchestra system, focusing on the MongoDB
+This document provides information about the storage backends implemented in the cherry_ai system, focusing on the MongoDB
 
 ## Overview
 
-The Orchestra system now supports persistent storage through
+The cherry_ai system now supports persistent storage through
 - **Persistent Storage**: All conversations and agent data are stored persistently in MongoDB
 - **Caching Layer**: Recent conversations and session data are cached in Redis for faster access
 - **Fallback Mechanism**: System continues to work with degraded performance if Redis is unavailable
@@ -21,7 +21,7 @@ The storage implementation follows a tiered architecture:
    - `ConcreteMemoryManager`: Combines MongoDB
    - `MemoryManagerStub`: In-memory implementation for development and testing
 
-3. **Dependency Injection**: The appropriate implementation is selected based on the environment in `core/orchestrator/src/api/dependencies/memory.py`
+3. **Dependency Injection**: The appropriate implementation is selected based on the environment in `core/conductor/src/api/dependencies/memory.py`
 
 ## Configuration
 

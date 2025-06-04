@@ -7,8 +7,8 @@
   },
   "experiment_defaults": {
     "tags": {
-      "team": "ai-orchestra",
-      "project": "orchestrator"
+      "team": "ai-cherry_ai",
+      "project": "conductor"
     },
     "log_models": true,
     "log_datasets": true,

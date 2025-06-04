@@ -53,7 +53,7 @@ The Architect has completed the detailed system design for Factory AI Droid inte
 
 #### Task 3.2.2: Droid-Specific Adapters
 Create adapters for each Factory Droid:
-1. `architect_adapter.py` → orchestrator_server.py
+1. `architect_adapter.py` → conductor_server.py
 2. `code_adapter.py` → tools_server.py
 3. `debug_adapter.py` → tools_server.py
 4. `reliability_adapter.py` → deployment_server.py
@@ -108,9 +108,9 @@ Create adapters for each Factory Droid:
 **Priority**: MEDIUM
 **Dependencies**: Phase 3.4
 
-#### Task 3.5.1: Hybrid Orchestrator
+#### Task 3.5.1: Hybrid conductor
 ```python
-# factory_integration/hybrid_orchestrator.py
+# factory_integration/hybrid_conductor.py
 - Implement task routing logic
 - Add dynamic load balancing
 - Implement fallback mechanisms
@@ -154,7 +154,7 @@ Create adapters for each Factory Droid:
 - [ ] Caching implementation
 - [ ] API gateway with auth
 - [ ] Monitoring integration
-- [ ] Hybrid orchestrator
+- [ ] Hybrid conductor
 - [ ] Comprehensive tests
 - [ ] Performance benchmarks
 - [ ] Migration scripts

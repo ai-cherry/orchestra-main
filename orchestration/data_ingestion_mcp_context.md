@@ -84,7 +84,7 @@
     "s3": {
       "total_files": 3456,
       "size_gb": 234.5,
-      "bucket": "orchestra-data-ingestion"
+      "bucket": "cherry_ai-data-ingestion"
     }
   }
 }
@@ -108,7 +108,7 @@ graph TB
 
     subgraph "Application Services"
         US[Upload Service]
-        PO[Processing Orchestrator]
+        PO[Processing conductor]
         QE[Query Engine]
         AS[API Sync Service]
     end
@@ -232,7 +232,7 @@ events:
       size_bytes: integer
       user_id: string
     producers: [upload_service]
-    consumers: [processing_orchestrator, mcp_context]
+    consumers: [processing_conductor, mcp_context]
 
   - name: file.validation.completed
     schema:
@@ -240,7 +240,7 @@ events:
       valid: boolean
       errors: array[string]
     producers: [file_validator]
-    consumers: [processing_orchestrator, mcp_context]
+    consumers: [processing_conductor, mcp_context]
 
   # Processing events
   - name: processing.started
@@ -248,7 +248,7 @@ events:
       file_id: string
       parser_type: string
       estimated_duration_ms: integer
-    producers: [processing_orchestrator]
+    producers: [processing_conductor]
     consumers: [mcp_context, monitoring]
 
   - name: processing.progress
@@ -257,7 +257,7 @@ events:
       progress_percent: integer
       records_processed: integer
     producers: [parsers]
-    consumers: [processing_orchestrator, mcp_context]
+    consumers: [processing_conductor, mcp_context]
 
   - name: processing.completed
     schema:
@@ -265,7 +265,7 @@ events:
       total_records: integer
       processing_time_ms: integer
       vector_count: integer
-    producers: [processing_orchestrator]
+    producers: [processing_conductor]
     consumers: [query_engine, mcp_context]
 
   # Query events
@@ -296,7 +296,7 @@ events:
       duration_ms: integer
       next_sync: timestamp
     producers: [api_sync_service]
-    consumers: [processing_orchestrator, mcp_context]
+    consumers: [processing_conductor, mcp_context]
 ```
 
 ### 4. MCP Server Implementation
@@ -421,22 +421,22 @@ class DataIngestionMCPServer(MCPServer):
         return suggestions[:5]
 ```
 
-### 5. Integration with Existing Orchestra System
+### 5. Integration with Existing cherry_ai System
 
 ```python
 # Integration points with existing system
-class DataIngestionOrchestrator:
-    """Orchestrates data ingestion with existing Orchestra components"""
+class DataIngestionconductor:
+    """cherry_aites data ingestion with existing cherry_ai components"""
     
     def __init__(
         self,
         llm_router,  # Existing LLM router
-        agent_orchestrator,  # Existing agent orchestrator
+        agent_conductor,  # Existing agent conductor
         memory_manager,  # Existing memory manager
         mcp_server  # Data ingestion MCP server
     ):
         self.llm_router = llm_router
-        self.agent_orchestrator = agent_orchestrator
+        self.agent_conductor = agent_conductor
         self.memory_manager = memory_manager
         self.mcp_server = mcp_server
     
@@ -451,7 +451,7 @@ class DataIngestionOrchestrator:
         # Execute search
         if query_intent.requires_specialized_agent:
             # Use specialized agent for complex queries
-            agent = await self.agent_orchestrator.get_agent("data_query_specialist")
+            agent = await self.agent_conductor.get_agent("data_query_specialist")
             results = await agent.execute(query, sources, context)
         else:
             # Direct query execution
@@ -580,7 +580,7 @@ This MCP context architecture provides:
 
 1. **Complete Context Management**: All data ingestion state is tracked and shared via MCP
 2. **Event-Driven Updates**: Real-time context updates through event system
-3. **Integration Points**: Seamless integration with existing Orchestra components
+3. **Integration Points**: Seamless integration with existing cherry_ai components
 4. **Performance Monitoring**: Real-time metrics and monitoring through MCP context
 5. **Scalable Design**: Supports horizontal scaling with shared context
 

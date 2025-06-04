@@ -53,14 +53,14 @@ The `manage_mcp_servers.sh` script provides comprehensive server control:
 
 ### Available Servers (Reflecting Actual Deployed Services)
 
-This list reflects the MCP servers typically active in your Vultr-based Orchestra AI environment. Refer to `mcp_server/server_registry.json` and individual server scripts in `mcp_server/servers/` for precise details.
+This list reflects the MCP servers typically active in your Vultr-based Cherry AI environment. Refer to `mcp_server/server_registry.json` and individual server scripts in `mcp_server/servers/` for precise details.
 
-1.  **`orchestrator` / `orchestrator-mcp`**
+1.  **`conductor` / `conductor-mcp`**
     *   **Likely Role**: Core workflow execution and task management. Coordinates other MCP services and AI agents.
     *   Required: `POSTGRES_URL` (for state), `WEAVIATE_URL`, `VULTR_API_KEY` (potentially for dynamic resource management).
     *   Capabilities: Workflow definition, task queuing, agent dispatch, context aggregation.
 
-2.  **`memory` / `memory-mcp` / `enhanced-memory` / `orchestra-memory-mcp`**
+2.  **`memory` / `memory-mcp` / `enhanced-memory` / `cherry_ai-memory-mcp`**
     *   **Likely Role**: Provides various forms of memory to AI agents. This could include:
         *   Short-term conversational context (e.g., Redis/DragonflyDB via `memory-cache-server` if that's one of these).
         *   Long-term semantic memory (Weaviate via `weaviate-direct-mcp`).
@@ -100,21 +100,21 @@ This list reflects the MCP servers typically active in your Vultr-based Orchestr
 
 ### Log Locations
 
-- Setup logs: `~/.orchestra-ai/logs/setup_*.log` (Example path)
-- Server logs: `~/.orchestra-ai/logs/mcp_<server_name>_<date>.log`
-- Launch logs: `~/.orchestra-ai/logs/cursor_launch_*.log`
+- Setup logs: `~/.cherry_ai-ai/logs/setup_*.log` (Example path)
+- Server logs: `~/.cherry_ai-ai/logs/mcp_<server_name>_<date>.log`
+- Launch logs: `~/.cherry_ai-ai/logs/cursor_launch_*.log`
 
 ### Viewing Logs
 
 ```bash
 # View latest setup log
-tail -f ~/.orchestra-ai/logs/setup_*.log
+tail -f ~/.cherry_ai-ai/logs/setup_*.log
 
 # View specific server log (e.g., memory_cache_server)
-tail -f ~/.orchestra-ai/logs/mcp_memory_cache_server_*.log
+tail -f ~/.cherry_ai-ai/logs/mcp_memory_cache_server_*.log
 
 # Check for errors
-grep -i ERROR ~/.orchestra-ai/logs/*.log
+grep -i ERROR ~/.cherry_ai-ai/logs/*.log
 ```
 
 ### Common Issues and Solutions
@@ -173,7 +173,7 @@ Use the template at `mcp_server/servers/example_server.py.template` as a startin
 
 ### Required Environment Variables
 
-Set these in a `.env` file or your shell profile (e.g., `~/.bashrc.orchestra`):
+Set these in a `.env` file or your shell profile (e.g., `~/.bashrc.cherry_ai`):
 
 ```bash
 export VULTR_API_KEY="your_vultr_api_key"
@@ -212,7 +212,7 @@ Once MCP servers are running, you can use their tools in your AI agents:
 
 ### MCP Configuration
 AI agent configuration (e.g., for Claude Code via Cursor) should point to the MCP server endpoints.
-This is usually managed via the orchestrator or agent-specific settings.
+This is usually managed via the conductor or agent-specific settings.
 
 ## Monitoring and Health Checks
 
@@ -230,8 +230,8 @@ ps aux | grep mcp_server # General check
 ps aux | grep memory_cache_server.py # Specific server
 
 # Check specific server PID (if your scripts manage PIDs)
-# cat ~/.orchestra-ai/pids/mcp_memory_cache_server.pid
-# kill -0 $(cat ~/.orchestra-ai/pids/mcp_memory_cache_server.pid)
+# cat ~/.cherry_ai-ai/pids/mcp_memory_cache_server.pid
+# kill -0 $(cat ~/.cherry_ai-ai/pids/mcp_memory_cache_server.pid)
 ```
 
 ## Best Practices
@@ -259,7 +259,7 @@ python --version
 ss -tulnp | grep :8001
 
 # Clear PID files if needed (example path)
-# rm ~/.orchestra-ai/pids/*.pid
+# rm ~/.cherry_ai-ai/pids/*.pid
 
 # Full system check (using your scripts)
 ./check_mcp_servers.sh && ./manage_mcp_servers.sh status
@@ -269,7 +269,13 @@ ss -tulnp | grep :8001
 
 For issues:
 
-1.  Check the logs first (`~/.orchestra-ai/logs/`).
+1.  Check the logs first (`~/.cherry_ai-ai/logs/`).
 2.  Verify environment setup (`.env` file or shell profile).
 3.  Consult server-specific documentation if applicable.
 4.  Check the example server template for patterns.
+
+## Docker & Redis Integration
+
+- Docker Compose is the preferred way to run the MCP server stack locally and for development.
+- Redis is required for caching and semantic caching. It is included in the Docker Compose setup.
+- All AI coding context for Cursor AI and other agents should be provided via the MCP servers to ensure consistent, up-to-date project context.

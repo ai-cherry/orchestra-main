@@ -106,7 +106,7 @@ class AdapterConfig:
 @click.option("--verbose", "-v", is_flag=True, help="Enable verbose output")
 @click.pass_context
 def cli(ctx, verbose):
-    """Orchestra AI Unified CLI - Manage all aspects of the Orchestra AI system."""
+    """Cherry AI Unified CLI - Manage all aspects of the Cherry AI system."""
     ctx.obj["verbose"] = verbose
 
     # Environment variables for secrets are injected by GCP infra or set in CI/CD.
@@ -217,7 +217,7 @@ def validate(ctx):
         console.print("\n[green]✓ All required secrets are present[/green]")
     else:
         console.print("\n[red]✗ Some required secrets are missing[/red]")
-        console.print("[yellow]Run 'orchestra secrets sync' to fetch from Pulumi[/yellow]")
+        console.print("[yellow]Run 'cherry_ai secrets sync' to fetch from Pulumi[/yellow]")
         sys.exit(1)
 
 @secrets.command()
@@ -403,10 +403,10 @@ def check_adapters_health():
         return False, f"{ready}/{total} adapters ready"
 
 @cli.group()
-def orchestrator():
-    """Manage the orchestration system."""
-    """Reload orchestrator configuration."""
-    console.print("[yellow]Reloading orchestrator configuration...[/yellow]")
+def conductor():
+    """Manage the coordination system."""
+    """Reload conductor configuration."""
+    console.print("[yellow]Reloading conductor configuration...[/yellow]")
 
     try:
 
@@ -418,20 +418,20 @@ def orchestrator():
         # Reload environment (for local/dev only; not used in production)
         # load_dotenv(override=True)
 
-        # Signal orchestrator to reload (this would be implemented based on your orchestrator)
-        console.print("[green]✓ Orchestrator configuration reloaded[/green]")
+        # Signal conductor to reload (this would be implemented based on your conductor)
+        console.print("[green]✓ conductor configuration reloaded[/green]")
     except Exception:
 
         pass
         console.print(f"[red]✗ Failed to reload: {e}[/red]")
 
-@orchestrator.command()
+@conductor.command()
 @click.pass_context
 def status(ctx):
-    """Show orchestrator status."""
-    console.print(Panel("[bold blue]Orchestrator Status[/bold blue]"))
+    """Show conductor status."""
+    console.print(Panel("[bold blue]conductor Status[/bold blue]"))
 
-    # This would connect to your actual orchestrator
+    # This would connect to your actual conductor
     # For now, show configuration status
 
     table = Table()
@@ -459,8 +459,8 @@ def status(ctx):
 @cli.command()
 @click.pass_context
 def init(ctx):
-    """Initialize Orchestra AI system with all checks."""
-    console.print(Panel("[bold blue]Initializing Orchestra AI System[/bold blue]"))
+    """Initialize Cherry AI system with all checks."""
+    console.print(Panel("[bold blue]Initializing Cherry AI System[/bold blue]"))
 
     with Progress(
         SpinnerColumn(),
@@ -482,7 +482,7 @@ def init(ctx):
         ctx.invoke(health)
         progress.update(task, completed=True)
 
-    console.print("\n[green]✓ Orchestra AI system initialized successfully![/green]")
+    console.print("\n[green]✓ Cherry AI system initialized successfully![/green]")
 
 if __name__ == "__main__":
     cli()

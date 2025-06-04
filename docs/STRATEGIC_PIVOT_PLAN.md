@@ -12,7 +12,7 @@ This plan outlines the strategic pivot from EigenCode dependency to a comprehens
    - Recraft integration for design generation
    - DALL-E integration for image creation
    - Claude analysis via OpenRouter
-   - Design orchestrator with workflow automation
+   - Design conductor with workflow automation
    - Comprehensive testing and deployment scripts
 
 2. **Core Infrastructure**
@@ -77,7 +77,7 @@ This plan outlines the strategic pivot from EigenCode dependency to a comprehens
 
 2. **Enhanced Roo Code**
    - Upgrade to Claude Max
-   - Improve architect/code/orchestrator modes
+   - Improve architect/code/conductor modes
    - Better context management
 
 3. **Project Analysis Enhancement**
@@ -118,7 +118,7 @@ This plan outlines the strategic pivot from EigenCode dependency to a comprehens
 
 ### 1. No Duplication Policy
 
-- **USE EXISTING**: Design orchestrator, MCP servers, database infrastructure
+- **USE EXISTING**: Design conductor, MCP servers, database infrastructure
 - **ENHANCE**: Current agent implementations
 - **AVOID**: Creating parallel systems or redundant components
 
@@ -131,8 +131,8 @@ class EnhancedCursorAIAgent(CursorAIAgent):
     async def generate_code(self, spec: Dict) -> Dict
     async def refactor_code(self, code: str, goals: List) -> Dict
 
-# Step 2: Integrate with existing orchestrator
-# No need for new orchestrator - use ai_orchestrator_enhanced.py
+# Step 2: Integrate with existing conductor
+# No need for new conductor - use ai_conductor_enhanced.py
 ```
 
 ### 3. Leverage Existing Infrastructure
@@ -148,7 +148,7 @@ class EnhancedCursorAIAgent(CursorAIAgent):
 
 ```python
 # Location: ai_components/agents/cursor_ai_enhanced.py
-# Integrates with: ai_orchestrator_enhanced.py
+# Integrates with: ai_conductor_enhanced.py
 # Uses: MCP servers, PostgreSQL, Weaviate
 ```
 
@@ -178,11 +178,11 @@ class EnhancedCursorAIAgent(CursorAIAgent):
 
 ```
 ai_components/
-├── orchestration/          # Keep existing
-│   ├── ai_orchestrator.py  # Original
-│   └── ai_orchestrator_enhanced.py  # Enhanced version
+├── coordination/          # Keep existing
+│   ├── ai_conductor.py  # Original
+│   └── ai_conductor_enhanced.py  # Enhanced version
 ├── design/                 # Keep existing UI/UX system
-│   ├── design_orchestrator.py
+│   ├── design_conductor.py
 │   ├── recraft_integration.py
 │   └── dalle_integration.py
 ├── agents/                 # New enhancements here
@@ -195,7 +195,7 @@ ai_components/
 ### 2. Configuration Management
 
 - Use existing `config/` directory
-- Extend `orchestrator_config.json`
+- Extend `conductor_config.json`
 - No new configuration systems
 
 ### 3. Database Schema

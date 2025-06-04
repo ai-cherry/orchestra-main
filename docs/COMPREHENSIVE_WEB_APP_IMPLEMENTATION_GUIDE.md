@@ -19,7 +19,7 @@
 15. [Database Schema & API Design](#database-schema--api-design)
 16. [Authentication & Authorization](#authentication--authorization)
 17. [Microservices Architecture](#microservices-architecture)
-18. [Containerization & Orchestration](#containerization--orchestration)
+18. [Containerization & coordination](#containerization--coordination)
 19. [Testing Frameworks & QA](#testing-frameworks--qa)
 20. [Documentation Standards](#documentation-standards)
 21. [Troubleshooting Guide](#troubleshooting-guide)
@@ -122,8 +122,8 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Orchestra - AI Workflow Platform',
-  description: 'Modern AI-powered workflow orchestration',
+  title: 'cherry_ai - AI Workflow Platform',
+  description: 'Modern AI-powered workflow coordination',
 };
 
 export default function RootLayout({
@@ -279,18 +279,18 @@ const environment = config.require("environment");
 const region = config.get("region") || "ewr";
 
 // VPC Network
-const vpc = new vultr.Vpc("orchestra-vpc", {
+const vpc = new vultr.Vpc("cherry_ai-vpc", {
     region: region,
     v4Subnet: "10.0.0.0",
     v4SubnetMask: 16,
-    description: `Orchestra VPC - ${environment}`,
+    description: `cherry_ai VPC - ${environment}`,
 });
 
 // Kubernetes Cluster
-const cluster = new vultr.Kubernetes("orchestra-k8s", {
+const cluster = new vultr.Kubernetes("cherry_ai-k8s", {
     region: region,
     version: "v1.28.2+1",
-    label: `orchestra-${environment}`,
+    label: `cherry_ai-${environment}`,
     nodePools: [{
         nodeQuantity: 3,
         plan: "vc2-4c-8gb",
@@ -303,12 +303,12 @@ const cluster = new vultr.Kubernetes("orchestra-k8s", {
 });
 
 // Database Instance
-const database = new vultr.Database("orchestra-db", {
+const database = new vultr.Database("cherry_ai-db", {
     databaseEngine: "pg",
     databaseEngineVersion: "15",
     region: region,
     plan: "vultr-dbaas-hobbyist-cc-1-25-1",
-    label: `orchestra-db-${environment}`,
+    label: `cherry_ai-db-${environment}`,
     tag: environment,
     maintenanceDow: "sunday",
     maintenanceTime: "03:00",
@@ -316,26 +316,26 @@ const database = new vultr.Database("orchestra-db", {
 });
 
 // Redis Instance
-const redis = new vultr.Database("orchestra-redis", {
+const redis = new vultr.Database("cherry_ai-redis", {
     databaseEngine: "redis",
     databaseEngineVersion: "7",
     region: region,
     plan: "vultr-dbaas-hobbyist-cc-1-25-1",
-    label: `orchestra-redis-${environment}`,
+    label: `cherry_ai-redis-${environment}`,
     tag: environment,
     redisEvictionPolicy: "allkeys-lru",
 });
 
 // Object Storage
-const objectStore = new vultr.ObjectStorage("orchestra-storage", {
+const objectStore = new vultr.ObjectStorage("cherry_ai-storage", {
     clusterId: 2, // NYC cluster
-    label: `orchestra-storage-${environment}`,
+    label: `cherry_ai-storage-${environment}`,
 });
 
 // Load Balancer
-const loadBalancer = new vultr.LoadBalancer("orchestra-lb", {
+const loadBalancer = new vultr.LoadBalancer("cherry_ai-lb", {
     region: region,
-    label: `orchestra-lb-${environment}`,
+    label: `cherry_ai-lb-${environment}`,
     balancingAlgorithm: "roundrobin",
     forwardingRules: [{
         frontendProtocol: "https",
@@ -373,33 +373,33 @@ export const loadBalancerIp = loadBalancer.ipv4;
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: orchestra-api
-  namespace: orchestra
+  name: cherry_ai-api
+  namespace: cherry_ai
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: orchestra-api
+      app: cherry_ai-api
   template:
     metadata:
       labels:
-        app: orchestra-api
+        app: cherry_ai-api
     spec:
       containers:
       - name: api
-        image: orchestra/api:latest
+        image: cherry_ai/api:latest
         ports:
         - containerPort: 8000
         env:
         - name: DATABASE_URL
           valueFrom:
             secretKeyRef:
-              name: orchestra-secrets
+              name: cherry_ai-secrets
               key: database-url
         - name: REDIS_URL
           valueFrom:
             secretKeyRef:
-              name: orchestra-secrets
+              name: cherry_ai-secrets
               key: redis-url
         resources:
           requests:
@@ -424,11 +424,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: orchestra-api
-  namespace: orchestra
+  name: cherry_ai-api
+  namespace: cherry_ai
 spec:
   selector:
-    app: orchestra-api
+    app: cherry_ai-api
   ports:
   - port: 80
     targetPort: 8000
@@ -437,25 +437,25 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: orchestra-ingress
-  namespace: orchestra
+  name: cherry_ai-ingress
+  namespace: cherry_ai
   annotations:
     kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   tls:
   - hosts:
-    - api.orchestra.example.com
-    secretName: orchestra-tls
+    - api.cherry_ai.example.com
+    secretName: cherry_ai-tls
   rules:
-  - host: api.orchestra.example.com
+  - host: api.cherry_ai.example.com
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: orchestra-api
+            name: cherry_ai-api
             port:
               number: 80
 ```
@@ -465,7 +465,7 @@ spec:
 ## File Structure & Organization
 
 ```bash
-orchestra/
+cherry_ai/
 ├── .github/                    # GitHub Actions workflows
 │   ├── workflows/
 │   │   ├── ci.yml

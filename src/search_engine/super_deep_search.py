@@ -4,6 +4,7 @@
 import asyncio
 import logging
 from typing import Dict, List, Any, Optional
+from typing_extensions import Optional
 
 from .deep_search import DeepSearcher
 from ..utils.circuit_breaker import circuit_breaker

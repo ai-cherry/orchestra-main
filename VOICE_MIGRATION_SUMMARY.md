@@ -1,7 +1,7 @@
 # Voice Service Migration: Resemble AI to ElevenLabs
 
 ## Migration Summary
-This document summarizes the migration from Resemble AI to ElevenLabs for voice synthesis in the Orchestra AI project.
+This document summarizes the migration from Resemble AI to ElevenLabs for voice synthesis in the Cherry AI project.
 
 ## Changes Made
 

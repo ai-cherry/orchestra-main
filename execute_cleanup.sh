@@ -1,5 +1,5 @@
 #!/bin/bash
-# Execute Cleanup Script for Orchestra
+# Execute Cleanup Script for cherry_ai
 #
 # This script implements the cleanup plan documented in final_cleanup_plan.md
 # Updated: May 2025
@@ -17,7 +17,7 @@ NC='\033[0m' # No Color
 BLUE='\033[0;34m'
 
 echo -e "${BLUE}========================================================${NC}"
-echo -e "${BLUE}      Orchestra Redundancy Elimination Execution        ${NC}"
+echo -e "${BLUE}      cherry_ai Redundancy Elimination Execution        ${NC}"
 echo -e "${BLUE}========================================================${NC}"
 
 # Confirm before proceeding
@@ -32,13 +32,13 @@ fi
 echo -e "${YELLOW}Checking prerequisites...${NC}"
 
 # Check that FirestoreMemoryManagerV2 exists
-if [ ! -f "/workspaces/orchestra-main/packages/shared/src/storage/firestore/v2/adapter.py" ]; then
+if [ ! -f "/workspaces/cherry_ai-main/packages/shared/src/storage/firestore/v2/adapter.py" ]; then
     echo -e "${RED}Error: FirestoreMemoryManagerV2 not found at expected location.${NC}"
     exit 1
 fi
 
 # Check that unified scripts exist
-if [ ! -f "/workspaces/orchestra-main/unified_setup.sh" ] || [ ! -f "/workspaces/orchestra-main/unified_diagnostics.py" ]; then
+if [ ! -f "/workspaces/cherry_ai-main/unified_setup.sh" ] || [ ! -f "/workspaces/cherry_ai-main/unified_diagnostics.py" ]; then
     echo -e "${RED}Error: Unified scripts not found.${NC}"
     exit 1
 fi
@@ -59,9 +59,9 @@ FILES_TO_REMOVE=(
 )
 
 for file in "${FILES_TO_REMOVE[@]}"; do
-    if [ -f "/workspaces/orchestra-main/$file" ]; then
+    if [ -f "/workspaces/cherry_ai-main/$file" ]; then
         echo "Removing $file..."
-        git rm "/workspaces/orchestra-main/$file"
+        git rm "/workspaces/cherry_ai-main/$file"
     else
         echo "File $file not found, skipping removal."
     fi
@@ -73,29 +73,29 @@ echo -e "${GREEN}Deprecated files removed successfully.${NC}"
 echo -e "${YELLOW}Step 2: Fixing import issues...${NC}"
 
 echo "Creating a backup of files with import issues..."
-BACKUP_DIR="/workspaces/orchestra-main/backups/import_fixes_$(date +%Y%m%d_%H%M%S)"
+BACKUP_DIR="/workspaces/cherry_ai-main/backups/import_fixes_$(date +%Y%m%d_%H%M%S)"
 mkdir -p "$BACKUP_DIR"
 
 # Find files with deprecated imports and back them up
-grep -r --include="*.py" "from packages.memory.src.base" /workspaces/orchestra-main | awk -F: '{print $1}' | sort -u | xargs -I{} cp {} "$BACKUP_DIR"/
+grep -r --include="*.py" "from packages.memory.src.base" /workspaces/cherry_ai-main | awk -F: '{print $1}' | sort -u | xargs -I{} cp {} "$BACKUP_DIR"/
 
 echo "Updating imports from packages.memory.src.base to packages.shared.src.memory.memory_manager..."
-find /workspaces/orchestra-main -type f -name "*.py" -exec sed -i 's/from packages\.memory\.src\.base import MemoryManager/from packages.shared.src.memory.memory_manager import MemoryManager/g' {} \;
+find /workspaces/cherry_ai-main -type f -name "*.py" -exec sed -i 's/from packages\.memory\.src\.base import MemoryManager/from packages.shared.src.memory.memory_manager import MemoryManager/g' {} \;
 
 # Also update any other outdated imports
 echo "Updating additional deprecated imports..."
-find /workspaces/orchestra-main -type f -name "*.py" -exec sed -i 's/from packages\.shared\.src\.storage\.firestore\.firestore_memory import FirestoreMemoryManager/from packages.shared.src.storage.firestore.v2.adapter import FirestoreMemoryManagerV2/g' {} \;
+find /workspaces/cherry_ai-main -type f -name "*.py" -exec sed -i 's/from packages\.shared\.src\.storage\.firestore\.firestore_memory import FirestoreMemoryManager/from packages.shared.src.storage.firestore.v2.adapter import FirestoreMemoryManagerV2/g' {} \;
 
 echo -e "${GREEN}Import issues fixed. Backup created in $BACKUP_DIR${NC}"
 
 # Step 3: Create documentation
 echo -e "${YELLOW}Step 3: Creating documentation for memory system structure...${NC}"
 
-mkdir -p /workspaces/orchestra-main/docs
-cat > /workspaces/orchestra-main/docs/MEMORY_SYSTEM_STRUCTURE.md << 'EOF'
+mkdir -p /workspaces/cherry_ai-main/docs
+cat > /workspaces/cherry_ai-main/docs/MEMORY_SYSTEM_STRUCTURE.md << 'EOF'
 # Memory System Structure
 
-This document outlines the current structure of the memory system components in Orchestra.
+This document outlines the current structure of the memory system components in cherry_ai.
 
 ## Directory Structure
 
@@ -153,17 +153,17 @@ Note that initialization parameters are compatible between versions.
 ## Workload Identity Federation
 
 For production deployments, always use Workload Identity Federation instead of service account keys.
-See the `orchestra_wif_master.sh` script for setting up Workload Identity Federation.
+See the `cherry_ai_wif_master.sh` script for setting up Workload Identity Federation.
 EOF
 
-echo -e "${GREEN}Documentation created at /workspaces/orchestra-main/docs/MEMORY_SYSTEM_STRUCTURE.md${NC}"
+echo -e "${GREEN}Documentation created at /workspaces/cherry_ai-main/docs/MEMORY_SYSTEM_STRUCTURE.md${NC}"
 
 # Step 4: Add detailed deprecation notice to FirestoreMemoryManager
 echo -e "${YELLOW}Step 4: Adding detailed deprecation notice to FirestoreMemoryManager...${NC}"
 
-if [ -f "/workspaces/orchestra-main/add_deprecation_notices.py" ]; then
-    chmod +x /workspaces/orchestra-main/add_deprecation_notices.py
-    /workspaces/orchestra-main/add_deprecation_notices.py --file packages/shared/src/storage/firestore/firestore_memory.py
+if [ -f "/workspaces/cherry_ai-main/add_deprecation_notices.py" ]; then
+    chmod +x /workspaces/cherry_ai-main/add_deprecation_notices.py
+    /workspaces/cherry_ai-main/add_deprecation_notices.py --file packages/shared/src/storage/firestore/firestore_memory.py
     echo -e "${GREEN}Deprecation notice added to FirestoreMemoryManager.${NC}"
 else
     echo -e "${YELLOW}Warning: add_deprecation_notices.py not found, adding deprecation notice manually...${NC}"
@@ -210,7 +210,7 @@ fi
 echo -e "${YELLOW}Step 5: Checking for hardcoded organization references...${NC}"
 
 # Look for hardcoded references to 'ai-cherry' organization and suggest updating them
-HARDCODED_ORG_FILES=$(grep -l "ai-cherry" --include="*.sh" --include="*.py" --include="*.yml" --include="*.yaml" /workspaces/orchestra-main)
+HARDCODED_ORG_FILES=$(grep -l "ai-cherry" --include="*.sh" --include="*.py" --include="*.yml" --include="*.yaml" /workspaces/cherry_ai-main)
 
 if [ -n "$HARDCODED_ORG_FILES" ]; then
     echo -e "${YELLOW}Found hardcoded organization references in the following files:${NC}"
@@ -220,7 +220,7 @@ if [ -n "$HARDCODED_ORG_FILES" ]; then
     read -p "Would you like to see examples of the hardcoded references? (y/n) " -n 1 -r
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
-        grep -n "ai-cherry" --include="*.sh" --include="*.py" --include="*.yml" --include="*.yaml" /workspaces/orchestra-main | head -10
+        grep -n "ai-cherry" --include="*.sh" --include="*.py" --include="*.yml" --include="*.yaml" /workspaces/cherry_ai-main | head -10
     fi
 
     read -p "Would you like to automatically update these references to use environment variables? (y/n) " -n 1 -r
@@ -234,7 +234,7 @@ if [ -n "$HARDCODED_ORG_FILES" ]; then
         done
 
         # Update the files
-        find /workspaces/orchestra-main -type f \( -name "*.sh" -o -name "*.py" -o -name "*.yml" -o -name "*.yaml" \) -exec sed -i 's/ai-cherry/${GITHUB_ORG:-ai-cherry}/g' {} \;
+        find /workspaces/cherry_ai-main -type f \( -name "*.sh" -o -name "*.py" -o -name "*.yml" -o -name "*.yaml" \) -exec sed -i 's/ai-cherry/${GITHUB_ORG:-ai-cherry}/g' {} \;
 
         echo -e "${GREEN}Updated hardcoded references. Backups created with .bak extension.${NC}"
     fi
@@ -245,7 +245,7 @@ fi
 # Step 6: Verify changes and commit
 echo -e "${YELLOW}Step 6: Verifying changes...${NC}"
 
-git add /workspaces/orchestra-main/docs/MEMORY_SYSTEM_STRUCTURE.md
+git add /workspaces/cherry_ai-main/docs/MEMORY_SYSTEM_STRUCTURE.md
 git status -s
 
 echo -e "${GREEN}=============================================================${NC}"

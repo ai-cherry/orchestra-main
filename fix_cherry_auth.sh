@@ -7,15 +7,15 @@ echo "🔧 Fixing Cherry-AI.me Authentication Issues..."
 
 # 1. Rebuild the backend with new auth endpoints
 echo "📦 Building backend Docker image..."
-docker build -t orchestra-api:latest -f Dockerfile .
+docker build -t cherry_ai-api:latest -f Dockerfile .
 
 # 2. Tag for Vultr registry (adjust registry URL as needed)
 echo "🏷️ Tagging for Vultr registry..."
-docker tag orchestra-api:latest registry.vultr.com/orchestra/api:latest
+docker tag cherry_ai-api:latest registry.vultr.com/cherry_ai/api:latest
 
 # 3. Push to registry
 echo "📤 Pushing to registry..."
-docker push registry.vultr.com/orchestra/api:latest
+docker push registry.vultr.com/cherry_ai/api:latest
 
 # 4. Rebuild frontend with updated login
 echo "📦 Building frontend..."
@@ -26,12 +26,12 @@ cd ..
 
 # 5. Build frontend Docker image
 echo "🐳 Building frontend Docker image..."
-docker build -t orchestra-admin-ui:latest -f admin-ui/Dockerfile ./admin-ui
+docker build -t cherry_ai-admin-ui:latest -f admin-ui/Dockerfile ./admin-ui
 
 # 6. Tag and push frontend
 echo "🏷️ Tagging frontend for registry..."
-docker tag orchestra-admin-ui:latest registry.vultr.com/orchestra/admin-ui:latest
-docker push registry.vultr.com/orchestra/admin-ui:latest
+docker tag cherry_ai-admin-ui:latest registry.vultr.com/cherry_ai/admin-ui:latest
+docker push registry.vultr.com/cherry_ai/admin-ui:latest
 
 # 7. Restart services (adjust based on your deployment method)
 echo "🔄 Restarting services..."
@@ -39,8 +39,8 @@ echo "🔄 Restarting services..."
 # ssh vultr-server "cd /app && docker-compose pull && docker-compose up -d"
 
 # If using Kubernetes:
-# kubectl rollout restart deployment/orchestra-api
-# kubectl rollout restart deployment/orchestra-admin-ui
+# kubectl rollout restart deployment/cherry_ai-api
+# kubectl rollout restart deployment/cherry_ai-admin-ui
 
 echo "✅ Fix deployed! The authentication should now work properly."
 echo ""

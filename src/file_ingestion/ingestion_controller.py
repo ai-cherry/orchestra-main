@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""File ingestion controller for Orchestra AI"""
+"""File ingestion controller for Cherry AI"""
 
 import asyncio
 import logging
 from pathlib import Path
 from typing import Dict, Any, List, Optional
+from typing_extensions import Optional
 
 logger = logging.getLogger(__name__)
 

@@ -3,7 +3,7 @@
 
 set -euo pipefail
 
-echo "🚀 Orchestra Safe Install"
+echo "🚀 cherry_ai Safe Install"
 echo "========================"
 
 # Ensure we're in venv

@@ -1,6 +1,6 @@
-# Secure Credential Management for AI Orchestra
+# Secure Credential Management for AI cherry_ai
 
-This document outlines the secure credential management architecture for the AI Orchestra project, including best practices, implementation details, and usage examples.
+This document outlines the secure credential management architecture for the AI cherry_ai project, including best practices, implementation details, and usage examples.
 
 ## Table of Contents
 
@@ -14,7 +14,7 @@ This document outlines the secure credential management architecture for the AI 
 
 ## Overview
 
-AI Orchestra requires secure access to various
+AI cherry_ai requires secure access to various
 Key features:
 
 - Secret storage in - Service account management with least privilege
@@ -51,7 +51,7 @@ The secure credential management architecture follows a multi-layered approach:
 
 ## Security Best Practices
 
-The AI Orchestra credential management system follows these security best practices:
+The AI cherry_ai credential management system follows these security best practices:
 
 1. **Least Privilege Principle**
 
@@ -120,11 +120,11 @@ config = credential_manager.get_json_secret("app-config")
 
 ### 3. FastAPI Dependencies
 
-The `core/orchestrator/src/api/dependencies/credentials.py` module provides FastAPI dependencies for injecting credentials:
+The `core/conductor/src/api/dependencies/credentials.py` module provides FastAPI dependencies for injecting credentials:
 
 ```python
 from fastapi import Depends, FastAPI
-from core.orchestrator.src.api.dependencies.credentials import get_vertex_ai_credentials
+from core.conductor.src.api.dependencies.credentials import get_vertex_ai_credentials
 
 app = FastAPI()
 
@@ -144,7 +144,7 @@ secure_credentials = ComponentResource( {
   region      = var.region
   env         = var.env
   github_org  = "ai-cherry"
-  github_repo = "orchestra-main"
+  github_repo = "cherry_ai-main"
 }
 ```
 
@@ -154,7 +154,7 @@ secure_credentials = ComponentResource( {
 ```python
 from fastapi import Depends, FastAPI
 from google.cloud import aiplatform
-from core.orchestrator.src.api.dependencies.credentials import get_vertex_ai_credentials
+from core.conductor.src.api.dependencies.credentials import get_vertex_ai_credentials
 
 app = FastAPI()
 
@@ -203,9 +203,9 @@ jobs:
 
       # Deploy to       - name: Deploy to         uses: google-github-actions/deploy-cloudrun@v1
         with:
-          service: ai-orchestra
+          service: ai-cherry_ai
           region: us-central1
-          image: gcr.io/cherry-ai-project/ai-orchestra:${{ github.sha }}
+          image: gcr.io/cherry-ai-project/ai-cherry_ai:${{ github.sha }}
 ```
 
 ### Example 3: CLI Script
@@ -230,7 +230,7 @@ rm -f "$GOOGLE_APPLICATION_CREDENTIALS"
 
 ## Credential Rotation
 
-Credentials should be rotated regularly to minimize the risk of compromise. The AI Orchestra project implements automatic rotation for service account keys.
+Credentials should be rotated regularly to minimize the risk of compromise. The AI cherry_ai project implements automatic rotation for service account keys.
 
 ### Manual Rotation
 

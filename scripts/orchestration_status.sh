@@ -1,8 +1,8 @@
 #!/bin/bash
-# Display AI Orchestration System Status
+# Display AI coordination System Status
 
 echo "╔══════════════════════════════════════════════════════════════════╗"
-echo "║           AI ORCHESTRATION SYSTEM STATUS REPORT                  ║"
+echo "║           AI COORDINATION SYSTEM STATUS REPORT                  ║"
 echo "╚══════════════════════════════════════════════════════════════════╝"
 echo
 
@@ -11,10 +11,10 @@ echo "📊 DATABASE STATUS"
 echo "─────────────────"
 if sudo -u postgres psql -c "SELECT 1" &>/dev/null; then
     echo "✅ PostgreSQL: Running"
-    if sudo -u postgres psql -d orchestra -c "SELECT 1" &>/dev/null; then
-        echo "✅ Orchestra Database: Available"
+    if sudo -u postgres psql -d cherry_ai -c "SELECT 1" &>/dev/null; then
+        echo "✅ cherry_ai Database: Available"
     else
-        echo "❌ Orchestra Database: Not accessible"
+        echo "❌ cherry_ai Database: Not accessible"
     fi
 else
     echo "❌ PostgreSQL: Not running"
@@ -32,7 +32,7 @@ else
     echo "❌ .env file: Missing"
 fi
 
-if [ -f /etc/systemd/system/ai-orchestrator.service ]; then
+if [ -f /etc/systemd/system/ai-conductor.service ]; then
     echo "✅ Systemd Services: Configured"
 else
     echo "⚠️  Systemd Services: Not configured (run as root)"
@@ -83,17 +83,17 @@ echo
 # Quick Actions
 echo "🚀 QUICK ACTIONS"
 echo "───────────────"
-echo "1. Test AI Orchestrator:"
-echo "   python3 ai_components/orchestration/ai_orchestrator.py"
+echo "1. Test AI conductor:"
+echo "   python3 ai_components/coordination/ai_conductor.py"
 echo
 echo "2. Configure GitHub Secrets:"
 echo "   ./scripts/setup_github_secrets.sh"
 echo
 echo "3. View logs:"
-echo "   tail -f ai_components/logs/orchestrator.log"
+echo "   tail -f ai_components/logs/conductor.log"
 echo
 echo "4. Check service status:"
-echo "   sudo systemctl status ai-orchestrator"
+echo "   sudo systemctl status ai-conductor"
 echo
 
 echo "╔══════════════════════════════════════════════════════════════════╗"

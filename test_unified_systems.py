@@ -146,7 +146,7 @@ async def test_integration():
 
 async def main():
     """Run all tests."""
-    print("🚀 Orchestra AI Unified Systems Test Suite")
+    print("🚀 Cherry AI Unified Systems Test Suite")
     print("=" * 50)
     
     results = []

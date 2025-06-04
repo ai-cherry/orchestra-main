@@ -93,21 +93,21 @@ jobs:
       
       - name: Build Docker images
         run: |
-          docker build -t orchestra-api:${{ github.sha }} -f Dockerfile.minimal .
-          docker build -t orchestra-webscraping:${{ github.sha }} -f Dockerfile.webscraping .
+          docker build -t cherry_ai-api:${{ github.sha }} -f Dockerfile.minimal .
+          docker build -t cherry_ai-webscraping:${{ github.sha }} -f Dockerfile.webscraping .
       
       - name: Save Docker images
         run: |
-          docker save orchestra-api:${{ github.sha }} | gzip > orchestra-api.tar.gz
-          docker save orchestra-webscraping:${{ github.sha }} | gzip > orchestra-webscraping.tar.gz
+          docker save cherry_ai-api:${{ github.sha }} | gzip > cherry_ai-api.tar.gz
+          docker save cherry_ai-webscraping:${{ github.sha }} | gzip > cherry_ai-webscraping.tar.gz
       
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
           name: docker-images
           path: |
-            orchestra-api.tar.gz
-            orchestra-webscraping.tar.gz
+            cherry_ai-api.tar.gz
+            cherry_ai-webscraping.tar.gz
 
   deploy-staging:
     needs: build

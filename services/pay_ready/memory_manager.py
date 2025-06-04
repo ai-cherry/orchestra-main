@@ -1,5 +1,8 @@
 # TODO: Consider adding connection pooling configuration
 """
+PayReadyMemoryManager
+
+Redis is permitted and recommended for the warm cache tier and semantic caching. The warm cache should use Redis for optimal performance. Docker is the preferred way to run the full stack locally.
 """
     """Memory tier levels"""
     HOT = "hot"  # In-memory cache (last 24 hours)

@@ -3,7 +3,7 @@
 
 set -e
 
-echo "🚀 Deploying Orchestra AI to Vultr..."
+echo "🚀 Deploying Cherry AI to Vultr..."
 
 # Check for required tools
 command -v pulumi >/dev/null 2>&1 || { echo "❌ Pulumi CLI not found. Please install it first."; exit 1; }
@@ -15,15 +15,15 @@ export VULTR_API_KEY=${VULTR_API_KEY:?Please set VULTR_API_KEY}
 
 # Build Docker images
 echo "📦 Building Docker images..."
-docker build -t orchestra-api:latest -f Dockerfile .
-docker build -t orchestra-admin-ui:latest -f admin-ui/Dockerfile ./admin-ui
+docker build -t cherry_ai-api:latest -f Dockerfile .
+docker build -t cherry_ai-admin-ui:latest -f admin-ui/Dockerfile ./admin-ui
 
 # Push to Vultr Container Registry
 echo "📤 Pushing to Vultr Container Registry..."
-docker tag orchestra-api:latest registry.vultr.com/orchestra/api:latest
-docker tag orchestra-admin-ui:latest registry.vultr.com/orchestra/admin-ui:latest
-docker push registry.vultr.com/orchestra/api:latest
-docker push registry.vultr.com/orchestra/admin-ui:latest
+docker tag cherry_ai-api:latest registry.vultr.com/cherry_ai/api:latest
+docker tag cherry_ai-admin-ui:latest registry.vultr.com/cherry_ai/admin-ui:latest
+docker push registry.vultr.com/cherry_ai/api:latest
+docker push registry.vultr.com/cherry_ai/admin-ui:latest
 
 # Deploy with Pulumi
 echo "🏗️ Deploying infrastructure with Pulumi..."

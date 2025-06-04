@@ -1,8 +1,8 @@
 #!/bin/bash
-# Setup API keys for Orchestra AI
+# Setup API keys for Cherry AI
 # This script should be run locally and NOT committed with actual keys
 
-echo "🔐 Setting up API keys for Orchestra AI"
+echo "🔐 Setting up API keys for Cherry AI"
 
 # Check if .env exists
 if [ ! -f .env ]; then

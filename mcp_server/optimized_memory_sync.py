@@ -68,13 +68,13 @@ def run_demo():
     print("1. Creating and sharing small memory item...")
     manager.share_memory(
         "project_info",
-        "AI Orchestra - A framework for orchestrating multiple AI tools",
+        "AI cherry_ai - A framework for cherry_aiting multiple AI tools",
         "roo",
     )
 
     print("\n2. Creating and sharing medium memory item...")
     medium_content = {
-        "project": "AI Orchestra",
+        "project": "AI cherry_ai",
         "components": ["Memory Sync", "Task Router", "Mode Manager"],
         "status": "In Development",
     }

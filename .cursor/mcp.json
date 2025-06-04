@@ -1,41 +1,44 @@
 {
   "mcp-servers": {
-    "memory": {
+    "code-intelligence": {
       "command": "python",
-      "args": ["mcp_server/servers/memory_server.py"],
+      "args": [
+        "mcp_server/servers/code_intelligence_server.py"
+      ],
       "env": {
-        "DATABASE_URL": "postgresql://postgres:your_password@localhost:5432/orchestra",
-        "WEAVIATE_URL": "http://localhost:8082",
-        "WEAVIATE_API_KEY": "your-weaviate-key"
+        "REDIS_URL": "${REDIS_URL:-redis://redis:6379}",
+        "MCP_CODE_INTELLIGENCE_PORT": "${MCP_CODE_INTELLIGENCE_PORT:-8007}"
       }
     },
-    "orchestrator": {
+    "git-intelligence": {
       "command": "python",
-      "args": ["mcp_server/servers/orchestrator_server.py"],
+      "args": [
+        "mcp_server/servers/git_intelligence_server.py"
+      ],
       "env": {
-        "DATABASE_URL": "postgresql://postgres:your_password@localhost:5432/orchestra"
+        "REDIS_URL": "${REDIS_URL:-redis://redis:6379}",
+        "MCP_GIT_INTELLIGENCE_PORT": "${MCP_GIT_INTELLIGENCE_PORT:-8008}"
       }
     },
     "tools": {
       "command": "python",
-      "args": ["mcp_server/servers/tools_server.py"],
+      "args": [
+        "mcp_server/servers/tools_server.py"
+      ],
       "env": {
-        "PORTKEY_API_KEY": "your-portkey-key"
+        "REDIS_URL": "${REDIS_URL:-redis://redis:6379}",
+        "MCP_TOOLS_PORT": "${MCP_TOOLS_PORT:-8006}"
       }
     },
-    "weaviate": {
+    "memory": {
       "command": "python",
-      "args": ["mcp_server/servers/weaviate_server.py"],
+      "args": [
+        "mcp_server/servers/memory_server.py"
+      ],
       "env": {
-        "WEAVIATE_URL": "http://localhost:8082",
-        "WEAVIATE_API_KEY": "your-weaviate-key"
-      }
-    },
-    "postgres": {
-      "command": "python",
-      "args": ["mcp_server/servers/postgres_server.py"],
-      "env": {
-        "DATABASE_URL": "postgresql://postgres:your_password@localhost:5432/orchestra"
+        "REDIS_URL": "${REDIS_URL:-redis://redis:6379}",
+        "MCP_MEMORY_PORT": "${MCP_MEMORY_PORT:-8003}",
+        "POSTGRES_URL": "postgresql://postgres:postgres@postgres:5432/cherry_ai"
       }
     }
   }

@@ -1,15 +1,15 @@
-# Orchestrator Landing Page - Implementation Guide & Code Handoff
+# conductor Landing Page - Implementation Guide & Code Handoff
 
 ## Overview
-This document provides a complete implementation guide for the Orchestrator Landing Page, consolidating all architectural decisions, component specifications, and integration requirements for immediate development.
+This document provides a complete implementation guide for the conductor Landing Page, consolidating all architectural decisions, component specifications, and integration requirements for immediate development.
 
 ## Project Structure
 
 ```
 admin-ui/src/
 ├── components/
-│   └── orchestrator/
-│       ├── OrchestratorLandingPage.tsx
+│   └── conductor/
+│       ├── conductorLandingPage.tsx
 │       ├── layout/
 │       │   ├── Header.tsx
 │       │   ├── Footer.tsx
@@ -41,7 +41,7 @@ admin-ui/src/
 │           ├── ErrorBoundary.tsx
 │           └── VirtualList.tsx
 ├── store/
-│   └── orchestratorStore.ts
+│   └── conductorStore.ts
 ├── services/
 │   ├── api/
 │   │   ├── httpClient.ts
@@ -49,22 +49,22 @@ admin-ui/src/
 │   │   ├── voiceAPI.ts
 │   │   └── fileAPI.ts
 │   └── websocket/
-│       ├── OrchestratorWebSocket.ts
+│       ├── conductorWebSocket.ts
 │       └── websocketEvents.ts
 ├── hooks/
-│   ├── useOrchestratorSearch.ts
+│   ├── useconductorSearch.ts
 │   ├── useVoiceRecording.ts
 │   ├── useFileUpload.ts
 │   └── useWebSocket.ts
 ├── types/
-│   └── orchestrator.types.ts
+│   └── conductor.types.ts
 ├── utils/
 │   ├── circuitBreaker.ts
 │   ├── debounce.ts
 │   ├── formatters.ts
 │   └── validators.ts
 └── routes/
-    └── orchestrator.tsx
+    └── conductor.tsx
 ```
 
 ## Implementation Steps
@@ -73,7 +73,7 @@ admin-ui/src/
 Create the base type definitions that will be used throughout the application.
 
 ```typescript
-// types/orchestrator.types.ts
+// types/conductor.types.ts
 export type InputMode = 'text' | 'voice' | 'file';
 export type SearchMode = 'creative' | 'deep' | 'super_deep';
 export type FileStatus = 'queued' | 'downloading' | 'completed' | 'failed' | 'cancelled';
@@ -88,20 +88,20 @@ export interface SearchResult {
   metadata?: Record<string, any>;
 }
 
-// ... (include all types from orchestrator_component_specifications.md)
+// ... (include all types from conductor_component_specifications.md)
 ```
 
 ### Step 2: Zustand Store Setup
-Implement the orchestrator store with all required state and actions.
+Implement the conductor store with all required state and actions.
 
 ```typescript
-// store/orchestratorStore.ts
+// store/conductorStore.ts
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { subscribeWithSelector } from 'zustand/middleware';
 import { searchAPI, voiceAPI, fileAPI } from '@/services/api';
 
-interface OrchestratorState {
+interface conductorState {
   // State definitions from architecture document
   search: SearchState;
   voice: VoiceState;
@@ -109,10 +109,10 @@ interface OrchestratorState {
   ui: UIState;
   
   // Actions
-  actions: OrchestratorActions;
+  actions: conductorActions;
 }
 
-export const useOrchestratorStore = create<OrchestratorState>()(
+export const useconductorStore = create<conductorState>()(
   subscribeWithSelector(
     persist(
       (set, get) => ({
@@ -171,7 +171,7 @@ export const useOrchestratorStore = create<OrchestratorState>()(
         },
       }),
       {
-        name: 'orchestrator-storage',
+        name: 'conductor-storage',
         storage: createJSONStorage(() => localStorage),
         partialize: (state) => ({
           search: { mode: state.search.mode },
@@ -193,12 +193,12 @@ import axios from 'axios';
 import { API_CONFIG } from '@/config/api.config';
 
 // Implement base HTTP client with interceptors
-// (Use code from orchestrator_api_integration.md)
+// (Use code from conductor_api_integration.md)
 
 // services/api/searchAPI.ts
 export class SearchAPI {
   // Implement search methods with circuit breaker
-  // (Use code from orchestrator_api_integration.md)
+  // (Use code from conductor_api_integration.md)
 }
 
 // services/api/voiceAPI.ts
@@ -216,23 +216,23 @@ export class FileAPI {
 Set up the WebSocket connection for real-time updates.
 
 ```typescript
-// services/websocket/OrchestratorWebSocket.ts
-// (Use the complete implementation from orchestrator_api_integration.md)
+// services/websocket/conductorWebSocket.ts
+// (Use the complete implementation from conductor_api_integration.md)
 
 // hooks/useWebSocket.ts
 import { useEffect, useRef } from 'react';
-import { OrchestratorWebSocket } from '@/services/websocket';
-import { useOrchestratorStore } from '@/store/orchestratorStore';
+import { conductorWebSocket } from '@/services/websocket';
+import { useconductorStore } from '@/store/conductorStore';
 
 export const useWebSocket = () => {
-  const wsRef = useRef<OrchestratorWebSocket | null>(null);
-  const { actions } = useOrchestratorStore();
+  const wsRef = useRef<conductorWebSocket | null>(null);
+  const { actions } = useconductorStore();
   
   useEffect(() => {
     const token = localStorage.getItem('auth-token');
     if (!token) return;
     
-    wsRef.current = new OrchestratorWebSocket(
+    wsRef.current = new conductorWebSocket(
       API_CONFIG.wsURL,
       token
     );
@@ -261,10 +261,10 @@ export const useWebSocket = () => {
 
 #### Main Landing Page Component
 ```typescript
-// components/orchestrator/OrchestratorLandingPage.tsx
+// components/conductor/conductorLandingPage.tsx
 import { FC, Suspense, lazy } from 'react';
 import { PageWrapper } from '@/components/layout/PageWrapper';
-import { useOrchestratorStore } from '@/store/orchestratorStore';
+import { useconductorStore } from '@/store/conductorStore';
 import { useWebSocket } from '@/hooks/useWebSocket';
 import { Header } from './layout/Header';
 import { SearchSection } from './search/SearchSection';
@@ -275,12 +275,12 @@ import { LoadingSection } from './common/LoadingSection';
 const VoiceSection = lazy(() => import('./voice/VoiceSection'));
 const FileManager = lazy(() => import('./files/FileManager'));
 
-export const OrchestratorLandingPage: FC = () => {
-  const { ui } = useOrchestratorStore();
+export const conductorLandingPage: FC = () => {
+  const { ui } = useconductorStore();
   const ws = useWebSocket();
   
   return (
-    <PageWrapper className="orchestrator-landing bg-[#181111] min-h-screen">
+    <PageWrapper className="conductor-landing bg-[#181111] min-h-screen">
       <Header />
       <main className="flex-1 overflow-hidden">
         <div className="container mx-auto px-4 py-6 max-w-6xl">
@@ -301,30 +301,30 @@ export const OrchestratorLandingPage: FC = () => {
 
 #### Search Components
 ```typescript
-// components/orchestrator/search/SearchInput.tsx
-// (Use the complete implementation from orchestrator_component_specifications.md)
+// components/conductor/search/SearchInput.tsx
+// (Use the complete implementation from conductor_component_specifications.md)
 
-// components/orchestrator/search/SearchSection.tsx
-// (Use the complete implementation from orchestrator_component_specifications.md)
+// components/conductor/search/SearchSection.tsx
+// (Use the complete implementation from conductor_component_specifications.md)
 ```
 
 ### Step 6: Route Configuration
-Add the orchestrator route to the routing system.
+Add the conductor route to the routing system.
 
 ```typescript
-// routes/orchestrator.tsx
+// routes/conductor.tsx
 import { createFileRoute } from '@tanstack/react-router';
-import { OrchestratorLandingPage } from '@/components/orchestrator/OrchestratorLandingPage';
+import { conductorLandingPage } from '@/components/conductor/conductorLandingPage';
 
-export const Route = createFileRoute('/orchestrator')({
-  component: OrchestratorLandingPage,
+export const Route = createFileRoute('/conductor')({
+  component: conductorLandingPage,
   beforeLoad: async ({ context }) => {
     // Ensure user is authenticated
     if (!context.auth.isAuthenticated) {
       throw redirect({
         to: '/login',
         search: {
-          redirect: '/orchestrator',
+          redirect: '/conductor',
         },
       });
     }
@@ -341,7 +341,7 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        orchestrator: {
+        conductor: {
           bg: '#181111',
           card: '#261C1C',
           border: '#382929',
@@ -361,19 +361,19 @@ module.exports = {
 
 #### Virtual List Implementation
 ```typescript
-// components/orchestrator/common/VirtualList.tsx
-// (Use the implementation from orchestrator_landing_architecture.md)
+// components/conductor/common/VirtualList.tsx
+// (Use the implementation from conductor_landing_architecture.md)
 ```
 
 #### Debounced Search Hook
 ```typescript
-// hooks/useOrchestratorSearch.ts
+// hooks/useconductorSearch.ts
 import { useCallback, useEffect, useMemo } from 'react';
-import { useOrchestratorStore } from '@/store/orchestratorStore';
+import { useconductorStore } from '@/store/conductorStore';
 import { debounce } from '@/utils/debounce';
 
-export const useOrchestratorSearch = () => {
-  const { search, actions } = useOrchestratorStore();
+export const useconductorSearch = () => {
+  const { search, actions } = useconductorStore();
   
   const debouncedSearch = useMemo(
     () => debounce(actions.performSearch, 300),
@@ -403,7 +403,7 @@ export const useOrchestratorSearch = () => {
 ### Step 9: Error Handling
 
 ```typescript
-// components/orchestrator/common/ErrorBoundary.tsx
+// components/conductor/common/ErrorBoundary.tsx
 import { Component, ErrorInfo, ReactNode } from 'react';
 
 interface Props {
@@ -427,7 +427,7 @@ export class ErrorBoundary extends Component<Props, State> {
   }
   
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('Orchestrator Error:', error, errorInfo);
+    console.error('conductor Error:', error, errorInfo);
     // Send to error tracking service
   }
   
@@ -455,7 +455,7 @@ export class ErrorBoundary extends Component<Props, State> {
 ### Step 10: Testing Setup
 
 ```typescript
-// components/orchestrator/__tests__/SearchInput.test.tsx
+// components/conductor/__tests__/SearchInput.test.tsx
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { SearchInput } from '../search/SearchInput';
 
@@ -539,8 +539,8 @@ describe('SearchInput', () => {
 ### Environment Variables
 ```bash
 # .env.production
-VITE_API_URL=https://api.orchestrator.com
-VITE_WS_URL=wss://api.orchestrator.com/ws
+VITE_API_URL=https://api.conductor.com
+VITE_WS_URL=wss://api.conductor.com/ws
 VITE_MAX_FILE_SIZE=10485760
 VITE_ALLOWED_FILE_TYPES=image/*,application/pdf,text/*
 VITE_VOICE_LANGUAGES=en-US,es-ES,fr-FR,de-DE
@@ -554,8 +554,8 @@ VITE_VOICE_LANGUAGES=en-US,es-ES,fr-FR,de-DE
     rollupOptions: {
       output: {
         manualChunks: {
-          'orchestrator-voice': ['./src/components/orchestrator/voice'],
-          'orchestrator-files': ['./src/components/orchestrator/files'],
+          'conductor-voice': ['./src/components/conductor/voice'],
+          'conductor-files': ['./src/components/conductor/files'],
           'vendor-audio': ['wavesurfer.js', 'recorder.js'],
         },
       },
@@ -581,7 +581,7 @@ export const trackPerformance = (metric: string, value: number) => {
     window.gtag('event', 'timing_complete', {
       name: metric,
       value: Math.round(value),
-      event_category: 'orchestrator',
+      event_category: 'conductor',
     });
   }
 };
@@ -591,7 +591,7 @@ export const trackError = (error: Error, context?: any) => {
   if (window.Sentry) {
     window.Sentry.captureException(error, {
       tags: {
-        component: 'orchestrator',
+        component: 'conductor',
       },
       extra: context,
     });
@@ -643,4 +643,4 @@ export const trackError = (error: Error, context?: any) => {
 - 95%+ test coverage
 - Zero critical security vulnerabilities
 
-This completes the comprehensive architecture and implementation guide for the Orchestrator Landing Page. The code agent can now proceed with implementation following this detailed blueprint.
+This completes the comprehensive architecture and implementation guide for the conductor Landing Page. The code agent can now proceed with implementation following this detailed blueprint.

@@ -1,4 +1,4 @@
-name: Deploy Orchestra AI (including Admin UI)
+name: Deploy Cherry AI (including Admin UI)
 
 on:
   push:
@@ -185,7 +185,7 @@ jobs:
           echo "Deploying to server: $SERVER_IP"
           
           # SSH into server and deploy
-          ssh -o StrictHostKeyChecking=no root@$SERVER_IP 'cd /opt/orchestra && bash deploy/deploy_stack.sh'
+          ssh -o StrictHostKeyChecking=no root@$SERVER_IP 'cd /opt/cherry_ai && bash deploy/deploy_stack.sh'
           
       - name: Verify deployment
         run: |
@@ -290,7 +290,7 @@ jobs:
           echo "Deploying to server: $SERVER_IP"
           
           # SSH into server and deploy
-          ssh -o StrictHostKeyChecking=no root@$SERVER_IP 'cd /opt/orchestra && bash deploy/deploy_stack.sh'
+          ssh -o StrictHostKeyChecking=no root@$SERVER_IP 'cd /opt/cherry_ai && bash deploy/deploy_stack.sh'
           
       - name: Verify deployment
         run: |

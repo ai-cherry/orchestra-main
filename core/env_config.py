@@ -65,7 +65,7 @@
         env_file_encoding = "utf-8"
 
 # Singleton instance for use throughout the project
-settings = OrchestraSettings()
+settings = cherry_aiSettings()
 
 # Usage example (in other modules):
 # from core.env_config import settings

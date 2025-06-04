@@ -3,7 +3,9 @@ uvicorn[standard]==0.24.0
 pydantic==2.5.0
 sqlalchemy==2.0.23
 asyncpg==0.29.0
-redis==5.0.1
+redis==5.0.1  # Required for caching and semantic caching
+redisvl==0.2.0  # Required for Redis vector search/semantic caching
+langchain-redis==0.0.5  # Required for LangChain Redis semantic cache integration
 weaviate-client==3.25.3
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4

@@ -1,10 +1,10 @@
 # Pulumi ESC Environment Configuration
 # This template should be populated with actual secrets using:
-# pulumi env set orchestra-ai/dev-app-config --file esc.yaml
+# pulumi env set cherry_ai-ai/dev-app-config --file esc.yaml
 
 environments:
   # DigitalOcean environments
-  orchestra-ai/dev-app-config:
+  cherry_ai-ai/dev-app-config:
     values:
       OPENAI_API_KEY:
         fn::secret: "your-dev-openai-key"
@@ -18,7 +18,7 @@ environments:
       DIGITALOCEAN_TOKEN:
         fn::secret: "your-do-token"
 
-  orchestra-ai/prod-app-config:
+  cherry_ai-ai/prod-app-config:
     values:
       OPENAI_API_KEY:
         fn::secret: "your-prod-openai-key"
@@ -33,7 +33,7 @@ environments:
         fn::secret: "your-do-token"
 
   # Paperspace environments
-  orchestra-ai/dev-paperspace:
+  cherry_ai-ai/dev-paperspace:
     values:
       PAPERSACE_WEAVIATE_URL: "http://localhost:8080"
       PAPERSACE_WEAVIATE_API_KEY:

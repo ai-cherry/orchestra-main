@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Automated Broken Import Fixer for Orchestra AI
+Automated Broken Import Fixer for Cherry AI
 Fixes the most common import issues found in the codebase analysis.
 """
 
@@ -43,7 +43,8 @@ Redis Semantic Caching Module
 Placeholder for Redis-based semantic caching functionality.
 """
 
-from typing import Any, Optional, Dict
+from typing import Any, Optional
+from typing_extensions import Optional, Dict
 import redis
 import json
 import hashlib

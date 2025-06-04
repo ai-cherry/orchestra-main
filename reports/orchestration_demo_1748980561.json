@@ -1,0 +1,84 @@
+{
+  "workflow_id": "demo_1748980555",
+  "agents": {
+    "search": {
+      "status": "idle",
+      "tasks": [
+        "t1"
+      ]
+    },
+    "ingestion": {
+      "status": "idle",
+      "tasks": [
+        "t2"
+      ]
+    },
+    "persona": {
+      "status": "idle",
+      "tasks": [
+        "t3"
+      ]
+    },
+    "analytics": {
+      "status": "idle",
+      "tasks": [
+        "t4"
+      ]
+    }
+  },
+  "context": {
+    "mcp_servers": {
+      "postgresql": "Connected",
+      "weaviate": "Connected",
+      "redis": "Connected"
+    },
+    "personas": [
+      "Cherry",
+      "Sophia",
+      "Karen"
+    ],
+    "search_modes": [
+      "normal",
+      "creative",
+      "deep",
+      "super-deep",
+      "uncensored"
+    ],
+    "workflow_results": {
+      "t1": {
+        "task_id": "t1",
+        "agent": "search",
+        "status": "success",
+        "timestamp": "2025-06-03T19:55:56.151720",
+        "data": "Processed by search agent"
+      },
+      "t2": {
+        "task_id": "t2",
+        "agent": "ingestion",
+        "status": "success",
+        "timestamp": "2025-06-03T19:55:57.653664",
+        "data": "Processed by ingestion agent"
+      },
+      "t3": {
+        "task_id": "t3",
+        "agent": "persona",
+        "status": "success",
+        "timestamp": "2025-06-03T19:55:59.155734",
+        "data": "Processed by persona agent"
+      },
+      "t4": {
+        "task_id": "t4",
+        "agent": "analytics",
+        "status": "success",
+        "timestamp": "2025-06-03T19:56:00.657656",
+        "data": "Processed by analytics agent"
+      }
+    },
+    "completion_time": "2025-06-03T19:56:01.158393"
+  },
+  "metrics": {
+    "total_tasks": 4,
+    "mcp_servers_used": 3,
+    "personas_supported": 3
+  }
+}

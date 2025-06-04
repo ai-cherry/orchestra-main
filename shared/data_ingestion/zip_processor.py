@@ -1,4 +1,4 @@
-"""ZIP file ingestion processor for Orchestra AI."""
+"""ZIP file ingestion processor for Cherry AI."""
     """Unpack ZIP archives and feed contained files to existing processors."""
             for fp in Path(tmpdir).rglob("*"):
                 if fp.is_file():

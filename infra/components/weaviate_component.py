@@ -1,5 +1,5 @@
 """
-        name="orchestra-weaviate",
+        name="cherry_ai-weaviate",
         config={
             "namespace": "superagi",
             "weaviate_api_key": "...",  # Pulumi config key
@@ -12,7 +12,7 @@
 """
     """
     """
-        super().__init__("orchestra:weaviate:Component", name, None, opts)
+        super().__init__("cherry_ai:weaviate:Component", name, None, opts)
 
         self.config = config
         self.namespace = config.get("namespace", "superagi")

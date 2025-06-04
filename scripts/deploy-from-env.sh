@@ -7,7 +7,7 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-echo -e "${GREEN}AI Orchestra Direct Deployment Script${NC}"
+echo -e "${GREEN}AI cherry_ai Direct Deployment Script${NC}"
 echo "====================================="
 
 # Check if running in GitHub Actions or locally
@@ -49,34 +49,34 @@ chmod 600 ~/.ssh/id_rsa
 ssh-keyscan -H $VULTR_IP_ADDRESS >> ~/.ssh/known_hosts 2>/dev/null || true
 
 # Check if Docker image exists locally
-if [ ! -f "orchestra-api-minimal.tar.gz" ]; then
+if [ ! -f "cherry_ai-api-minimal.tar.gz" ]; then
     echo -e "${YELLOW}Docker image not found locally, building...${NC}"
-    docker build -f Dockerfile.minimal -t orchestra-api-minimal:latest .
-    docker save orchestra-api-minimal:latest | gzip > orchestra-api-minimal.tar.gz
+    docker build -f Dockerfile.minimal -t cherry_ai-api-minimal:latest .
+    docker save cherry_ai-api-minimal:latest | gzip > cherry_ai-api-minimal.tar.gz
 fi
 
 # Copy Docker image to server
 echo -e "${YELLOW}Copying Docker image to server...${NC}"
-scp -i ~/.ssh/id_rsa orchestra-api-minimal.tar.gz root@$VULTR_IP_ADDRESS:/tmp/
+scp -i ~/.ssh/id_rsa cherry_ai-api-minimal.tar.gz root@$VULTR_IP_ADDRESS:/tmp/
 
 # Create deployment script with environment variables
 cat > /tmp/deploy-on-server.sh << 'SCRIPT'
 #!/bin/bash
 set -e
 
-echo "Deploying AI Orchestra..."
+echo "Deploying AI cherry_ai..."
 
 # Create directories
-mkdir -p /opt/orchestra/config
-cd /opt/orchestra
+mkdir -p /opt/cherry_ai/config
+cd /opt/cherry_ai
 
 # Load Docker image
 echo "Loading Docker image..."
-mv /tmp/orchestra-api-minimal.tar.gz .
-docker load < orchestra-api-minimal.tar.gz
+mv /tmp/cherry_ai-api-minimal.tar.gz .
+docker load < cherry_ai-api-minimal.tar.gz
 
 # Create personas configuration
-cat > /opt/orchestra/config/personas.yaml << 'EOF'
+cat > /opt/cherry_ai/config/personas.yaml << 'EOF'
 cherry:
   id: cherry
   name: Cherry
@@ -193,8 +193,8 @@ gordon_gekko:
 EOF
 
 # Stop and remove old container
-docker stop orchestra-api 2>/dev/null || true
-docker rm orchestra-api 2>/dev/null || true
+docker stop cherry_ai-api 2>/dev/null || true
+docker rm cherry_ai-api 2>/dev/null || true
 
 # Build environment variables string
 ENV_VARS=""
@@ -208,23 +208,23 @@ ENV_VARS=""
 [ -n "$HUGGINGFACE_API_TOKEN" ] && ENV_VARS="$ENV_VARS -e HUGGINGFACE_API_TOKEN=$HUGGINGFACE_API_TOKEN"
 
 # Run container
-echo "Starting Orchestra API container..."
+echo "Starting cherry_ai API container..."
 docker run -d \
-  --name orchestra-api \
+  --name cherry_ai-api \
   --restart unless-stopped \
   -p 8000:8000 \
-  -v /opt/orchestra/config:/app/core/orchestrator/src/config \
+  -v /opt/cherry_ai/config:/app/core/conductor/src/config \
   -e ENVIRONMENT=production \
   -e CORS_ORIGINS="*" \
   $ENV_VARS \
-  orchestra-api-minimal:latest
+  cherry_ai-api-minimal:latest
 
 # Wait for container to start
 sleep 10
 
 # Check if container is running
-if docker ps | grep orchestra-api; then
-    echo "Orchestra API is running!"
+if docker ps | grep cherry_ai-api; then
+    echo "cherry_ai API is running!"
     
     # Test the API
     echo "Testing API..."
@@ -233,8 +233,8 @@ if docker ps | grep orchestra-api; then
     echo ""
     echo "Deployment complete!"
 else
-    echo "Failed to start Orchestra API"
-    docker logs orchestra-api
+    echo "Failed to start cherry_ai API"
+    docker logs cherry_ai-api
     exit 1
 fi
 SCRIPT

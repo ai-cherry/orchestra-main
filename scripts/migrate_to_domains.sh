@@ -9,23 +9,23 @@ mkdir -p domains/{Personal,PayReady,ParagonRX}/{services,models,api,config}
 # mv agent/app/routers/llm.py domains/Personal/services/
 # mv agent/app/routers/data_ingestion.py domains/Personal/services/
 # mv agent/app/routers/natural_language.py domains/Personal/services/
-# mv agent/app/routers/llm_orchestration.py domains/Personal/services/
+# mv agent/app/routers/llm_coordination.py domains/Personal/services/
 # mv agent/app/routers/suggestions.py domains/Personal/services/
 
 # Migrate Personal files
 # mv agent/app/services/specialized_agents.py domains/Personal/services/
 # mv agent/app/services/audit_log.py domains/Personal/services/
-# mv agent/app/services/agent_orchestrator.py domains/Personal/services/
+# mv agent/app/services/agent_conductor.py domains/Personal/services/
 
 # Migrate Personal files
 # mv ai_components/claude/claude_analyzer.py domains/Personal/services/
 
 # Migrate Personal files
-# mv ai_components/orchestration/vultr_autoscaling.py domains/Personal/services/
-# mv ai_components/orchestration/roo_mcp_adapter.py domains/Personal/services/
-# mv ai_components/orchestration/intelligent_cache.py domains/Personal/services/
-# mv ai_components/orchestration/mode_transition_manager.py domains/Personal/services/
-# mv ai_components/orchestration/ai_orchestrator.py domains/Personal/services/
+# mv ai_components/coordination/vultr_autoscaling.py domains/Personal/services/
+# mv ai_components/coordination/roo_mcp_adapter.py domains/Personal/services/
+# mv ai_components/coordination/intelligent_cache.py domains/Personal/services/
+# mv ai_components/coordination/mode_transition_manager.py domains/Personal/services/
+# mv ai_components/coordination/ai_conductor.py domains/Personal/services/
 
 # Migrate Personal files
 # mv ai_components/tests/test_roo_integration.py domains/Personal/services/
@@ -37,7 +37,7 @@ mkdir -p domains/{Personal,PayReady,ParagonRX}/{services,models,api,config}
 # Migrate Personal files
 # mv ai_components/design/dalle_integration.py domains/Personal/services/
 # mv ai_components/design/recraft_integration.py domains/Personal/services/
-# mv ai_components/design/design_orchestrator.py domains/Personal/services/
+# mv ai_components/design/design_conductor.py domains/Personal/services/
 
 # Migrate Personal files
 # mv core/env_config.py domains/Personal/services/
@@ -59,86 +59,86 @@ mkdir -p domains/{Personal,PayReady,ParagonRX}/{services,models,api,config}
 # mv core/api/endpoints/conversation.py domains/Personal/services/
 
 # Migrate Personal files
-# mv core/orchestrator/examples/llm_client.py domains/Personal/services/
-# mv core/orchestrator/examples/llm_demo.py domains/Personal/services/
-# mv core/orchestrator/examples/persona_client.py domains/Personal/services/
+# mv core/conductor/examples/llm_client.py domains/Personal/services/
+# mv core/conductor/examples/llm_demo.py domains/Personal/services/
+# mv core/conductor/examples/persona_client.py domains/Personal/services/
 
 # Migrate Personal files
-# mv core/orchestrator/src/main_simple.py domains/Personal/services/
+# mv core/conductor/src/main_simple.py domains/Personal/services/
 
 # Migrate Personal files
-# mv core/orchestrator/src/memory/integration.py domains/Personal/services/
+# mv core/conductor/src/memory/integration.py domains/Personal/services/
 
 # Migrate Personal files
-# mv core/orchestrator/src/memory/lifecycle/importance_scorer.py domains/Personal/services/
+# mv core/conductor/src/memory/lifecycle/importance_scorer.py domains/Personal/services/
 
 # Migrate Personal files
-# mv core/orchestrator/src/memory/retrieval/query_classifier.py domains/Personal/services/
+# mv core/conductor/src/memory/retrieval/query_classifier.py domains/Personal/services/
 
 # Migrate Personal files
-# mv core/orchestrator/src/core/agents.py domains/Personal/services/
-# mv core/orchestrator/src/core/orchestrator.py domains/Personal/services/
-# mv core/orchestrator/src/core/main.py domains/Personal/services/
-# mv core/orchestrator/src/core/memory.py domains/Personal/services/
+# mv core/conductor/src/core/agents.py domains/Personal/services/
+# mv core/conductor/src/core/conductor.py domains/Personal/services/
+# mv core/conductor/src/core/main.py domains/Personal/services/
+# mv core/conductor/src/core/memory.py domains/Personal/services/
 
 # Migrate Personal files
-# mv core/orchestrator/src/api/dependencies/prompt_builder.py domains/Personal/services/
+# mv core/conductor/src/api/dependencies/prompt_builder.py domains/Personal/services/
 
 # Migrate Personal files
-# mv core/orchestrator/src/api/endpoints/interaction.py domains/Personal/services/
-# mv core/orchestrator/src/api/endpoints/monitoring.py domains/Personal/services/
-# mv core/orchestrator/src/api/endpoints/llm_interaction.py domains/Personal/services/
-# mv core/orchestrator/src/api/endpoints/phidata_chat.py domains/Personal/services/
-# mv core/orchestrator/src/api/endpoints/auth.py domains/Personal/services/
+# mv core/conductor/src/api/endpoints/interaction.py domains/Personal/services/
+# mv core/conductor/src/api/endpoints/monitoring.py domains/Personal/services/
+# mv core/conductor/src/api/endpoints/llm_interaction.py domains/Personal/services/
+# mv core/conductor/src/api/endpoints/phidata_chat.py domains/Personal/services/
+# mv core/conductor/src/api/endpoints/auth.py domains/Personal/services/
 
 # Migrate Personal files
-# mv core/orchestrator/src/api/middleware/persona_loader.py domains/Personal/services/
+# mv core/conductor/src/api/middleware/persona_loader.py domains/Personal/services/
 
 # Migrate Personal files
-# mv core/orchestrator/src/agents/persona_agent.py domains/Personal/services/
-# mv core/orchestrator/src/agents/simplified_agent_registry.py domains/Personal/services/
-# mv core/orchestrator/src/agents/llm_agent.py domains/Personal/services/
-# mv core/orchestrator/src/agents/messaging_agent.py domains/Personal/services/
-# mv core/orchestrator/src/agents/__init__.py domains/Personal/services/
+# mv core/conductor/src/agents/persona_agent.py domains/Personal/services/
+# mv core/conductor/src/agents/simplified_agent_registry.py domains/Personal/services/
+# mv core/conductor/src/agents/llm_agent.py domains/Personal/services/
+# mv core/conductor/src/agents/messaging_agent.py domains/Personal/services/
+# mv core/conductor/src/agents/__init__.py domains/Personal/services/
 
 # Migrate Personal files
-# mv core/orchestrator/src/agents/examples/agent_usage_example.py domains/Personal/services/
-# mv core/orchestrator/src/agents/examples/pubsub_agent_example.py domains/Personal/services/
+# mv core/conductor/src/agents/examples/agent_usage_example.py domains/Personal/services/
+# mv core/conductor/src/agents/examples/pubsub_agent_example.py domains/Personal/services/
 
 # Migrate Personal files
-# mv core/orchestrator/src/agents/memory/models.py domains/Personal/services/
-# mv core/orchestrator/src/agents/memory/layered_memory.py domains/Personal/services/
+# mv core/conductor/src/agents/memory/models.py domains/Personal/services/
+# mv core/conductor/src/agents/memory/layered_memory.py domains/Personal/services/
 
 # Migrate Personal files
-# mv core/orchestrator/src/agents/teams/coordinator.py domains/Personal/services/
+# mv core/conductor/src/agents/teams/coordinator.py domains/Personal/services/
 
 # Migrate Personal files
-# mv core/orchestrator/src/resilience/incident_reporter.py domains/Personal/services/
-# mv core/orchestrator/src/resilience/tasks.py domains/Personal/services/
+# mv core/conductor/src/resilience/incident_reporter.py domains/Personal/services/
+# mv core/conductor/src/resilience/tasks.py domains/Personal/services/
 
 # Migrate Personal files
-# mv core/orchestrator/src/personas/loader.py domains/Personal/services/
-# mv core/orchestrator/src/personas/enhanced_persona_manager.py domains/Personal/services/
+# mv core/conductor/src/personas/loader.py domains/Personal/services/
+# mv core/conductor/src/personas/enhanced_persona_manager.py domains/Personal/services/
 
 # Migrate Personal files
-# mv core/orchestrator/src/llm/litellm_client.py domains/Personal/services/
+# mv core/conductor/src/llm/litellm_client.py domains/Personal/services/
 
 # Migrate Personal files
-# mv core/orchestrator/src/config/models.py domains/Personal/services/
-# mv core/orchestrator/src/config/personas.yaml domains/Personal/services/
+# mv core/conductor/src/config/models.py domains/Personal/services/
+# mv core/conductor/src/config/personas.yaml domains/Personal/services/
 
 # Migrate Personal files
-# mv core/orchestrator/src/tools/registry.py domains/Personal/services/
+# mv core/conductor/src/tools/registry.py domains/Personal/services/
 
 # Migrate Personal files
-# mv core/orchestrator/src/services/interaction_service.py domains/Personal/services/
-# mv core/orchestrator/src/services/enhanced_agent_orchestrator.py domains/Personal/services/
-# mv core/orchestrator/src/services/conversation_service.py domains/Personal/services/
-# mv core/orchestrator/src/services/agent_orchestrator.py domains/Personal/services/
-# mv core/orchestrator/src/services/base_orchestrator.py domains/Personal/services/
+# mv core/conductor/src/services/interaction_service.py domains/Personal/services/
+# mv core/conductor/src/services/enhanced_agent_conductor.py domains/Personal/services/
+# mv core/conductor/src/services/conversation_service.py domains/Personal/services/
+# mv core/conductor/src/services/agent_conductor.py domains/Personal/services/
+# mv core/conductor/src/services/base_conductor.py domains/Personal/services/
 
 # Migrate Personal files
-# mv core/orchestrator/src/services/llm/providers.py domains/Personal/services/
+# mv core/conductor/src/services/llm/providers.py domains/Personal/services/
 
 # Migrate Personal files
 # mv core/agents/retriever_agent.py domains/Personal/services/
@@ -196,7 +196,7 @@ mkdir -p domains/{Personal,PayReady,ParagonRX}/{services,models,api,config}
 # mv agent/app/services/natural_language_processor.py domains/PayReady/services/
 
 # Migrate PayReady files
-# mv services/pay_ready/etl_orchestrator.py domains/PayReady/services/
+# mv services/pay_ready/etl_conductor.py domains/PayReady/services/
 # mv services/pay_ready/entity_resolver.py domains/PayReady/services/
 # mv services/pay_ready/__init__.py domains/PayReady/services/
 # mv services/pay_ready/memory_manager.py domains/PayReady/services/
@@ -227,10 +227,10 @@ mkdir -p domains/{Personal,PayReady,ParagonRX}/{services,models,api,config}
 # mv agent/app/services/automation.py domains/ParagonRX/services/
 
 # Migrate ParagonRX files
-# mv ai_components/orchestrator_cli_enhanced.py domains/ParagonRX/services/
+# mv ai_components/conductor_cli_enhanced.py domains/ParagonRX/services/
 
 # Migrate ParagonRX files
-# mv ai_components/orchestration/unified_api_router.py domains/ParagonRX/services/
+# mv ai_components/coordination/unified_api_router.py domains/ParagonRX/services/
 
 # Migrate ParagonRX files
 # mv ai_components/cursor_ai/cursor_integration_enhanced.py domains/ParagonRX/services/
@@ -255,17 +255,17 @@ mkdir -p domains/{Personal,PayReady,ParagonRX}/{services,models,api,config}
 # mv core/api/models/responses.py domains/ParagonRX/services/
 
 # Migrate ParagonRX files
-# mv core/orchestrator/src/main.py domains/ParagonRX/services/
+# mv core/conductor/src/main.py domains/ParagonRX/services/
 
 # Migrate ParagonRX files
-# mv core/orchestrator/src/api/app.py domains/ParagonRX/services/
+# mv core/conductor/src/api/app.py domains/ParagonRX/services/
 
 # Migrate ParagonRX files
-# mv core/orchestrator/src/api/dependencies/cache.py domains/ParagonRX/services/
-# mv core/orchestrator/src/api/dependencies/memory.py domains/ParagonRX/services/
+# mv core/conductor/src/api/dependencies/cache.py domains/ParagonRX/services/
+# mv core/conductor/src/api/dependencies/memory.py domains/ParagonRX/services/
 
 # Migrate ParagonRX files
-# mv core/orchestrator/src/api/endpoints/health.py domains/ParagonRX/services/
+# mv core/conductor/src/api/endpoints/health.py domains/ParagonRX/services/
 
 # Migrate ParagonRX files
 # mv core/data_ingestion/interfaces/storage.py domains/ParagonRX/services/

@@ -220,10 +220,10 @@ api_instance = vultr.Instance("api-server",
 
 pulumi.export("api_ip", api_instance.main_ip)
 """
-                    "pulumi_stack": "orchestra-main",
+                    "pulumi_stack": "cherry_ai-main",
                     "pulumi_config": {
                         "vultr:region": "ewr",
-                        "project:name": "orchestra",
+                        "project:name": "cherry_ai",
                     },
                     "version": "1.0.0",
                     "generation_time": 1.8,

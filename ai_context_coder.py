@@ -28,6 +28,7 @@ REQUIRED PATTERNS:
 import os
 import sys
 from typing import Dict, List, Optional
+from typing_extensions import Optional
 
 # Environment variables
 from dotenv import load_dotenv
@@ -73,7 +74,7 @@ EXTERNAL SERVICES CONFIG:
 ```python
 # MongoDB connection
 client = pymongo.MongoClient(os.getenv("MONGODB_URI", "mongodb://localhost:27017"))
-db = client.orchestra
+db = client.cherry_ai
 
 # Redis/DragonflyDB connection
 redis_client = redis.Redis(
@@ -111,7 +112,7 @@ python -m pytest tests/
 
 PROJECT STRUCTURE:
 - scripts/: All automation tools
-- core/orchestrator/: Main orchestration logic
+- core/conductor/: Main coordination logic
 - mcp_server/: MCP server implementations
 - requirements/: Dependency files (base.txt, dev.txt)
 - .env: Environment configuration

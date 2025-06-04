@@ -4,6 +4,7 @@ import requests
 import json
 import time
 from typing import Dict, List, Optional
+from typing_extensions import Optional
 
 logger = logging.getLogger(__name__)
 

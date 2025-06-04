@@ -1,5 +1,5 @@
 #!/bin/bash
-# prepare_for_deployment.sh - Script to prepare environment for Orchestra deployment
+# prepare_for_deployment.sh - Script to prepare environment for cherry_ai deployment
 #
 # This script will:
 # 1. Install necessary tools (Docker, Vultr SDK)
@@ -18,7 +18,7 @@ NC='\033[0m' # No Color
 
 # Print header
 echo -e "${BLUE}======================================================${NC}"
-echo -e "${BLUE}   Orchestra Deployment Preparation                   ${NC}"
+echo -e "${BLUE}   cherry_ai Deployment Preparation                   ${NC}"
 echo -e "${BLUE}======================================================${NC}"
 
 # Create directories

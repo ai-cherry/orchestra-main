@@ -1,6 +1,6 @@
-# AI Orchestra Agent Infrastructure Setup Guide
+# AI cherry_ai Agent Infrastructure Setup Guide
 
-This document provides a comprehensive guide for setting up the AI Orchestra agent infrastructure on
+This document provides a comprehensive guide for setting up the AI cherry_ai agent infrastructure on
 ## Table of Contents
 
 1. [Overview](#overview)
@@ -13,7 +13,7 @@ This document provides a comprehensive guide for setting up the AI Orchestra age
 
 ## Overview
 
-The AI Orchestra agent infrastructure provides a robust foundation for deploying and managing AI agents with different capabilities, memory systems, and tool integrations. The infrastructure is designed to be:
+The AI cherry_ai agent infrastructure provides a robust foundation for deploying and managing AI agents with different capabilities, memory systems, and tool integrations. The infrastructure is designed to be:
 
 - **Scalable**: Support for multiple agent types and teams
 - **Flexible**: Configurable memory systems and tool integrations
@@ -48,13 +48,13 @@ We've created a comprehensive bootstrap script that sets up the entire infrastru
 1. Make the script executable:
 
    ```bash
-   chmod +x scripts/bootstrap_orchestra_infrastructure.sh
+   chmod +x scripts/bootstrap_cherry_ai_infrastructure.sh
    ```
 
 2. Run the script:
 
    ```bash
-   ./scripts/bootstrap_orchestra_infrastructure.sh
+   ./scripts/bootstrap_cherry_ai_infrastructure.sh
    ```
 
 3. Follow the prompts and confirm when asked
@@ -175,5 +175,5 @@ After running the bootstrap script, you should:
 
 ## Conclusion
 
-The AI Orchestra agent infrastructure provides a solid foundation for building and deploying AI agents on
+The AI cherry_ai agent infrastructure provides a solid foundation for building and deploying AI agents on
 For more detailed information on the agent configuration system and memory architecture, see the [Agent Infrastructure Documentation](agent_infrastructure.md).

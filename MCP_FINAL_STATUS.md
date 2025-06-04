@@ -6,7 +6,7 @@
 
 1. **PostgreSQL Database** ✅
    - Running and configured with correct permissions
-   - User: `orchestrator` 
+   - User: `conductor` 
    - Password: `orch3str4_2024`
    - Auto-starts on boot
 
@@ -21,7 +21,7 @@
 4. **Automation** ✅
    - Services auto-check when you enter the directory
    - PostgreSQL auto-fixes permissions if needed
-   - Helpful aliases: `orchestra-status`, `mcp-check`
+   - Helpful aliases: `cherry_ai-status`, `mcp-check`
 
 ### How MCP Works:
 
@@ -32,14 +32,14 @@
 1. Open Cursor in this project
 2. In chat, type `@` to see MCP servers
 3. Use commands like:
-   - `@orchestra-memory store_memory "important decision"`
-   - `@orchestra-memory search_memories "database"`
+   - `@cherry_ai-memory store_memory "important decision"`
+   - `@cherry_ai-memory search_memories "database"`
 
 ### Quick Commands:
 
 ```bash
 # Check everything is running
-orchestra-status
+cherry_ai-status
 
 # View critical config (passwords, ports, etc)
 cat CRITICAL_CONFIG.md
@@ -50,7 +50,7 @@ cat CURSOR_MCP_SETUP.md
 
 ### What Happens Automatically:
 
-1. When you open a new terminal in the orchestra directory:
+1. When you open a new terminal in the cherry_ai directory:
    - Virtual environment activates
    - PostgreSQL is checked and fixed if needed
    - You see a helpful reminder
@@ -64,15 +64,15 @@ cat CURSOR_MCP_SETUP.md
 
 ```bash
 # Run the status check
-orchestra-status
+cherry_ai-status
 
 # Check PostgreSQL manually
 sudo systemctl status postgresql
 
 # Test PostgreSQL connection
-PGPASSWORD=orch3str4_2024 psql -h localhost -U orchestrator -d orchestrator -c "SELECT 1;"
+PGPASSWORD=orch3str4_2024 psql -h localhost -U conductor -d conductor -c "SELECT 1;"
 ```
 
 ## The Bottom Line:
 
-**MCP is ready to use**. Just open Cursor and start using `@orchestra-memory` and other MCP tools. Everything else is automated. 
+**MCP is ready to use**. Just open Cursor and start using `@cherry_ai-memory` and other MCP tools. Everything else is automated. 

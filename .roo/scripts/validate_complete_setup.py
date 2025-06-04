@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Comprehensive validation of Roo and MCP setup for Orchestra project."""
+"""Comprehensive validation of Roo and MCP setup for cherry_ai project."""
     """Check if a JSON file is valid."""
         return True, "Valid JSON"
     except Exception:
@@ -48,7 +48,7 @@ def validate_modes() -> Dict[str, Dict]:
         "architect",
         "code",
         "debug",
-        "orchestrator",
+        "conductor",
         "strategy",
         "research",
         "analytics",
@@ -62,7 +62,7 @@ def validate_modes() -> Dict[str, Dict]:
         "architect": "anthropic/claude-opus-4",
         "code": "google/gemini-2.5-flash-preview-05-20",
         "debug": "openai/gpt-4.1",
-        "orchestrator": "anthropic/claude-sonnet-4",
+        "conductor": "anthropic/claude-sonnet-4",
         "strategy": "anthropic/claude-opus-4",
         "research": "anthropic/claude-sonnet-4",
         "analytics": "google/gemini-2.5-flash-preview-05-20",
@@ -112,7 +112,7 @@ def validate_rules() -> Dict[str, Dict]:
         "architect",
         "code",
         "debug",
-        "orchestrator",
+        "conductor",
         "strategy",
         "research",
         "analytics",
@@ -157,13 +157,13 @@ def validate_mcp_config() -> Dict[str, any]:
                 result["servers"] = {
                     "memory-bank": "memory-bank" in data["mcpServers"],
                     "portkey-router": "portkey-router" in data["mcpServers"],
-                    "orchestra-mcp": "orchestra-mcp" in data["mcpServers"],
+                    "conductor-mcp": "conductor-mcp" in data["mcpServers"],
                 }
 
-                # Check orchestra-mcp configuration
-                if "orchestra-mcp" in data["mcpServers"]:
-                    orch_config = data["mcpServers"]["orchestra-mcp"]
-                    result["orchestra_config"] = {
+                # Check conductor-mcp configuration
+                if "conductor-mcp" in data["mcpServers"]:
+                    orch_config = data["mcpServers"]["conductor-mcp"]
+                    result["cherry_ai_config"] = {
                         "command": orch_config.get("command"),
                         "args": orch_config.get("args"),
                         "env_configured": bool(orch_config.get("env")),
@@ -226,8 +226,8 @@ def print_results(modes_results, rules_results, mcp_result, legacy_files):
     mcp_ok = mcp_result["exists"] and mcp_result["valid_json"] and mcp_result["has_servers"]
     if mcp_ok and all(mcp_result["servers"].values()):
         print("  ✅ MCP configuration - All servers configured")
-        if "orchestra_config" in mcp_result:
-            config = mcp_result["orchestra_config"]
+        if "cherry_ai_config" in mcp_result:
+            config = mcp_result["cherry_ai_config"]
             print(f"     - Command: {config['command']}")
             print(f"     - Tools: {', '.join(config['tools_allowed'][:3])}...")
     else:
@@ -259,7 +259,7 @@ def print_results(modes_results, rules_results, mcp_result, legacy_files):
         print("1. Ensure Roo UI settings for modes are blank/default")
         print("2. Close Roo if running")
         print("3. Start MCP servers:")
-        print("   python mcp_server/servers/orchestrator_server.py")
+        print("   python mcp_server/servers/conductor_server.py")
         print("4. Reopen Roo")
         print("5. Test mode switching and MCP tools")
     else:

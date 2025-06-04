@@ -6,14 +6,14 @@
     debug: bool = Field(default=False, env="DEBUG")
     
     # Vultr configuration
-    vultr_project_id: str = Field(default="orchestra-ai", env="VULTR_PROJECT_ID")
+    vultr_project_id: str = Field(default="cherry_ai-ai", env="VULTR_PROJECT_ID")
     vultr_region: str = Field(default="ewr", env="VULTR_REGION")  # New Jersey
     vultr_api_key: Optional[str] = Field(default=None, env="VULTR_API_KEY")
     vultr_credentials_path: Optional[str] = Field(default=None, env="VULTR_CREDENTIALS_PATH")
     
     # Database configuration
     database_url: str = Field(
-        default="postgresql://postgres:postgres@localhost:5432/orchestra",
+        default="postgresql://postgres:postgres@localhost:5432/cherry_ai",
         env="DATABASE_URL"
     )
     
@@ -22,7 +22,7 @@
     weaviate_api_key: Optional[str] = Field(default=None, env="WEAVIATE_API_KEY")
     
     # Redis configuration (for Celery)
-    redis_url: str = Field(default="redis://localhost:6379/0", env="REDIS_URL")
+    redis_url: str = Field(default="redis://localhost:6379", env="REDIS_URL")  # Standard Redis config
     
     # API Keys
     openai_api_key: Optional[str] = Field(default=None, env="OPENAI_API_KEY")

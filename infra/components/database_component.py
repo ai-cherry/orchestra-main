@@ -17,7 +17,7 @@
             region=self.region,
             node_count=self.node_count,
             project_id=self.config.require("project_id"),
-            tags=["orchestra", "database"],
+            tags=["cherry_ai", "database"],
         )
 
         # Create database user

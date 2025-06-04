@@ -9,7 +9,7 @@
         
         # MCP server endpoints
         self.mcp_servers = {
-            'orchestrator': 'http://localhost:8002',
+            'conductor': 'http://localhost:8002',
             'memory': 'http://localhost:8003',
             'tools': 'http://localhost:8006'
         }
@@ -393,7 +393,7 @@
                     "suggestion": "Consider using logging instead of print statements"
                 })
             
-            if 'except:' in line:
+            if 'except Exception:' in line:
                 patterns.append({
                     "type": "bare_except",
                     "line": i + 1,
@@ -474,11 +474,11 @@
                 "example": "with open(file_path, 'r') as f: instead of f = open(file_path, 'r')"
             })
         
-        if 'try:' in code_content and 'except:' in code_content:
+        if 'try:' in code_content and 'except Exception:' in code_content:
             suggestions.append({
                 "type": "specific_exceptions",
                 "description": "Catch specific exceptions instead of bare except",
-                "example": "except ValueError: instead of except:"
+                "example": "except ValueError: instead of except Exception:"
             })
         
         return suggestions

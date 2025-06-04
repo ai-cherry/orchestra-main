@@ -121,6 +121,6 @@ If you encounter any issues:
 ## Future Improvements
 
 1. Add health check endpoint for proper monitoring in production
-2. Implement graceful shutdown for better container orchestration
+2. Implement graceful shutdown for better container coordination
 3. Add more comprehensive error handling for API keys and configuration
 4. Create CI/CD pipeline test to verify server startup during deployment

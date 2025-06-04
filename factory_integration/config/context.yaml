@@ -63,8 +63,8 @@ postgresql:
   # Database connection settings
   host: localhost
   port: 5432
-  database: orchestra
-  user: orchestra_user
+  database: cherry_ai
+  user: cherry_ai_user
   
   # Connection pool settings
   pool_size: 20

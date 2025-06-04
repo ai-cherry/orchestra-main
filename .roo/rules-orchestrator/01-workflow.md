@@ -1,4 +1,4 @@
-# Workflow Orchestration for Orchestrator Mode
+# Workflow coordination for conductor Mode
 
 ## Task Decomposition
 - Break complex tasks into atomic units

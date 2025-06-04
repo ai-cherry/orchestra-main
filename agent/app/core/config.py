@@ -7,11 +7,11 @@ SERVER_HOST = os.getenv("SERVER_HOST", "45.32.69.157")
 ENVIRONMENT = os.getenv("ENVIRONMENT", "unified")
 
 # Database Configuration
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://orchestra:your_secure_password@localhost:5432/orchestra")
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://cherry_ai:your_secure_password@localhost:5432/cherry_ai")
 POSTGRES_HOST = os.getenv("POSTGRES_HOST", "localhost")
 POSTGRES_PORT = int(os.getenv("POSTGRES_PORT", "5432"))
-POSTGRES_DB = os.getenv("POSTGRES_DB", "orchestrator")
-POSTGRES_USER = os.getenv("POSTGRES_USER", "orchestrator")
+POSTGRES_DB = os.getenv("POSTGRES_DB", "conductor")
+POSTGRES_USER = os.getenv("POSTGRES_USER", "conductor")
 POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD", "orch3str4_2024")
 
 # Weaviate Configuration

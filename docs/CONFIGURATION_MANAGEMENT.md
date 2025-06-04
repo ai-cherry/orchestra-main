@@ -1,10 +1,10 @@
-# AI Orchestra Configuration Management
+# AI cherry_ai Configuration Management
 
-This document describes the standardized configuration management approach for the AI Orchestra project.
+This document describes the standardized configuration management approach for the AI cherry_ai project.
 
 ## Overview
 
-The AI Orchestra project uses a consistent approach to configuration management across all scripts and workflows. This approach:
+The AI cherry_ai project uses a consistent approach to configuration management across all scripts and workflows. This approach:
 
 1. Uses environment variables as the primary configuration mechanism
 2. Provides sensible defaults for all configuration values

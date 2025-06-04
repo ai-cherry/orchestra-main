@@ -1,22 +1,22 @@
 # AGENTS.md
 
-## Orchestra AI Agent Management Guide
+## Cherry AI Agent Management Guide
 
-This document provides clear, actionable guidance for configuring, registering, and managing agents in the Orchestra AI platform. It is designed for a single-developer/admin context and is kept up-to-date with best practices and new features.
+This document provides clear, actionable guidance for configuring, registering, and managing agents in the Cherry AI platform. It is designed for a single-developer/admin context and is kept up-to-date with best practices and new features.
 
 ---
 
 ## 1. Agent Overview
 
-- **Agents** are modular, autonomous components that perform orchestration, enrichment, or workflow tasks.
-- Each agent is registered with the Orchestrator backend and can be managed via the admin interface.
+- **Agents** are modular, autonomous components that perform coordination, enrichment, or workflow tasks.
+- Each agent is registered with the conductor backend and can be managed via the admin interface.
 - Agents interact with memory, external APIs, and other agents via well-defined interfaces.
 
 ---
 
 ## 2. Agent Configuration
 
-- Agent configuration is centralized in `core/env_config.py` and `core/orchestrator/src/config/settings.py`.
+- Agent configuration is centralized in `core/env_config.py` and `core/conductor/src/config/settings.py`.
 - All environment variables and secrets should be managed via the centralized settings object.
 - Example agent configuration block:
 
@@ -33,17 +33,17 @@ class MyAgentConfig:
 
 ## 3. Agent Registration
 
-- Agents are registered at orchestrator startup via the agent registry.
+- Agents are registered at conductor startup via the agent registry.
 - To register a new agent:
   1. Implement the agent class, inheriting from the base agent interface.
-  2. Add the agent to the registry in `orchestrator/agents/registry.py`.
-  3. Ensure the agent is included in the orchestrator's startup sequence.
+  2. Add the agent to the registry in `conductor/agents/registry.py`.
+  3. Ensure the agent is included in the conductor's startup sequence.
 
 ---
 
 ## 4. Agent Lifecycle Management
 
-- Agents can be started, stopped, and restarted via the admin interface or orchestrator API.
+- Agents can be started, stopped, and restarted via the admin interface or conductor API.
 - Use the `/agents` endpoint for programmatic management.
 - Agent health and status are monitored and exposed via `/health` and `/agents/status`.
 
@@ -61,10 +61,10 @@ class MyAgentConfig:
 
 ## 6. Example Agent Workflow
 
-1. **Initialization:** Agent loads config and registers with orchestrator.
+1. **Initialization:** Agent loads config and registers with conductor.
 2. **Execution:** Agent receives a task via API or workflow trigger.
 3. **Processing:** Agent interacts with memory, APIs, or other agents as needed.
-4. **Result:** Agent returns result/status to orchestrator and logs the operation.
+4. **Result:** Agent returns result/status to conductor and logs the operation.
 
 ---
 

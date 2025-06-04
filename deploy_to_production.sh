@@ -23,7 +23,7 @@ sleep 30
 
 # Run database migrations
 echo "🗄️ Running database migrations..."
-docker exec orchestra-postgres psql -U orchestra -d orchestra -f /scripts/create_admin_user.sql
+docker exec cherry_ai-postgres psql -U cherry_ai -d cherry_ai -f /scripts/create_admin_user.sql
 
 # Health check
 echo "🏥 Running health checks..."

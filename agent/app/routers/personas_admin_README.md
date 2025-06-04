@@ -1,6 +1,6 @@
 # Personas Admin API
 
-The Personas Admin API provides endpoints for managing persona configurations in the Orchestra AI system. This API allows administrators to list, retrieve, update, validate, and export persona configurations.
+The Personas Admin API provides endpoints for managing persona configurations in the Cherry AI system. This API allows administrators to list, retrieve, update, validate, and export persona configurations.
 
 ## Overview
 

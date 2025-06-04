@@ -3,13 +3,13 @@
 ## Quick Start
 ```bash
 # SSH to Vultr production server
-ssh -i ~/.ssh/vultr_orchestra root@45.32.69.157
+ssh -i ~/.ssh/vultr_cherry_ai root@45.32.69.157
 
 # For development, use screen/tmux
 screen -S dev
 
 # Edit code
-cd /root/orchestra-main
+cd /root/cherry_ai-main
 vim agent/app/services/real_agents.py
 
 # Test changes locally
@@ -19,7 +19,7 @@ python -m agent.app.main  # Runs on port 8080
 # Deploy changes
 git add -A && git commit -m "Your changes"
 git push origin main
-systemctl restart orchestra-api  # or whatever service name
+systemctl restart cherry_ai-api  # or whatever service name
 
 # Detach from screen: Ctrl+A, D
 # Reattach: screen -r dev
@@ -48,7 +48,7 @@ Use `scripts/vultr_provision.py` to spin up a fresh Vultr VM and attach block st
 ```bash
 export VULTR_API_KEY=your-api-key
 python scripts/vultr_provision.py --region ewr --plan vc2-1c-2gb --os 215 \
-    --label orchestra-dev --ssh-key <key_id> --volume <volume_id>
+    --label cherry_ai-dev --ssh-key <key_id> --volume <volume_id>
 ```
 
 The script interacts with the Vultr API to create the server and optionally attach an existing volume.
