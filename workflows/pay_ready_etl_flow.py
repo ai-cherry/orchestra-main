@@ -29,17 +29,12 @@ async def trigger_source_sync(conductor: PayReadyETLconductor, source: str) -> D
     logger.info(f"Triggering sync for {source}")
 
     try:
-
-
-        pass
         source_type = SourceType(source)
         job_id = await conductor.trigger_airbyte_sync(source_type)
 
         return {"source": source, "job_id": job_id, "status": "triggered", "timestamp": datetime.utcnow().isoformat()}
-    except Exception:
-
-        pass
-        logger.error(f"Failed to trigger sync for {source}: {e}")
+    except Exception as e:
+        logger.error(f"Failed to trigger sync for {source}: {e}", exc_info=True) # Added exc_info for stack trace
         return {
             "source": source,
             "job_id": None,
@@ -162,15 +157,34 @@ async def flush_pending_vectors(memory_manager: PayReadyMemoryManager) -> Dict[s
         await memory_manager.flush_pending_vectors()
 
         return {"status": "success", "timestamp": datetime.utcnow().isoformat()}
-    except Exception:
+    except Exception as e: # Ensure 'e' is captured
+        logger.error(f"Failed to flush vectors: {e}", exc_info=True)
+        return {"status": "failed", "error": str(e), "timestamp": datetime.utcnow().isoformat()}
 
-        pass
-        logger.error(f"Failed to flush vectors: {e}")
+@task(
+    name="Run Vector Enrichment Schema Prep",
+    description="Prepare Weaviate schema for vector enrichment (add properties)",
+    retries=1,
+    retry_delay_seconds=30,
+)
+async def run_vector_enrichment_task(conductor: PayReadyETLconductor) -> Dict[str, Any]:
+    """Run Weaviate schema preparation for vector enrichment."""
+    logger.info("Running vector enrichment schema preparation task")
+    try:
+        result = await conductor.run_vector_enrichment() # This now returns a dict
+        logger.info(f"Vector enrichment schema preparation completed with status: {result.get('status')}")
+        return result
+    except Exception as e:
+        logger.error(f"Vector enrichment schema preparation failed: {e}", exc_info=True)
         return {"status": "failed", "error": str(e), "timestamp": datetime.utcnow().isoformat()}
 
 @task(name="Generate Pipeline Report", description="Generate a summary report of the pipeline execution", retries=1)
 async def generate_pipeline_report(
-    sync_results: List[Dict], processing_results: List[Dict], entity_resolution_result: Dict, analytics_result: Dict
+    sync_results: List[Dict],
+    processing_results: List[Dict],
+    entity_resolution_result: Dict,
+    analytics_result: Dict,
+    enrichment_result: Dict # Added new parameter
 ) -> str:
     """Generate a markdown report of the pipeline execution."""
     total_records = sum(r.get("records_processed", 0) for r in processing_results)
@@ -197,12 +211,39 @@ async def generate_pipeline_report(
         report += f"| {result['source']} | {result['records_processed']:,} | {result['status']} | {error} |\n"
 
     report += f"""
+### Entity Resolution
+- **Status:** {entity_resolution_result.get('status', 'N/A')}
+- **Duration:** {entity_resolution_result.get('duration_seconds', 'N/A')} seconds
+"""
+
+    # Add Vector Enrichment Status
+    report += f"""
+### Vector Enrichment Schema Preparation
+- **Status:** {enrichment_result.get('status', 'N/A')}
+"""
+    if enrichment_result.get("status") == "success" and enrichment_result.get("details"):
+        for key, value in enrichment_result["details"].items():
+            report += f"- **{key}:** {'Ensured' if value else 'Failed/Error'}\n"
+    elif enrichment_result.get("error"):
+        report += f"- **Error:** {enrichment_result.get('error')}\n"
+
+    report += f"""
+### Analytics Cache & Memory Stats
+- **Status:** {analytics_result.get('status', 'N/A')}
 """
     if analytics_result.get("status") == "success" and analytics_result.get("memory_stats"):
         stats = analytics_result["memory_stats"]
-        hot_cache = stats.get("hot_cache", {})
-        report += f"""
+        # hot_cache = stats.get("hot_cache", {}) # Assuming hot_cache structure might change or not be primary focus
+        report += f"""- **Total Interactions in Memory:** {stats.get('total_interactions', 'N/A'):,}
+- **Interactions by Type:**
 """
+        for key, value in stats.get("interactions_by_type", {}).items():
+            report += f"  - {key}: {value:,}\n"
+
+    report += "\n"
+
+    # Save report as artifact
+    await create_markdown_artifact(
         key="pipeline-report", markdown=report, description="Pay Ready ETL Pipeline Execution Report"
     )
 
@@ -251,20 +292,31 @@ async def pay_ready_etl_pipeline(
 
     # Phase 4: Entity resolution
     logger.info("Phase 4: Running entity resolution")
-    entity_resolution_result = await run_entity_resolution(entity_resolver)
+    entity_resolution_result = await run_entity_resolution(entity_resolver) # This is a task, so use .submit() if run in parallel
 
-    # Phase 5: Update analytics and flush vectors
-    logger.info("Phase 5: Updating analytics and flushing vectors")
+    # Phase 5: Vector Enrichment (Schema Preparation)
+    logger.info("Phase 5: Running vector enrichment schema preparation")
+    enrichment_task = run_vector_enrichment_task.submit(conductor) # Submit as a task
+
+    # Phase 6: Update analytics and flush vectors (can run in parallel with enrichment or after)
+    logger.info("Phase 6: Updating analytics and flushing vectors")
     analytics_task = update_analytics_cache.submit(conductor)
     flush_task = flush_pending_vectors.submit(memory_manager)
 
+    # Wait for parallel tasks from Phase 5 and 6
+    enrichment_result = await enrichment_task.result()
     analytics_result = await analytics_task.result()
     flush_result = await flush_task.result()
+
 
     # Generate report
     logger.info("Generating pipeline report")
     report = await generate_pipeline_report(
-        completed_syncs, processing_results, entity_resolution_result, analytics_result
+        completed_syncs,
+        processing_results,
+        entity_resolution_result,
+        analytics_result,
+        enrichment_result # Pass new result
     )
 
     # Calculate summary
@@ -276,9 +328,10 @@ async def pay_ready_etl_pipeline(
         "total_records_processed": total_records,
         "successful_sources": successful_sources,
         "failed_sources": len(sources) - successful_sources,
-        "entity_resolution_status": entity_resolution_result["status"],
-        "analytics_update_status": analytics_result["status"],
-        "vector_flush_status": flush_result["status"],
+        "entity_resolution_status": entity_resolution_result.get("status", "N/A"),
+        "vector_enrichment_status": enrichment_result.get("status", "N/A"),
+        "analytics_update_status": analytics_result.get("status", "N/A"),
+        "vector_flush_status": flush_result.get("status", "N/A"),
         "execution_time": datetime.utcnow().isoformat(),
         "report": report,
     }
