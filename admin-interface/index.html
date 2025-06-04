@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cherry AI Orchestrator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cherry: {
+                            50: '#fef2f2',
+                            500: '#ef4444',
+                            600: '#dc2626',
+                            700: '#b91c1c'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-black/20 backdrop-blur-sm border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <span class="text-2xl">🍒</span>
+                    <span class="ml-2 text-xl font-bold text-white">Cherry AI Orchestrator</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button onclick="showDomain('cherry')" class="px-4 py-2 rounded-lg bg-pink-600 hover:bg-pink-700 text-white transition-colors">
+                        🍒 Cherry
+                    </button>
+                    <button onclick="showDomain('sophia')" class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-colors">
+                        💼 Sophia
+                    </button>
+                    <button onclick="showDomain('karen')" class="px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white transition-colors">
+                        🏥 Karen
+                    </button>
+                    <button onclick="showAdmin()" class="px-4 py-2 rounded-lg bg-gray-600 hover:bg-gray-700 text-white transition-colors">
+                        ⚙️ Admin
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Natural Language Interface (Main Landing) -->
+        <div id="chat-interface" class="space-y-6">
+            <div class="text-center mb-8">
+                <h1 class="text-4xl font-bold text-white mb-4">
+                    Welcome to Cherry AI Orchestrator
+                </h1>
+                <p class="text-xl text-gray-300">
+                    Your intelligent assistant for personal, business, and healthcare operations
+                </p>
+            </div>
+
+            <!-- Chat Container -->
+            <div class="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 p-6">
+                <div id="chat-messages" class="h-96 overflow-y-auto mb-4 space-y-4">
+                    <div class="flex items-start space-x-3">
+                        <div class="w-8 h-8 bg-cherry-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
+                            AI
+                        </div>
+                        <div class="bg-white/20 rounded-lg p-3 max-w-md">
+                            <p class="text-white">Hello! I'm your Cherry AI assistant. I can help you with:</p>
+                            <ul class="mt-2 text-sm text-gray-300">
+                                <li>🍒 <strong>Cherry:</strong> Personal tasks, ranch management, lifestyle</li>
+                                <li>💼 <strong>Sophia:</strong> Business intelligence, Pay Ready operations</li>
+                                <li>🏥 <strong>Karen:</strong> Healthcare operations, ParagonRX management</li>
+                            </ul>
+                            <p class="mt-2 text-white">What would you like to work on today?</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Input -->
+                <div class="flex space-x-3">
+                    <input 
+                        type="text" 
+                        id="chat-input" 
+                        placeholder="Ask me anything about your domains..."
+                        class="flex-1 bg-white/20 border border-white/30 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cherry-500"
+                        onkeypress="handleChatInput(event)"
+                    >
+                    <button 
+                        onclick="sendMessage()"
+                        class="px-6 py-3 bg-cherry-600 hover:bg-cherry-700 text-white rounded-lg transition-colors font-medium"
+                    >
+                        Send
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Domain-Specific Interfaces (Hidden by default) -->
+        <div id="cherry-domain" class="hidden space-y-6">
+            <h2 class="text-3xl font-bold text-white mb-6">🍒 Cherry Domain - Personal Assistant</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                    <h3 class="text-xl font-bold text-white mb-3">Personal Management</h3>
+                    <p class="text-gray-300 mb-4">Manage your personal tasks, calendar, and lifestyle preferences</p>
+                    <button class="w-full bg-pink-600 hover:bg-pink-700 text-white py-2 rounded-lg transition-colors">
+                        Open Personal Dashboard
+                    </button>
+                </div>
+                <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                    <h3 class="text-xl font-bold text-white mb-3">Ranch Operations</h3>
+                    <p class="text-gray-300 mb-4">Monitor and manage ranch activities, livestock, and operations</p>
+                    <button class="w-full bg-pink-600 hover:bg-pink-700 text-white py-2 rounded-lg transition-colors">
+                        Open Ranch Dashboard
+                    </button>
+                </div>
+                <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                    <h3 class="text-xl font-bold text-white mb-3">Health & Wellness</h3>
+                    <p class="text-gray-300 mb-4">Track health metrics, fitness goals, and wellness activities</p>
+                    <button class="w-full bg-pink-600 hover:bg-pink-700 text-white py-2 rounded-lg transition-colors">
+                        Open Health Dashboard
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="sophia-domain" class="hidden space-y-6">
+            <h2 class="text-3xl font-bold text-white mb-6">💼 Sophia Domain - Pay Ready Business Intelligence</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                    <h3 class="text-xl font-bold text-white mb-3">Debt Recovery Analytics</h3>
+                    <p class="text-gray-300 mb-4">Advanced analytics for debt recovery operations and performance</p>
+                    <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition-colors">
+                        Open Analytics Dashboard
+                    </button>
+                </div>
+                <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                    <h3 class="text-xl font-bold text-white mb-3">Sales Intelligence</h3>
+                    <p class="text-gray-300 mb-4">Sales performance tracking and business intelligence</p>
+                    <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition-colors">
+                        Open Sales Dashboard
+                    </button>
+                </div>
+                <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                    <h3 class="text-xl font-bold text-white mb-3">Business Operations</h3>
+                    <p class="text-gray-300 mb-4">Comprehensive business operations and workflow management</p>
+                    <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition-colors">
+                        Open Operations Dashboard
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="karen-domain" class="hidden space-y-6">
+            <h2 class="text-3xl font-bold text-white mb-6">🏥 Karen Domain - ParagonRX Healthcare Operations</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                    <h3 class="text-xl font-bold text-white mb-3">Patient Management</h3>
+                    <p class="text-gray-300 mb-4">HIPAA-compliant patient data processing and management</p>
+                    <button class="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg transition-colors">
+                        Open Patient Dashboard
+                    </button>
+                </div>
+                <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                    <h3 class="text-xl font-bold text-white mb-3">Clinical Analytics</h3>
+                    <p class="text-gray-300 mb-4">Advanced clinical analytics and quality metrics</p>
+                    <button class="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg transition-colors">
+                        Open Analytics Dashboard
+                    </button>
+                </div>
+                <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                    <h3 class="text-xl font-bold text-white mb-3">Compliance Monitoring</h3>
+                    <p class="text-gray-300 mb-4">Healthcare compliance monitoring and reporting</p>
+                    <button class="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg transition-colors">
+                        Open Compliance Dashboard
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Interface -->
+        <div id="admin-interface" class="hidden space-y-6">
+            <h2 class="text-3xl font-bold text-white mb-6">⚙️ System Administration</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                    <h3 class="text-lg font-bold text-white mb-2">Infrastructure Status</h3>
+                    <div class="space-y-2">
+                        <div class="flex justify-between">
+                            <span class="text-gray-300">Production:</span>
+                            <span class="text-green-400">●</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-300">Database:</span>
+                            <span class="text-green-400">●</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-300">Monitoring:</span>
+                            <span class="text-green-400">●</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                    <h3 class="text-lg font-bold text-white mb-2">Database Connections</h3>
+                    <div class="space-y-2">
+                        <div class="flex justify-between">
+                            <span class="text-gray-300">PostgreSQL:</span>
+                            <span class="text-green-400">●</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-300">Redis:</span>
+                            <span class="text-green-400">●</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-300">Weaviate:</span>
+                            <span class="text-green-400">●</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-300">Pinecone:</span>
+                            <span class="text-green-400">●</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                    <h3 class="text-lg font-bold text-white mb-2">System Metrics</h3>
+                    <div class="space-y-2">
+                        <div class="flex justify-between">
+                            <span class="text-gray-300">CPU:</span>
+                            <span class="text-blue-400">23%</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-300">Memory:</span>
+                            <span class="text-blue-400">45%</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-300">Storage:</span>
+                            <span class="text-blue-400">67%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                    <h3 class="text-lg font-bold text-white mb-2">Quick Actions</h3>
+                    <div class="space-y-2">
+                        <button class="w-full bg-gray-600 hover:bg-gray-700 text-white py-1 px-2 rounded text-sm transition-colors">
+                            View Logs
+                        </button>
+                        <button class="w-full bg-gray-600 hover:bg-gray-700 text-white py-1 px-2 rounded text-sm transition-colors">
+                            Restart Services
+                        </button>
+                        <button class="w-full bg-gray-600 hover:bg-gray-700 text-white py-1 px-2 rounded text-sm transition-colors">
+                            Backup Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Grafana Dashboard Link -->
+            <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                <h3 class="text-xl font-bold text-white mb-3">Monitoring Dashboard</h3>
+                <p class="text-gray-300 mb-4">Access real-time infrastructure monitoring and analytics</p>
+                <a href="http://207.246.108.201:3000" target="_blank" class="inline-block bg-orange-600 hover:bg-orange-700 text-white py-2 px-4 rounded-lg transition-colors">
+                    Open Grafana Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Chat functionality
+        function handleChatInput(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            if (!message) return;
+
+            // Add user message
+            addMessage('user', message);
+            input.value = '';
+
+            // Simulate AI response
+            setTimeout(() => {
+                const response = generateAIResponse(message);
+                addMessage('ai', response);
+            }, 1000);
+        }
+
+        function addMessage(sender, text) {
+            const messagesContainer = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'flex items-start space-x-3';
+
+            if (sender === 'user') {
+                messageDiv.innerHTML = `
+                    <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
+                        U
+                    </div>
+                    <div class="bg-blue-600/20 rounded-lg p-3 max-w-md">
+                        <p class="text-white">${text}</p>
+                    </div>
+                `;
+            } else {
+                messageDiv.innerHTML = `
+                    <div class="w-8 h-8 bg-cherry-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
+                        AI
+                    </div>
+                    <div class="bg-white/20 rounded-lg p-3 max-w-md">
+                        <p class="text-white">${text}</p>
+                    </div>
+                `;
+            }
+
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function generateAIResponse(message) {
+            const lowerMessage = message.toLowerCase();
+            
+            if (lowerMessage.includes('cherry') || lowerMessage.includes('personal')) {
+                return "I can help you with personal tasks and ranch management. Would you like me to show you the Cherry domain dashboard?";
+            } else if (lowerMessage.includes('sophia') || lowerMessage.includes('business') || lowerMessage.includes('pay ready')) {
+                return "I can assist with business intelligence and Pay Ready operations. Let me show you the Sophia domain features.";
+            } else if (lowerMessage.includes('karen') || lowerMessage.includes('healthcare') || lowerMessage.includes('paragon')) {
+                return "I can help with healthcare operations and ParagonRX management. Would you like to access the Karen domain?";
+            } else if (lowerMessage.includes('admin') || lowerMessage.includes('system')) {
+                return "I can show you system administration features and infrastructure monitoring. Check out the admin panel.";
+            } else {
+                return "I'm here to help with your three domains: Cherry (personal), Sophia (business), and Karen (healthcare). What specific area would you like to work on?";
+            }
+        }
+
+        // Navigation functions
+        function showDomain(domain) {
+            // Hide all interfaces
+            document.getElementById('chat-interface').classList.add('hidden');
+            document.getElementById('cherry-domain').classList.add('hidden');
+            document.getElementById('sophia-domain').classList.add('hidden');
+            document.getElementById('karen-domain').classList.add('hidden');
+            document.getElementById('admin-interface').classList.add('hidden');
+
+            // Show selected domain
+            document.getElementById(domain + '-domain').classList.remove('hidden');
+        }
+
+        function showAdmin() {
+            // Hide all interfaces
+            document.getElementById('chat-interface').classList.add('hidden');
+            document.getElementById('cherry-domain').classList.add('hidden');
+            document.getElementById('sophia-domain').classList.add('hidden');
+            document.getElementById('karen-domain').classList.add('hidden');
+
+            // Show admin interface
+            document.getElementById('admin-interface').classList.remove('hidden');
+        }
+
+        function showChat() {
+            // Hide all interfaces
+            document.getElementById('cherry-domain').classList.add('hidden');
+            document.getElementById('sophia-domain').classList.add('hidden');
+            document.getElementById('karen-domain').classList.add('hidden');
+            document.getElementById('admin-interface').classList.add('hidden');
+
+            // Show chat interface
+            document.getElementById('chat-interface').classList.remove('hidden');
+        }
+
+        // Add click handler to logo to return to chat
+        document.querySelector('nav .flex.items-center').addEventListener('click', showChat);
+    </script>
+</body>
+</html>
+
