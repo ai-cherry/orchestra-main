@@ -1,0 +1,323 @@
+{
+  "name": "Cherry AI MCP Platform - Tier 2 Infrastructure",
+  "version": "5.0.0",
+  "description": "Updated MCP setup aligned with Tier 2 enterprise infrastructure and three-domain strategy",
+  "servers": {
+    "conductor": {
+      "command": "python",
+      "args": [
+        "mcp_server/servers/conductor_server.py"
+      ],
+      "env": {
+        "API_URL": "${API_URL:-http://45.32.69.157:8080}",
+        "API_KEY": "${API_KEY:-OrchAI_API_2024!}",
+        "CHERRY_AI_CONDUCTOR_PORT": "${CHERRY_AI_CONDUCTOR_PORT:-8002}",
+        "REDIS_URL": "${REDIS_URL:-redis://45.77.87.106:6379}",
+        "DATABASE_URL": "${DATABASE_URL:-postgresql://orchestra:OrchAI_DB_2024!@45.77.87.106:5432/orchestra}",
+        "PRODUCTION_SERVER": "45.32.69.157",
+        "DATABASE_SERVER": "45.77.87.106",
+        "STAGING_SERVER": "207.246.108.201",
+        "LOAD_BALANCER": "45.63.58.63"
+      },
+      "capabilities": {
+        "tools": true,
+        "resources": true,
+        "prompts": true
+      },
+      "description": "Main orchestration conductor for three AI domains"
+    },
+    "memory": {
+      "command": "python",
+      "args": [
+        "mcp_server/servers/enhanced_memory_server.py"
+      ],
+      "env": {
+        "POSTGRES_HOST": "${POSTGRES_HOST:-45.77.87.106}",
+        "POSTGRES_PORT": "${POSTGRES_PORT:-5432}",
+        "POSTGRES_DB": "${POSTGRES_DB:-orchestra}",
+        "POSTGRES_USER": "${POSTGRES_USER:-orchestra}",
+        "POSTGRES_PASSWORD": "${POSTGRES_PASSWORD:-OrchAI_DB_2024!}",
+        "WEAVIATE_HOST": "${WEAVIATE_HOST:-45.77.87.106}",
+        "WEAVIATE_PORT": "${WEAVIATE_PORT:-8080}",
+        "WEAVIATE_API_KEY": "${WEAVIATE_API_KEY:-}",
+        "PINECONE_API_KEY": "${PINECONE_API_KEY:-pcsk_4vD8zy_Shcrmkr8JKBGm9hZ7ipbFRGVfGxb4Z3xkTAky5noWPRx2RMrWoFcoXPr5Vkwm5L}",
+        "MCP_MEMORY_PORT": "${MCP_MEMORY_PORT:-8003}",
+        "REDIS_URL": "${REDIS_URL:-redis://45.77.87.106:6379}",
+        "DATABASE_URL": "${DATABASE_URL:-postgresql://orchestra:OrchAI_DB_2024!@45.77.87.106:5432/orchestra}"
+      },
+      "capabilities": {
+        "tools": true,
+        "resources": true
+      },
+      "description": "Enhanced memory server with vector database integration"
+    },
+    "weaviate": {
+      "command": "python",
+      "args": [
+        "mcp_server/servers/weaviate_direct_mcp_server.py"
+      ],
+      "env": {
+        "MCP_WEAVIATE_DIRECT_PORT": "${MCP_WEAVIATE_DIRECT_PORT:-8001}",
+        "WEAVIATE_HOST": "${WEAVIATE_HOST:-45.77.87.106}",
+        "WEAVIATE_PORT": "${WEAVIATE_PORT:-8080}",
+        "WEAVIATE_GRPC_PORT": "${WEAVIATE_GRPC_PORT:-50051}",
+        "WEAVIATE_API_KEY": "${WEAVIATE_API_KEY:-}",
+        "WEAVIATE_SECURED": "${WEAVIATE_SECURED:-false}",
+        "WEAVIATE_SKIP_VERIFICATION": "${WEAVIATE_SKIP_VERIFICATION:-false}",
+        "REDIS_URL": "${REDIS_URL:-redis://45.77.87.106:6379}"
+      },
+      "capabilities": {
+        "tools": true,
+        "resources": true
+      },
+      "description": "Direct Weaviate vector database access"
+    },
+    "cherry-domain": {
+      "command": "python",
+      "args": [
+        "mcp_server/servers/cherry_domain_server.py"
+      ],
+      "env": {
+        "MCP_CHERRY_PORT": "${MCP_CHERRY_PORT:-8010}",
+        "DATABASE_URL": "${DATABASE_URL:-postgresql://orchestra:OrchAI_DB_2024!@45.77.87.106:5432/orchestra}",
+        "REDIS_URL": "${REDIS_URL:-redis://45.77.87.106:6379}",
+        "WEAVIATE_URL": "${WEAVIATE_URL:-http://45.77.87.106:8080}",
+        "PINECONE_API_KEY": "${PINECONE_API_KEY:-pcsk_4vD8zy_Shcrmkr8JKBGm9hZ7ipbFRGVfGxb4Z3xkTAky5noWPRx2RMrWoFcoXPr5Vkwm5L}",
+        "DOMAIN_TYPE": "personal"
+      },
+      "capabilities": {
+        "tools": true,
+        "resources": true,
+        "prompts": true
+      },
+      "description": "Cherry domain server for personal assistant features"
+    },
+    "sophia-domain": {
+      "command": "python",
+      "args": [
+        "mcp_server/servers/sophia_domain_server.py"
+      ],
+      "env": {
+        "MCP_SOPHIA_PORT": "${MCP_SOPHIA_PORT:-8011}",
+        "DATABASE_URL": "${DATABASE_URL:-postgresql://orchestra:OrchAI_DB_2024!@45.77.87.106:5432/orchestra}",
+        "REDIS_URL": "${REDIS_URL:-redis://45.77.87.106:6379}",
+        "WEAVIATE_URL": "${WEAVIATE_URL:-http://45.77.87.106:8080}",
+        "PINECONE_API_KEY": "${PINECONE_API_KEY:-pcsk_4vD8zy_Shcrmkr8JKBGm9hZ7ipbFRGVfGxb4Z3xkTAky5noWPRx2RMrWoFcoXPr5Vkwm5L}",
+        "DOMAIN_TYPE": "business"
+      },
+      "capabilities": {
+        "tools": true,
+        "resources": true,
+        "prompts": true
+      },
+      "description": "Sophia domain server for Pay Ready business intelligence"
+    },
+    "karen-domain": {
+      "command": "python",
+      "args": [
+        "mcp_server/servers/karen_domain_server.py"
+      ],
+      "env": {
+        "MCP_KAREN_PORT": "${MCP_KAREN_PORT:-8012}",
+        "DATABASE_URL": "${DATABASE_URL:-postgresql://orchestra:OrchAI_DB_2024!@45.77.87.106:5432/orchestra}",
+        "REDIS_URL": "${REDIS_URL:-redis://45.77.87.106:6379}",
+        "WEAVIATE_URL": "${WEAVIATE_URL:-http://45.77.87.106:8080}",
+        "PINECONE_API_KEY": "${PINECONE_API_KEY:-pcsk_4vD8zy_Shcrmkr8JKBGm9hZ7ipbFRGVfGxb4Z3xkTAky5noWPRx2RMrWoFcoXPr5Vkwm5L}",
+        "DOMAIN_TYPE": "healthcare"
+      },
+      "capabilities": {
+        "tools": true,
+        "resources": true,
+        "prompts": true
+      },
+      "description": "Karen domain server for ParagonRX healthcare operations"
+    },
+    "deployment": {
+      "command": "python",
+      "args": [
+        "mcp_server/servers/deployment_server.py"
+      ],
+      "env": {
+        "MCP_DEPLOYMENT_PORT": "${MCP_DEPLOYMENT_PORT:-8005}",
+        "REDIS_URL": "${REDIS_URL:-redis://45.77.87.106:6379}",
+        "VULTR_API_KEY": "${VULTR_API_KEY:-}",
+        "PRODUCTION_SERVER": "45.32.69.157",
+        "DATABASE_SERVER": "45.77.87.106",
+        "STAGING_SERVER": "207.246.108.201"
+      },
+      "capabilities": {
+        "tools": true
+      },
+      "description": "Infrastructure deployment and management"
+    },
+    "tools": {
+      "command": "python",
+      "args": [
+        "mcp_server/servers/tools_server.py"
+      ],
+      "env": {
+        "MCP_TOOLS_PORT": "${MCP_TOOLS_PORT:-8006}",
+        "REDIS_URL": "${REDIS_URL:-redis://45.77.87.106:6379}",
+        "DATABASE_URL": "${DATABASE_URL:-postgresql://orchestra:OrchAI_DB_2024!@45.77.87.106:5432/orchestra}",
+        "OPENAI_API_KEY": "${OPENAI_API_KEY:-}",
+        "ANTHROPIC_API_KEY": "${ANTHROPIC_API_KEY:-}",
+        "PORTKEY_API_KEY": "${PORTKEY_API_KEY:-}",
+        "PINECONE_API_KEY": "${PINECONE_API_KEY:-pcsk_4vD8zy_Shcrmkr8JKBGm9hZ7ipbFRGVfGxb4Z3xkTAky5noWPRx2RMrWoFcoXPr5Vkwm5L}"
+      },
+      "capabilities": {
+        "tools": true,
+        "resources": true
+      },
+      "description": "Tool discovery and execution server with rich metadata"
+    },
+    "code-intelligence": {
+      "command": "python",
+      "args": [
+        "mcp_server/servers/code_intelligence_server.py"
+      ],
+      "env": {
+        "MCP_CODE_INTELLIGENCE_PORT": "${MCP_CODE_INTELLIGENCE_PORT:-8007}",
+        "REDIS_URL": "${REDIS_URL:-redis://45.77.87.106:6379}",
+        "DATABASE_URL": "${DATABASE_URL:-postgresql://orchestra:OrchAI_DB_2024!@45.77.87.106:5432/orchestra}"
+      },
+      "capabilities": {
+        "tools": true
+      },
+      "description": "Code analysis and AST intelligence for better AI coding context"
+    },
+    "git-intelligence": {
+      "command": "python",
+      "args": [
+        "mcp_server/servers/git_intelligence_server.py"
+      ],
+      "env": {
+        "MCP_GIT_INTELLIGENCE_PORT": "${MCP_GIT_INTELLIGENCE_PORT:-8008}",
+        "REDIS_URL": "${REDIS_URL:-redis://45.77.87.106:6379}",
+        "DATABASE_URL": "${DATABASE_URL:-postgresql://orchestra:OrchAI_DB_2024!@45.77.87.106:5432/orchestra}"
+      },
+      "capabilities": {
+        "tools": true
+      },
+      "description": "Git history and change analysis for understanding code evolution"
+    },
+    "infrastructure-monitoring": {
+      "command": "python",
+      "args": [
+        "mcp_server/servers/infrastructure_monitoring_server.py"
+      ],
+      "env": {
+        "MCP_MONITORING_PORT": "${MCP_MONITORING_PORT:-8013}",
+        "GRAFANA_URL": "${GRAFANA_URL:-http://207.246.108.201:3000}",
+        "GRAFANA_USERNAME": "${GRAFANA_USERNAME:-admin}",
+        "GRAFANA_PASSWORD": "${GRAFANA_PASSWORD:-OrchAI_Grafana_2024!}",
+        "PROMETHEUS_URL": "${PROMETHEUS_URL:-http://207.246.108.201:9090}",
+        "DATABASE_URL": "${DATABASE_URL:-postgresql://orchestra:OrchAI_DB_2024!@45.77.87.106:5432/orchestra}",
+        "REDIS_URL": "${REDIS_URL:-redis://45.77.87.106:6379}"
+      },
+      "capabilities": {
+        "tools": true,
+        "resources": true
+      },
+      "description": "Real-time infrastructure monitoring and alerting"
+    }
+  },
+  "client": {
+    "mcpServers": {
+      "conductor": {
+        "command": "python",
+        "args": [
+          "mcp_server/servers/conductor_server.py"
+        ]
+      },
+      "memory": {
+        "command": "python",
+        "args": [
+          "mcp_server/servers/enhanced_memory_server.py"
+        ]
+      },
+      "cherry-domain": {
+        "command": "python",
+        "args": [
+          "mcp_server/servers/cherry_domain_server.py"
+        ]
+      },
+      "sophia-domain": {
+        "command": "python",
+        "args": [
+          "mcp_server/servers/sophia_domain_server.py"
+        ]
+      },
+      "karen-domain": {
+        "command": "python",
+        "args": [
+          "mcp_server/servers/karen_domain_server.py"
+        ]
+      },
+      "tools": {
+        "command": "python",
+        "args": [
+          "mcp_server/servers/tools_server.py"
+        ]
+      },
+      "infrastructure-monitoring": {
+        "command": "python",
+        "args": [
+          "mcp_server/servers/infrastructure_monitoring_server.py"
+        ]
+      }
+    }
+  },
+  "domains": {
+    "cherry": {
+      "name": "Cherry Personal Domain",
+      "description": "Personal assistant for lifestyle, entertainment, and ranch management",
+      "server": "cherry-domain",
+      "database_schema": "cherry_personal",
+      "features": [
+        "personal_data_management",
+        "ranch_operations",
+        "entertainment_preferences",
+        "lifestyle_optimization"
+      ]
+    },
+    "sophia": {
+      "name": "Sophia Pay Ready Domain", 
+      "description": "Business intelligence for Pay Ready operations and analytics",
+      "server": "sophia-domain",
+      "database_schema": "sophia_business",
+      "features": [
+        "business_intelligence",
+        "sales_automation",
+        "debt_recovery_analytics",
+        "financial_reporting"
+      ]
+    },
+    "karen": {
+      "name": "Karen ParagonRX Domain",
+      "description": "Healthcare operations for ParagonRX management",
+      "server": "karen-domain", 
+      "database_schema": "karen_healthcare",
+      "features": [
+        "healthcare_operations",
+        "patient_data_processing",
+        "compliance_monitoring",
+        "medical_workflow_automation"
+      ]
+    }
+  },
+  "infrastructure": {
+    "tier": 2,
+    "monthly_cost": 455,
+    "servers": {
+      "production": "45.32.69.157",
+      "database": "45.77.87.106",
+      "staging": "207.246.108.201",
+      "load_balancer": "45.63.58.63"
+    },
+    "monitoring": {
+      "grafana": "http://207.246.108.201:3000",
+      "prometheus": "http://207.246.108.201:9090"
+    }
+  }
+}
+
