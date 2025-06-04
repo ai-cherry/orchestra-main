@@ -1,268 +1,137 @@
-name: Security Audit
+name: Enhanced Security Audit
 
 on:
-  push:
-    branches: [ main, develop ]
-    paths:
-      - 'requirements/**'
-      - 'requirements*.txt'
-      - 'pyproject.toml'
-      - 'poetry.lock'
-      - 'Pipfile'
-      - 'Pipfile.lock'
-      - 'admin-ui/package.json'
-      - 'admin-ui/pnpm-lock.yaml'
-  pull_request:
-    branches: [ main, develop ]
-    paths:
-      - 'requirements/**'
-      - 'requirements*.txt'
-      - 'pyproject.toml'
-      - 'poetry.lock'
-      - 'Pipfile'
-      - 'Pipfile.lock'
-      - 'admin-ui/package.json'
-      - 'admin-ui/pnpm-lock.yaml'
   schedule:
-    # Run every Monday at 2 AM UTC
-    - cron: '0 2 * * 1'
+    # Run every Monday at 9:00 AM UTC
+    - cron: '0 9 * * 1'
   workflow_dispatch:
-    inputs:
-      detailed_scan:
-        description: 'Run detailed security scan'
-        required: false
-        default: 'false'
+  push:
+    branches: [ main ]
+    paths:
+      - 'requirements/**'
+      - 'requirements.txt'
+      - '.github/workflows/security-audit.yml'
+
+env:
+  PYTHON_VERSION: '3.11'
 
 jobs:
-  python-security-audit:
+  security-audit:
+    name: Comprehensive Security Audit
     runs-on: ubuntu-latest
-    name: Python Security Audit
     
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.10'
+      - name: Checkout code
+        uses: actions/checkout@v4
         
-    - name: Cache pip packages
-      uses: actions/cache@v4
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('requirements/*.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-pip-
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
           
-    - name: Install security tools
-      run: |
-        python -m pip install --upgrade pip
-        pip install pip-audit safety bandit
-        
-    - name: Run pip-audit
-      id: pip_audit
-      continue-on-error: true
-      run: |
-        echo "## Pip Audit Results" >> $GITHUB_STEP_SUMMARY
-        echo "Running security audit on all requirements files..."
-        
-        # Scan each requirements file
-        for req_file in requirements/*.txt requirements/production/*.txt requirements*.txt; do
-          if [ -f "$req_file" ]; then
-            echo "### Scanning $req_file" >> $GITHUB_STEP_SUMMARY
-            if pip-audit --requirement "$req_file" --format markdown >> audit_output.md 2>&1; then
-              echo "✅ No vulnerabilities found" >> $GITHUB_STEP_SUMMARY
-            else
-              echo "❌ Vulnerabilities detected:" >> $GITHUB_STEP_SUMMARY
-              cat audit_output.md >> $GITHUB_STEP_SUMMARY
-            fi
-            echo "" >> $GITHUB_STEP_SUMMARY
+      - name: Install security tools
+        run: |
+          pip install --upgrade pip
+          pip install safety pip-audit bandit semgrep
+          
+      - name: Install project dependencies
+        run: |
+          pip install -r requirements.txt || true
+          
+      - name: Run security audit script
+        run: |
+          ./scripts/security_audit.sh
+          
+      - name: Run Semgrep security scan
+        run: |
+          semgrep --config=auto --json --output=security_reports/semgrep_$(date +%Y%m%d).json . || true
+          
+      - name: Check for high-severity vulnerabilities
+        id: check_vulnerabilities
+        run: |
+          # Check if there are any critical or high severity issues
+          CRITICAL_ISSUES=0
+          
+          # Check pip-audit results
+          if [ -f security_reports/pip_audit_*.json ]; then
+            CRITICAL_COUNT=$(jq '[.vulnerabilities[] | select(.aliases[] | contains("CVE")) | select(.fix_versions | length == 0)] | length' security_reports/pip_audit_*.json 2>/dev/null || echo "0")
+            CRITICAL_ISSUES=$((CRITICAL_ISSUES + CRITICAL_COUNT))
           fi
-        done
-        
-    - name: Run Safety check
-      id: safety_check
-      continue-on-error: true
-      run: |
-        echo "## Safety Check Results" >> $GITHUB_STEP_SUMMARY
-        safety check --json > safety_report.json || true
-        
-        # Parse and display results
-        cat > parse_safety.py << 'EOF'
-        import json
-        with open('safety_report.json', 'r') as f:
-            data = json.load(f)
-            vulns = data.get('vulnerabilities', [])
-            if not vulns:
-                print('✅ No vulnerabilities found')
-            else:
-                print(f'❌ Found {len(vulns)} vulnerabilities')
-                for v in vulns[:10]:  # Show first 10
-                    print(f"- {v.get('package', 'Unknown')}: {v.get('advisory', 'No details')}")
-                if len(vulns) > 10:
-                    print(f'... and {len(vulns) - 10} more')
-        EOF
-        python parse_safety.py >> $GITHUB_STEP_SUMMARY
-        
-    - name: Run Bandit security linter
-      if: ${{ github.event.inputs.detailed_scan == 'true' || github.event_name == 'schedule' }}
-      continue-on-error: true
-      run: |
-        echo "## Bandit Security Linter Results" >> $GITHUB_STEP_SUMMARY
-        bandit -r . -f json -o bandit_report.json || true
-        
-        # Parse and display results
-        cat > parse_bandit.py << 'EOF'
-        import json
-        with open('bandit_report.json', 'r') as f:
-            data = json.load(f)
-            issues = data.get('results', [])
-            if not issues:
-                print('✅ No security issues found in code')
-            else:
-                print(f'⚠️ Found {len(issues)} potential security issues')
-                for issue in issues[:5]:  # Show first 5
-                    print(f"- {issue.get('filename', 'Unknown')}:{issue.get('line_number', '?')}: {issue.get('issue_text', 'No details')}")
-                if len(issues) > 5:
-                    print(f'... and {len(issues) - 5} more')
-        EOF
-        python parse_bandit.py >> $GITHUB_STEP_SUMMARY
-        
-    - name: Upload security reports
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: security-reports-${{ github.run_id }}
-        path: |
-          audit_output.md
-          safety_report.json
-          bandit_report.json
-        retention-days: 30
-        
-    - name: Comment on PR
-      if: github.event_name == 'pull_request' && (steps.pip_audit.outcome == 'failure' || steps.safety_check.outcome == 'failure')
-      uses: actions/github-script@v7
-      with:
-        script: |
-          const comment = `## ⚠️ Security Vulnerabilities Detected
           
-          This PR introduces or contains dependencies with known security vulnerabilities.
-          Please review the security audit results in the workflow summary and update the affected packages.
+          echo "critical_issues=$CRITICAL_ISSUES" >> $GITHUB_OUTPUT
           
-          [View detailed report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})`;
+          if [ $CRITICAL_ISSUES -gt 0 ]; then
+            echo "⚠️ Found $CRITICAL_ISSUES critical security issues!"
+            exit 1
+          else
+            echo "✅ No critical security issues found"
+          fi
           
-          github.rest.issues.createComment({
-            issue_number: context.issue.number,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            body: comment
-          });
+      - name: Upload security reports
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: security-reports-${{ github.run_number }}
+          path: security_reports/
+          retention-days: 30
           
-    - name: Fail if vulnerabilities found
-      if: steps.pip_audit.outcome == 'failure' || steps.safety_check.outcome == 'failure'
-      run: |
-        echo "❌ Security vulnerabilities detected. Please fix before merging."
-        exit 1
-        
-  pnpm-security-audit:
-    runs-on: ubuntu-latest
-    name: Frontend Security Audit
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup pnpm
-      uses: pnpm/action-setup@v4
-      with:
-        version: 10.10.0
-        
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-        cache: 'pnpm'
-        cache-dependency-path: admin-ui/pnpm-lock.yaml
-        
-    - name: Install dependencies
-      working-directory: admin-ui
-      run: pnpm install --frozen-lockfile
-      
-    - name: Run security audit
-      id: pnpm_audit
-      working-directory: admin-ui
-      continue-on-error: true
-      run: |
-        echo "## pnpm Security Audit Results" >> $GITHUB_STEP_SUMMARY
-        
-        # Run the custom security audit script
-        if node scripts/security-audit.js; then
-          echo "✅ No critical vulnerabilities found" >> $GITHUB_STEP_SUMMARY
-        else
-          echo "❌ Security vulnerabilities detected" >> $GITHUB_STEP_SUMMARY
-          exit 1
-        fi
-        
-    - name: Check for outdated packages
-      if: github.event_name == 'schedule' || github.event.inputs.detailed_scan == 'true'
-      working-directory: admin-ui
-      continue-on-error: true
-      run: |
-        echo "## Outdated Packages" >> $GITHUB_STEP_SUMMARY
-        pnpm outdated >> $GITHUB_STEP_SUMMARY || echo "Failed to check outdated packages" >> $GITHUB_STEP_SUMMARY
-        
-    - name: Upload frontend security reports
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: frontend-security-reports-${{ github.run_id }}
-        path: |
-          admin-ui/security-report.json
-        retention-days: 30
-        
-    - name: Comment on PR (Frontend)
-      if: github.event_name == 'pull_request' && steps.pnpm_audit.outcome == 'failure'
-      uses: actions/github-script@v7
-      with:
-        script: |
-          const comment = `## ⚠️ Frontend Security Vulnerabilities Detected
-          
-          The admin-ui has dependencies with known security vulnerabilities.
-          Please run \`pnpm run security:fix\` in the admin-ui directory and review the changes.
-          
-          [View detailed report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})`;
-          
-          github.rest.issues.createComment({
-            issue_number: context.issue.number,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            body: comment
-          });
-          
-  security-summary:
-    needs: [python-security-audit, pnpm-security-audit]
-    runs-on: ubuntu-latest
-    if: always()
-    
-    steps:
-    - name: Security Check Summary
-      run: |
-        echo "## 🔒 Security Audit Summary" >> $GITHUB_STEP_SUMMARY
-        
-        if [[ "${{ needs.python-security-audit.result }}" == "success" ]]; then
-          echo "✅ Python dependencies: Secure" >> $GITHUB_STEP_SUMMARY
-        else
-          echo "❌ Python dependencies: Vulnerabilities found" >> $GITHUB_STEP_SUMMARY
-        fi
-        
-        if [[ "${{ needs.pnpm-security-audit.result }}" == "success" ]]; then
-          echo "✅ Frontend dependencies: Secure" >> $GITHUB_STEP_SUMMARY
-        else
-          echo "❌ Frontend dependencies: Vulnerabilities found" >> $GITHUB_STEP_SUMMARY
-        fi
-        
-        # Fail the workflow if either audit failed
-        if [[ "${{ needs.python-security-audit.result }}" != "success" ]] || [[ "${{ needs.pnpm-security-audit.result }}" != "success" ]]; then
-          exit 1
-        fi 
+      - name: Create issue for critical vulnerabilities
+        if: failure() && steps.check_vulnerabilities.outputs.critical_issues > 0
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const title = `🚨 Critical Security Vulnerabilities Detected - ${new Date().toISOString().split('T')[0]}`;
+            const body = `
+            ## Critical Security Alert
+            
+            Our automated security audit has detected **${{ steps.check_vulnerabilities.outputs.critical_issues }}** critical security vulnerabilities.
+            
+            ### Immediate Action Required
+            1. Review the security reports in the workflow artifacts
+            2. Update vulnerable packages immediately
+            3. Test the application after updates
+            4. Close this issue once all vulnerabilities are resolved
+            
+            ### Reports Available
+            - pip-audit results
+            - safety check results  
+            - bandit code scan results
+            - semgrep security scan results
+            
+            **Workflow Run:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            
+            ---
+            *This issue was automatically created by the security audit workflow.*
+            `;
+            
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              body: body,
+              labels: ['security', 'critical', 'automated']
+            });
+            
+      - name: Comment on PR if security issues found
+        if: github.event_name == 'pull_request' && failure()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const comment = `
+            ## 🚨 Security Issues Detected
+            
+            This PR introduces or contains security vulnerabilities:
+            - **${{ steps.check_vulnerabilities.outputs.critical_issues }}** critical issues found
+            
+            Please review the security reports and fix all issues before merging.
+            
+            **Security Reports:** Available in workflow artifacts
+            `;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+

@@ -244,7 +244,7 @@ tomlkit==0.13.2
 torch==2.7.0
 torchvision==0.22.0
 tqdm==4.67.1
-transformers==4.36.2
+transformers==4.50.0
 triton==3.3.0
 typer==0.15.4
 types-PyYAML==6.0.12.20250516
