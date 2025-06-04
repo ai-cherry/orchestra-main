@@ -1,0 +1,154 @@
+{
+  "timestamp": "2025-06-04T16:53:26.015413",
+  "environment": {
+    "POSTGRES_HOST": {
+      "set": true,
+      "value_preview": "localhos..."
+    },
+    "POSTGRES_PASSWORD": {
+      "set": true,
+      "value_preview": "OrchAI_D..."
+    },
+    "REDIS_HOST": {
+      "set": true,
+      "value_preview": "localhos..."
+    },
+    "WEAVIATE_URL": {
+      "set": true,
+      "value_preview": "http://l..."
+    },
+    "PINECONE_API_KEY": {
+      "set": true,
+      "value_preview": "your_pin..."
+    },
+    "OPENAI_API_KEY": {
+      "set": true,
+      "value_preview": "your_ope..."
+    },
+    "SALESFORCE_CLIENT_ID": {
+      "set": true,
+      "value_preview": "your_sal..."
+    },
+    "HUBSPOT_API_KEY": {
+      "set": true,
+      "value_preview": "your_hub..."
+    },
+    "APOLLO_API_KEY": {
+      "set": true,
+      "value_preview": "your_apo..."
+    }
+  },
+  "databases": {
+    "PostgreSQL": {
+      "host": "localhost",
+      "port": 5432,
+      "accessible": false
+    },
+    "Redis": {
+      "host": "localhost",
+      "port": 6379,
+      "accessible": true
+    },
+    "Weaviate": {
+      "host": "localhost",
+      "port": 8080,
+      "accessible": false
+    },
+    "Local PostgreSQL": {
+      "host": "localhost",
+      "port": 5432,
+      "accessible": false
+    },
+    "Local Redis": {
+      "host": "localhost",
+      "port": 6379,
+      "accessible": true
+    },
+    "Local Weaviate": {
+      "host": "localhost",
+      "port": 8080,
+      "accessible": false
+    }
+  },
+  "apis": {
+    "Salesforce": {
+      "functional": true,
+      "message": "Endpoint accessible"
+    },
+    "HubSpot": {
+      "functional": true,
+      "message": "Endpoint accessible"
+    },
+    "Apollo": {
+      "functional": true,
+      "message": "Endpoint accessible"
+    },
+    "Gong": {
+      "functional": true,
+      "message": "Endpoint accessible"
+    },
+    "Slack": {
+      "functional": false,
+      "message": "invalid_auth"
+    },
+    "Looker": {
+      "functional": false,
+      "message": "Server disconnected"
+    },
+    "OpenAI": {
+      "functional": false,
+      "message": "Invalid API key"
+    },
+    "Pinecone": {
+      "functional": false,
+      "message": "Invalid API key"
+    }
+  },
+  "services": {
+    "Python Version": {
+      "ok": true,
+      "message": "Python 3.11.0rc1",
+      "version": "3.11.0rc1"
+    },
+    "Required Packages": {
+      "ok": true,
+      "message": "All packages available",
+      "missing": []
+    },
+    "Disk Space": {
+      "ok": true,
+      "message": "19GB free",
+      "free_bytes": 21157101568
+    },
+    "Memory Usage": {
+      "ok": true,
+      "message": "1.0GB available",
+      "available_bytes": 1984565248
+    },
+    "Network Connectivity": {
+      "ok": true,
+      "message": "Connected (100.24.106.50)",
+      "ip": "100.24.106.50"
+    }
+  },
+  "summary": {
+    "environment": {
+      "set": 9,
+      "total": 9
+    },
+    "databases": {
+      "accessible": 2,
+      "total": 6
+    },
+    "apis": {
+      "functional": 4,
+      "total": 8
+    },
+    "services": {
+      "ok": 5,
+      "total": 5
+    },
+    "overall_percentage": 71.42857142857143,
+    "status": "\ud83d\udfe1 GOOD"
+  }
+}

@@ -360,7 +360,7 @@ docker-compose -f monitoring/docker-compose.yml up -d
 
 # Access dashboards
 # Prometheus: http://localhost:9090
-# Grafana: http://localhost:3000
+# Grafana: https://cherry-ai.me
 ```
 
 ## Advanced Features
