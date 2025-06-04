@@ -1,45 +1,52 @@
 {
-  "mcp-servers": {
-    "code-intelligence": {
-      "command": "python",
-      "args": [
-        "mcp_server/servers/code_intelligence_server.py"
-      ],
+  "mcpServers": {
+    "cherry-ai-codebase": {
+      "command": "python3",
+      "args": ["./mcp_server/servers/enhanced_codebase_server.py"],
       "env": {
-        "REDIS_URL": "${REDIS_URL:-redis://redis:6379}",
-        "MCP_CODE_INTELLIGENCE_PORT": "${MCP_CODE_INTELLIGENCE_PORT:-8007}"
+        "PYTHONPATH": ".:./mcp_server",
+        "PROJECT_ROOT": ".",
+        "OPENAI_API_KEY": "${OPENAI_API_KEY}",
+        "ANTHROPIC_API_KEY": "${ANTHROPIC_API_KEY}",
+        "REDIS_URL": "redis://localhost:6379"
       }
     },
-    "git-intelligence": {
-      "command": "python",
-      "args": [
-        "mcp_server/servers/git_intelligence_server.py"
-      ],
+    "cherry-ai-infrastructure": {
+      "command": "python3",
+      "args": ["./mcp_server/servers/infrastructure_manager.py"],
       "env": {
-        "REDIS_URL": "${REDIS_URL:-redis://redis:6379}",
-        "MCP_GIT_INTELLIGENCE_PORT": "${MCP_GIT_INTELLIGENCE_PORT:-8008}"
+        "PYTHONPATH": ".:./mcp_server",
+        "PROJECT_ROOT": ".",
+        "VULTR_API_KEY": "${VULTR_API_KEY}",
+        "PULUMI_ACCESS_TOKEN": "${PULUMI_ACCESS_TOKEN}",
+        "PRODUCTION_SERVER_IP": "45.32.69.157"
       }
     },
-    "tools": {
-      "command": "python",
-      "args": [
-        "mcp_server/servers/tools_server.py"
-      ],
+    "cherry-ai-codex": {
+      "command": "python3",
+      "args": ["./mcp_server/codex_integration.py"],
       "env": {
-        "REDIS_URL": "${REDIS_URL:-redis://redis:6379}",
-        "MCP_TOOLS_PORT": "${MCP_TOOLS_PORT:-8006}"
+        "PYTHONPATH": ".:./mcp_server",
+        "PROJECT_ROOT": ".",
+        "OPENAI_API_KEY": "${OPENAI_API_KEY}"
       }
     },
-    "memory": {
-      "command": "python",
-      "args": [
-        "mcp_server/servers/memory_server.py"
-      ],
+    "cherry-ai-database": {
+      "command": "python3",
+      "args": ["./infrastructure/database_layer/enterprise_db_manager.py"],
       "env": {
-        "REDIS_URL": "${REDIS_URL:-redis://redis:6379}",
-        "MCP_MEMORY_PORT": "${MCP_MEMORY_PORT:-8003}",
-        "POSTGRES_URL": "postgresql://postgres:postgres@postgres:5432/cherry_ai"
+        "PYTHONPATH": ".:./mcp_server",
+        "PROJECT_ROOT": ".",
+        "POSTGRES_HOST": "45.77.87.106",
+        "POSTGRES_USER": "postgres",
+        "POSTGRES_PASSWORD": "${POSTGRES_PASSWORD}",
+        "POSTGRES_DB": "cherry_ai",
+        "REDIS_URL": "redis://localhost:6379",
+        "WEAVIATE_URL": "${WEAVIATE_URL}",
+        "WEAVIATE_API_KEY": "${WEAVIATE_API_KEY}",
+        "PINECONE_API_KEY": "${PINECONE_API_KEY}"
       }
     }
   }
 }
+
