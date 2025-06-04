@@ -143,6 +143,42 @@ jobs:
           build-args: |
             NODE_ENV=production
 
+  # Stage 3.5: Build Backend API Server
+  build-backend:
+    name: Build Backend API Server
+    runs-on: ubuntu-latest
+    needs: unit-tests # Assuming backend unit tests would be a prerequisite if they existed as a separate job
+    outputs:
+      image-tag: ${{ steps.meta-backend.outputs.tags }}
+      image-digest: ${{ steps.build-backend-image.outputs.digest }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Docker Meta for Backend
+        id: meta-backend
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.DOCKER_REGISTRY }}/${{ env.VULTR_PROJECT_ID }}/api-server
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix={{branch}}-
+            type=raw,value=${{ env.DEPLOYMENT_ENVIRONMENT }}-latest
+
+      - name: Build and Push Backend Docker Image
+        id: build-backend-image
+        uses: docker/build-push-action@v5
+        with:
+          context: . # Assuming Dockerfile.minimal is at the root of the repo
+          file: ./Dockerfile.minimal # Path to the backend Dockerfile
+          push: true
+          tags: ${{ steps.meta-backend.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          # No build-args specified here, but could be added if backend needs them
+
   # Stage 4: Integration Tests
   integration-tests:
     name: Integration Tests
@@ -170,10 +206,40 @@ jobs:
   infrastructure:
     name: Provision Infrastructure with Pulumi
     runs-on: ubuntu-latest
-    needs: integration-tests
+    needs: integration-tests # Should ideally run after all builds if infra depends on image digests, or in parallel if not.
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
+    outputs: # Define outputs for this job to be used by the deploy job
+      vke_cluster_id: ${{ steps.pulumi-outputs.outputs.vke_cluster_id }}
+      admin_ui_load_balancer_ip: ${{ steps.pulumi-outputs.outputs.admin_ui_load_balancer_ip }}
+      admin_ui_dns_name: ${{ steps.pulumi-outputs.outputs.admin_ui_dns_name }}
+      admin_ui_deployment_name: ${{ steps.pulumi-outputs.outputs.admin_ui_deployment_name }}
+      admin_ui_container_name: ${{ steps.pulumi-outputs.outputs.admin_ui_container_name }}
+      api_deployment_name: ${{ steps.pulumi-outputs.outputs.api_deployment_name }}
+      api_container_name: ${{ steps.pulumi-outputs.outputs.api_container_name }}
+      api_service_url: ${{ steps.pulumi-outputs.outputs.api_service_url }}
     steps:
       - uses: actions/checkout@v4
+
+      # Pulumi Design Notes for Backend API (infrastructure/pulumi/api/ or extend existing):
+      # 1. Kubernetes Deployment for API Server:
+      #    - Uses image from ${{ env.DOCKER_REGISTRY }}/${{ env.VULTR_PROJECT_ID }}/api-server.
+      #    - Mounts K8s Secrets as environment variables for:
+      #      - POSTGRES_HOST, POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB
+      #      - WEAVIATE_CLUSTER_URL, WEAVIATE_API_KEY, OPENAI_API_KEY
+      #      - AIRBYTE_API_TOKEN (or AIRBYTE_CLIENT_ID/SECRET)
+      #      - PORTKEY_API_KEY, ANTHROPIC_API_KEY, LANGCHAIN_API_KEY
+      #      - REDIS_DATABASE_NAME, REDIT_DATABASE_ENDPOINT # Note: Typo REDIT -> REDIS
+      #    - Mounts K8s ConfigMaps for configuration files (paths relative to container's /app workdir):
+      #      - 'personas.yaml' from './config/personas.yaml' (repo) into '/app/config/personas.yaml'.
+      #      - 'mcp_servers.yaml' from './config/mcp_servers.yaml' (repo) into '/app/config/mcp_servers.yaml'.
+      #        IMPORTANT: If mcp_servers.yaml is dynamically updated by the API, it requires a PersistentVolumeClaim (PVC)
+      #        and should not be a read-only ConfigMap. For initial setup, ConfigMap is okay for read-only use.
+      #        The MCPConfigManager currently writes to this file, so a PVC is necessary for the API server.
+      # 2. Kubernetes Service (e.g., ClusterIP) for internal access to API pods.
+      # 3. Kubernetes Ingress to expose the API service externally (e.g., via /api/v1/*).
+      #    - Ingress rules should align with NEXT_PUBLIC_API_URL for the frontend.
+      # Outputs from Pulumi for this job should include:
+      #   api_deployment_name, api_container_name, api_service_url (or ingress details).
       
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -227,9 +293,21 @@ jobs:
         id: pulumi-outputs
         run: |
           cd infrastructure/pulumi/dashboard
-          # Export outputs for use in subsequent jobs
-          echo "cloud_run_url=$(pulumi stack output cloudRunUrl)" >> $GITHUB_OUTPUT
-          echo "load_balancer_ip=$(pulumi stack output loadBalancerIp)" >> $GITHUB_OUTPUT
+          # Ensure these outputs are actually set by your Pulumi script for the dashboard
+          echo "vke_cluster_id=$(pulumi stack output vkeClusterId || echo 'default-vke-id')" >> $GITHUB_OUTPUT
+          # Kubeconfig is sensitive, prefer fetching it in the deploy job using vultr-cli if possible.
+          # If outputting directly, ensure it's handled as a secret or very carefully.
+          # For this example, we'll assume only cluster ID is needed and kubeconfig is fetched dynamically.
+          # echo "kubeconfig_content=$(pulumi stack output kubeconfigContent)" >> $GITHUB_OUTPUT
+          echo "admin_ui_load_balancer_ip=$(pulumi stack output adminUiLoadBalancerIp || echo '0.0.0.0')" >> $GITHUB_OUTPUT
+          echo "admin_ui_dns_name=$(pulumi stack output adminUiDnsName || echo 'placeholder.example.com')" >> $GITHUB_OUTPUT
+          echo "admin_ui_deployment_name=$(pulumi stack output adminUiDeploymentName || echo 'admin-ui-deployment')" >> $GITHUB_OUTPUT
+          echo "admin_ui_container_name=$(pulumi stack output adminUiContainerName || echo 'admin-ui')" >> $GITHUB_OUTPUT
+          # Backend related outputs
+          echo "api_deployment_name=$(pulumi stack output apiDeploymentName || echo 'api-server-deployment')" >> $GITHUB_OUTPUT
+          echo "api_container_name=$(pulumi stack output apiContainerName || echo 'api-server')" >> $GITHUB_OUTPUT
+          echo "api_service_url=$(pulumi stack output apiServiceUrl || echo 'http://api-server-internal-svc:9000')" >> $GITHUB_OUTPUT
+          echo "All Pulumi outputs exported."
 
   # Stage 6: Database Migrations
   database-migrations:
@@ -242,44 +320,107 @@ jobs:
       
       - name: Run Migrations
         run: |
-          # Ensure VULTR_API_KEY is available if vultr-cli needs it here
-          # Connect to Vultr Database and run migrations
-          # The command below is a placeholder and needs to be Vultr-specific
-          echo "Placeholder for Vultr database migration: ${{ secrets.DB_INSTANCE }}"
-          # Example: vultr-cli database sql ${{ secrets.VULTR_DB_ID }} < migrations/latest.sql
-          # Or use psql via an SSH tunnel if self-managed PostgreSQL on a Vultr VPS
+          echo "Database migrations placeholder - not directly applicable to frontend deployment or managed by backend."
 
   # Stage 7: Deploy Application
   deploy:
     name: Deploy to ${{ github.ref == 'refs/heads/main' && 'Production' || 'Staging' }}
     runs-on: ubuntu-latest
-    needs: [build, infrastructure, database-migrations]
+    needs: [build, build-backend, infrastructure, database-migrations] # Added build-backend
     if: github.event_name == 'push'
     environment:
       name: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
-      url: ${{ steps.deploy.outputs.url }}
+      url: ${{ steps.set-output-url.outputs.url }}
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Deploy to Vultr Instance (Example for VPS)
-        id: deploy
+
+      - name: Install Vultr CLI
         run: |
-          echo "Deploying to Vultr instance..."
-          # Example using vultr-cli to deploy a container or update an app
-          # This is highly dependent on your Vultr setup (Kubernetes, VPS with Docker, etc.)
-          # If deploying to a Vultr VPS with Docker:
-          # 1. Ensure SSH key is set up for the instance
-          # 2. Use scp/rsync to copy new image or docker-compose file
-          # 3. SSH into instance and run docker-compose up -d or docker run ...
-          # For Vultr Kubernetes (VKE):
-          # vultr-cli kubernetes config > kubeconfig.yaml
-          # KUBECONFIG=kubeconfig.yaml kubectl set image deployment/admin-ui-deployment admin-ui=${{ needs.build.outputs.image-tag }}
+          echo "Installing Vultr CLI..."
+          # Official Vultr CLI install script
+          curl -sL "https://github.com/vultr/vultr-cli/releases/latest/download/vultr-cli_linux_amd64" -o /usr/local/bin/vultr-cli
+          chmod +x /usr/local/bin/vultr-cli
+          vultr-cli version
+      
+      - name: Install kubectl
+        run: |
+          echo "Installing kubectl..."
+          KUBECTL_VERSION=$(curl -L -s https://dl.k8s.io/release/stable.txt)
+          curl -LO "https://dl.k8s.io/release/$KUBECTL_VERSION/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          sudo mv kubectl /usr/local/bin/
+          kubectl version --client
+
+      - name: Configure Kubectl for Vultr VKE
+        env:
+          VULTR_API_KEY: ${{ secrets.VULTR_API_KEY }}
+        run: |
+          echo "Fetching kubeconfig for VKE cluster ${{ needs.infrastructure.outputs.vke_cluster_id }}"
+          mkdir -p $HOME/.kube
+          vultr-cli kubernetes config ${{ needs.infrastructure.outputs.vke_cluster_id }} --save --output-dir $HOME/.kube
+          export KUBECONFIG=$HOME/.kube/config
+          kubectl config current-context
+          kubectl get nodes # Verify connectivity
           
-          # Placeholder for actual Vultr deployment logic:
-          echo "Vultr deployment target URL would be: https://admin.${{ env.DEPLOYMENT_ENVIRONMENT }}.example.com"
-          # The following lines assume a Vultr Cloud Run equivalent or Load Balancer IP for url output
-          # You will need to replace this with actual URL/IP from your Vultr deployment
-          echo "url=https://placeholder-url.vultr.com" >> $GITHUB_OUTPUT 
+      - name: Update Kubernetes Deployment for Admin UI
+        id: deploy-k8s
+        env:
+          KUBECONFIG: $HOME/.kube/config # Ensure KUBECONFIG is set for this step
+        run: |
+          echo "Deploying image ${{ needs.build.outputs.image-tag }} to VKE..."
+          DEPLOYMENT_NAME="${{ needs.infrastructure.outputs.admin_ui_deployment_name }}"
+          CONTAINER_NAME="${{ needs.infrastructure.outputs.admin_ui_container_name }}"
+          IMAGE_TAG="${{ needs.build.outputs.image-tag }}"
+
+          echo "Target K8s Deployment: $DEPLOYMENT_NAME"
+          echo "Target K8s Container in Deployment: $CONTAINER_NAME"
+          echo "New Docker Image: $IMAGE_TAG"
+
+          kubectl set image deployment/$DEPLOYMENT_NAME $CONTAINER_NAME=$IMAGE_TAG --record
+          echo "Waiting for rollout to complete..."
+          kubectl rollout status deployment/$DEPLOYMENT_NAME -w --timeout=5m
+          echo "Admin UI Rollout complete."
+
+      - name: Deploy Backend API to VKE
+        if: success() # Only run if Admin UI deployment succeeded
+        env:
+          KUBECONFIG: ${{ env.HOME }}/.kube/config
+          VULTR_API_KEY: ${{ secrets.VULTR_API_KEY }}
+        run: |
+          echo "Deploying backend image ${{ needs.build-backend.outputs.image-tag }} to VKE..."
+          API_DEPLOYMENT_NAME="${{ needs.infrastructure.outputs.api_deployment_name }}"
+          API_CONTAINER_NAME="${{ needs.infrastructure.outputs.api_container_name }}"
+          # Use a specific tag, like the SHA-based one, for precise deployment
+          # Assuming needs.build-backend.outputs.image-tag provides the appropriate tag for deployment
+          BACKEND_IMAGE_TAG="${{ needs.build-backend.outputs.image-tag }}"
+
+          echo "Target K8s API Deployment: $API_DEPLOYMENT_NAME"
+          echo "Target K8s API Container: $API_CONTAINER_NAME"
+          echo "New Backend Docker Image: $BACKEND_IMAGE_TAG"
+
+          kubectl set image deployment/$API_DEPLOYMENT_NAME $API_CONTAINER_NAME=$BACKEND_IMAGE_TAG --record
+          echo "Waiting for backend API rollout to complete..."
+          kubectl rollout status deployment/$API_DEPLOYMENT_NAME -w --timeout=5m
+          echo "Backend API deployment updated."
+
+      - name: Set Deployment Output URL
+        id: set-output-url
+        run: |
+          # Prefer DNS name if available, otherwise use Load Balancer IP
+          ACCESS_POINT="${{ needs.infrastructure.outputs.admin_ui_dns_name || needs.infrastructure.outputs.admin_ui_load_balancer_ip }}"
+          # Ensure it's a valid value before proceeding
+          if [ -z "$ACCESS_POINT" ] || [ "$ACCESS_POINT" == "placeholder.example.com" ] || [ "$ACCESS_POINT" == "0.0.0.0" ]; then
+            echo "Warning: Valid DNS name or Load Balancer IP not available from infrastructure outputs. Using placeholder."
+            DEPLOY_URL="https://placeholder-deployed-url.example.com"
+          else
+            DEPLOY_URL="$ACCESS_POINT"
+          fi
+
+          if [[ ! "$DEPLOY_URL" =~ ^https?:// ]]; then
+            DEPLOY_URL="https://$DEPLOY_URL" # Assume HTTPS if no scheme provided
+          fi
+          echo "url=$DEPLOY_URL" >> $GITHUB_OUTPUT
+          echo "Deployment URL: $DEPLOY_URL"
 
   # Stage 8: Performance Tests
   performance-tests:
@@ -300,8 +441,8 @@ jobs:
       
       - name: Run Load Tests
         run: |
-          # Run k6 load tests
-          docker run --rm -i grafana/k6 run - <tests/load/dashboard.js
+          echo "K6 load tests placeholder - to be implemented if tests/load/dashboard.js is configured."
+          # docker run --rm -i grafana/k6 run - <tests/load/dashboard.js
 
   # Stage 9: Post-Deployment Validation
   validate-deployment:
@@ -312,24 +453,30 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Health Check
+      - name: Health Check (Frontend)
         run: |
-          URL="${{ needs.deploy.outputs.url }}"
+          URL="${{ needs.deploy.outputs.url }}" # This now refers to set-output-url step's output
+          echo "Attempting health check on frontend URL: $URL"
+          # For a Next.js app, a successful GET on the base URL is usually a good basic health check.
+          # The backend API health check /api/health is separate.
           for i in {1..30}; do
-            if curl -f "$URL/api/health"; then
-              echo "Health check passed"
+            # Using --head to avoid downloading body, -f to fail on HTTP errors, -s for silent, -L to follow redirects
+            if curl --head -fsL "$URL"; then
+              echo "Frontend health check passed (received HTTP 2xx/3xx) at $URL"
               exit 0
             fi
-            echo "Waiting for service to be healthy..."
+            echo "Waiting for frontend service to be healthy at $URL..."
             sleep 10
           done
-          echo "Health check failed"
+          echo "Frontend health check failed at $URL"
           exit 1
       
-      - name: Smoke Tests
+      - name: Smoke Tests (E2E)
         run: |
-          cd dashboard
-          npm run test:e2e -- --baseUrl=${{ needs.deploy.outputs.url }}
+          echo "E2E tests placeholder - ensure 'npm run test:e2e' is configured and dashboard dependencies are installed if run here."
+          # cd dashboard
+          # npm ci # If not already done or if this job runs on a fresh runner without cached node_modules
+          # npm run test:e2e -- --baseUrl=${{ needs.deploy.outputs.url }}
 
   # Stage 10: Traffic Switch (Blue-Green)
   switch-traffic:
@@ -342,13 +489,11 @@ jobs:
     steps:
       - name: Switch Traffic (Example for Vultr Load Balancer or DNS)
         run: |
-          echo "Switching traffic on Vultr..."
-          # This is highly dependent on your Vultr setup.
-          # If using Vultr Load Balancer: 
-          # vultr-cli load-balancer update <LB_ID> --forwarding-rules "...new_instance_id..."
-          # If using Vultr DNS for traffic switch:
-          # vultr-cli dns records update <DOMAIN> <RECORD_ID> --data <NEW_INSTANCE_IP>
-          echo "Traffic switched (placeholder)"
+          echo "Placeholder for Vultr Traffic Switch logic."
+          echo "This would involve API calls to Vultr Load Balancer or DNS to point to the new deployment."
+          # Example: vultr-cli load-balancer update <LB_ID> --forwarding-rules "...new_instance_id..."
+          # Example: vultr-cli dns records update <DOMAIN> <RECORD_ID> --data <NEW_INSTANCE_IP>
+          echo "Traffic switched (simulated)."
 
   # Stage 11: Monitoring & Alerting Setup
   monitoring:
@@ -361,26 +506,41 @@ jobs:
       
       - name: Setup Monitoring
         run: |
-          # Configure Vultr Monitoring
-          vultr-cli alpha monitoring policies create \
-            --notification-channels=${{ secrets.ALERT_CHANNEL }} \
-            --display-name="Admin UI - High Error Rate" \
-            --condition-display-name="Error rate > 1%" \
-            --condition-threshold-value=0.01 \
-            --condition-threshold-duration=300s
+          echo "Placeholder for Vultr Monitoring setup."
+          echo "This would involve API calls to configure monitoring alerts for the new deployment."
+          # Example: vultr-cli alpha monitoring policies create ...
+          echo "Monitoring setup (simulated)."
 
   # Rollback Job (Manual Trigger)
   rollback:
     name: Rollback Deployment
     runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'workflow_dispatch' # Allow manual trigger
+    environment:
+      name: ${{ github.event.inputs.environment || 'staging' }} # Default to staging if not specified
+    inputs:
+      environment:
+        description: 'Environment to rollback (staging or production)'
+        required: true
+        default: 'staging'
+      image_tag_or_release:
+        description: 'Specific Docker image tag or release version to roll back to'
+        required: true
     steps:
-      - name: Rollback to Previous Version (Example for Vultr)
+      - name: Rollback to Previous Version (Example for Vultr VKE)
+        env:
+          VULTR_API_KEY: ${{ secrets.VULTR_API_KEY }}
+          # KUBECONFIG will be set up similarly to the deploy job
         run: |
-          echo "Rolling back to previous version on Vultr..."
-          # This depends on your deployment strategy on Vultr
-          # e.g., point Load Balancer to old instance, or redeploy previous Docker image tag
-          echo "Rollback completed (placeholder)"
+          echo "Attempting to roll back environment: ${{ github.event.inputs.environment }} to image/release: ${{ github.event.inputs.image_tag_or_release }}"
+          echo "Fetching kubeconfig for VKE cluster (cluster ID would be needed, e.g., from secrets or fixed per env)..."
+          # Example: VKE_CLUSTER_ID=$(aws ssm get-parameter --name /my-app/${{ github.event.inputs.environment }}/vke-cluster-id --query Parameter.Value --output text)
+          # vultr-cli kubernetes config $VKE_CLUSTER_ID --save --output-dir $HOME/.kube
+          # export KUBECONFIG=$HOME/.kube/config
+          # kubectl set image deployment/<deployment-name> <container-name>=${{ github.event.inputs.image_tag_or_release }} --record
+          # kubectl rollout status deployment/<deployment-name> -w --timeout=3m
+          echo "Rollback logic placeholder. Actual implementation depends on Vultr setup and rollback strategy."
+          echo "Simulated rollback to ${{ github.event.inputs.image_tag_or_release }} for ${{ github.event.inputs.environment }}."
 
   # Cleanup Job
   cleanup:

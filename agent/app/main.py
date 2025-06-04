@@ -17,6 +17,9 @@ app.include_router(llm_router)
 app.include_router(personas_admin_router)
 app.include_router(llm_admin_router)
 app.include_router(llm_coordination_router)
+# Import and include the MCP admin router
+from agent.app.routers import mcp_admin # Assuming mcp_admin.py is in agent/app/routers
+app.include_router(mcp_admin.router)
 
 # Middleware for logging requests and latency
 
