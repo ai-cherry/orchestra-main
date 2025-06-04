@@ -95,13 +95,30 @@ services:
 
   redis:
     image: redis:7-alpine
-    command: redis-server --maxmemory 512mb --maxmemory-policy allkeys-lru --save ""
+    command: >
+      redis-server
+      --maxmemory 512mb
+      --maxmemory-policy allkeys-lru
+      --save ""
+      --appendonly yes
+      --appendfsync everysec
+      --tcp-backlog 511
+      --tcp-keepalive 300
+      --timeout 0
+      --protected-mode no
+      --bind 0.0.0.0
     restart: always
+    volumes:
+      - redis_data:/data
     healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
-      interval: 10s
-      timeout: 5s
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      interval: 5s
+      timeout: 3s
       retries: 5
+      start_period: 10s
+    environment:
+      # Redis configuration for resilience
+      REDIS_REPLICATION_MODE: master
 
   weaviate:
     image: semitechnologies/weaviate:latest
@@ -125,3 +142,4 @@ services:
 volumes:
   postgres_data:
   weaviate_data:
+  redis_data:

@@ -1,0 +1,44 @@
+{
+  "timestamp": "2025-06-04T03:48:14.935778",
+  "duration_seconds": 0.02772,
+  "mcp_servers": {
+    "memory": {
+      "status": "unreachable",
+      "error": "Cannot connect to host localhost:8003 ssl:default [Multiple exceptions: [Errno 111] Connect call failed ('::1', 8003, 0, 0), [Errno 111] Connect call failed ('127.0.0.1', 8003)]",
+      "endpoint": "http://localhost:8003"
+    },
+    "code-intelligence": {
+      "status": "unreachable",
+      "error": "Cannot connect to host localhost:8007 ssl:default [Multiple exceptions: [Errno 111] Connect call failed ('::1', 8007, 0, 0), [Errno 111] Connect call failed ('127.0.0.1', 8007)]",
+      "endpoint": "http://localhost:8007"
+    },
+    "git-intelligence": {
+      "status": "unreachable",
+      "error": "Cannot connect to host localhost:8008 ssl:default [Multiple exceptions: [Errno 111] Connect call failed ('::1', 8008, 0, 0), [Errno 111] Connect call failed ('127.0.0.1', 8008)]",
+      "endpoint": "http://localhost:8008"
+    },
+    "tools": {
+      "status": "unreachable",
+      "error": "Cannot connect to host localhost:8006 ssl:default [Multiple exceptions: [Errno 111] Connect call failed ('::1', 8006, 0, 0), [Errno 111] Connect call failed ('127.0.0.1', 8006)]",
+      "endpoint": "http://localhost:8006"
+    }
+  },
+  "postgresql": {
+    "status": "unhealthy",
+    "error": "password authentication failed for user \"postgres\""
+  },
+  "redis": {
+    "status": "healthy",
+    "version": "7.4.4",
+    "connected_clients": 1,
+    "used_memory_human": "1012.64K",
+    "ops_per_sec": 0,
+    "keyspace_hits": 0,
+    "keyspace_misses": 0
+  },
+  "weaviate": {
+    "status": "unhealthy",
+    "error": "Client.__init__() takes 1 positional argument but 2 were given"
+  },
+  "overall_status": "unhealthy"
+}

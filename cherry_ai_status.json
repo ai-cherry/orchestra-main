@@ -1,0 +1,24 @@
+{
+  "timestamp": "2025-06-04T04:26:11.607587",
+  "containers": [
+    "orchestra-main_api_1",
+    "orchestra-main_redis_1",
+    "orchestra-main_postgres_1",
+    "orchestra-main_weaviate_1"
+  ],
+  "services": {
+    "PostgreSQL": {
+      "status": "unhealthy",
+      "message": "localhost:5432 - no response"
+    },
+    "Redis": {
+      "status": "unhealthy",
+      "message": ""
+    },
+    "Weaviate": {
+      "status": "unhealthy",
+      "message": "HTTP 503"
+    }
+  },
+  "overall_healthy": false
+}

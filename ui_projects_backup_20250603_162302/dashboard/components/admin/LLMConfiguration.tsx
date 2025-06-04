@@ -1,3 +1,4 @@
+"use client";
 /**
  * Main LLM Configuration Component for Admin Dashboard
  * Provides a comprehensive interface for managing LLM routing configurations

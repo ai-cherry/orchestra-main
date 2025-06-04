@@ -13,8 +13,10 @@ from pathlib import Path
 from typing import Dict, List, Any, Optional
 from dataclasses import dataclass, asdict
 
-import redis
 import psycopg2
+
+# Import resilient Redis client
+from core.redis import ResilientRedisClient, RedisConfig
 
 
 @dataclass
@@ -55,26 +57,16 @@ class AIAgentDiscoverySystem:
         self._load_ai_agents()
 
     def _initialize_redis(self):
-        """Initialize Redis connection for caching and coordination."""
+        """Initialize resilient Redis connection for caching and coordination."""
         try:
-            # Try Docker Redis first, then localhost fallback
-            redis_urls = [
-                os.getenv("REDIS_URL", "redis://redis:6379"),
-                "redis://localhost:6379"
-            ]
-            
-            for redis_url in redis_urls:
-                try:
-                    self.redis_client = redis.from_url(redis_url, decode_responses=True)
-                    self.redis_client.ping()
-                    print(f"✅ Redis connection established: {redis_url}")
-                    return
-                except Exception:
-                    continue
-            
-            print("⚠️  Redis connection failed, continuing without caching")
+            # Use resilient Redis client with automatic fallback
+            redis_config = RedisConfig.from_env()
+            self.redis_client = ResilientRedisClient(redis_config)
+            print(f"✅ Resilient Redis client initialized (mode: {redis_config.mode})")
         except Exception as e:
             print(f"⚠️  Redis initialization error: {e}")
+            # Create a minimal fallback client
+            self.redis_client = None
 
     def _load_mcp_servers(self):
         """Load and register all available MCP servers."""
@@ -428,13 +420,13 @@ class AIAgentDiscoverySystem:
             }
         }
         
-        # Try to cache in Redis if available
+        # Try to cache in Redis with resilient client
         if self.redis_client:
             try:
-                self.redis_client.setex(
-                    "mcp:discovery", 
-                    3600,  # 1 hour TTL
-                    json.dumps(discovery_data)
+                await self.redis_client.set(
+                    "mcp:discovery",
+                    json.dumps(discovery_data),
+                    ex=3600  # 1 hour TTL
                 )
                 print("✅ Cached discovery data in Redis")
             except Exception as e:
@@ -598,13 +590,13 @@ if __name__ == "__main__":
         await self.create_smart_routing_system() 
         await self.create_automation_scripts()
         
-        # Cache routing rules in Redis if available
+        # Cache routing rules in Redis with resilient client
         if self.redis_client:
             try:
                 for agent_name, agent_config in self.ai_agents.items():
                     routing_key = f"mcp:routing:{agent_name}"
-                    self.redis_client.hset(routing_key, mapping=agent_config.routing_rules)
-                    self.redis_client.expire(routing_key, 86400)  # 24 hours
+                    await self.redis_client.hset(routing_key, mapping=agent_config.routing_rules)
+                    await self.redis_client.expire(routing_key, 86400)  # 24 hours
                 print("✅ Cached routing rules in Redis")
             except Exception as e:
                 print(f"⚠️  Redis routing cache failed: {e}")
