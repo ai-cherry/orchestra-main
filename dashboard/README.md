@@ -36,7 +36,7 @@ A modern, conversational AI-first admin interface built with Next.js, TypeScript
    ```
 
 4. **Open browser**:
-   Navigate to http://localhost:3000
+   Navigate to https://cherry-ai.me
 
 ## Manual Setup
 

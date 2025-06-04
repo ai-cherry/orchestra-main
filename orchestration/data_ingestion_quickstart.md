@@ -56,7 +56,7 @@ python -m uvicorn agent.app.main:app --reload --port 8000
 
 ### 4. Access the Web Interface
 
-Open your browser to: `http://localhost:3000/data-ingestion`
+Open your browser to: `https://cherry-ai.me/data-ingestion`
 
 ## Usage Examples
 

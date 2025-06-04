@@ -184,7 +184,7 @@ services:
       - name: cors
         config:
           origins:
-            - http://localhost:3000
+            - https://cherry-ai.me
             - https://admin.example.com
 ```
 
@@ -520,7 +520,7 @@ services:
       - name: cors
         config:
           origins:
-            - http://localhost:3000
+            - https://cherry-ai.me
             - https://admin.example.com
 ```
 
