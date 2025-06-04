@@ -14,7 +14,9 @@
         logger.info("Initializing Pay Ready Query Agent")
 
         # Initialize Query Agent with our collections
-        self.query_agent = QueryAgent(client=self.client, collections=self.collections)
+        # self.client is an instance of WeaviateService.
+        # The generic QueryAgent likely expects the raw Weaviate Python client instance.
+        self.query_agent = QueryAgent(client=self.client.client, collections=self.collections)
 
         self._initialized = True
         logger.info("Query Agent initialized successfully")
