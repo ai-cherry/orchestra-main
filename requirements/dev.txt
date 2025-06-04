@@ -54,4 +54,4 @@ pgcli==4.0.1
 
 # Debugging
 debugpy==1.8.0
-pdbpp==0.10.3
+pdbpp==0.11.6
