@@ -1,88 +1,74 @@
-# Dependabot configuration for AI cherry_ai project
-# Automatically updates dependencies to address security vulnerabilities
-# Updated: 2025-06-02 - Enhanced for comprehensive security scanning
-
 version: 2
 updates:
-  # Python dependencies - Base requirements
-  - package-ecosystem: "pip"
-    directory: "/requirements"
-    schedule:
-      interval: "daily"  # Check daily for security updates
-    open-pull-requests-limit: 10
-    labels:
-      - "dependencies"
-      - "security"
-      - "python"
-    commit-message:
-      prefix: "deps"
-      include: "scope"
-    # Prioritize security updates
-    priority: 1
-    groups:
-      python-security:
-        patterns:
-          - "*"
-        update-types:
-          - "security"
-
-  # Python dependencies - Root directory
+  # Python dependencies
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
       interval: "daily"
+      time: "09:00"
     open-pull-requests-limit: 5
-    labels:
-      - "dependencies"
-      - "security"
-      - "python"
+    reviewers:
+      - "scoobyjava"
+    assignees:
+      - "scoobyjava"
     commit-message:
       prefix: "deps"
       include: "scope"
-
+    # Auto-merge low-risk updates
+    allow:
+      - dependency-type: "direct"
+        update-type: "version-update:semver-patch"
+      - dependency-type: "indirect"
+        update-type: "version-update:semver-patch"
+    
+  # Python requirements in subdirectories
+  - package-ecosystem: "pip"
+    directory: "/requirements"
+    schedule:
+      interval: "daily"
+      time: "09:30"
+    open-pull-requests-limit: 3
+    reviewers:
+      - "scoobyjava"
+    assignees:
+      - "scoobyjava"
+    commit-message:
+      prefix: "deps(requirements)"
+      include: "scope"
+    
+  # Node.js dependencies (admin-ui)
+  - package-ecosystem: "npm"
+    directory: "/admin-ui"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "10:00"
+    open-pull-requests-limit: 3
+    reviewers:
+      - "scoobyjava"
+    assignees:
+      - "scoobyjava"
+    commit-message:
+      prefix: "deps(admin-ui)"
+      include: "scope"
+    # Auto-merge patch updates for admin-ui
+    allow:
+      - dependency-type: "direct"
+        update-type: "version-update:semver-patch"
+      - dependency-type: "indirect"
+        update-type: "version-update:semver-patch"
+        
   # GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 10
-    labels:
-      - "dependencies"
-      - "github-actions"
+      day: "sunday"
+    open-pull-requests-limit: 2
+    reviewers:
+      - "scoobyjava"
+    assignees:
+      - "scoobyjava"
     commit-message:
-      prefix: "ci"
-      include: "scope"
+      prefix: "deps(actions)"
 
-  # Docker dependencies
-  - package-ecosystem: "docker"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 10
-    labels:
-      - "dependencies"
-      - "docker"
-    commit-message:
-      prefix: "docker"
-      include: "scope"
-
-  # Node.js (Admin UI)
-  - package-ecosystem: "npm"
-    directory: "/admin-ui"
-    schedule:
-      interval: "daily"  # Daily for security
-    open-pull-requests-limit: 10
-    labels:
-      - "dependencies"
-      - "security"
-      - "admin-ui"
-    commit-message:
-      prefix: "deps"
-      include: "scope"
-    # Group security updates
-    groups:
-      npm-security:
-        patterns:
-          - "*"
-        update-types:
-          - "security"
