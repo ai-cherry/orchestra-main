@@ -1,18 +1,36 @@
-# TODO: Consider adding connection pooling configuration
-"""
-"""
-    """MCP server for memory management using PostgreSQL and Weaviate."""
-        self.server = Server("memory")
-        self.setup_database()
-        self.setup_handlers()
+#!/usr/bin/env python3
+"""MCP server for memory management using PostgreSQL and Weaviate."""
 
-    def setup_database(self):
-        """Setup unified database connection."""
-        self.db = UnifiedDatabase(postgres_url=os.getenv("POSTGRES_URL", "postgresql://postgres:postgres@localhost:5432/cherry_ai"))
+import asyncio
+import json
+import os
+import uuid
+from typing import Any, Dict, List
+
+from mcp.server import Server
+from mcp.server.stdio import stdio_server
+from mcp.types import TextContent
+
+from shared.database import UnifiedDatabase
+
+
+class MemoryServer:
+    """MCP server for memory management using PostgreSQL and Weaviate."""
+    
+    def __init__(self):
+        """Initialize the Memory MCP server."""
+        self.server = Server("memory")
+        self.db = None  # Initialize later in async context
+        self.setup_handlers()
 
     def setup_handlers(self):
         """Setup MCP handlers."""
+        
+        @self.server.list_tools()
+        async def list_tools():
             """List available tools."""
+            return [
+                {
                     "name": "store_memory",
                     "description": "Store agent memory in Weaviate",
                     "inputSchema": {
@@ -151,6 +169,11 @@
         @self.server.call_tool()
         async def call_tool(name: str, arguments: Dict[str, Any]) -> List[TextContent]:
             """Handle tool calls."""
+            try:
+                # Check if database is initialized
+                if not self.db:
+                    return [TextContent(type="text", text="❌ Database not initialized yet")]
+                
                 if name == "store_memory":
                     memory_id = self.db.weaviate.store_memory(
                         agent_id=arguments["agent_id"],
@@ -316,21 +339,32 @@
                 else:
                     return [TextContent(type="text", text=f"Unknown tool: {name}")]
 
-            except Exception:
-
-
-                pass
+            except Exception as e:
                 return [TextContent(type="text", text=f"❌ Error executing {name}: {str(e)}")]
+
+    async def setup_database(self):
+        """Setup unified database connection."""
+        self.db = UnifiedDatabase(postgres_url=os.getenv("POSTGRES_URL", "postgresql://postgres:postgres@localhost:5432/cherry_ai"))
+        await self.db.initialize()
 
     async def run(self):
         """Run the MCP server."""
-        if not health["overall"]:
-            print(f"⚠️  Database health check failed: {health}")
-        else:
-            print("✅ Database connections healthy")
+        try:
+            # Initialize database first
+            await self.setup_database()
+            
+            health = await self.db.health_check()
+            if not health["overall"]:
+                print(f"⚠️  Database health check failed: {health}")
+            else:
+                print("✅ Database connections healthy")
 
-        async with stdio_server() as (read_stream, write_stream):
-            await self.server.run(read_stream, write_stream, {})
+            print("🚀 Memory MCP Server starting...")
+            async with stdio_server() as (read_stream, write_stream):
+                await self.server.run(read_stream, write_stream, {})
+        except Exception as e:
+            print(f"❌ Failed to start Memory MCP Server: {e}")
+
 
 if __name__ == "__main__":
     server = MemoryServer()
