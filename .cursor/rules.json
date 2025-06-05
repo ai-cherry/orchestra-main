@@ -2,7 +2,7 @@
   "rules": [
     {
       "tags": ["cursor", "ai-assistant"],
-      "message": "You are working on the Cherry AI Orchestrator project - a comprehensive AI-powered infrastructure management system. The project includes:\n\n**Architecture:**\n- Production server: 45.32.69.157 (16 vCPUs, 64GB RAM)\n- Database server: 45.77.87.106 (PostgreSQL, Redis)\n- Staging server: 207.246.108.201\n- Load balancer and Kubernetes cluster\n\n**Tech Stack:**\n- Frontend: HTML5, CSS3, JavaScript (Vanilla)\n- Backend: Python 3.11, Flask, FastAPI\n- Databases: PostgreSQL, Redis, Weaviate, Pinecone\n- Infrastructure: Vultr, Pulumi IaC\n- CI/CD: GitHub Actions\n- AI Services: OpenAI, Anthropic, Google Gemini\n\n**Key Components:**\n- Admin interface with three AI personas (Cherry, Sophia, Karen)\n- MCP servers for AI tool integration\n- Infrastructure automation and monitoring\n- Vector databases for semantic search\n- Real-time deployment pipeline\n\n**Coding Standards:**\n- Use type hints in Python\n- Follow PEP 8 style guide\n- Write comprehensive docstrings\n- Include error handling and logging\n- Use environment variables for secrets\n- Write tests for all new functionality\n\n**Security:**\n- Never hardcode API keys or secrets\n- Use GitHub organization secrets\n- Implement proper authentication\n- Follow OWASP security guidelines\n\nWhen suggesting code changes, consider the production environment and ensure compatibility with the existing infrastructure."
+      "message": "You are working on the Cherry AI Orchestrator project - a comprehensive AI-powered infrastructure management system.\n\n**Production Infrastructure:**\n- Production server: 45.32.69.157 (16 vCPUs, 64GB RAM)\n- Database server: 45.77.87.106 (PostgreSQL, Redis)\n- Staging server: 207.246.108.201\n- Load balancer and Kubernetes cluster\n\n**Tech Stack:**\n- Frontend: HTML5, CSS3, JavaScript (Vanilla)\n- Backend: Python 3.11, Flask, FastAPI\n- Databases: PostgreSQL, Redis, Weaviate, Pinecone\n- Infrastructure: Vultr, Pulumi IaC\n- CI/CD: GitHub Actions\n- AI Services: Anthropic Claude, Google Gemini\n\n**Key Components:**\n- Admin interface with three AI personas (for end users, not coding)\n- MCP servers for development tool integration\n- Infrastructure automation and monitoring\n- Vector databases for semantic search\n- Real-time deployment pipeline\n\n**Development Tools:**\n- Cursor AI with Max Mode for large context analysis\n- Roo Code with custom modes (cherry-dev, infra, database)\n- Three optimized MCP servers (codebase, infrastructure, database)\n\n**Coding Standards:**\n- Use type hints in Python\n- Follow PEP 8 style guide\n- Write comprehensive docstrings\n- Include error handling and logging\n- Use environment variables for secrets\n- Write tests for all new functionality\n\n**Security:**\n- Never hardcode API keys or secrets\n- Use GitHub organization secrets\n- Implement proper authentication\n- Follow OWASP security guidelines\n\nWhen suggesting code changes, consider the production environment and ensure compatibility with the existing infrastructure."
     },
     {
       "tags": ["python"],
@@ -15,6 +15,10 @@
     {
       "tags": ["infrastructure", "devops"],
       "message": "For Infrastructure/DevOps code in the Cherry AI project:\n\n**Pulumi IaC:**\n- Use TypeScript or Python for Pulumi\n- Tag all resources appropriately\n- Implement proper resource dependencies\n- Use stack configurations for environments\n\n**GitHub Actions:**\n- Use organization secrets\n- Implement proper error handling\n- Use matrix builds for multiple environments\n- Include security scanning\n\n**Docker/Containers:**\n- Use multi-stage builds\n- Minimize image size\n- Run as non-root user\n- Include health checks\n\n**Monitoring:**\n- Implement comprehensive logging\n- Use structured logging (JSON)\n- Set up alerts for critical metrics\n- Monitor resource usage\n\n**Example Pulumi pattern:**\n```python\nimport pulumi\nimport pulumi_vultr as vultr\n\n# Create instance with proper configuration\ninstance = vultr.Instance(\n    'cherry-ai-server',\n    plan='vc2-16c-64gb',\n    region='lax',\n    os_id=1743,  # Ubuntu 24.04\n    label='cherry-ai-production',\n    tags=['production', 'cherry-ai'],\n    enable_ipv6=True,\n    backups='enabled'\n)\n\npulumi.export('server_ip', instance.main_ip)\n```"
+    },
+    {
+      "tags": ["database"],
+      "message": "For Database operations in the Cherry AI project:\n\n**PostgreSQL Best Practices:**\n- Use connection pooling\n- Implement proper indexing\n- Use prepared statements\n- Handle transactions properly\n- Monitor query performance\n\n**Redis Caching:**\n- Set appropriate TTL values\n- Use Redis for session management\n- Implement cache invalidation\n- Monitor memory usage\n\n**Vector Databases:**\n- Optimize embedding strategies\n- Use appropriate distance metrics\n- Implement proper chunking\n- Monitor performance and costs\n\n**Example database pattern:**\n```python\nimport asyncpg\nimport redis\nfrom typing import Optional\n\nclass DatabaseManager:\n    def __init__(self):\n        self.pg_pool = None\n        self.redis_client = redis.Redis(host='45.77.87.106')\n    \n    async def init_postgres(self):\n        self.pg_pool = await asyncpg.create_pool(\n            host='45.77.87.106',\n            database='cherry_ai',\n            user='postgres',\n            password=os.getenv('POSTGRES_PASSWORD'),\n            min_size=5,\n            max_size=20\n        )\n    \n    async def execute_query(self, query: str, *args) -> Optional[list]:\n        async with self.pg_pool.acquire() as conn:\n            return await conn.fetch(query, *args)\n```"
     }
   ],
   "include": ["**/*"],
@@ -25,7 +29,9 @@
     "*.pyc",
     ".env*",
     "*.log",
-    ".DS_Store"
+    ".DS_Store",
+    "venv/**",
+    ".migration_backups/**"
   ]
 }
 
