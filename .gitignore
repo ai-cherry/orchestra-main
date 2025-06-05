@@ -80,3 +80,10 @@ nohup.out
 api_keys.txt
 config/secrets.json
 !.env.example
+
+# Auto-generated scripts
+auto_setup.sh
+activate.sh
+start.sh
+run.sh
+test_server.py

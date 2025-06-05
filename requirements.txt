@@ -1,22 +1,73 @@
-fastapi==0.104.1
-uvicorn[standard]==0.24.0
-pydantic==2.5.0
+# Core FastAPI dependencies
+fastapi==0.115.5
+uvicorn[standard]==0.32.0
+pydantic==2.10.5
 sqlalchemy==2.0.23
 asyncpg==0.29.0
-redis==5.0.1  # Required for caching and semantic caching
-redisvl==0.2.0  # Required for Redis vector search/semantic caching
-langchain-redis==0.0.5  # Required for LangChain Redis semantic cache integration
+
+# Redis for caching and semantic caching
+redis==5.0.1
+redisvl==0.6.0
+langchain-redis==0.2.2
+
+# Vector database
 weaviate-client==3.25.3
+
+# Authentication
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
+
+# File handling and HTTP
 python-multipart==0.0.6
 aiofiles==23.2.1
 httpx==0.25.2
+
+# Configuration
 python-dotenv==1.0.0
+
+# PostgreSQL
 psycopg2-binary==2.9.9
 
-# Performance and stability enhancements
-psutil==5.9.6  # System resource monitoring
-pyyaml==6.0.1  # YAML processing for configurations
-weakref  # Built-in, for object pools
+# System monitoring and utilities
+psutil==5.9.6
+pyyaml==6.0.1
+
+# Portkey AI (for multi-LLM support)
+portkey-ai==1.9.2
+
+# ElevenLabs for voice synthesis
+elevenlabs==2.1.0
+
+# OpenAI SDK
+openai==1.59.2
+
+# Anthropic Claude SDK
+anthropic==0.42.0
+
+# Google Generative AI
+google-generativeai==0.8.3
+
+# LangChain core
+langchain==0.3.14
+langchain-community==0.3.14
+
+# Jinja2 for templates
+jinja2==3.1.6
+
+# Email validation
+email-validator==2.2.0
+
+# Pulumi for infrastructure
+pulumi==3.142.0
+pulumi-vultr==2.2.3
+
+# Development tools
+black==24.10.0
+flake8==7.1.1
+mypy==1.14.1
+pytest==8.3.4
+pytest-asyncio==0.24.0
+
+# Monitoring
+prometheus-client==0.22.1
 
