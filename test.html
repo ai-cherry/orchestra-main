@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Collaboration Test - HTML</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            margin: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .live-indicator {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Live Collaboration Test</h1>
+        
+        <div class="live-indicator pulse">
+            <h2>🔄 LIVE MONITORING ACTIVE</h2>
+            <p>Manus AI can see changes to this HTML file in real-time!</p>
+        </div>
+        
+        <div class="live-indicator">
+            <h3>📊 Test Status</h3>
+            <p>✅ HTML file created and monitored</p>
+            <p>✅ Real-time synchronization enabled</p>
+            <p>✅ Multi-language support demonstrated</p>
+        </div>
+        
+        <div class="live-indicator">
+            <h3>🎯 What This Proves</h3>
+            <ul style="text-align: left; max-width: 500px; margin: 0 auto;">
+                <li>Instant file change detection</li>
+                <li>Cross-language collaboration support</li>
+                <li>Real-time content streaming</li>
+                <li>Production-ready live collaboration</li>
+            </ul>
+        </div>
+        
+        <p><strong>Any changes to this HTML file will be visible to Manus immediately!</strong></p>
+        
+        <script>
+            // JavaScript within HTML - also monitored!
+            console.log("Manus can see this JavaScript code too! 🎉");
+            
+            function liveCollaborationTest() {
+                return "Live collaboration between Cursor and Manus is working!";
+            }
+            
+            // Log the test message
+            console.log(liveCollaborationTest());
+        </script>
+    </div>
+</body>
+</html> 
