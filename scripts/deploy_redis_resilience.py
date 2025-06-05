@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger(__name__)
+
 #!/usr/bin/env python3
 """
 Deploy Redis Resilience Solution
@@ -42,7 +45,8 @@ class RedisResilienceDeployer:
         try:
             subprocess.run(["docker", "--version"], check=True, capture_output=True)
             results["checks"]["docker"] = "✓ Installed"
-        except:
+        except Exception as e:
+            logger.error(f"Unexpected error: {e}")
             results["checks"]["docker"] = "✗ Not found"
             results["status"] = "failed"
         

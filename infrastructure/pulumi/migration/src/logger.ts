@@ -156,7 +156,7 @@ export class Logger {
         } else if (entry.level === LogLevel.WARN) {
             console.warn(output);
         } else {
-            console.log(output);
+            // console.log(output);
         }
     }
 

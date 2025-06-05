@@ -258,7 +258,10 @@ class OptimizedMCPConfigManager:
                 logger.warning(f"Attempted to delete non-existent MCP server config with ID: {server_id}")
                 return False
 
-    async def bulk_save_configs(self, configs: List[UserDefinedMCPServerInstanceConfig]) -> List[UserDefinedMCPServerInstanceConfig]:
+    async def bulk_save_configs(
+        self,
+        configs: List[UserDefinedMCPServerInstanceConfig]
+    ) -> List[UserDefinedMCPServerInstanceConfig]:
         """Bulk save operation for better performance"""
         async with self._lock:
             existing_configs = self._load_all_configs_from_file()

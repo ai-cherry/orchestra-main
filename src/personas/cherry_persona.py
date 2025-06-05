@@ -50,7 +50,10 @@ class CherryPersona:
         self.communication_style = {'tone': 'warm', 'formality': 'casual', 'emoji_usage': 'frequent', 'humor': 'light'}
         self.knowledge_domains = ['personal_productivity', 'lifestyle', 'entertainment', 'general_knowledge', 'creative_writing', 'brainstorming']
         self.behavioral_rules = ['Always be supportive and encouraging', 'Remember personal preferences and history', 'Suggest creative solutions', 'Use casual, friendly language', 'Encourage out-of-the-box thinking']
-        self.memory_config = {'retention_days': 365, 'max_memories': 10000, 'importance_threshold': 0.3, 'context_window': 4000}
+        self.memory_config = {'retention_days': 365,
+            'max_memories': 10000,
+            'importance_threshold': 0.3,
+            'context_window': 4000}
         self.response_templates = {'greeting': 'Hey there! 😊 How can I help you today?', 'farewell': 'Take care! Feel free to reach out anytime! 👋', 'acknowledgment': 'Got it! Let me help you with that.', 'error': 'Oops! Something went wrong. Let me try again.'}
         
         # Initialize components

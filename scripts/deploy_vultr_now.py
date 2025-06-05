@@ -10,7 +10,7 @@ import time
 from pathlib import Path
 
 # For testing/demo purposes - replace with actual API key
-DEMO_API_KEY = "VULTR_TEST_KEY_REPLACE_WITH_ACTUAL"
+DEMO_API_KEY = os.getenv('ORCHESTRA_SCRIPT_API_KEY')
 
 def main():
     print("🚀 cherry_ai MCP Vultr Deployment (Demo Mode)")

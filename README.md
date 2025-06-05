@@ -1,97 +1,39 @@
-# AI cherry_ai
+# 🚀 Live Collaboration Test Project
 
-## Quick Start
+## 🎯 Purpose
+This project demonstrates **real-time collaboration** between Cursor IDE and Manus AI!
 
-### Option 1: Local Development with Docker Compose (Recommended)
+## ✨ What Makes This Special
+- **No Git commits needed** - Manus sees changes instantly
+- **Real-time synchronization** - Changes appear in < 1 second
+- **Multi-language support** - Python, JavaScript, HTML, Markdown
 
-1. **Clone and run locally**:
-   ```bash
-   git clone <repository>
-   cd cherry_ai-main
-   docker-compose up --build
-   ```
+## 📁 Test Files
+- `main.py` - Python demonstration with fibonacci calculations
+- `utils.js` - JavaScript utilities with factorial functions  
+- `test.html` - HTML page showing live collaboration
+- `README.md` - This documentation (also monitored!)
 
-2. **Access services**:
-   - API: http://localhost:8000
-   - Admin UI: http://localhost:3000
-   - Weaviate: http://localhost:8080
+## 🔬 How It Works
+1. **Cursor** edits files in this project
+2. **File Watcher** detects changes instantly
+3. **WebSocket Bridge** streams changes to shared database
+4. **Manus AI** receives real-time notifications
+5. **Collaboration** happens without delays!
 
-### Option 2: Development on Vultr Server
+## 🎉 Live Demo Instructions
+1. Start the file watcher: `python connect_cursor.py /path/to/this/project`
+2. Edit any file in Cursor
+3. Watch Manus receive changes instantly!
 
-1. **SSH to Vultr server**:
-   ```bash
-   ssh root@45.32.69.157
-   cd /root/cherry_ai-main
-   ```
+## 📊 Expected Results
+- ✅ Connection established in < 2 seconds
+- ✅ File changes sync in < 1 second  
+- ✅ Manus can read live file content
+- ✅ Real-time collaboration achieved!
 
-2. **Code directly on Vultr**:
-   - Edit files on the server
-   - Test changes locally on the server
-   - Commit and push from the server
+---
 
-3. **Deploy changes**:
-   ```bash
-   ./deploy.sh
-   ```
-   Or push to GitHub for auto-deploy:
-   ```bash
-   git push origin main
-   ```
+**This is the future of AI-assisted development!** 🌟
 
-## Architecture
-
-- **API**: Python FastAPI backend
-- **Admin UI**: React frontend
-- **Database**: PostgreSQL
-- **Cache**: Redis (required for caching and semantic caching)
-- **Vector DB**: Weaviate
-- **Deployment**: Docker Compose on Vultr
-- **MCP Servers**: Provide AI coding context for Cursor AI and other agents
-- **Domain**: cherry-ai.me
-
-## Docker & Redis Integration
-
-- **Docker Compose is the preferred way to run the full stack locally and for development.**
-- **Redis is required for caching and semantic caching.** It's included in the Docker Compose setup.
-- **All AI coding context for Cursor AI and other agents is provided via MCP servers** to ensure consistent, up-to-date project context.
-
-## Essential Files
-
-- `docker-compose.yml` - Service definitions (includes Redis, PostgreSQL, Weaviate)
-- `nginx.conf` - Reverse proxy config
-- `.mcp.json` - MCP server configuration for AI coding context
-- `.github/workflows/deploy.yml` - Auto-deployment
-- `deploy.sh` - Manual deployment script
-- `.env` - Environment variables (add your API keys, Redis URL)
-
-## Working on Vultr
-
-**Connect to server:**
-```bash
-ssh root@45.32.69.157
-cd /root/cherry_ai-main
-```
-
-**Edit files:**
-```bash
-nano file.py  # or vim, or install your preferred editor
-```
-
-**Deploy changes:**
-```bash
-./deploy.sh
-```
-
-**View logs:**
-```bash
-docker-compose logs -f
-```
-
-## Workflow
-
-1. SSH to Vultr server
-2. Edit code directly on server
-3. Run `./deploy.sh` to deploy
-4. Changes live at cherry-ai.me
-
-No local development. No Paperspace. Just Vultr.
+*Any changes to this README will be visible to Manus immediately!*

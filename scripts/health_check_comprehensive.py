@@ -1,3 +1,4 @@
+import os
 #!/usr/bin/env python3
 """
 Comprehensive Health Check for Cherry AI Infrastructure
@@ -52,7 +53,7 @@ class HealthChecker:
                 host="localhost",
                 port=5432,
                 user="postgres",
-                password="postgres",
+password = os.getenv('ORCHESTRA_SCRIPT_PASSWORD')
                 database="conductor"
             )
             

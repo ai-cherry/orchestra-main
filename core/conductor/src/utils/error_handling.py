@@ -238,6 +238,7 @@ def retry(
                         # Wait before retrying
                         import time
 
+                        # TODO: Replace with asyncio.sleep() for async code
                         time.sleep(current_delay)
 
                         # Increase delay for next attempt

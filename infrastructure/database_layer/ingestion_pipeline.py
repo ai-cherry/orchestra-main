@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger(__name__)
+
 #!/usr/bin/env python3
 """
 Enterprise File Ingestion Pipeline
@@ -291,7 +294,8 @@ class TextChunker:
         # Initialize tokenizer
         try:
             self.tokenizer = tiktoken.get_encoding("cl100k_base")
-        except:
+        except Exception as e:
+            logger.error(f"Unexpected error: {e}")
             self.tokenizer = None
             logger.warning("Tiktoken not available, using character-based chunking")
     

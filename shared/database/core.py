@@ -24,7 +24,10 @@ except Exception:
     DATABASE_URL = f"postgresql+psycopg://{PG_USER}:{PG_PASSWORD}@{PG_HOST}:{PG_PORT}/{PG_DB}"
     # Final fallback if individual vars also not set, using a placeholder that will likely fail but shows intent
     if PG_USER == "conductor" and PG_HOST == "localhost" and os.getenv("DATABASE_URL") is None:
-        DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+psycopg://user:pass@host:5432/db") # Ensure port is numeric here
+        DATABASE_URL = os.getenv(
+            "DATABASE_URL",
+            "postgresql+psycopg://user:pass@host:5432/db"
+        ) # Ensure port is numeric here
 
 print(f"[shared.database.core] Using DATABASE_URL: {DATABASE_URL}") # For debugging startup
 

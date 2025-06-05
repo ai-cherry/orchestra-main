@@ -1,0 +1,18 @@
+{
+  "timestamp": "2025-06-05T09:29:30.870125",
+  "status": "deployed",
+  "infrastructure": {
+    "provider": "Lambda Labs",
+    "server_ip": "150.136.94.139",
+    "instance_type": "8x A100 GPU"
+  },
+  "services": {
+    "cherry_ai": "operational",
+    "weaviate": "operational",
+    "postgresql": "operational",
+    "redis": "operational",
+    "nginx": "operational"
+  },
+  "deployment_method": "SSH-based deployment",
+  "main_interface": "Cherry AI on port 8000"
+}

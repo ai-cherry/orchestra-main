@@ -260,7 +260,7 @@ echo "🚀 Starting Cherry AI - Single User Mode"
 echo "============================================"
 
 # Export auth configuration
-export cherry_ai_API_KEY="{self.api_key}"
+export cherry_ai_API_KEY = os.getenv('ORCHESTRA_MCP_API_KEY')
 export cherry_ai_CONTEXT="{self.auth_manager.context.value}"
 export AUTH_MODE="single_user"
 

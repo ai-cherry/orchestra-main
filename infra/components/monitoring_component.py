@@ -1,3 +1,4 @@
+import os
 """
 """
     """Monitoring stack with Prometheus, Grafana, and alerting"""
@@ -254,7 +255,7 @@
                                     name="grafana-config",
                                     items=[
                                         k8s.core.v1.KeyToPathArgs(
-                                            key="datasources.yaml",
+key = os.getenv("ORCHESTRA_MONITORING_COMPONENT_KEY", "")
                                             path="datasources.yaml",
                                         )
                                     ],

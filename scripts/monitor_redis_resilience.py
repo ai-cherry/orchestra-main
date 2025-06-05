@@ -1,3 +1,4 @@
+import os
 #!/usr/bin/env python3
 """
 Monitor and Demonstrate Redis Resilience Solution
@@ -85,7 +86,7 @@ class RedisResilienceMonitor:
     
     def _test_set_get(self) -> bool:
         """Test SET/GET operations"""
-        key = "resilience:test:basic"
+key = os.getenv('ORCHESTRA_SCRIPT_KEY')
         value = {"timestamp": time.time(), "status": "testing"}
         
         self.redis_client.set(key, json.dumps(value), ex=60)
@@ -132,6 +133,7 @@ class RedisResilienceMonitor:
         self.redis_client.set(key, "test", ex=1)
         
         exists_before = self.redis_client.exists(key)
+        # TODO: Replace with asyncio.sleep() for async code
         time.sleep(2)
         exists_after = self.redis_client.exists(key)
         

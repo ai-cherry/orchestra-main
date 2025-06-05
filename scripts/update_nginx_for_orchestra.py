@@ -140,6 +140,7 @@ server {
     
     # Ensure API container is running on port 8001
     print("\n7. Verifying API is accessible...")
+    # TODO: Replace with asyncio.sleep() for async code
     time.sleep(2)
     result = run_command("curl -s http://localhost:8001/health", check=False)
     if result.returncode == 0:

@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger(__name__)
+
 #!/usr/bin/env python3
 """
 Comprehensive MCP Server and Database Architecture Audit
@@ -575,7 +578,8 @@ class MCPDatabaseAuditor:
                     content = f.read()
                     if "batch" in content.lower() or "bulk" in content.lower():
                         batch_operations.append(str(file_path))
-            except:
+            except Exception as e:
+                logger.error(f"Unexpected error: {e}")
                 pass
         
         metrics["batch_operations"] = len(batch_operations)
@@ -712,7 +716,12 @@ class MCPDatabaseAuditor:
         
         return report
     
-    def _generate_executive_summary(self, status: ComponentStatus, issues: List[str], recommendations: List[str]) -> str:
+    def _generate_executive_summary(
+        self,
+        status: ComponentStatus,
+        issues: List[str],
+        recommendations: List[str]
+    ) -> str:
         """Generate executive summary of the audit"""
         summary = f"System Status: {status.value.upper()}\n\n"
         

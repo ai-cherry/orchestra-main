@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+.git/
+venv/
+node_modules/
+*.log
+.env
+*.db
+*.sqlite
+*.md
+audit_results_*
+debug_report_*
+test_validation_report_*

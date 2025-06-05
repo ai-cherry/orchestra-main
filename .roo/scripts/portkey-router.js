@@ -122,8 +122,8 @@ async function routeModelRequest(mode, prompt, systemPrompt) {
 
   // Log the request (excluding sensitive data)
   const safePayload = { ...payload, virtual_key: "***REDACTED***" };
-  console.log(`Sending request to ${provider}/${config.model}`);
-  console.log(`Request payload: ${JSON.stringify(safePayload)}`);
+  // console.log(`Sending request to ${provider}/${config.model}`);
+  // console.log(`Request payload: ${JSON.stringify(safePayload)}`);
 
   return new Promise((resolve, reject) => {
     const req = https.request(
@@ -224,10 +224,10 @@ const server = http.createServer(handleRequest);
 const PORT = process.env.PORT || 3000;
 
 server.listen(PORT, () => {
-  console.log(`Portkey Router MCP server listening on port ${PORT}`);
+  // console.log(`Portkey Router MCP server listening on port ${PORT}`);
 
   // Write to stdout for MCP to connect
-  console.log(
+  // console.log(
     JSON.stringify({
       schema: {
         route_model_request: {

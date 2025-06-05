@@ -37,7 +37,15 @@ class PersonaManager:
             for persona_id, persona in self.personas.items()
         }
     
-    async def process_message(self, message: str, persona_id: str, user_id: str, session_id: str, context: Dict[str, Any] = None) -> Dict[str, Any]:
+    async def process_message(
+        self,
+        message: str,
+        persona_id: str,
+        user_id: str,
+        session_id: str,
+        context: Dict[str,
+        Any] = None
+    ) -> Dict[str, Any]:
         """Process message with specified persona."""
         persona = self.get_persona(persona_id)
         

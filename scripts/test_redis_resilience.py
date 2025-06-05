@@ -1,3 +1,4 @@
+import os
 #!/usr/bin/env python3
 """
 Test Redis Resilience - Demonstrates circuit breaker, fallback, and monitoring
@@ -49,7 +50,7 @@ class RedisResilienceDemo:
         print("\n=== Testing Basic Operations ===")
         
         # Test set/get
-        key = "test:basic:1"
+key = os.getenv('ORCHESTRA_SCRIPT_KEY')
         value = {"data": "test value", "timestamp": time.time()}
         
         success = self.client.set(key, value, ex=300)
@@ -72,7 +73,7 @@ class RedisResilienceDemo:
         
         # Simulate Redis failure by using invalid connection
         failed_client = ResilientRedisClient(
-            redis_url="redis://invalid-host:6379",
+redis_url = os.getenv("SCRIPT_TEST_REDIS_RESILIENCE_REDIS_URL", "")
             circuit_breaker_config={
                 "failure_threshold": 3,
                 "recovery_timeout": 5
@@ -110,7 +111,7 @@ class RedisResilienceDemo:
         fallback = InMemoryFallback(max_size=100, ttl=60)
         
         client = ResilientRedisClient(
-            redis_url="redis://invalid-host:6379",
+redis_url = os.getenv("SCRIPT_TEST_REDIS_RESILIENCE_REDIS_URL", "")
             fallback_handler=fallback
         )
         

@@ -73,6 +73,7 @@ class ContactEnrichmentAgent:
             if response.status_code == 429:  # Rate limited
                 retry_after = int(response.headers.get("Retry-After", 60))
                 logger.warning(f"Rate limited by Apollo API. Retrying after {retry_after}s")
+                # TODO: Replace with asyncio.sleep() for async code
                 time.sleep(retry_after)
                 return self._call_apollo_api(endpoint, params)
 

@@ -38,7 +38,7 @@ ${chalk.cyan(`
 
 // Migrate command
 async function migrate(argv: any): Promise<void> {
-    console.log(banner);
+    // console.log(banner);
     
     const spinner = ora("Initializing migration framework...").start();
     const logger = createLogger("CLI", { 
@@ -66,16 +66,16 @@ async function migrate(argv: any): Promise<void> {
         }
         
         // Execute migration
-        console.log(chalk.cyan("\n🚀 Starting migration...\n"));
+        // console.log(chalk.cyan("\n🚀 Starting migration...\n"));
         const result = await orchestrator.executeMigration();
         
         // Shutdown
         await orchestrator.shutdown();
         
         if (result.success) {
-            console.log(chalk.green("\n✅ Migration completed successfully!"));
+            // console.log(chalk.green("\n✅ Migration completed successfully!"));
         } else {
-            console.log(chalk.red("\n❌ Migration completed with errors"));
+            // console.log(chalk.red("\n❌ Migration completed with errors"));
             process.exit(1);
         }
         
@@ -89,7 +89,7 @@ async function migrate(argv: any): Promise<void> {
 
 // Validate command
 async function validate(argv: any): Promise<void> {
-    console.log(banner);
+    // console.log(banner);
     
     const spinner = ora("Running validation...").start();
     const logger = createLogger("Validator", { verbose: argv.verbose });
@@ -106,19 +106,19 @@ async function validate(argv: any): Promise<void> {
         
         if (result.isValid) {
             spinner.succeed("Validation passed");
-            console.log(chalk.green("\n✅ All validation checks passed!"));
+            // console.log(chalk.green("\n✅ All validation checks passed!"));
         } else {
             spinner.fail("Validation failed");
-            console.log(chalk.red("\n❌ Validation errors:"));
+            // console.log(chalk.red("\n❌ Validation errors:"));
             result.errors.forEach(error => {
-                console.log(chalk.red(`  • ${error.code}: ${error.message}`));
+                // console.log(chalk.red(`  • ${error.code}: ${error.message}`));
             });
         }
         
         if (result.warnings.length > 0) {
-            console.log(chalk.yellow("\n⚠️  Warnings:"));
+            // console.log(chalk.yellow("\n⚠️  Warnings:"));
             result.warnings.forEach(warning => {
-                console.log(chalk.yellow(`  • ${warning.code}: ${warning.message}`));
+                // console.log(chalk.yellow(`  • ${warning.code}: ${warning.message}`));
             });
         }
         
@@ -131,7 +131,7 @@ async function validate(argv: any): Promise<void> {
 
 // Discover command
 async function discover(argv: any): Promise<void> {
-    console.log(banner);
+    // console.log(banner);
     
     const spinner = ora("Discovering resources...").start();
     const logger = createLogger("Discovery", { verbose: argv.verbose });
@@ -148,7 +148,7 @@ async function discover(argv: any): Promise<void> {
         spinner.succeed(`Discovered ${resources.length} resources`);
         
         // Display summary
-        console.log(chalk.cyan("\n📊 Discovery Summary:\n"));
+        // console.log(chalk.cyan("\n📊 Discovery Summary:\n"));
         
         const byType = resources.reduce((acc, r) => {
             acc[r.source.type] = (acc[r.source.type] || 0) + 1;
@@ -156,14 +156,14 @@ async function discover(argv: any): Promise<void> {
         }, {} as Record<string, number>);
         
         Object.entries(byType).forEach(([type, count]) => {
-            console.log(`  ${chalk.blue(type)}: ${count}`);
+            // console.log(`  ${chalk.blue(type)}: ${count}`);
         });
         
         // Save report if requested
         if (argv.output) {
             const report = discovery.getDiscoveryReport();
             fs.writeFileSync(argv.output, report);
-            console.log(chalk.green(`\n✅ Report saved to: ${argv.output}`));
+            // console.log(chalk.green(`\n✅ Report saved to: ${argv.output}`));
         }
         
     } catch (error) {
@@ -188,17 +188,17 @@ async function status(argv: any): Promise<void> {
         const state = stateManager.getState();
         const progress = stateManager.getProgress();
         
-        console.log(chalk.cyan("\n📊 Migration Status:\n"));
-        console.log(`  Status: ${chalk.bold(state.status)}`);
-        console.log(`  Environment: ${state.environment}`);
-        console.log(`  Last Updated: ${state.timestamp}`);
-        console.log(`\n  Progress:`);
-        console.log(`    Total Resources: ${progress.total}`);
-        console.log(`    Completed: ${chalk.green(progress.completed.toString())}`);
-        console.log(`    Failed: ${chalk.red(progress.failed.toString())}`);
-        console.log(`    In Progress: ${chalk.yellow(progress.inProgress.toString())}`);
-        console.log(`    Pending: ${chalk.gray(progress.pending.toString())}`);
-        console.log(`    Completion: ${progress.percentage}%`);
+        // console.log(chalk.cyan("\n📊 Migration Status:\n"));
+        // console.log(`  Status: ${chalk.bold(state.status)}`);
+        // console.log(`  Environment: ${state.environment}`);
+        // console.log(`  Last Updated: ${state.timestamp}`);
+        // console.log(`\n  Progress:`);
+        // console.log(`    Total Resources: ${progress.total}`);
+        // console.log(`    Completed: ${chalk.green(progress.completed.toString())}`);
+        // console.log(`    Failed: ${chalk.red(progress.failed.toString())}`);
+        // console.log(`    In Progress: ${chalk.yellow(progress.inProgress.toString())}`);
+        // console.log(`    Pending: ${chalk.gray(progress.pending.toString())}`);
+        // console.log(`    Completion: ${progress.percentage}%`);
         
         await stateManager.shutdown();
         
@@ -210,7 +210,7 @@ async function status(argv: any): Promise<void> {
 
 // Rollback command
 async function rollback(argv: any): Promise<void> {
-    console.log(banner);
+    // console.log(banner);
     
     const spinner = ora("Preparing rollback...").start();
     const logger = createLogger("Rollback", { verbose: argv.verbose });
@@ -272,12 +272,12 @@ async function loadConfiguration(argv: any, logger: Logger): Promise<MigrationCo
 }
 
 async function confirmMigration(config: MigrationConfig): Promise<boolean> {
-    console.log(chalk.yellow("\n⚠️  Migration Configuration:"));
-    console.log(`  Project: ${config.projectId}`);
-    console.log(`  Region: ${config.region}`);
-    console.log(`  Environment: ${config.environment}`);
-    console.log(`  Parallelism: ${config.parallelism}`);
-    console.log(`  Dry Run: ${config.dryRun}`);
+    // console.log(chalk.yellow("\n⚠️  Migration Configuration:"));
+    // console.log(`  Project: ${config.projectId}`);
+    // console.log(`  Region: ${config.region}`);
+    // console.log(`  Environment: ${config.environment}`);
+    // console.log(`  Parallelism: ${config.parallelism}`);
+    // console.log(`  Dry Run: ${config.dryRun}`);
     
     const readline = await import("readline");
     const rl = readline.createInterface({
@@ -294,7 +294,7 @@ async function confirmMigration(config: MigrationConfig): Promise<boolean> {
 }
 
 async function confirmRollback(): Promise<boolean> {
-    console.log(chalk.red("\n⚠️  WARNING: This will rollback the migration!"));
+    // console.log(chalk.red("\n⚠️  WARNING: This will rollback the migration!"));
     
     const readline = await import("readline");
     const rl = readline.createInterface({
@@ -468,6 +468,6 @@ process.on("unhandledRejection", (error) => {
 });
 
 process.on("SIGINT", () => {
-    console.log(chalk.yellow("\n\n🛑 Migration interrupted by user"));
+    // console.log(chalk.yellow("\n\n🛑 Migration interrupted by user"));
     process.exit(130);
 });

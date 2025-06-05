@@ -290,7 +290,10 @@ echo "Ready for enhanced AI coding with full contextualization! 🤖✨"
         print("-" * 40)
         for server in self.mcp_servers:
             status_icon = "✅" if server.is_running else "❌"
-            health_icon = {"healthy": "💚", "unhealthy": "🟡", "unreachable": "🔴", "not_running": "⚫"}.get(server.health_status, "❓")
+            health_icon = {"healthy": "💚", "unhealthy": "🟡", "unreachable": "🔴", "not_running": "⚫"}.get(
+                server.health_status,
+                "❓"
+            )
             print(f"{status_icon} {server.name:20} | Port {server.port:4} | {health_icon} {server.health_status:12} | {server.description}")
         
         # AI Services Status

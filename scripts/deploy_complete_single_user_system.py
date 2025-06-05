@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger(__name__)
+
 #!/usr/bin/env python3
 """
 Complete deployment of Cherry AI with single-user optimizations
@@ -92,7 +95,8 @@ class CompleteSystemDeployment:
                 text=True
             )
             return result.returncode == 0
-        except:
+        except Exception as e:
+            logger.error(f"Unexpected error: {e}")
             return False
     
     def check_python(self) -> bool:

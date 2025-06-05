@@ -59,6 +59,7 @@ async def create_admin_user(username: str, password: str, email: str) -> Dict[st
     
     try:
         # Check if user already exists
+        # TODO: Run EXPLAIN ANALYZE on this query
         existing = await db.execute(
             "SELECT id FROM users WHERE username = :username",
             {"username": username}

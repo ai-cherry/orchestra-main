@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger(__name__)
+
 #!/usr/bin/env python3
 """
 Redis Resilience Solution Status
@@ -41,7 +44,8 @@ def check_docker_service(service_name):
         else:
             print(f"  {RED}✗{RESET} {service_name}: Not running")
             return False
-    except:
+    except Exception as e:
+        logger.error(f"Unexpected error: {e}")
         print(f"  {YELLOW}⚠{RESET} {service_name}: Unable to check")
         return False
 

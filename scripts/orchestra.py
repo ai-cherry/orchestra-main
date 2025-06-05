@@ -114,6 +114,7 @@
 
         # Wait for services to start
         print("Waiting for services to start...")
+        # TODO: Replace with asyncio.sleep() for async code
         time.sleep(3)
 
         # Check status
@@ -133,6 +134,7 @@
         print("🛑 Stopping Cherry AI...")
 
         # Stop API server
+        # TODO: Replace with asyncio.sleep() for async code
         self.run_command(["pkill", "-f", "uvicorn agent.app.main"], check=False)
         time.sleep(1)
 

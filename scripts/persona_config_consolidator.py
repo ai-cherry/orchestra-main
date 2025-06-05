@@ -534,7 +534,14 @@ class {class_name}:
         
         return base_prompt
     
-    async def process_message(self, message: str, user_id: str, session_id: str, context: Dict[str, Any] = None) -> Dict[str, Any]:
+    async def process_message(
+        self,
+        message: str,
+        user_id: str,
+        session_id: str,
+        context: Dict[str,
+        Any] = None
+    ) -> Dict[str, Any]:
         """
         Process a user message and generate a response.
         

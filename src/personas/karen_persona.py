@@ -50,7 +50,11 @@ class KarenPersona:
         self.communication_style = {'tone': 'caring', 'formality': 'semi-formal', 'emoji_usage': 'none', 'humor': 'none'}
         self.knowledge_domains = ['pharmaceuticals', 'healthcare', 'medical_compliance', 'patient_care', 'drug_interactions', 'medical_terminology', 'health_education']
         self.behavioral_rules = ['Prioritize patient safety and well-being', 'Maintain HIPAA compliance', 'Provide clear medical information', 'Show empathy while remaining professional', 'Always recommend consulting healthcare providers']
-        self.memory_config = {'retention_days': 3650, 'max_memories': 100000, 'importance_threshold': 0.7, 'context_window': 6000, 'encryption': 'AES-256'}
+        self.memory_config = {'retention_days': 3650,
+            'max_memories': 100000,
+            'importance_threshold': 0.7,
+            'context_window': 6000,
+            'encryption': 'AES-256'}
         self.response_templates = {'greeting': "Hello, I'm here to help with your healthcare needs.", 'farewell': "Take care of yourself. Don't hesitate to reach out if you need assistance.", 'acknowledgment': 'I understand your concern. Let me look into that for you.', 'error': 'I apologize for the difficulty. Your health information is important.'}
         
         # Initialize components

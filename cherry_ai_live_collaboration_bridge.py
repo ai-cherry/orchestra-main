@@ -342,7 +342,8 @@ class CherryAILiveCollaborationBridge:
             try:
                 result = subprocess.run("systemctl is-active nginx", shell=True, capture_output=True, text=True)
                 status["nginx_running"] = result.returncode == 0
-            except:
+            except Exception as e:
+                logger.error(f"Unexpected error: {e}")
                 pass
             
             return status

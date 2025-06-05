@@ -1,3 +1,4 @@
+import os
 #!/usr/bin/env python3
 """
 Simple Redis Connection Test
@@ -43,7 +44,7 @@ def test_redis_connection():
         
         # Test 2: Set/Get
         print("\n2. Testing SET/GET...")
-        test_key = "test:connection"
+test_key = os.getenv('ORCHESTRA_SCRIPT_KEY')
         test_value = {"status": "connected", "timestamp": time.time()}
         
         r.set(test_key, json.dumps(test_value), ex=60)
@@ -95,6 +96,7 @@ def test_redis_connection():
         
         print(f"   Key exists: {r.exists(expire_key)}")
         print("   Waiting 3 seconds...")
+        # TODO: Replace with asyncio.sleep() for async code
         time.sleep(3)
         print(f"   Key exists after expiry: {r.exists(expire_key)}")
         print("   ✅ Expiration working")

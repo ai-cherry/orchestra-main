@@ -1,3 +1,4 @@
+import os
 """
 """
     """Supported use cases for intelligent model selection"""
@@ -26,7 +27,7 @@ class Provider(str, Enum):
     OPENAI = "openai"
     ANTHROPIC = "anthropic"
     GOOGLE = "google"
-    PORTKEY = "portkey"
+PORTKEY = os.getenv("CORE_UNIFIED_ROUTER_KEY", "")
     OPENROUTER = "openrouter"
     AZURE = "azure"
     LITELLM = "litellm"

@@ -64,7 +64,7 @@ class DatabaseManager:
                 host="localhost",
                 database="cherry_ai_production",
                 user="cherry_ai",
-                password="CherryAI2024!"
+password = os.getenv('ORCHESTRA_APP_PASSWORD')
             )
             logger.info("✅ PostgreSQL connected")
             

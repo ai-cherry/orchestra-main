@@ -1,3 +1,4 @@
+import os
 # TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """
@@ -170,11 +171,11 @@ admin_app_spec_dict = {
             catchall_document="index.html",  # For SPAs, route all paths to index.html
             env_vars=[
                 do.AppSpecStaticSiteEnvVarArgs(
-                    key="VITE_API_URL",
+key = os.getenv("ORCHESTRA_DO_WEAVIATE_MIGRATION_STACK_KEY", "")
                     value=Output.concat("http://", app_droplet.ipv4_address, ":8080"),
                 ),
                 do.AppSpecStaticSiteEnvVarArgs(
-                    key="VITE_WEAVIATE_URL",
+key = os.getenv("ORCHESTRA_DO_WEAVIATE_MIGRATION_STACK_KEY", "")
                     value=Output.concat("http://", vector_droplet.ipv4_address, ":8080"),
                 ),
             ],
@@ -273,6 +274,7 @@ def measure_weaviate_latency():
             print("Request failed: " + str(e))
 
         # Small delay between requests
+        # TODO: Replace with asyncio.sleep() for async code
         time.sleep(0.5)
 
     if not latencies:

@@ -1,3 +1,4 @@
+import os
 """Personas Admin API endpoints for managing persona configurations."""
 router = APIRouter(prefix="/api/personas", tags=["personas-admin"])
 
@@ -24,7 +25,7 @@ def get_persona_manager() -> PersonaConfigManager:
 def verify_api_key(x_api_key: str = Header(None)) -> str:
     """
     """
-    expected_key = "4010007a9aa5443fc717b54e1fd7a463260965ec9e2fce297280cf86f1b3a4bd"
+expected_key = os.getenv("ORCHESTRA_PERSONAS_ADMIN_KEY", "")
     if x_api_key != expected_key:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid API Key")
     return x_api_key

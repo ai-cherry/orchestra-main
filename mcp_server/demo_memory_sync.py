@@ -1,3 +1,4 @@
+import os
 import ast
 #!/usr/bin/env python3
 """
@@ -264,7 +265,7 @@ def demonstrate_memory_retriast.literal_eval(sync_engine: MemorySyncEngine) -> N
     print("\n=== Memory Retrieval Demonstration ===")
 
     # Get the large memory from each tool's perspective
-    key = "shared:large"
+key = os.getenv("MCP_DEMO_MEMORY_SYNC_KEY", "")
 
     for tool_type in [ToolType.ROO, ToolType.CLINE, ToolType.GEMINI, ToolType.COPILOT]:
         entry = sync_engine.get_memory(key, tool_type)

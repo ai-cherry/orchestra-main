@@ -61,7 +61,7 @@ class SingleUserAuthDeployment:
         if self.env_file.exists():
             with open(self.env_file, 'r') as f:
                 for line in f:
-                    if line.startswith("cherry_ai_API_KEY=") and "=" in line:
+if line.startswith("cherry_ai_API_KEY = os.getenv('ORCHESTRA_SCRIPT_API_KEY')
                         key = line.split("=", 1)[1].strip()
                         if key and key != "your-api-key":
                             self.api_key = key
@@ -280,6 +280,7 @@ server {
         # Wait for services to be ready
         print("  - Waiting for services to be ready...")
         import time
+        # TODO: Replace with asyncio.sleep() for async code
         time.sleep(10)
     
     def run_tests(self):

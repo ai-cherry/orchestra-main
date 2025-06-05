@@ -285,7 +285,8 @@ class IntelligentOrchestrator:
                                 else:
                                     health.status = ServiceStatus.UNHEALTHY
                                     health.error_count += 1
-                    except:
+                    except Exception as e:
+                        logger.error(f"Unexpected error: {e}")
                         health.status = ServiceStatus.UNHEALTHY
                         health.error_count += 1
             
@@ -665,6 +666,7 @@ def main():
         daemon.stop()
     elif args.command == 'restart':
         daemon.stop()
+        # TODO: Replace with asyncio.sleep() for async code
         time.sleep(2)
         daemon.start()
     elif args.command == 'status':

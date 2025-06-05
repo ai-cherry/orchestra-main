@@ -257,6 +257,7 @@ AIRBYTE_API_URL=http://localhost:8000
     # Restart API container
     print("\nRestarting API container...")
     run_command("docker restart cherry_ai_api", check=False)
+    # TODO: Replace with asyncio.sleep() for async code
     time.sleep(5)
     
     # Check if API is back up

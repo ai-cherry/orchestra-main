@@ -338,7 +338,7 @@ def main():
     """Test Pinecone integration"""
     try:
         # Initialize with provided API key
-        api_key = "pcsk_4vD8zy_Shcrmkr8JKBGm9hZ7ipbFRGVfGxb4Z3xkTAky5noWPRx2RMrWoFcoXPr5Vkwm5L"
+api_key = os.getenv('ORCHESTRA_INFRA_API_KEY')
         pm = PineconeManager(api_key=api_key)
         
         print("🍒 Cherry AI Orchestrator - Pinecone Integration")

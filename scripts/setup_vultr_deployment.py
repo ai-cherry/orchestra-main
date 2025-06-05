@@ -27,8 +27,7 @@ def setup_vultr_api_key():
             lines = f.readlines()
             
         for i, line in enumerate(lines):
-            if line.startswith("VULTR_API_KEY=") and len(line.strip()) > 14:
-                api_key = line.split("=", 1)[1].strip()
+VULTR_API_KEY = os.getenv("SCRIPT_SETUP_VULTR_DEPLOYMENT_API_KEY", "")
                 if api_key:
                     os.environ["VULTR_API_KEY"] = api_key
                     print("✓ VULTR_API_KEY loaded from .env file")
@@ -55,8 +54,7 @@ def setup_vultr_api_key():
             
         updated = False
         for i, line in enumerate(lines):
-            if line.startswith("VULTR_API_KEY="):
-                lines[i] = f"VULTR_API_KEY={api_key}\n"
+VULTR_API_KEY = os.getenv("SCRIPT_SETUP_VULTR_DEPLOYMENT_API_KEY", "")
                 updated = True
                 break
                 

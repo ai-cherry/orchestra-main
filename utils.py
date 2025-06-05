@@ -3,6 +3,7 @@
     """Retry decorator with exponential backoff."""
                         f"Attempt {attempt + 1} failed for {func.__name__}: {e}. " f"Retrying in {wait_time} seconds..."
                     )
+                    # TODO: Replace with asyncio.sleep() for async code
                     time.sleep(wait_time)
             return None
 

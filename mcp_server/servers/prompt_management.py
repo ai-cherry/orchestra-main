@@ -1,3 +1,4 @@
+import os
 #!/usr/bin/env python3
 """
 Prompt Management MCP Server
@@ -748,7 +749,7 @@ async def generate_cheat_sheet(arguments: dict) -> CallToolResult:
 ```bash
 # Setup on remote server
 npm install -g @openai/codex
-export OPENAI_API_KEY="your-key"
+export OPENAI_API_KEY = os.getenv('ORCHESTRA_MCP_API_KEY')
 cd ~/orchestra-main
 codex "optimize this codebase for performance"
 ```

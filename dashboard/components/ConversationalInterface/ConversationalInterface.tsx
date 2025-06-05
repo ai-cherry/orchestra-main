@@ -133,7 +133,7 @@ export const ConversationalInterface: React.FC = () => {
         exportConversation();
         break;
       default:
-        console.log('Unknown action:', action);
+        // console.log('Unknown action:', action);
     }
   }, []);
 

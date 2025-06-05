@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger(__name__)
+
 #!/usr/bin/env python3
 """Cherry AI Website Deployment Status - Complete verification of cherry-ai.me deployment"""
 
@@ -71,7 +74,8 @@ def main():
         result = subprocess.run("systemctl is-active nginx", shell=True, capture_output=True, text=True)
         nginx_active = result.stdout.strip() == "active"
         all_good &= check_status("Nginx", nginx_active, f"Status: {result.stdout.strip()}")
-    except:
+    except Exception as e:
+        logger.error(f"Unexpected error: {e}")
         all_good &= check_status("Nginx", False, "Unable to check")
     
     # 2. API Endpoints

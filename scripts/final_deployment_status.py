@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger(__name__)
+
 #!/usr/bin/env python3
 """
 Final deployment status and next steps for cherry_ai MCP
@@ -29,7 +32,8 @@ def check_local_services():
             else:
                 result = subprocess.run(check.split(), capture_output=True)
                 status[name] = "✅ Healthy" if result.returncode == 0 else "❌ Unhealthy"
-        except:
+        except Exception as e:
+            logger.error(f"Unexpected error: {e}")
             status[name] = "❌ Not responding"
             
     for name, state in status.items():

@@ -1,3 +1,4 @@
+import os
 # TODO: Consider adding connection pooling configuration
 """
 """
@@ -289,7 +290,7 @@ class TestMemoryItem:
     
     def test_memory_item_expiration(self):
         """Test MemoryItem expiration check."""
-            key="expired",
+key = os.getenv("CORE_TEST_MEMORY_MANAGER_KEY", "")
             value="old_data",
             metadata={},
             tier=MemoryTier.L1_PROCESS_MEMORY,
@@ -306,7 +307,7 @@ class TestMemoryItem:
         
         # Create non-expired item
         fresh_item = MemoryItem(
-            key="fresh",
+key = os.getenv("CORE_TEST_MEMORY_MANAGER_KEY", "")
             value="new_data",
             metadata={},
             tier=MemoryTier.L1_PROCESS_MEMORY,

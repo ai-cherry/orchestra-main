@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger(__name__)
+
 #!/usr/bin/env python3
 """
 Setup production configuration for cherry_ai MCP deployment
@@ -150,7 +153,8 @@ def setup_pulumi():
     try:
         subprocess.run(["pulumi", "whoami"], check=True, capture_output=True)
         print("  ✓ Pulumi already logged in")
-    except:
+    except Exception as e:
+        logger.error(f"Unexpected error: {e}")
         print("  ⚠️  Pulumi not logged in. Logging in to local backend...")
         subprocess.run(["pulumi", "login", "--local"], check=True)
     

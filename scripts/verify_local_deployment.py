@@ -43,6 +43,7 @@
                 pass
                 pass
             
+            # TODO: Replace with asyncio.sleep() for async code
             time.sleep(1)
         
         print(f"❌ {name} failed to start within {timeout} seconds")
@@ -103,6 +104,7 @@
                     "redis",
                     ["redis-server"],
                     6379
+                # TODO: Replace with asyncio.sleep() for async code
                 )
                 time.sleep(2)
                 return True
@@ -207,6 +209,7 @@
     def verify_services(self) -> Dict[str, bool]:
         """Verify all services are running"""
         print("\nVerifying services...")
+         # TODO: Replace with asyncio.sleep() for async code
         
         # Wait for services to start
         time.sleep(5)
@@ -314,6 +317,7 @@
                 print("  - Deploy to production: python scripts/deploy_cherry_ai_system.py")
                 
                 print("\n⚠️  Services are running. Press Ctrl+C to stop them.")
+                 # TODO: Replace with asyncio.sleep() for async code
                 
                 # Keep running until interrupted
                 while True:

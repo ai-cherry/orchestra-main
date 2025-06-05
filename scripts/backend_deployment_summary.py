@@ -41,6 +41,7 @@ def check_service_status():
         cursor = conn.cursor()
         
         # Check version
+        # TODO: Run EXPLAIN ANALYZE on this query
         cursor.execute("SELECT version()")
         version = cursor.fetchone()[0].split()[1]
         print(f"  ✅ Connected (PostgreSQL {version})")
@@ -56,6 +57,7 @@ def check_service_status():
         print(f"  📋 Tables: {', '.join(tables) if tables else 'None'}")
         
         # Check user count
+        # TODO: Run EXPLAIN ANALYZE on this query
         if 'users' in tables:
             cursor.execute("SELECT COUNT(*) FROM users")
             user_count = cursor.fetchone()[0]
@@ -217,7 +219,10 @@ def check_service_status():
     # 8. Quick start commands
     print("\n🚀 Quick Commands:")
     print("  • View API docs: http://localhost:8000/docs")
-    print("  • Test login: curl -X POST http://localhost:8000/api/v1/auth/login -H 'Content-Type: application/json' -d '{\"username\":\"scoobyjava\",\"password\":\"Huskers1983$\"}'")
+    print(
+        "  • Test login: curl -X POST http://localhost:8000/api/v1/auth/login -H 'Content-Type: application/json' -d '{\"username\":\"scoobyjava\",
+        \"password\":\"Huskers1983$\"}'"
+    )
     print("  • View logs: tail -f /tmp/cherry_ai-api.log")
     print("  • Check containers: docker ps")
     

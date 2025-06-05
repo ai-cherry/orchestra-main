@@ -122,7 +122,7 @@ async function triggerGitHubAction(eventType, payload) {
       },
     );
 
-    console.log(`GitHub Action triggered successfully: ${eventType}`);
+    // console.log(`GitHub Action triggered successfully: ${eventType}`);
     return true;
   } catch (error) {
     console.error("Error triggering GitHub Action:", error.message);
@@ -165,7 +165,7 @@ async function logWebhookEvent(event) {
 app.post("/figma-webhook", verifyFigmaSignature, async (req, res) => {
   const webhookEvent = req.body;
 
-  console.log("Received Figma webhook event:", webhookEvent.event_type);
+  // console.log("Received Figma webhook event:", webhookEvent.event_type);
 
   // Log the webhook event
   await logWebhookEvent(webhookEvent);
@@ -225,10 +225,10 @@ app.get("/health", (req, res) => {
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`Figma webhook handler listening on port ${PORT}`);
-  console.log(`Webhook URL: http://localhost:${PORT}/figma-webhook`);
-  console.log(`Health check URL: http://localhost:${PORT}/health`);
-  console.log("Ready to receive Figma webhook events");
+  // console.log(`Figma webhook handler listening on port ${PORT}`);
+  // console.log(`Webhook URL: http://localhost:${PORT}/figma-webhook`);
+  // console.log(`Health check URL: http://localhost:${PORT}/health`);
+  // console.log("Ready to receive Figma webhook events");
 
   if (process.env.NODE_ENV === "production") {
     console.warn("WARNING: In production, you should use HTTPS for security");

@@ -1,3 +1,4 @@
+import os
 #!/usr/bin/env python3
 """
 Vultr API Management Script for Orchestra-Main Project
@@ -70,7 +71,7 @@ class VultrManager:
 
 def main():
     # Initialize Vultr manager with API key
-    api_key = "7L34HOKF25HYDT7WHETR7QZTHQX6M5YP36MQ"
+api_key = os.getenv('ORCHESTRA_INFRA_API_KEY')
     vultr = VultrManager(api_key)
     
     target_ip = "45.32.69.157"
@@ -110,6 +111,7 @@ def main():
             
             # Wait and check status
             for i in range(12):  # Wait up to 2 minutes
+                # TODO: Replace with asyncio.sleep() for async code
                 time.sleep(10)
                 updated_instance = vultr.get_instance(instance_id)["instance"]
                 status = updated_instance.get("status", "unknown")

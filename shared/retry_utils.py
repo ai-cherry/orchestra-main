@@ -23,6 +23,7 @@ def retry(max_attempts=3, delay=1, backoff=2):
                         raise e
                     
                     print(f"Attempt {attempts} failed, retrying in {current_delay}s...")
+                    # TODO: Replace with asyncio.sleep() for async code
                     time.sleep(current_delay)
                     current_delay *= backoff
             

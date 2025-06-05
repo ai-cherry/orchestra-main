@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger(__name__)
+
 #!/usr/bin/env python3
 """
 Simplified MCP Server and Database Architecture Audit
@@ -217,7 +220,8 @@ class MCPDatabaseAuditor:
                     content = f.read()
                     if "async def" in content:
                         async_count += 1
-            except:
+            except Exception as e:
+                logger.error(f"Unexpected error: {e}")
                 pass
         
         metrics["async_implementations"] = async_count

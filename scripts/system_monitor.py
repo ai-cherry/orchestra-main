@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger(__name__)
+
 #!/usr/bin/env python3
 """
 Comprehensive System Monitor and Manager
@@ -91,7 +94,8 @@ class SystemMonitor:
         try:
             response = requests.get(f"http://localhost:{port}{endpoint}", timeout=2)
             return response.status_code < 500
-        except:
+        except Exception as e:
+            logger.error(f"Unexpected error: {e}")
             return False
             
     def get_container_logs(self, container_name: str, lines: int = 10) -> List[str]:
@@ -108,6 +112,7 @@ class SystemMonitor:
         if port_info:
             try:
                 os.kill(port_info["pid"], 9)
+                # TODO: Replace with asyncio.sleep() for async code
                 time.sleep(1)
             except:
                 pass
@@ -224,6 +229,7 @@ class SystemMonitor:
             if self.start_mcp_server(name, config):
                 print(f"{GREEN}✓{NC}")
             else:
+                # TODO: Replace with asyncio.sleep() for async code
                 print(f"{RED}✗{NC}")
             time.sleep(2)
             
@@ -246,6 +252,7 @@ class SystemMonitor:
         print(f"\n{YELLOW}Restarting Docker services...{NC}")
         
         # Stop services
+        # TODO: Replace with asyncio.sleep() for async code
         print("Stopping services...")
         self.run_command(["docker-compose", "down"])
         time.sleep(2)
@@ -253,6 +260,7 @@ class SystemMonitor:
         # Start services
         print("Starting services...")
         self.run_command(["docker-compose", "up", "-d"])
+         # TODO: Replace with asyncio.sleep() for async code
         
         # Wait for services to be ready
         print("Waiting for services to be ready...")
@@ -387,6 +395,7 @@ class SystemMonitor:
                 elif choice == "6":
                     self.export_status_report()
                     input(f"\n{WHITE}Press Enter to continue...{NC}")
+                # TODO: Replace with asyncio.sleep() for async code
                 elif choice == "":
                     continue  # Refresh
                 else:

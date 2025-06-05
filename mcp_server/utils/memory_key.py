@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import os
 """
 """
     """Predefined scopes for memory keys."""
@@ -48,7 +49,7 @@ class MemoryKey:
 
     def __repr__(self) -> str:
         """Representation for debugging."""
-            f"MemoryKey(namespace='{self.namespace}', key='{self.key}', "
+namespace = os.getenv("MCP_MEMORY_KEY_KEY", "")
             f"scope='{self.scope}', user_id='{self.user_id}', "
             f"session_id='{self.session_id}', agent_id='{self.agent_id}')"
         )

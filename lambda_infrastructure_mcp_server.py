@@ -1,3 +1,4 @@
+import os
 #!/usr/bin/env python3
 """
 Enhanced MCP Server for Lambda Labs Infrastructure
@@ -23,7 +24,7 @@ logger = logging.getLogger(__name__)
 class LambdaLabsInfrastructureServer:
     def __init__(self):
         self.server = Server("lambda-infrastructure")
-        self.api_key = "secret_manus_5305c377b1e94aaa8352f2efc72f5ae3.cA4GcSKfAAhTtT2XsNDmC3CpRPvvupIk"
+self.api_key = os.getenv('ORCHESTRA_APP_API_KEY')
         self.base_url = "https://cloud.lambda.ai/api/v1"
         self.production_ip = "150.136.94.139"
         

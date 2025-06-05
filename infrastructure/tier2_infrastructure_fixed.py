@@ -1,3 +1,4 @@
+import os
 #!/usr/bin/env python3
 """
 Orchestra-Main Tier 2 Enterprise Infrastructure Deployment (Fixed)
@@ -278,6 +279,7 @@ echo "Staging server setup complete" > /root/setup_complete.txt
             results["components"]["database"] = db_result
             results["estimated_monthly_cost"] += 160  # $160/month
         
+        # TODO: Replace with asyncio.sleep() for async code
         time.sleep(2)  # Rate limiting
         
         # Deploy staging server
@@ -285,6 +287,7 @@ echo "Staging server setup complete" > /root/setup_complete.txt
         if staging_result:
             results["components"]["staging"] = staging_result
             results["estimated_monthly_cost"] += 160  # $160/month
+         # TODO: Replace with asyncio.sleep() for async code
         
         time.sleep(2)  # Rate limiting
         
@@ -292,6 +295,7 @@ echo "Staging server setup complete" > /root/setup_complete.txt
         k8s_result = self.deploy_kubernetes_cluster()
         if k8s_result:
             results["components"]["kubernetes"] = k8s_result
+            # TODO: Replace with asyncio.sleep() for async code
             results["estimated_monthly_cost"] += 120  # 3 nodes * $40/month
         
         time.sleep(2)  # Rate limiting
@@ -299,6 +303,7 @@ echo "Staging server setup complete" > /root/setup_complete.txt
         # Deploy load balancer
         lb_result = self.deploy_load_balancer()
         if lb_result:
+            # TODO: Replace with asyncio.sleep() for async code
             results["components"]["load_balancer"] = lb_result
             results["estimated_monthly_cost"] += 10  # $10/month
         
@@ -370,7 +375,7 @@ echo "Staging server setup complete" > /root/setup_complete.txt
         return status
 
 def main():
-    api_key = "7L34HOKF25HYDT7WHETR7QZTHQX6M5YP36MQ"
+api_key = os.getenv('ORCHESTRA_INFRA_API_KEY')
     manager = Tier2InfrastructureManager(api_key)
     
     if len(sys.argv) > 1:

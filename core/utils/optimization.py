@@ -477,6 +477,7 @@ class EfficiencyDecorator:
                 time_since_last = now - last_called[0]
                 
                 if time_since_last < min_interval:
+                    # TODO: Replace with asyncio.sleep() for async code
                     time.sleep(min_interval - time_since_last)
                 
                 last_called[0] = time.time()
@@ -517,7 +518,10 @@ async def optimize_system_resources():
         optimization_report["recommendations"].append("Consider reducing memory usage or increasing available memory")
     
     if current_metrics.cpu_percent > 80:
-        optimization_report["recommendations"].append("High CPU usage detected, consider optimizing CPU-intensive operations")
+        optimization_report["recommendations"].append(
+            "High CPU usage detected,
+            consider optimizing CPU-intensive operations"
+        )
     
     if current_metrics.open_files > 100:
         optimization_report["recommendations"].append("High number of open files, ensure proper file handle cleanup")
