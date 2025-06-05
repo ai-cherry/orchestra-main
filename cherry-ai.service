@@ -1,0 +1,17 @@
+[Unit]
+Description=Cherry AI Interface Service
+After=network.target postgresql.service redis.service
+
+[Service]
+Type=simple
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/opt/cherry-ai
+Environment=PYTHONPATH=/opt/cherry-ai
+Environment=PATH=/home/ubuntu/.local/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=/usr/bin/python3 /opt/cherry-ai/cherry_interface.py
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target 
