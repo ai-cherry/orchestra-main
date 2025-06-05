@@ -6,29 +6,23 @@
       "env": {
         "PYTHONPATH": ".:./mcp_server",
         "PROJECT_ROOT": ".",
-        "OPENAI_API_KEY": "${OPENAI_API_KEY}",
-        "ANTHROPIC_API_KEY": "${ANTHROPIC_API_KEY}",
-        "REDIS_URL": "redis://localhost:6379"
+        "REDIS_URL": "redis://localhost:6379",
+        "ENABLE_CURSOR_INTEGRATION": "true",
+        "ENABLE_ROO_INTEGRATION": "true"
       }
     },
     "cherry-ai-infrastructure": {
-      "command": "python3",
+      "command": "python3", 
       "args": ["./mcp_server/servers/infrastructure_manager.py"],
       "env": {
         "PYTHONPATH": ".:./mcp_server",
         "PROJECT_ROOT": ".",
         "VULTR_API_KEY": "${VULTR_API_KEY}",
         "PULUMI_ACCESS_TOKEN": "${PULUMI_ACCESS_TOKEN}",
-        "PRODUCTION_SERVER_IP": "45.32.69.157"
-      }
-    },
-    "cherry-ai-codex": {
-      "command": "python3",
-      "args": ["./mcp_server/codex_integration.py"],
-      "env": {
-        "PYTHONPATH": ".:./mcp_server",
-        "PROJECT_ROOT": ".",
-        "OPENAI_API_KEY": "${OPENAI_API_KEY}"
+        "PRODUCTION_SERVER_IP": "45.32.69.157",
+        "DATABASE_SERVER_IP": "45.77.87.106",
+        "STAGING_SERVER_IP": "207.246.108.201",
+        "ENABLE_CURSOR_INTEGRATION": "true"
       }
     },
     "cherry-ai-database": {
@@ -38,13 +32,15 @@
         "PYTHONPATH": ".:./mcp_server",
         "PROJECT_ROOT": ".",
         "POSTGRES_HOST": "45.77.87.106",
-        "POSTGRES_USER": "postgres",
+        "POSTGRES_USER": "postgres", 
         "POSTGRES_PASSWORD": "${POSTGRES_PASSWORD}",
         "POSTGRES_DB": "cherry_ai",
         "REDIS_URL": "redis://localhost:6379",
         "WEAVIATE_URL": "${WEAVIATE_URL}",
         "WEAVIATE_API_KEY": "${WEAVIATE_API_KEY}",
-        "PINECONE_API_KEY": "${PINECONE_API_KEY}"
+        "PINECONE_API_KEY": "${PINECONE_API_KEY}",
+        "ENABLE_VECTOR_SEARCH": "true",
+        "ENABLE_SEMANTIC_CACHE": "true"
       }
     }
   }
