@@ -1,107 +1,41 @@
 #!/bin/bash
+# Orchestra AI Quick Start
 
-# Colors for output
-GREEN='\033[0;32m'
-BLUE='\033[0;34m'
-YELLOW='\033[1;33m'
-RED='\033[0;31m'
-NC='\033[0m'
+# Auto-activate environment
+eval "$(pyenv init -)" 2>/dev/null || true
+source venv/bin/activate
 
-echo -e "${BLUE}🚀 Cherry AI - Docker Development Environment${NC}"
-echo "================================================"
+# Check if main_app.py exists
+if [ -f "main_app.py" ]; then
+    echo "🚀 Starting Orchestra AI server..."
+    uvicorn main_app:app --reload --host 0.0.0.0 --port 8000
+elif [ -f "agent/app/main.py" ]; then
+    echo "🚀 Starting Orchestra AI agent server..."
+    uvicorn agent.app.main:app --reload --host 0.0.0.0 --port 8000
+else
+    echo "⚠️  No main application file found. Creating a simple test server..."
+    cat > test_server.py << 'PYEOF'
+from fastapi import FastAPI
+from pydantic import BaseModel
+import uvicorn
 
-# Function to check if Docker is running
-check_docker() {
-    if ! docker info > /dev/null 2>&1; then
-        echo -e "${RED}❌ Docker is not running!${NC}"
-        echo "Please start Docker Desktop or Docker daemon"
-        exit 1
-    fi
-}
+app = FastAPI(title="Orchestra AI Test Server")
 
-# Function to show the menu
-show_menu() {
-    echo ""
-    echo -e "${GREEN}What would you like to do?${NC}"
-    echo "1) Start everything (recommended)"
-    echo "2) Start backend only"
-    echo "3) Start with fresh database"
-    echo "4) Shell into main container"
-    echo "5) View logs"
-    echo "6) Stop everything"
-    echo "7) Clean everything (nuclear option)"
-    echo "8) Run tests"
-    echo "9) Exit"
-}
+class HealthResponse(BaseModel):
+    status: str
+    message: str
 
-# Main logic
-check_docker
+@app.get("/", response_model=HealthResponse)
+async def root():
+    return HealthResponse(status="ok", message="Orchestra AI is running!")
 
-case "${1:-menu}" in
-    "up"|"start"|"1")
-        echo -e "${GREEN}🚀 Starting all services...${NC}"
-        docker compose up -d
-        echo ""
-        echo -e "${GREEN}✅ Everything is running!${NC}"
-        echo ""
-        echo "📍 Services available at:"
-        echo "   - FastAPI:    http://localhost:8000"
-        echo "   - Admin UI:   http://localhost:3001"
-        echo "   - MCP:        http://localhost:8002"
-        echo "   - Redis:      localhost:6379"
-        echo "   - PostgreSQL: localhost:5432"
-        echo ""
-        echo -e "${YELLOW}💡 To get a shell: ./start.sh shell${NC}"
-        ;;
+@app.get("/health", response_model=HealthResponse)
+async def health():
+    return HealthResponse(status="healthy", message="All systems operational")
 
-    "shell"|"4")
-        echo -e "${GREEN}🐚 Opening shell in main container...${NC}"
-        docker compose exec cherry_ai-dev /bin/bash
-        ;;
-
-    "logs"|"5")
-        echo -e "${GREEN}📋 Showing logs (Ctrl+C to exit)...${NC}"
-        docker compose logs -f
-        ;;
-
-    "stop"|"down"|"6")
-        echo -e "${YELLOW}🛑 Stopping all services...${NC}"
-        docker compose down
-        echo -e "${GREEN}✅ All services stopped${NC}"
-        ;;
-
-    "clean"|"nuke"|"7")
-        echo -e "${RED}⚠️  This will delete all containers, volumes, and data!${NC}"
-        read -p "Are you sure? (y/N) " -n 1 -r
-        echo
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
-            docker compose down -v --remove-orphans
-            docker system prune -f
-            echo -e "${GREEN}✅ Everything cleaned${NC}"
-        fi
-        ;;
-
-    "test"|"8")
-        echo -e "${GREEN}🧪 Running tests...${NC}"
-        docker compose exec cherry_ai-dev poetry run pytest
-        ;;
-
-    "menu"|*)
-        while true; do
-            show_menu
-            read -p "Select option: " choice
-            case $choice in
-                1) $0 up ;;
-                2) docker compose up -d cherry_ai-dev redis postgres ;;
-                3) docker compose down -v && docker compose up -d ;;
-                4) $0 shell ;;
-                5) $0 logs ;;
-                6) $0 stop ;;
-                7) $0 clean ;;
-                8) $0 test ;;
-                9) exit 0 ;;
-                *) echo -e "${RED}Invalid option${NC}" ;;
-            esac
-        done
-        ;;
-esac
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)
+PYEOF
+    echo "🚀 Starting test server..."
+    python test_server.py
+fi
