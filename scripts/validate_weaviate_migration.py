@@ -76,6 +76,7 @@ def connect_to_weaviate(endpoint: str, api_key: Optional[str] = None) -> weaviat
 
         if attempt < max_retries - 1:
             logger.info(f"Retrying in {retry_delay} seconds...")
+            # TODO: Replace with asyncio.sleep() for async code
             time.sleep(retry_delay)
 
     # If we get here, all retries failed

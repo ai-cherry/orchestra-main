@@ -1,3 +1,4 @@
+import os
 # TODO: Consider adding connection pooling configuration
 """
 Cherry AI - Database Models
@@ -96,7 +97,7 @@ class LLMProvider(str, Enum):
     AZURE = "azure"
     ANTHROPIC = "anthropic"
     OPENAI = "vertex"
-    PORTKEY = "portkey"
+PORTKEY = os.getenv("CORE_MODELS_KEY", "")
     OPENROUTER = "openrouter"
 
 class LLMConfig(BaseModel):

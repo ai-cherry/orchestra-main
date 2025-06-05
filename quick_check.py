@@ -1,6 +1,23 @@
 #!/usr/bin/env python3
 """
+Quick Check Utility for Patrick's Orchestrator Experience
+
+This script provides a rapid check of the most common issues affecting
+Patrick's experience with the Orchestrator system. It's designed to be
+fast and minimally invasive, checking only configuration and structure
+without making any actual API calls.
+
+For a more thorough diagnostic, use diagnose_patrick_issues.py.
 """
+
+import logging
+import os
+import sys
+from pathlib import Path
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
 )
 logger = logging.getLogger("quick-check")
@@ -61,14 +78,14 @@ def check_critical_files():
 
     critical_paths = [
         # Core configuration
-        ("core/conductor/src/config/personas.yaml", "Persona configurations"),
+        ("core/orchestrator/src/config/personas.yaml", "Persona configurations"),
         # Core modules for Patrick's experience
         ("packages/shared/src/memory/memory_manager.py", "Memory management"),
         ("packages/shared/src/llm_client", "LLM integration"),
-        ("core/conductor/src/personas", "Persona management"),
+        ("core/orchestrator/src/personas", "Persona management"),
         # API endpoints
         (
-            "core/conductor/src/api/endpoints/interaction.py",
+            "core/orchestrator/src/api/endpoints/interaction.py",
             "API interaction endpoint",
         ),
     ]
@@ -89,21 +106,19 @@ def check_api_configuration():
     print(f"\n{Colors.BOLD}Checking API configuration...{Colors.ENDC}")
 
     # Check for the main API entrypoint
-    api_app_path = Path("core/conductor/src/api/app.py")
+    api_app_path = Path("core/orchestrator/src/api/app.py")
     if not api_app_path.exists():
         print(f"  {Colors.RED}✗ API app.py not found{Colors.ENDC}")
         return False
 
     # Read the file to check for required route registrations
     try:
-
-        pass
         with open(api_app_path, "r") as f:
             content = f.read()
 
         # Check for essential route registrations
         checks = [
-            ("from shared.endpoints import interaction", "Interaction endpoint import"),
+            ("from .endpoints import interaction", "Interaction endpoint import"),
             (".include_router(interaction.router", "Interaction router registration"),
             ("from .middleware", "Middleware imports (for persona handling)"),
         ]
@@ -117,9 +132,7 @@ def check_api_configuration():
                 all_found = False
 
         return all_found
-    except Exception:
-
-        pass
+    except Exception as e:
         print(f"  {Colors.RED}✗ Error checking API configuration: {e}{Colors.ENDC}")
         return False
 
@@ -129,7 +142,7 @@ def check_hardcoded_references():
 
     # Files to check for hardcoded references
     files_to_check = [
-        "core/conductor/src/api/endpoints/interaction.py",
+        "core/orchestrator/src/api/endpoints/interaction.py",
         "packages/shared/src/memory/memory_manager.py",
     ]
 
@@ -143,8 +156,6 @@ def check_hardcoded_references():
     issues_found = False
     for file_path in files_to_check:
         try:
-
-            pass
             path = Path(file_path)
             if not path.exists():
                 continue
@@ -159,9 +170,7 @@ def check_hardcoded_references():
                     )
                     print(f"  {Colors.YELLOW}⚠ {description} found in {file_path}:{line_num}{Colors.ENDC}")
                     issues_found = True
-        except Exception:
-
-            pass
+        except Exception as e:
             print(f"  {Colors.YELLOW}⚠ Error checking {file_path}: {e}{Colors.ENDC}")
 
     if not issues_found:
@@ -171,7 +180,7 @@ def check_hardcoded_references():
 
 def main():
     """Run all quick checks."""
-    print(f"{Colors.BOLD}conductor Quick Check Tool{Colors.ENDC}")
+    print(f"{Colors.BOLD}Orchestrator Quick Check Tool{Colors.ENDC}")
     print(f"{Colors.BLUE}Running rapid checks for Patrick's experience...{Colors.ENDC}\n")
 
     # Run all checks

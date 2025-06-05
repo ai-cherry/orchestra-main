@@ -1,0 +1,47 @@
+{
+  "deployment_type": "SSH-based deployment to existing Lambda Labs instance",
+  "target_server": {
+    "ip": "150.136.94.139",
+    "provider": "Lambda Labs",
+    "specs": "8x A100 GPU instance",
+    "os": "Ubuntu 22.04 LTS"
+  },
+  "deployment_steps": [
+    {
+      "step": 1,
+      "action": "SSH Key Setup",
+      "command": "ssh-copy-id ubuntu@150.136.94.139"
+    },
+    {
+      "step": 2,
+      "action": "Deploy Application Code",
+      "method": "Git pull or rsync",
+      "target_dir": "/opt/orchestra"
+    },
+    {
+      "step": 3,
+      "action": "Configure Services",
+      "services": [
+        "nginx",
+        "systemd services",
+        "SSL certificates"
+      ]
+    },
+    {
+      "step": 4,
+      "action": "Database Migrations",
+      "command": "python manage.py migrate"
+    },
+    {
+      "step": 5,
+      "action": "Restart Services",
+      "command": "systemctl restart orchestra-*"
+    }
+  ],
+  "existing_services": {
+    "postgresql": "localhost:5432",
+    "redis": "localhost:6379",
+    "weaviate": "localhost:8080",
+    "api": "localhost:8000"
+  }
+}

@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger(__name__)
+
 #!/usr/bin/env python3
 """
 Cherry AI Final System Status Report
@@ -15,7 +18,8 @@ def run_command(cmd):
     try:
         result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
         return result.stdout.strip() if result.returncode == 0 else None
-    except:
+    except Exception as e:
+        logger.error(f"Unexpected error: {e}")
         return None
 
 def check_service_health(service_name):

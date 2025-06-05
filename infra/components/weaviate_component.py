@@ -1,3 +1,4 @@
+import os
 """
         name="cherry_ai-weaviate",
         config={
@@ -72,7 +73,7 @@
                                         value_from=k8s.core.v1.EnvVarSourceArgs(
                                             secret_key_ref=k8s.core.v1.SecretKeySelectorArgs(
                                                 name="weaviate-secrets",
-                                                key="weaviate-api-key",
+key = os.getenv("ORCHESTRA_WEAVIATE_COMPONENT_KEY", "")
                                             ),
                                         ),
                                     ),
@@ -81,7 +82,7 @@
                                         value_from=k8s.core.v1.EnvVarSourceArgs(
                                             secret_key_ref=k8s.core.v1.SecretKeySelectorArgs(
                                                 name="weaviate-secrets",
-                                                key="weaviate-rest-endpoint",
+key = os.getenv("ORCHESTRA_WEAVIATE_COMPONENT_KEY", "")
                                             ),
                                         ),
                                     ),

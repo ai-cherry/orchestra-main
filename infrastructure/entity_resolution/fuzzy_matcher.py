@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger(__name__)
+
 #!/usr/bin/env python3
 """
 Enterprise Entity Resolution and Fuzzy Matching System
@@ -162,7 +165,8 @@ class FuzzyMatcher:
                 stop_words='english',
                 ngram_range=(1, 2)
             )
-        except:
+        except Exception as e:
+            logger.error(f"Unexpected error: {e}")
             logger.warning("ML components not available")
     
     def preprocess_text(self, text: str) -> str:

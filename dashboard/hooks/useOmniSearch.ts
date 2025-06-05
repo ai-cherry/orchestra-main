@@ -192,11 +192,11 @@ export const useOmniSearch = () => {
           break;
         case 'command':
           // Execute command and show result
-          console.log('Command result:', result);
+          // console.log('Command result:', result);
           break;
         default:
           // Handle search results
-          console.log('Search results:', result);
+          // console.log('Search results:', result);
       }
     } catch (error) {
       console.error('Search execution error:', error);

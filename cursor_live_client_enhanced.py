@@ -139,7 +139,10 @@ async def main():
             ("Check cherry-ai.me status", "curl -I http://cherry-ai.me"),
             ("List web directory", "ls -la /var/www/html/"),
             ("Find enhanced interface", "find /var/www/cherry-ai -name '*enhanced*.html' -type f"),
-            ("Deploy interface", "cp /var/www/cherry-ai/admin-interface/enhanced-production-interface.html /var/www/html/index.html"),
+            (
+                "Deploy interface",
+                "cp /var/www/cherry-ai/admin-interface/enhanced-production-interface.html /var/www/html/index.html"
+            ),
             ("Reload nginx", "systemctl reload nginx"),
             ("Verify deployment", "curl -s http://cherry-ai.me | grep -E 'Cherry|Sophia|Karen'")
         ]

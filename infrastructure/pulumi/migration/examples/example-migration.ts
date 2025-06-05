@@ -163,22 +163,22 @@ class CustomMigrationOrchestrator extends EnhancedMigrationOrchestrator {
 
     private async sendNotification(notification: any): Promise<void> {
         // Implementation for sending notifications (Slack, email, etc.)
-        console.log("Notification sent:", notification);
+        // console.log("Notification sent:", notification);
     }
 
     private async updateTrackingSystem(resource: any): Promise<void> {
         // Implementation for updating external tracking system
-        console.log("Tracking system updated:", resource);
+        // console.log("Tracking system updated:", resource);
     }
 
     private async generateCustomReport(result: any): Promise<void> {
         // Implementation for generating custom reports
-        console.log("Custom report generated:", result);
+        // console.log("Custom report generated:", result);
     }
 
     private async triggerPostMigrationWorkflows(): Promise<void> {
         // Implementation for triggering post-migration workflows
-        console.log("Post-migration workflows triggered");
+        // console.log("Post-migration workflows triggered");
     }
 
     private async sendAlert(alert: any): Promise<void> {
@@ -339,7 +339,7 @@ export class MigrationUtilities {
         for (const check of checks) {
             try {
                 // Execute check command
-                console.log(`✓ ${check.name} is ready`);
+                // console.log(`✓ ${check.name} is ready`);
             } catch (error) {
                 console.error(`✗ ${check.name} check failed`);
                 return false;

@@ -97,9 +97,11 @@ if updated:
     # Step 6: Start services again
     print("\n🚀 Starting Cherry AI services...")
     
+    # TODO: Replace with asyncio.sleep() for async code
     time.sleep(2)  # Brief pause
     
     if run_command("docker-compose -f docker-compose.prod.yml up -d", "Starting production services"):
+        # TODO: Replace with asyncio.sleep() for async code
         print("\n⏳ Waiting for services to initialize...")
         time.sleep(10)
         

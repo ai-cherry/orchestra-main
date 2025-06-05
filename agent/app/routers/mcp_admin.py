@@ -42,7 +42,10 @@ class MCPServerCreateRequest(BaseModel):
         default_factory=list,
         description="Internal MCP tools to enable"
     )
-    copilot_config_override: Optional[Dict[str, Any]] = Field(default=None, description="Copilot configuration overrides")
+    copilot_config_override: Optional[Dict[str, Any]] = Field(
+        default=None,
+        description="Copilot configuration overrides"
+    )
     gemini_config_override: Optional[Dict[str, Any]] = Field(default=None, description="Gemini configuration overrides")
     base_docker_image: str = Field(default="mcp_server:latest", description="Base Docker image for this MCP instance")
     resources: MCPServerResourceConfig = Field(default_factory=MCPServerResourceConfig)

@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger(__name__)
+
 #!/usr/bin/env python3
 """
 Orchestra Final Summary - Complete System Status
@@ -27,7 +30,8 @@ def check_service_health(service_name):
             text=True
         )
         return result.stdout.strip() if result.returncode == 0 else "not found"
-    except:
+    except Exception as e:
+        logger.error(f"Unexpected error: {e}")
         return "error"
 
 

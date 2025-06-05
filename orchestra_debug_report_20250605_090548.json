@@ -1,0 +1,85 @@
+{
+  "timestamp": "2025-06-05T09:05:48.502493",
+  "debug_type": "Infrastructure Alignment",
+  "findings": [
+    {
+      "issue": "Infrastructure Provider Mismatch",
+      "severity": "CRITICAL",
+      "details": {
+        "expected": "Lambda Labs (as per user requirement)",
+        "found": "Vultr (in deployment scripts)",
+        "affected_files": [
+          "deploy_orchestrator_infrastructure.py",
+          "deploy-cherry-orchestrator.sh",
+          "infrastructure/vultr_deployment.py",
+          "infrastructure/vultr_manager.py"
+        ]
+      },
+      "root_cause": "Implementation mode created Vultr-specific deployment instead of Lambda Labs"
+    },
+    {
+      "issue": "Lambda Labs Infrastructure Already Exists",
+      "severity": "INFO",
+      "details": {
+        "existing_files": [
+          "lambda_infrastructure_mcp_server.py",
+          "main.py (references Lambda Labs)",
+          "fixed_main_app.py (references Lambda Labs)"
+        ],
+        "production_ip": "150.136.94.139",
+        "server_specs": "8x A100 GPUs, 124 vCPUs, 1.8TB RAM"
+      },
+      "root_cause": "Project already has Lambda Labs integration"
+    },
+    {
+      "issue": "Deployment Strategy Conflict",
+      "severity": "HIGH",
+      "details": {
+        "cherry_ai_orchestrator": "Frontend-only deployment (HTML/JS)",
+        "orchestra_platform": "Full-stack deployment with backend services",
+        "deployment_method": "Blue-green deployment configured for traditional VPS, not Lambda Labs"
+      },
+      "root_cause": "Mixed deployment strategies between frontend app and full platform"
+    }
+  ],
+  "corrections": [
+    {
+      "action": "Create Lambda Labs deployment script",
+      "description": "Replace Vultr deployment with Lambda Labs-specific deployment",
+      "new_file": "deploy_orchestra_lambda.py",
+      "changes": [
+        "Use Lambda Labs API instead of Vultr",
+        "Deploy to existing production instance (150.136.94.139)",
+        "Integrate with existing services (PostgreSQL, Redis, Weaviate)",
+        "Use SSH deployment instead of cloud provisioning"
+      ]
+    },
+    {
+      "action": "Update infrastructure configuration",
+      "description": "Align all infrastructure code with Lambda Labs",
+      "files_to_update": [
+        ".env.template (add LAMBDA_LABS_API_KEY)",
+        "Pulumi.yaml (change provider to custom Lambda Labs)",
+        "Remove Vultr-specific configurations"
+      ]
+    },
+    {
+      "action": "Integrate with existing Lambda Labs services",
+      "description": "Connect to already running services on Lambda Labs",
+      "services": [
+        "PostgreSQL (already running)",
+        "Redis (already running)",
+        "Weaviate (Docker container)",
+        "Nginx (reverse proxy)",
+        "Cherry AI API (port 8000)"
+      ]
+    }
+  ],
+  "recommendation": "Use Lambda Labs deployment instead of Vultr",
+  "next_steps": [
+    "Create deploy_orchestra_lambda.py script",
+    "Update all infrastructure references to Lambda Labs",
+    "Test deployment on existing Lambda Labs instance",
+    "Remove Vultr-specific code"
+  ]
+}

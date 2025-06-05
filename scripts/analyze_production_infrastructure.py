@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger(__name__)
+
 #!/usr/bin/env python3
 """
 Comprehensive Production Infrastructure Analysis for cherry-ai.me
@@ -47,7 +50,8 @@ class ProductionInfrastructureAnalyzer:
                 a_records = resolver.resolve(self.domain, 'A')
                 self.analysis_results["dns"]["a_records"] = [str(r) for r in a_records]
                 print(f"  A Records: {', '.join(self.analysis_results['dns']['a_records'])}")
-            except:
+            except Exception as e:
+                logger.error(f"Unexpected error: {e}")
                 self.analysis_results["dns"]["a_records"] = []
                 
             # CNAME records

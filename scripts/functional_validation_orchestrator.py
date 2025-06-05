@@ -894,7 +894,10 @@ Overall System Health: {(summary['search_engine']['health_score'] + summary['per
             if info.get("exists", False):
                 status = "✅" if info.get("is_complete", False) else "⚠️"
                 todo_info = f" ({info.get('todo_count', 0)} TODOs)" if info.get('todo_count', 0) > 0 else ""
-                report += f"{status} {mode}_search: {'Complete' if info.get('is_complete', False) else 'Incomplete'}{todo_info}\n"
+                report += f"{status} {mode}_search: {'Complete' if info.get(
+                    'is_complete',
+                    False
+                ) else 'Incomplete'}{todo_info}\n"
             else:
                 report += f"❌ {mode}_search: Missing\n"
         

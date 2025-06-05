@@ -221,6 +221,7 @@ class CherryAIDeployment:
         
         if success:
             print("   Waiting for services to be ready...")
+            # TODO: Replace with asyncio.sleep() for async code
             time.sleep(10)
         
         # Run database migrations
@@ -368,6 +369,7 @@ server {
         # Check Docker services
         if not self.check_docker_services():
             print(f"\n{YELLOW}Docker services not running. Starting them...{RESET}")
+            # TODO: Replace with asyncio.sleep() for async code
             self.deploy_services()
             time.sleep(10)
             self.check_docker_services()

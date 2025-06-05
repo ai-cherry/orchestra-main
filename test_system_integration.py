@@ -161,6 +161,7 @@ class SystemTester:
             conn_string = f"host={host} port={port} dbname=postgres user=postgres"
             conn = psycopg2.connect(conn_string)
             cursor = conn.cursor()
+            # TODO: Run EXPLAIN ANALYZE on this query
             cursor.execute("SELECT version();")
             version = cursor.fetchone()[0]
             cursor.close()

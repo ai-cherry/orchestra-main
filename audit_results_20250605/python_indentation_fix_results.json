@@ -1,0 +1,1201 @@
+{
+  "summary": {
+    "total_errors": 627,
+    "directories_processed": 5,
+    "files_attempted": 229,
+    "files_fixed": 0,
+    "files_failed": 229
+  },
+  "directory_results": [
+    {
+      "directory": "scripts",
+      "total_errors": 148,
+      "attempted": 148,
+      "fixed": 0,
+      "failed": 148,
+      "details": [
+        {
+          "file": "scripts/comprehensive_ai_validation.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/infrastructure_tests.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/apply_audit_fixes.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/orchestrator_daemon.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/ai_code_reviewer.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/eigencode_installer_simple.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/orchestra.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/smoke_tests.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/configure_airbyte.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/start_orchestra_services.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/ml_infrastructure_prep.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/ui_integration_spec.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/live_integration_demo.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/monitoring_improvements.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/test_design_system.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/next_phase_orchestrator.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/update_dependencies.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/verify_environment.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/domain_infrastructure_orchestrator.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/quick_start_design_system.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/optimize_without_eigencode.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/deploy_orchestra_system.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/error_handling_enhancements.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/test_integration_complete.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/check_env_config.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/deep_cleanup.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/performance_analyzer.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/migrate_to_unified_postgresql.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/implement_infrastructure_optimizations.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/infrastructure_improvement_orchestrator.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/purge_unwanted_infrastructure.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/simple_mcp_server.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/setup_orchestra_environment.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/version_manager.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/python_codebase_analyzer.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/infrastructure_robustness_analyzer.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/orchestrated_codebase_fix.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/test_new_setup.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/pip_forever_fix.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/setup_secrets_manager.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/roo_enhanced_launcher.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/architecture_analyzer.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/mcp_integration_check.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/test_weaviate_simple.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/start_mcp_servers.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/test_roo_integration_simple.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/validate_domain_infrastructure.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/test_roo_integration.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/security_audit.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/orchestra_implementation_status.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/setup_weaviate_collections.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/orchestra_deployment_summary.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/test_orchestra_integration.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/fix_pre_commit_issues.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/technical_roadmap_generator.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/orchestra_complete_setup.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/ai_infrastructure_monitor.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/validate_syntax.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/ai_code_assistant.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/deploy_and_test_enhanced_system.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/eigencode_monitor.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/eigencode_installer.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/test_nl_and_agent.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/deploy_enhanced_orchestration.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/test_orchestra_final.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/persona_config_manager.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/auto_mode_selector.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/agent_health_monitor.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/check_dependencies.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/setup_cursor_ai_database.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/refactoring_orchestrator.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/verify_enhancements.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/system_preparedness.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/health_monitor.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/test_postgres_connection.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/proof_of_functionality.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/fix_remaining_issues.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/initialize_roo_integration.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/deploy_design_automation.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/architect_advanced_system.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/cleanup_engine.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/migrate_to_portkey.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/ml_model_registry.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/final_cleanup.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/orchestra_setup_wizard.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/generate_env_from_pulumi.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/test_natural_language.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/integration_plan.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/metrics_pipeline.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/fix_python_version_permanently.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/setup_advanced_caching.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/parallel_mode_executor.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/test_orchestra_connections.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/setup_postgres_schema.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/update_github_secrets.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/fix_orchestration_config.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/performance_test.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/symphony_orchestrator.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/setup_api_keys.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/comprehensive_codebase_audit.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/verify_local_deployment.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/test_infrastructure.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/validate_weaviate_migration.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/roo_integration_standalone.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/complete_orchestrator_setup.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/test_orchestrator_demo.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/setup_ai_services.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/infrastructure_validation.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/maintain_uiux_design_system.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/rollback_infrastructure.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/initialize_weaviate.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/comprehensive_validation.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/version_updater.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/test_api_connections.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/health_check.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/initialize_enhanced_system.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/orchestra_status.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/verify_roo_mcp_integration.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/test_orchestration_setup.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/validate_config.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/deploy_orchestra_local.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/use_enhanced_cli_workflow.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/verify_orchestrator_mcp_connection.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/demo_orchestrator.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/domain_separation_analyzer.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/ai_system_orchestrator.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/orchestrator_startup_automation.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/system_validation.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/roo_orchestrator_quickstart.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/comprehensive_system_audit.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/review_ai_context.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/validate_integration.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/deploy_ai_system.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/complete_roo_integration_setup.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/complete_domain_orchestration.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/setup_llm_configuration.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/test_orchestra_system.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/secure_api_setup.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/test_tool_system.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/create_first_agent.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/test_mcp_connection.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/agent_lifecycle_manager.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/version_monitor.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/validate_environment.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/enhanced_provisioning.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/mcp_integration.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/initialize_unified_postgresql.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scripts/check_pre_commit_status.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        }
+      ]
+    },
+    {
+      "directory": ".",
+      "total_errors": 32,
+      "attempted": 32,
+      "fixed": 0,
+      "failed": 32,
+      "details": [
+        {
+          "file": "phidata_team_agent_implementation.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "migration_orchestrator.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "quick_check.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "webscraping_app.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "quick_verify_admin_ui.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "mcp_cli.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "enhanced_natural_language_interface.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "verify_factory_ai_connection.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "test_mcp_system.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "find_critical_lint_issues.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scan_for_hardcoded_values.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "monitor_extension_performance.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "service_management_consolidation.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "mvp_orchestra_ai.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "memory_management_improvements.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "deploy_via_api.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "redis_semantic_cache_example.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "test_personas_api.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "simple_mcp.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "test_modular_system.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "data_source_integrations.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "utils.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "execute_strategy_workflow.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "verify_app_startup.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "code_analysis.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "web_scraping_ai_agents.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "phidata_agent_team_init.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "error_handling_consolidation.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "scan_github_workflows.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "test_elevenlabs_voice.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "test_unified_systems.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "key_fix_script.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        }
+      ]
+    },
+    {
+      "directory": "mcp_server/adapters",
+      "total_errors": 20,
+      "attempted": 20,
+      "fixed": 0,
+      "failed": 20,
+      "details": [
+        {
+          "file": "mcp_server/adapters/example_integration.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "mcp_server/adapters/code_adapter.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "mcp_server/adapters/config.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "mcp_server/adapters/debug_adapter.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "mcp_server/adapters/knowledge_adapter.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "mcp_server/adapters/openrouter_adapter.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "mcp_server/adapters/architect_adapter.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "mcp_server/adapters/__init__.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "mcp_server/adapters/factory_mcp_adapter.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "mcp_server/adapters/codex_adapter.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "mcp_server/adapters/copilot_adapter.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "mcp_server/adapters/test_adapters.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "mcp_server/adapters/claude_adapter.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "mcp_server/adapters/openai_adapter.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "mcp_server/adapters/roo_adapter.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "mcp_server/adapters/reliability_adapter.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "mcp_server/adapters/deepseek_adapter.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "mcp_server/adapters/cursor_adapter.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "mcp_server/adapters/grok_adapter.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "mcp_server/adapters/portkey_adapter.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        }
+      ]
+    },
+    {
+      "directory": "core/conductor/src/services",
+      "total_errors": 15,
+      "attempted": 15,
+      "fixed": 0,
+      "failed": 15,
+      "details": [
+        {
+          "file": "core/conductor/src/services/enhanced_agent_orchestrator.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "core/conductor/src/services/conversation_service.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "core/conductor/src/services/base_orchestrator.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "core/conductor/src/services/registry.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "core/conductor/src/services/unified_registry.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "core/conductor/src/services/agent_service.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "core/conductor/src/services/__init__.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "core/conductor/src/services/distributed_task_queue.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "core/conductor/src/services/enhanced_registry.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "core/conductor/src/services/semantic_router.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "core/conductor/src/services/message_queue.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "core/conductor/src/services/agent_orchestrator.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "core/conductor/src/services/interaction_service.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "core/conductor/src/services/agent_communication.py",
+          "success": false,
+          "message": "autopep8 failed: Traceback (most recent call last):\n  File \"<frozen runpy>\", line 198, in _run_module_as_main\n  File \"<frozen runpy>\", line 88, in _run_code\n  File \"/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/autopep8.py\", line 4650, in <module>\n    sys.exit(main())\n             ^^^^^^\n  File \"/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/autopep8.py\", line 4608, in main\n    results = fix_multiple_files(args.files, args, sys.stdout)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/autopep8.py\", line 4503, in fix_multiple_files\n    ret = _fix_file((name, options, output))\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/autopep8.py\", line 4473, in _fix_file\n    return fix_file(*parameters)\n           ^^^^^^^^^^^^^^^^^^^^^\n  File \"/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/autopep8.py\", line 3647, in fix_file\n    fixed_source = fix_lines(fixed_source, options, filename=filename)\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/autopep8.py\", line 3627, in fix_lines\n    fixed_source = fix.fix()\n                   ^^^^^^^^^\n  File \"/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/autopep8.py\", line 623, in fix\n    results = _execute_pep8(pep8_options, self.source)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/autopep8.py\", line 3039, in _execute_pep8\n    checker.check_all()\n  File \"/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/pycodestyle.py\", line 2134, in check_all\n    self.check_logical()\n  File \"/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/pycodestyle.py\", line 1998, in check_logical\n    for offset, text in self.run_check(check, argument_names) or ():\n  File \"/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/autopep8.py\", line 406, in continued_indentation\n    rel_indent[end[0] - first_row] = rel_indent[row]\n    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^\nIndexError: list assignment index out of range\n"
+        },
+        {
+          "file": "core/conductor/src/services/memory_service.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        }
+      ]
+    },
+    {
+      "directory": "mcp_server",
+      "total_errors": 14,
+      "attempted": 14,
+      "fixed": 0,
+      "failed": 14,
+      "details": [
+        {
+          "file": "mcp_server/demo_memory_sync.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "mcp_server/memory_sync_engine.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "mcp_server/gateway.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "mcp_server/optimized_ide_integration.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "mcp_server/performance_wrapper.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "mcp_server/mcp_server_runner.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "mcp_server/test_orchestrator.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "mcp_server/run_mcp_server.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "mcp_server/run_optimized_server.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "mcp_server/exceptions.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "mcp_server/health_check.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "mcp_server/optimized_memory_sync.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "mcp_server/main.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        },
+        {
+          "file": "mcp_server/async_server.py",
+          "success": false,
+          "message": "autopep8 fix failed verification"
+        }
+      ]
+    }
+  ]
+}

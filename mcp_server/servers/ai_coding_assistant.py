@@ -1,3 +1,4 @@
+import os
 #!/usr/bin/env python3
 """
 AI Coding Assistant MCP Server
@@ -167,8 +168,8 @@ fi
 npm install -g @openai/codex
 
 # Set up environment
-export OPENAI_API_KEY="${OPENAI_API_KEY}"
-echo 'export OPENAI_API_KEY="${OPENAI_API_KEY}"' >> ~/.bashrc
+export OPENAI_API_KEY = os.getenv('ORCHESTRA_MCP_API_KEY')
+OPENAI_API_KEY = os.getenv("MCP_AI_CODING_ASSISTANT_API_KEY", "")
 
 # Initialize in project directory
 cd ~/orchestra-main
@@ -373,6 +374,7 @@ async def optimize_code(arguments: dict) -> CallToolResult:
             optimizations.append("Replace SELECT * with specific column names for better performance")
         if "for " in content and "append(" in content:
             optimizations.append("Consider using list comprehension instead of append in loops")
+        # TODO: Replace with asyncio.sleep() for async code
         if "time.sleep(" in content:
             optimizations.append("Consider using asyncio.sleep() for non-blocking delays")
     
@@ -454,6 +456,7 @@ async def analyze_performance(arguments: dict) -> CallToolResult:
             if "SELECT * FROM" in content:
                 performance_issues += 1
             if content.count("for ") > 5 and "append(" in content:
+                # TODO: Replace with asyncio.sleep() for async code
                 performance_issues += 1
             if "time.sleep(" in content:
                 performance_issues += 1

@@ -26,6 +26,7 @@
         cursor.# TODO: Consider adding EXPLAIN ANALYZE for performance
 execute("SELECT COUNT(*) FROM mode_executions")
         exec_count = cursor.fetchone()[0]
+        # TODO: Run EXPLAIN ANALYZE on this query
         cursor.execute("SELECT COUNT(*) FROM mode_transitions")
         trans_count = cursor.fetchone()[0]
         conn.close()

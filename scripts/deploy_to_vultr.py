@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger(__name__)
+
 #!/usr/bin/env python3
 """
 Deploy cherry_ai MCP to Vultr
@@ -78,7 +81,8 @@ class VultrDeployment:
         try:
             subprocess.run(["pulumi", "version"], check=True, capture_output=True)
             print("  ✓ Pulumi installed")
-        except:
+        except Exception as e:
+            logger.error(f"Unexpected error: {e}")
             print("❌ Pulumi not installed. Install with: curl -fsSL https://get.pulumi.com | sh")
             return False
             
@@ -188,6 +192,7 @@ class VultrDeployment:
                     if i == max_attempts - 1:
                         print(" ❌")
                         return False
+                    # TODO: Replace with asyncio.sleep() for async code
                     time.sleep(10)
                     print(".", end="", flush=True)
                     
@@ -291,6 +296,7 @@ class VultrDeployment:
         if not self.deploy_on_server(db_server["public_ip"], "database"):
             return False
             
+        # TODO: Replace with asyncio.sleep() for async code
         # Wait for database to be ready
         time.sleep(30)
         

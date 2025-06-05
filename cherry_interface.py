@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger(__name__)
+
 #!/usr/bin/env python3
 """
 Cherry AI - Functional Interface with MCP Integration
@@ -125,7 +128,8 @@ async def health_check():
             # Test memory server
             async with session.get(f"{MCP_MEMORY_URL}/health") as response:
                 mcp_status["memory"] = response.status == 200
-    except:
+    except Exception as e:
+        logger.error(f"Unexpected error: {e}")
         mcp_status["memory"] = False
     
     try:

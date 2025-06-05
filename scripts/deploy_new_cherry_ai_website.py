@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger(__name__)
+
 #!/usr/bin/env python3
 """
 DEFINITIVE Cherry AI Website Deployment
@@ -91,12 +94,19 @@ class SystemArchitect:
         
         # Check API health separately with better error handling
         try:
-            api_result = subprocess.run("curl -s https://cherry-ai.me/health", shell=True, capture_output=True, text=True, timeout=5)
+            api_result = subprocess.run(
+                "curl -s https://cherry-ai.me/health",
+                shell=True,
+                capture_output=True,
+                text=True,
+                timeout=5
+            )
             if api_result.returncode == 0 and "healthy" in api_result.stdout:
                 self.orchestrator.log("ARCHITECT", f"✓ API Health: OK", "SUCCESS")
             else:
                 self.orchestrator.log("ARCHITECT", f"⚠ API Health: Not responding (will continue)", "WARNING")
-        except:
+        except Exception as e:
+            logger.error(f"Unexpected error: {e}")
             self.orchestrator.log("ARCHITECT", f"⚠ API Health: Timeout (will continue)", "WARNING")
                 
         return all_good

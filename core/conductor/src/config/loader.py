@@ -1,3 +1,4 @@
+import os
 """
 """
 T = TypeVar("T")
@@ -185,7 +186,7 @@ def get_settings() -> Settings:
         portkey.init(
             api_key=PORTKEY_API_KEY,
             base_url="https://api.portkey.ai/v1",
-            virtual_key="vertex-agent-special",
+virtual_key = os.getenv("CORE_LOADER_KEY", "")
         )
 
         # Set budget limits for cost control

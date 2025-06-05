@@ -100,7 +100,7 @@ def main():
         print("1. Install dependencies: pip install asyncpg aiohttp weaviate-client psycopg2-binary")
         print("2. Set environment variables:")
         print("   export OPENROUTER_API_KEY= os.getenv('API_KEY')")
-        print("   export DATABASE_URL='postgresql://user:pass@localhost/db'")
+DATABASE_URL = os.getenv("SCRIPT_TEST_ROO_INTEGRATION_SIMPLE_DATABASE_URL", "")
         print("3. Run: python3 scripts/initialize_roo_integration.py")
     else:
         print(f"\n⚠️  Some components are missing. Please check the failed tests above.")

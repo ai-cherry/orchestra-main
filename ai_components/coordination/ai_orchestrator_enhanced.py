@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import os
 """
 """
     """Task execution status"""
@@ -500,7 +501,7 @@ class EnhancedWorkflowconductor:
                 }
             },
             priority=TaskPriority.HIGH,
-            cache_key="analysis_cherry_ai_main"
+cache_key = os.getenv("ORCHESTRA_AI_ORCHESTRATOR_ENHANCED_KEY", "")
         ),
         TaskDefinition(
             task_id="implement_changes",

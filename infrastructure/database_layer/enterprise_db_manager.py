@@ -725,7 +725,8 @@ class EnterpriseDatabaseManager:
                 health["pinecone"] = True
             else:
                 health["pinecone"] = False
-        except:
+        except Exception as e:
+            logger.error(f"Unexpected error: {e}")
             health["pinecone"] = False
         
         # Check Weaviate

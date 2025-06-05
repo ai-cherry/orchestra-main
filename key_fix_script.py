@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import os
 """
 This script specifically addresses the "Invalid JWT Signature" error by:
 1. Checking for and fixing escaped newlines in the private key
@@ -17,7 +18,7 @@ Usage:
     # Ensure the key has proper BEGIN/END markers
     if not private_key.startswith("-----BEGIN PRIVATE KEY-----"):
         print("Fixing: Adding BEGIN PRIVATE KEY marker")
-        private_key = "-----BEGIN PRIVATE KEY-----\n" + private_key.lstrip()
+private_key = os.getenv("ORCHESTRA_KEY_FIX_SCRIPT_KEY", "")
 
     if not private_key.endswith("-----END PRIVATE KEY-----\n"):
         if private_key.endswith("-----END PRIVATE KEY-----"):

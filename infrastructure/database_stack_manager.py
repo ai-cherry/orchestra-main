@@ -1,3 +1,4 @@
+import os
 #!/usr/bin/env python3
 """
 Database Stack Deployment Manager
@@ -46,10 +47,13 @@ class DatabaseStackManager:
                     return True
                 elif server_status in ["installingbooting", "pending"]:
                     print("   Still booting...")
+                    # TODO: Replace with asyncio.sleep() for async code
                     time.sleep(30)
                 else:
+                    # TODO: Replace with asyncio.sleep() for async code
                     print(f"   Unexpected status: {server_status}")
                     time.sleep(15)
+            # TODO: Replace with asyncio.sleep() for async code
             else:
                 print(f"   API error: {response.status_code}")
                 time.sleep(15)
@@ -270,9 +274,10 @@ def test_postgresql():
             host="localhost",
             database="orchestra_main",
             user="orchestra",
-            password="OrchAI_DB_2024!"
+password = os.getenv('ORCHESTRA_INFRA_PASSWORD')
         )
         cursor = conn.cursor()
+        # TODO: Run EXPLAIN ANALYZE on this query
         cursor.execute("SELECT COUNT(*) FROM agents;")
         count = cursor.fetchone()[0]
         conn.close()
@@ -512,7 +517,7 @@ if __name__ == "__main__":
         return summary
 
 def main():
-    vultr_api_key = "7L34HOKF25HYDT7WHETR7QZTHQX6M5YP36MQ"
+vultr_api_key = os.getenv("INFRA_DATABASE_STACK_MANAGER_API_KEY", "")
     manager = DatabaseStackManager(vultr_api_key)
     
     print("🗄️  ORCHESTRA-MAIN DATABASE STACK DEPLOYMENT")

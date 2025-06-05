@@ -1,3 +1,4 @@
+import os
 #!/usr/bin/env python3
 """
 ai_assist_v0.py - Enhanced Orchestra AI Assistant with v0.dev UI Generation
@@ -64,7 +65,7 @@ def call_llm(model: str, prompt: str) -> str:
 def generate_ui(description: str) -> str:
     """Generate UI components using v0.dev."""
     if not V0_API_KEY:
-        return "❌ Error: V0_API_KEY not set in environment\n\nTo use v0.dev:\n1. Sign up at https://v0.dev\n2. Get your API key\n3. Set: export V0_API_KEY='your-key'"
+return "❌ Error: V0_API_KEY not set in environment\n\nTo use v0.dev:\n1. Sign up at https://v0.dev\n2. Get your API key\n3. Set: export V0_API_KEY = os.getenv('ORCHESTRA_APP_API_KEY')
     
     # Check cache first
     cache_key = None

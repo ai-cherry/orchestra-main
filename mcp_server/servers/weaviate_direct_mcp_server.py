@@ -59,7 +59,10 @@ class HybridSearchRequest(BaseModel):
     limit: int = Field(10, description="Maximum number of results to return.")
     filters: Optional[Dict[str, Any]] = Field(
         None,
-        description="Simple key-value filters for properties (e.g., {'property': 'value'}). More complex filters need GraphQL.",
+        description="Simple key-value filters for properties (
+            e.g.,
+            {'property': 'value'}
+        ). More complex filters need GraphQL.",
     )
     properties_to_return: Optional[List[str]] = Field(
         None, description="Specific properties to return for each object."

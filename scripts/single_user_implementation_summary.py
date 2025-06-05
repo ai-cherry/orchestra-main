@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger(__name__)
+
 #!/usr/bin/env python3
 """
 Summary of Single-User Authentication Implementation for Cherry AI
@@ -23,8 +26,7 @@ def main():
         if env_file.exists():
             with open(env_file) as f:
                 for line in f:
-                    if line.startswith("cherry_ai_API_KEY="):
-                        api_key = line.split("=", 1)[1].strip()
+cherry_ai_API_KEY = os.getenv("SCRIPT_SINGLE_USER_IMPLEMENTATION_SUMMARY_API_KEY", "")
                         break
     
     print(f"\n🔑 API Key: {api_key[:20]}..." if api_key else "⚠️  No API key found")
@@ -90,7 +92,8 @@ def main():
                 state = service.get("State", "unknown")
                 health = service.get("Health", "")
                 print(f"  - {name}: {state} {f'({health})' if health else ''}")
-        except:
+        except Exception as e:
+            logger.error(f"Unexpected error: {e}")
             # Fallback to simple ps
             subprocess.run(["docker-compose", "-f", "docker-compose.single-user.yml", "ps"])
     

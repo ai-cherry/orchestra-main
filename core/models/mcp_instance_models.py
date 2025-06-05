@@ -15,7 +15,10 @@ class AIProvider(BaseModel):
     # Potentially add base_url for custom OpenAI-compatible APIs if needed later
 
 class ContextSourceConfig(BaseModel):
-    type: Literal["git_repo", "weaviate_collection", "file_path", "url_list"] = Field(..., description="Type of context source")
+    type: Literal["git_repo", "weaviate_collection", "file_path", "url_list"] = Field(
+        ...,
+        description="Type of context source"
+    )
     uri: Optional[str] = Field(default=None, description="URI for the context source (e.g., git repo URL, Weaviate collection name, base file path)")
     paths: List[str] = Field(default_factory=list, description="Specific paths or URLs within the URI (e.g., subdirectories, specific file names, list of web pages)")
     branch: Optional[str] = Field(default=None, description="Branch to use for git_repo context source")
@@ -33,7 +36,10 @@ class UserDefinedMCPServerInstanceConfig(BaseModel):
 
     enabled_internal_tools: List[Literal["copilot", "gemini"]] = Field(
         default_factory=list,
-        description="Internal MCP tools to enable (maps to sections in the internal MCPConfig like 'copilot', 'gemini')"
+        description="Internal MCP tools to enable (
+            maps to sections in the internal MCPConfig like 'copilot',
+            'gemini'
+        )"
     )
 
     copilot_config_override: Optional[Dict[str, Any]] = Field(default=None, description="Specific overrides for the 'copilot' section of the internal MCPConfig")

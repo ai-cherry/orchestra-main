@@ -1,0 +1,19 @@
+{
+  "deleted_files": [
+    "migration_orchestrator.py.corrupted_backup",
+    "phidata_team_agent_implementation.py.corrupted_backup",
+    "quick_check.py.corrupted_backup",
+    "core/personas/personas_detailed.yaml.backup"
+  ],
+  "errors": [
+    [
+      ".refactoring_backups/requirements/requirements_production_.backup",
+      "[Errno 1] Operation not permitted: '.refactoring_backups/requirements/requirements_production_.backup'"
+    ],
+    [
+      ".refactoring_backups/requirements/requirements_frozen_.backup",
+      "[Errno 1] Operation not permitted: '.refactoring_backups/requirements/requirements_frozen_.backup'"
+    ]
+  ],
+  "manual_review_needed": []
+}

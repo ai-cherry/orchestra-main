@@ -37,6 +37,7 @@ execute("SELECT name FROM sqlite_master WHERE type='table'")
             conn.commit()
             
             # Test query
+            # TODO: Run EXPLAIN ANALYZE on this query
             cursor.execute("SELECT COUNT(*) FROM mode_executions")
             count = cursor.fetchone()[0]
             self.test("Data insertion works", count > 0, f"Found {count} records")

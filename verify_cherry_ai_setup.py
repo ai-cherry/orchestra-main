@@ -202,7 +202,11 @@ class CherryAIVerifier:
                 mcp_enabled = settings.get("cursor.mcp.enabled", False)
                 
                 self.print_result("Cursor AI Settings", True, f"Valid configuration")
-                self.print_result("Cursor AI Enabled", cursor_ai_enabled, "AI features enabled" if cursor_ai_enabled else "AI features disabled")
+                self.print_result(
+                    "Cursor AI Enabled",
+                    cursor_ai_enabled,
+                    "AI features enabled" if cursor_ai_enabled else "AI features disabled"
+                )
                 self.print_result("MCP Integration", mcp_enabled, "MCP enabled" if mcp_enabled else "MCP disabled")
                 
             except json.JSONDecodeError as e:

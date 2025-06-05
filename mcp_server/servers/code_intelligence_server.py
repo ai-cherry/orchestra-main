@@ -65,7 +65,9 @@ class CodeIntelligenceServer:
                         "type": "object",
                         "properties": {
                             "target_file": {"type": "string", "description": "File to analyze imports for (optional)"},
-                            "detect_circular": {"type": "boolean", "description": "Check for circular imports", "default": True}
+                            "detect_circular": {"type": "boolean",
+                                "description": "Check for circular imports",
+                                "default": True}
                         }
                     }
                 ),

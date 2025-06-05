@@ -56,6 +56,7 @@ def main():
     # Step 4: Wait for services to be ready
     print("\n⏳ Waiting for services to be ready...")
     import time
+    # TODO: Replace with asyncio.sleep() for async code
     time.sleep(15)
     
     # Step 5: Run database migrations

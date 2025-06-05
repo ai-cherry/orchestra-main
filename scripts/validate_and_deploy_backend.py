@@ -366,6 +366,7 @@ class BackendDeployer:
                 
             # Wait for services to be ready
             print("  Waiting for services to be ready...")
+            # TODO: Replace with asyncio.sleep() for async code
             time.sleep(10)
             
         # Start API server
@@ -478,5 +479,14 @@ def main():
 
 if __name__ == "__main__":
     # Install required packages for validation
-    subprocess.run(["pip", "install", "-q", "psycopg2-binary", "redis", "requests", "python-dotenv"], capture_output=True)
+    subprocess.run(
+        ["pip",
+        "install",
+        "-q",
+        "psycopg2-binary",
+        "redis",
+        "requests",
+        "python-dotenv"],
+        capture_output=True
+    )
     main()

@@ -107,8 +107,10 @@ execute("SELECT id, name FROM llm_providers")
                 await session.execute(
                     """
                 """
+        # TODO: Run EXPLAIN ANALYZE on this query
         use_case_result = await session.execute("SELECT id, use_case FROM llm_use_cases")
         use_cases = {row[1]: row[0] for row in use_case_result}
+ # TODO: Run EXPLAIN ANALYZE on this query
 
         model_result = await session.execute("SELECT id, model_identifier FROM llm_models")
         models = {row[1]: row[0] for row in model_result}

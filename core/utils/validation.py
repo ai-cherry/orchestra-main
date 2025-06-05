@@ -79,7 +79,11 @@ class EnhancedValidator:
             result.add_error("Server name cannot exceed 100 characters")
         
         if not EnhancedValidator.NAME_PATTERN.match(name):
-            result.add_error("Server name must start and end with alphanumeric characters and can contain hyphens, underscores, and dots")
+            result.add_error(
+                "Server name must start and end with alphanumeric characters and can contain hyphens,
+                underscores,
+                and dots"
+            )
         
         # Check for reserved names
         reserved_names = {'admin', 'api', 'system', 'root', 'default', 'test'}

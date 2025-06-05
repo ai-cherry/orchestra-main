@@ -62,7 +62,10 @@ class CherryDomainServer:
     def _initialize_pinecone(self):
         """Initialize Pinecone vector database"""
         try:
-            pinecone_api_key = os.getenv("PINECONE_API_KEY", "pcsk_4vD8zy_Shcrmkr8JKBGm9hZ7ipbFRGVfGxb4Z3xkTAky5noWPRx2RMrWoFcoXPr5Vkwm5L")
+            pinecone_api_key = os.getenv(
+                "PINECONE_API_KEY",
+                "pcsk_4vD8zy_Shcrmkr8JKBGm9hZ7ipbFRGVfGxb4Z3xkTAky5noWPRx2RMrWoFcoXPr5Vkwm5L"
+            )
             if PineconeManager and pinecone_api_key:
                 self.pinecone_manager = PineconeManager(api_key=pinecone_api_key)
                 self.vector_store = DomainSpecificVectorStore(self.pinecone_manager)
@@ -296,7 +299,9 @@ class CherryDomainServer:
         if self.pg_conn:
             try:
                 cursor = self.pg_conn.cursor()
+                # TODO: Run EXPLAIN ANALYZE on this query
                 cursor.execute("SELECT COUNT(*) FROM cherry_personal_tasks")
+                # TODO: Run EXPLAIN ANALYZE on this query
                 task_count = cursor.fetchone()[0]
                 cursor.execute("SELECT COUNT(*) FROM cherry_ranch_operations")
                 ranch_count = cursor.fetchone()[0]

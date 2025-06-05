@@ -169,8 +169,10 @@ class RedisHealthMonitor:
             try:
                 health = self.check_health(redis_client)
                 self._process_health_check(health)
+                # TODO: Replace with asyncio.sleep() for async code
                 time.sleep(self.check_interval)
             except Exception as e:
+                # TODO: Replace with asyncio.sleep() for async code
                 logger.error(f"Health monitoring error: {e}")
                 time.sleep(self.check_interval)
                 

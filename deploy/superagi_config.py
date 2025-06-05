@@ -1,3 +1,4 @@
+import os
 """
 """
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -19,9 +20,9 @@ class SuperAGIDeployment:
 
         # Configure container environment
         env_vars = [
-            do.AppSpecEnvArgs(key="DB_URL", value=self.config["db_url"]),
-            do.AppSpecEnvArgs(key="WEAVIATE_URL", value=self.config["weaviate_url"]),
-            do.AppSpecEnvArgs(key="ENVIRONMENT", value=self.config.get("env", "production")),
+do.AppSpecEnvArgs(key = os.getenv('ORCHESTRA_APP_KEY')
+do.AppSpecEnvArgs(key = os.getenv('ORCHESTRA_APP_KEY')
+key = os.getenv("ORCHESTRA_SUPERAGI_CONFIG_KEY", "")
         ]
 
         # Create container app

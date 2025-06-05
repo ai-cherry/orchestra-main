@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger(__name__)
+
 #!/usr/bin/env python3
 """
 Test Unified Integration of Single-User Auth and AI Agent Discovery
@@ -398,7 +401,8 @@ async def main():
                     print("❌ Smart router not running. Start services first:")
                     print("   ./start_unified_cherry_ai.sh")
                     sys.exit(1)
-    except:
+    except Exception as e:
+        logger.error(f"Unexpected error: {e}")
         print("❌ Services not running. Start them first:")
         print("   ./start_unified_cherry_ai.sh")
         sys.exit(1)

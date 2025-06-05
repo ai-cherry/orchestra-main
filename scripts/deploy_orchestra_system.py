@@ -275,6 +275,7 @@
         self._switch_traffic("blue")
         
         # Monitor for issues
+        # TODO: Replace with asyncio.sleep() for async code
         time.sleep(60)  # Wait for metrics
         
         if self._check_deployment_health():

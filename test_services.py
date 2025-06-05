@@ -1,3 +1,4 @@
+import os
 #!/usr/bin/env python3
 """Test all services are working"""
 
@@ -12,10 +13,11 @@ def test_postgres():
             host="localhost",
             port=5432,
             user="postgres",
-            password="postgres",
+password = os.getenv('ORCHESTRA_APP_PASSWORD')
             database="postgres"
         )
         cur = conn.cursor()
+        # TODO: Run EXPLAIN ANALYZE on this query
         cur.execute("SELECT 1")
         result = cur.fetchone()
         conn.close()

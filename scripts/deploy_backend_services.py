@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger(__name__)
+
 #!/usr/bin/env python3
 """
 Deploy and manage Cherry AI backend services
@@ -63,6 +66,7 @@ class BackendDeployer:
         if self.run_command(cmd):
             print("✅ PostgreSQL started")
             self.services_status['postgres'] = True
+            # TODO: Replace with asyncio.sleep() for async code
             time.sleep(5)  # Wait for startup
             return True
         return False
@@ -115,6 +119,7 @@ class BackendDeployer:
         
         if self.run_command(cmd):
             print("✅ Weaviate started")
+            # TODO: Replace with asyncio.sleep() for async code
             self.services_status['weaviate'] = True
             time.sleep(10)  # Weaviate takes longer to start
             return True
@@ -263,6 +268,7 @@ class BackendDeployer:
         """Start the API server"""
         print("\n🌐 Starting API server...")
         
+        # TODO: Replace with asyncio.sleep() for async code
         # Kill any existing uvicorn process
         self.run_command("pkill -f uvicorn", check=False)
         time.sleep(2)
@@ -285,6 +291,7 @@ class BackendDeployer:
         cmd = f"cd {api_dir} && nohup uvicorn {os.path.basename(api_path).replace('.py', '')}:app --host 0.0.0.0 --port 8000 --reload > /tmp/cherry_ai-api.log 2>&1 &"
         
         if self.run_command(cmd):
+            # TODO: Replace with asyncio.sleep() for async code
             print("✅ API server started")
             print("📝 Logs available at: /tmp/cherry_ai-api.log")
             self.services_status['api'] = True
@@ -310,7 +317,8 @@ class BackendDeployer:
             )
             conn.close()
             print("✅ PostgreSQL: Connected")
-        except:
+        except Exception as e:
+            logger.error(f"Unexpected error: {e}")
             print("❌ PostgreSQL: Not accessible")
             all_good = False
             

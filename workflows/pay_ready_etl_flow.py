@@ -1,3 +1,4 @@
+import os
 """
 """
     name="Initialize Services",
@@ -244,7 +245,7 @@ async def generate_pipeline_report(
 
     # Save report as artifact
     await create_markdown_artifact(
-        key="pipeline-report", markdown=report, description="Pay Ready ETL Pipeline Execution Report"
+key = os.getenv("ORCHESTRA_PAY_READY_ETL_FLOW_KEY", "")
     )
 
     return report

@@ -135,6 +135,7 @@ def retry_with_backoff(
                         delay = base_delay
                     
                     logger.warning(f"Attempt {attempt + 1} failed for {func.__name__}: {e}. Retrying in {delay:.2f}s")
+                    # TODO: Replace with asyncio.sleep() for async code
                     time.sleep(delay)
             
             raise last_exception

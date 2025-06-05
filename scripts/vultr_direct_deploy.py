@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger(__name__)
+
 #!/usr/bin/env python3
 """
 Direct Vultr deployment using Vultr API
@@ -327,6 +330,7 @@ echo 'SERVER_ROLE={role}' > /opt/cherry_ai/.role
                     print(" ❌")
                     raise Exception(f"Instance {instance_id} failed to become active")
                     
+                # TODO: Replace with asyncio.sleep() for async code
                 time.sleep(5)
                 print(".", end="", flush=True)
                 
@@ -417,8 +421,10 @@ echo 'SERVER_ROLE={role}' > /opt/cherry_ai/.role
                     timeout=10
                 )
                 break
-            except:
+            except Exception as e:
+                logger.error(f"Unexpected error: {e}")
                 if i == max_attempts - 1:
+                    # TODO: Replace with asyncio.sleep() for async code
                     raise Exception(f"Failed to connect to {instance['label']}")
                 time.sleep(10)
                 

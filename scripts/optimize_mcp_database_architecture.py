@@ -680,7 +680,7 @@ class HealthChecker:
                 host="localhost",
                 port=5432,
                 user="postgres",
-                password="postgres",
+password = os.getenv('ORCHESTRA_SCRIPT_PASSWORD')
                 database="conductor"
             )
             

@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger(__name__)
+
 #!/usr/bin/env python3
 """
 Deploy Cherry AI Live Collaboration Bridge
@@ -63,7 +66,8 @@ def check_firewall():
         subprocess.run(["ufw", "allow", "80/tcp"], check=True)   # HTTP
         subprocess.run(["ufw", "allow", "443/tcp"], check=True)  # HTTPS
         print("✅ Firewall rules updated!")
-    except:
+    except Exception as e:
+        logger.error(f"Unexpected error: {e}")
         print("⚠️  UFW not found, checking iptables...")
         # Add iptables rule as fallback
         subprocess.run([
