@@ -5,7 +5,13 @@ set -e
 
 LAMBDA_IP="150.136.94.139"
 LAMBDA_USER="ubuntu"
-OPENROUTER_KEY="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"
+# Use GitHub secret if available, otherwise use hardcoded key
+if [ -n "$OPENROUTER_API_KEY" ]; then
+    echo "✅ Using OPENROUTER_API_KEY from GitHub secrets"
+    OPENROUTER_KEY="$OPENROUTER_API_KEY"
+else
+    OPENROUTER_KEY="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"
+fi
 
 echo "🔑 Deploying OpenRouter API key to Lambda Labs..."
 
