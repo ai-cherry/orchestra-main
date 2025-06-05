@@ -1,48 +1,40 @@
 {
   "mcpServers": {
-    "cherry-ai-codebase": {
-      "command": "python3",
-      "args": ["./mcp_server/servers/enhanced_codebase_server.py"],
+    "cherry-ai-enhanced": {
+      "command": "python",
+      "args": ["/home/ubuntu/orchestra-main-repo/mcp_server/servers/enhanced_codebase_server.py"],
       "env": {
-        "PYTHONPATH": ".:./mcp_server",
-        "PROJECT_ROOT": ".",
-        "REDIS_URL": "redis://localhost:6379",
-        "ENABLE_CURSOR_INTEGRATION": "true",
-        "ENABLE_ROO_INTEGRATION": "true"
+        "PRODUCTION_SERVER": "150.136.94.139",
+        "DATABASE_URL": "postgresql://cherry_ai:CherryAI2024!@150.136.94.139/cherry_ai_production",
+        "REDIS_URL": "redis://150.136.94.139:6379",
+        "WEAVIATE_URL": "http://150.136.94.139:8080",
+        "ENVIRONMENT": "lambda-production"
       }
     },
-    "cherry-ai-infrastructure": {
-      "command": "python3", 
-      "args": ["./mcp_server/servers/infrastructure_manager.py"],
+    "lambda-infrastructure": {
+      "command": "python",
+      "args": ["/home/ubuntu/orchestra-main-repo/lambda_infrastructure_mcp_server.py"],
       "env": {
-        "PYTHONPATH": ".:./mcp_server",
-        "PROJECT_ROOT": ".",
-        "VULTR_API_KEY": "${VULTR_API_KEY}",
-        "PULUMI_ACCESS_TOKEN": "${PULUMI_ACCESS_TOKEN}",
-        "PRODUCTION_SERVER_IP": "45.32.69.157",
-        "DATABASE_SERVER_IP": "45.77.87.106",
-        "STAGING_SERVER_IP": "207.246.108.201",
-        "ENABLE_CURSOR_INTEGRATION": "true"
+        "LAMBDA_API_KEY": "secret_manus_5305c377b1e94aaa8352f2efc72f5ae3.cA4GcSKfAAhTtT2XsNDmC3CpRPvvupIk",
+        "PRODUCTION_IP": "150.136.94.139"
       }
     },
-    "cherry-ai-database": {
-      "command": "python3",
-      "args": ["./infrastructure/database_layer/enterprise_db_manager.py"],
+    "cherry-ai-codex": {
+      "command": "python",
+      "args": ["/home/ubuntu/orchestra-main-repo/mcp_server/codex_integration.py"],
       "env": {
-        "PYTHONPATH": ".:./mcp_server",
-        "PROJECT_ROOT": ".",
-        "POSTGRES_HOST": "45.77.87.106",
-        "POSTGRES_USER": "postgres", 
-        "POSTGRES_PASSWORD": "${POSTGRES_PASSWORD}",
-        "POSTGRES_DB": "cherry_ai",
-        "REDIS_URL": "redis://localhost:6379",
-        "WEAVIATE_URL": "${WEAVIATE_URL}",
-        "WEAVIATE_API_KEY": "${WEAVIATE_API_KEY}",
-        "PINECONE_API_KEY": "${PINECONE_API_KEY}",
-        "ENABLE_VECTOR_SEARCH": "true",
-        "ENABLE_SEMANTIC_CACHE": "true"
+        "OPENAI_API_KEY": "${OPENAI_API_KEY}",
+        "PRODUCTION_SERVER": "150.136.94.139"
+      }
+    },
+    "database-manager": {
+      "command": "python",
+      "args": ["/home/ubuntu/orchestra-main-repo/mcp_server/database_manager.py"],
+      "env": {
+        "DATABASE_URL": "postgresql://cherry_ai:CherryAI2024!@150.136.94.139/cherry_ai_production",
+        "REDIS_URL": "redis://150.136.94.139:6379",
+        "WEAVIATE_URL": "http://150.136.94.139:8080"
       }
     }
   }
 }
-
