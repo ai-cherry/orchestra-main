@@ -39,13 +39,128 @@ CODEBASE_PATHS = [
 ]
 
 class CherryAICodebaseManager:
-    """Optimized codebase management for Cursor AI and Roo"""
+    """Optimized codebase management for Cursor AI and Roo with enhanced capabilities"""
     
     def __init__(self, project_root: Path):
         self.project_root = project_root
         self.file_cache = {}
+        self.command_history = []
+        self.context_cache = {}
         self.cursor_integration = os.getenv("ENABLE_CURSOR_INTEGRATION", "false").lower() == "true"
         self.roo_integration = os.getenv("ENABLE_ROO_INTEGRATION", "false").lower() == "true"
+        
+    def add_command_to_history(self, command: str, context: Dict[str, Any]) -> None:
+        """Add command to history for pattern recognition"""
+        self.command_history.append({
+            "timestamp": asyncio.get_event_loop().time(),
+            "command": command,
+            "context": context,
+            "project_state": self._get_project_state_snapshot()
+        })
+        # Keep only last 100 commands
+        if len(self.command_history) > 100:
+            self.command_history.pop(0)
+    
+    def _get_project_state_snapshot(self) -> Dict[str, Any]:
+        """Get current project state for context awareness"""
+        try:
+            # Get recent git activity
+            git_status = subprocess.run(
+                ["git", "status", "--porcelain"], 
+                cwd=self.project_root, 
+                capture_output=True, 
+                text=True
+            ).stdout.strip()
+            
+            git_branch = subprocess.run(
+                ["git", "branch", "--show-current"], 
+                cwd=self.project_root, 
+                capture_output=True, 
+                text=True
+            ).stdout.strip()
+            
+            return {
+                "git_status": git_status,
+                "git_branch": git_branch,
+                "modified_files": len(git_status.split('\n')) if git_status else 0,
+                "timestamp": asyncio.get_event_loop().time()
+            }
+        except Exception:
+            return {"error": "Could not get git status"}
+    
+    def get_smart_context_suggestions(self, current_task: str) -> Dict[str, Any]:
+        """Provide smart context suggestions based on current task and history"""
+        suggestions = {
+            "relevant_files": [],
+            "suggested_commands": [],
+            "context_patterns": [],
+            "workflow_recommendations": []
+        }
+        
+        # Analyze current task for context clues
+        task_lower = current_task.lower()
+        
+        # File suggestions based on task keywords
+        if any(word in task_lower for word in ["database", "db", "sql", "postgres", "redis"]):
+            suggestions["relevant_files"].extend([
+                "infrastructure/database_layer/",
+                "infrastructure/database_schema.sql",
+                "test_mcp_data.py"
+            ])
+            suggestions["suggested_commands"].extend([
+                "analyze_project database",
+                "search_codebase database",
+                "read_file infrastructure/database_schema.sql"
+            ])
+        
+        if any(word in task_lower for word in ["deploy", "infrastructure", "server", "vultr"]):
+            suggestions["relevant_files"].extend([
+                "infrastructure/",
+                "deploy_to_production.sh",
+                ".github/workflows/"
+            ])
+            suggestions["suggested_commands"].extend([
+                "analyze_project infrastructure",
+                "search_codebase deploy",
+                "get_file_structure infrastructure"
+            ])
+        
+        if any(word in task_lower for word in ["admin", "interface", "ui", "frontend"]):
+            suggestions["relevant_files"].extend([
+                "admin-interface/",
+                "admin-interface/enhanced-production-interface.html"
+            ])
+            suggestions["suggested_commands"].extend([
+                "get_file_structure admin-interface",
+                "search_codebase interface",
+                "read_file admin-interface/enhanced-production-interface.html"
+            ])
+        
+        # Pattern recognition from command history
+        recent_commands = self.command_history[-10:] if self.command_history else []
+        if recent_commands:
+            command_patterns = {}
+            for cmd in recent_commands:
+                cmd_type = cmd["command"].split()[0] if cmd["command"] else "unknown"
+                command_patterns[cmd_type] = command_patterns.get(cmd_type, 0) + 1
+            
+            suggestions["context_patterns"] = [
+                f"Recent focus on {cmd_type} commands ({count} times)"
+                for cmd_type, count in command_patterns.items()
+            ]
+        
+        # Workflow recommendations
+        if "test" in task_lower:
+            suggestions["workflow_recommendations"].append(
+                "Consider running system integration tests: python3 test_system_integration.py"
+            )
+        
+        if "deploy" in task_lower:
+            suggestions["workflow_recommendations"].append(
+                "Recommended deployment workflow: test locally → staging → production"
+            )
+        
+        return suggestions
         
     def get_project_overview(self) -> Dict[str, Any]:
         """Get comprehensive project overview optimized for AI assistants"""
@@ -348,6 +463,39 @@ async def handle_list_tools() -> list[types.Tool]:
                 }
             },
         ),
+        types.Tool(
+            name="get_smart_suggestions",
+            description="Get smart context suggestions based on current task and command history",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "current_task": {
+                        "type": "string",
+                        "description": "Description of the current development task"
+                    },
+                    "include_history": {
+                        "type": "boolean",
+                        "description": "Include command history analysis (default: true)",
+                        "default": True
+                    }
+                },
+                "required": ["current_task"]
+            },
+        ),
+        types.Tool(
+            name="get_command_history",
+            description="Get recent command history and usage patterns",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "limit": {
+                        "type": "integer",
+                        "description": "Number of recent commands to return (default: 10)",
+                        "default": 10
+                    }
+                }
+            },
+        ),
     ]
 
 @server.call_tool()
@@ -399,6 +547,44 @@ async def handle_call_tool(
                 result = {"overview": overview, "context": context}
         else:
             result = {"overview": overview, "context": context}
+        
+        return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
+    
+    elif name == "get_smart_suggestions":
+        current_task = arguments.get("current_task")
+        include_history = arguments.get("include_history", True)
+        if not current_task:
+            raise ValueError("current_task is required")
+        
+        # Add this command to history for future pattern recognition
+        codebase_manager.add_command_to_history(f"get_smart_suggestions: {current_task}", arguments)
+        
+        suggestions = codebase_manager.get_smart_context_suggestions(current_task)
+        
+        if not include_history:
+            suggestions.pop("context_patterns", None)
+        
+        return [types.TextContent(type="text", text=json.dumps(suggestions, indent=2))]
+    
+    elif name == "get_command_history":
+        limit = arguments.get("limit", 10)
+        recent_commands = codebase_manager.command_history[-limit:] if codebase_manager.command_history else []
+        
+        # Format command history for readability
+        formatted_history = []
+        for cmd in recent_commands:
+            formatted_history.append({
+                "command": cmd["command"],
+                "timestamp": cmd["timestamp"],
+                "git_branch": cmd.get("project_state", {}).get("git_branch", "unknown"),
+                "modified_files": cmd.get("project_state", {}).get("modified_files", 0)
+            })
+        
+        result = {
+            "total_commands": len(codebase_manager.command_history),
+            "recent_commands": formatted_history,
+            "current_project_state": codebase_manager._get_project_state_snapshot()
+        }
         
         return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
     
