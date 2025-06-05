@@ -19,11 +19,11 @@ from typing import Optional
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 
-# Model mappings
+# Model mappings - Using Claude Opus 4 for all tasks (world's best coding model)
 MODELS = {
-    "review": "openai/gpt-4o-mini",
-    "design": "anthropic/claude-3.5-sonnet",  # Updated model name
-    "optimize": "google/gemini-2.0-flash-preview"
+    "review": "anthropic/claude-opus-4",     # Code reviews & bug detection
+    "design": "anthropic/claude-opus-4",     # Architecture design & planning
+    "optimize": "anthropic/claude-opus-4"    # Performance optimization
 }
 
 def call_llm(model: str, prompt: str) -> str:
