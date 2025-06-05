@@ -12,6 +12,7 @@ from pathlib import Path
 
 # Add our modules to path
 sys.path.append(str(Path(__file__).parent / "live-collaboration" / "sync-server"))
+sys.path.append(str(Path(__file__).parent / "sync-server"))
 sys.path.append(str(Path(__file__).parent / "ai-adapters"))
 sys.path.append(str(Path(__file__).parent / "collaboration-scenarios"))
 
