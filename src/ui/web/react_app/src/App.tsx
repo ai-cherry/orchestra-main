@@ -1,40 +1,42 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Provider } from 'react-redux';
-import { store } from './store';
-import { AuthProvider } from './contexts/AuthContext';
-import { PersonaProvider } from './contexts/PersonaContext';
-import { ThemeProvider } from './contexts/ThemeContext';
-import { Layout } from './components/layout/Layout';
-import { HomePage } from './pages/HomePage';
-import { SearchPage } from './pages/SearchPage';
-import { AgentLabPage } from './pages/AgentLabPage';
-import { OrchestratorsPage } from './pages/OrchestratorsPage';
-import { MonitoringPage } from './pages/MonitoringPage';
-import { SettingsPage } from './pages/SettingsPage';
-import './styles/globals.css';
+import { store } from './store/store';
+import { HomePage } from './components/HomePage';
+import { wsClient } from './services/websocketClient';
+import './index.css';
+
+// Initialize WebSocket connection
+const initializeWebSocket = async () => {
+  try {
+    await wsClient.connect();
+    // console.log('WebSocket connected successfully');
+  } catch (error) {
+    console.warn('WebSocket connection failed, will retry:', error);
+  }
+};
 
 function App() {
+  useEffect(() => {
+    // Initialize WebSocket connection
+    initializeWebSocket();
+
+    // Cleanup on unmount
+    return () => {
+      wsClient.disconnect();
+    };
+  }, []);
+
   return (
     <Provider store={store}>
-      <AuthProvider>
-        <PersonaProvider>
-          <ThemeProvider>
-            <Router>
-              <Layout>
-                <Routes>
-                  <Route path="/" element={<HomePage />} />
-                  <Route path="/search" element={<SearchPage />} />
-                  <Route path="/agent-lab" element={<AgentLabPage />} />
-                  <Route path="/orchestrators" element={<OrchestratorsPage />} />
-                  <Route path="/monitoring" element={<MonitoringPage />} />
-                  <Route path="/settings" element={<SettingsPage />} />
-                </Routes>
-              </Layout>
-            </Router>
-          </ThemeProvider>
-        </PersonaProvider>
-      </AuthProvider>
+      <Router>
+        <div className="App min-h-screen bg-gradient-to-br from-primary-surface via-primary-surface2 to-primary-surface3">
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/home" element={<HomePage />} />
+          </Routes>
+        </div>
+      </Router>
     </Provider>
   );
 }
