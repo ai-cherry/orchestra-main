@@ -10,6 +10,7 @@ import json
 import logging
 import os
 import time
+import traceback
 from datetime import datetime
 from typing import Dict, List, Optional, Set
 from dataclasses import dataclass, field
@@ -17,13 +18,16 @@ from pathlib import Path
 
 import websockets
 import aioredis
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, WebSocketException
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
+# Configure logging with more detail
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
 logger = logging.getLogger("cherry-ai-bridge")
 
 @dataclass
@@ -121,27 +125,72 @@ class CherryAIBridge:
             await self.handle_websocket_connection(websocket)
     
     async def handle_websocket_connection(self, websocket: WebSocket):
-        """Handle WebSocket connections from AI assistants"""
-        await websocket.accept()
-        
+        """Handle WebSocket connections from AI assistants with proper error handling"""
         ai_name = None
+        logger.info("🔌 New WebSocket connection attempt")
+        
         try:
-            # Simple authentication
-            auth_message = await websocket.receive_text()
-            auth_data = json.loads(auth_message)
+            # Accept the WebSocket connection
+            await websocket.accept()
+            logger.info("✅ WebSocket connection accepted")
+            
+            # Wait for authentication message with timeout
+            try:
+                logger.debug("⏳ Waiting for authentication message...")
+                auth_message = await asyncio.wait_for(
+                    websocket.receive_text(),
+                    timeout=30.0  # 30 second timeout for auth
+                )
+                logger.debug(f"📨 Received auth message: {auth_message[:100]}...")
+            except asyncio.TimeoutError:
+                logger.error("❌ Authentication timeout - no message received within 30 seconds")
+                await websocket.send_text(json.dumps({
+                    "type": "error",
+                    "code": 1002,
+                    "message": "Authentication timeout"
+                }))
+                await websocket.close(code=1002, reason="Authentication timeout")
+                return
+            
+            # Parse authentication data
+            try:
+                auth_data = json.loads(auth_message)
+                logger.debug(f"📋 Parsed auth data: {json.dumps(auth_data, indent=2)}")
+            except json.JSONDecodeError as e:
+                logger.error(f"❌ Invalid JSON in auth message: {e}")
+                await websocket.send_text(json.dumps({
+                    "type": "error",
+                    "code": 1007,
+                    "message": "Invalid JSON format in authentication"
+                }))
+                await websocket.close(code=1007, reason="Invalid JSON")
+                return
             
             ai_name = auth_data.get("ai_name", "unknown")
             api_key = auth_data.get("api_key", "")
             capabilities = auth_data.get("capabilities", [])
             
-            # Validate API key (simple but effective)
+            logger.info(f"🤖 Authentication attempt from: {ai_name}")
+            
+            # Validate API key
             if api_key not in self.valid_api_keys.values():
+                logger.error(f"❌ Invalid API key from {ai_name}: {api_key}")
                 await websocket.send_text(json.dumps({
                     "type": "error",
+                    "code": 1008,
                     "message": "Invalid API key"
                 }))
-                await websocket.close()
+                await websocket.close(code=1008, reason="Invalid API key")
                 return
+            
+            # Check if AI is already connected
+            if ai_name in self.connected_ais:
+                logger.warning(f"⚠️ {ai_name} is already connected, disconnecting old connection")
+                old_ws = self.connected_ais[ai_name].websocket
+                try:
+                    await old_ws.close()
+                except:
+                    pass
             
             # Register the AI
             connected_ai = ConnectedAI(
@@ -152,9 +201,10 @@ class CherryAIBridge:
             )
             
             self.connected_ais[ai_name] = connected_ai
+            logger.info(f"✅ {ai_name} registered successfully")
             
             # Send connection confirmation
-            await websocket.send_text(json.dumps({
+            confirmation = {
                 "type": "connected",
                 "ai_name": ai_name,
                 "capabilities": capabilities,
@@ -163,9 +213,10 @@ class CherryAIBridge:
                     "connected_ais": list(self.connected_ais.keys()),
                     "features": ["real-time-sync", "multi-ai-collaboration", "code-sharing"]
                 }
-            }))
+            }
             
-            logger.info(f"✅ {ai_name} connected with capabilities: {capabilities}")
+            await websocket.send_text(json.dumps(confirmation))
+            logger.info(f"✅ Sent connection confirmation to {ai_name}")
             
             # Notify other AIs
             await self.broadcast_to_others(ai_name, {
@@ -175,23 +226,73 @@ class CherryAIBridge:
                 "timestamp": datetime.now().isoformat()
             })
             
-            # Handle messages
-            async for message in websocket.iter_text():
-                await self.handle_message(ai_name, message)
-                
+            # Now handle incoming messages
+            logger.info(f"📡 Starting message loop for {ai_name}")
+            
+            while True:
+                try:
+                    # Receive message with timeout to allow periodic checks
+                    message = await asyncio.wait_for(
+                        websocket.receive_text(),
+                        timeout=60.0  # 60 second timeout
+                    )
+                    await self.handle_message(ai_name, message)
+                except asyncio.TimeoutError:
+                    # Send ping to keep connection alive
+                    try:
+                        await websocket.send_text(json.dumps({
+                            "type": "ping",
+                            "timestamp": datetime.now().isoformat()
+                        }))
+                    except:
+                        logger.error(f"❌ Failed to send ping to {ai_name}")
+                        break
+                except WebSocketDisconnect:
+                    logger.info(f"🔌 {ai_name} disconnected normally")
+                    break
+                except Exception as e:
+                    logger.error(f"❌ Error in message loop for {ai_name}: {e}")
+                    logger.debug(traceback.format_exc())
+                    break
+                    
         except WebSocketDisconnect:
-            logger.info(f"🔌 {ai_name or 'Unknown AI'} disconnected")
+            logger.info(f"🔌 {ai_name or 'Unknown AI'} disconnected during setup")
         except Exception as e:
-            logger.error(f"❌ Connection error: {e}")
+            logger.error(f"❌ Unexpected error in connection handler: {e}")
+            logger.debug(traceback.format_exc())
+            
+            # Try to send error to client if possible
+            try:
+                if websocket.client_state.value == 1:  # CONNECTED
+                    await websocket.send_text(json.dumps({
+                        "type": "error",
+                        "code": 1011,
+                        "message": f"Internal server error: {str(e)}"
+                    }))
+            except:
+                pass
         finally:
             # Cleanup
             if ai_name and ai_name in self.connected_ais:
+                logger.info(f"🧹 Cleaning up connection for {ai_name}")
                 del self.connected_ais[ai_name]
-                await self.broadcast_to_others(ai_name, {
-                    "type": "ai_disconnected",
-                    "ai_name": ai_name,
-                    "timestamp": datetime.now().isoformat()
-                })
+                
+                # Notify other AIs
+                try:
+                    await self.broadcast_to_others(ai_name, {
+                        "type": "ai_disconnected",
+                        "ai_name": ai_name,
+                        "timestamp": datetime.now().isoformat()
+                    })
+                except:
+                    pass
+            
+            # Ensure WebSocket is closed
+            try:
+                if websocket.client_state.value == 1:  # CONNECTED
+                    await websocket.close()
+            except:
+                pass
     
     async def handle_message(self, sender_name: str, message: str):
         """Handle incoming messages from AIs"""
@@ -204,7 +305,8 @@ class CherryAIBridge:
                 self.connected_ais[sender_name].message_count += 1
                 self.connected_ais[sender_name].last_ping = time.time()
             
-            logger.info(f"📨 MSG IN: {sender_name} -> {message_type} | Data: {json.dumps(data, indent=2)}")
+            logger.info(f"📨 MSG IN: {sender_name} -> {message_type}")
+            logger.debug(f"Message data: {json.dumps(data, indent=2)}")
             
             # Handle different message types
             if message_type == "ping":
