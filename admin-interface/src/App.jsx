@@ -1,70 +1,126 @@
 import { useState, useEffect } from 'react'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import { Sidebar } from './components/layout/Sidebar'
-import { Header } from './components/layout/Header'
-import { Dashboard } from './components/pages/Dashboard'
-import { PersonaHub } from './components/pages/PersonaHub'
-import { SearchCenter } from './components/pages/SearchCenter'
-import EnhancedSearchCenter from './components/pages/EnhancedSearchCenter'
-import { WorkflowBuilder } from './components/pages/WorkflowBuilder'
-import { MultiModalSuite } from './components/pages/MultiModalSuite'
-import { SystemMonitor } from './components/pages/SystemMonitor'
-import { useWebSocket } from './hooks/useWebSocket'
-import { useSystemStore } from './stores/systemStore'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import './App.css'
 
+// Import components
+import DarkThemeLayout from './components/layout/DarkThemeLayout'
+import PersonaSelection from './components/pages/PersonaSelection'
+import SearchInterface from './components/pages/SearchInterface'
+import AgentFactory from './components/pages/AgentFactory'
+import SupervisorFactory from './components/pages/SupervisorFactory'
+import ProjectManagement from './components/pages/ProjectManagement'
+import SystemHealth from './components/pages/SystemHealth'
+
 function App() {
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
-  const { isConnected, connectionStatus } = useWebSocket('ws://localhost:8000/ws')
-  const { systemHealth, updateSystemHealth } = useSystemStore()
+  const [selectedPersona, setSelectedPersona] = useState(null)
+  const [systemStatus, setSystemStatus] = useState({
+    apiConnected: true,
+    activeSessions: 3,
+    activeAgents: 24,
+    apiRequests: 1247,
+    systemHealth: 98.5
+  })
 
+  // Load persona from localStorage on mount
   useEffect(() => {
-    // Initialize system health monitoring
-    const interval = setInterval(() => {
-      // This will be replaced with real WebSocket data
-      updateSystemHealth({
-        timestamp: new Date().toISOString(),
-        memory_usage_mb: Math.random() * 1000 + 500,
-        cpu_usage_percent: Math.random() * 100,
-        active_connections: Math.floor(Math.random() * 50) + 10,
-        response_time_ms: Math.random() * 200 + 50,
-        error_rate_percent: Math.random() * 5,
-        uptime_hours: 24.5
-      })
-    }, 5000)
+    const savedPersona = localStorage.getItem('selectedPersona')
+    if (savedPersona) {
+      setSelectedPersona(savedPersona)
+    }
+  }, [])
 
-    return () => clearInterval(interval)
-  }, [updateSystemHealth])
+  // Save persona to localStorage when changed
+  useEffect(() => {
+    if (selectedPersona) {
+      localStorage.setItem('selectedPersona', selectedPersona)
+    }
+  }, [selectedPersona])
 
   return (
     <Router>
-      <div className="flex h-screen bg-background">
-        <Sidebar 
-          collapsed={sidebarCollapsed} 
-          onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
-        />
-        
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <Header 
-            connectionStatus={connectionStatus}
-            isConnected={isConnected}
-          />
-          
-          <main className="flex-1 overflow-auto p-6">
-            <Routes>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/personas" element={<PersonaHub />} />
-              <Route path="/personas/:personaId" element={<PersonaHub />} />
-              <Route path="/search" element={<EnhancedSearchCenter />} />
-              <Route path="/workflows" element={<WorkflowBuilder />} />
-              <Route path="/workflows/:workflowId" element={<WorkflowBuilder />} />
-              <Route path="/generate" element={<MultiModalSuite />} />
-              <Route path="/generate/:type" element={<MultiModalSuite />} />
-              <Route path="/system" element={<SystemMonitor />} />
-            </Routes>
-          </main>
-        </div>
+      <div className="app dark-theme">
+        <DarkThemeLayout 
+          selectedPersona={selectedPersona}
+          systemStatus={systemStatus}
+          onPersonaChange={setSelectedPersona}
+        >
+          <Routes>
+            {/* Default route - if no persona selected, show selection */}
+            <Route 
+              path="/" 
+              element={
+                selectedPersona ? 
+                <Navigate to="/search" replace /> : 
+                <PersonaSelection onPersonaSelect={setSelectedPersona} />
+              } 
+            />
+            
+            {/* Search-first interface */}
+            <Route 
+              path="/search" 
+              element={
+                <SearchInterface 
+                  persona={selectedPersona}
+                  onPersonaChange={setSelectedPersona}
+                />
+              } 
+            />
+            
+            {/* Agent management */}
+            <Route 
+              path="/agents" 
+              element={
+                <AgentFactory 
+                  persona={selectedPersona}
+                  systemStatus={systemStatus}
+                />
+              } 
+            />
+            
+            {/* Supervisor management */}
+            <Route 
+              path="/supervisors" 
+              element={
+                <SupervisorFactory 
+                  persona={selectedPersona}
+                  systemStatus={systemStatus}
+                />
+              } 
+            />
+            
+            {/* Project management */}
+            <Route 
+              path="/projects" 
+              element={
+                <ProjectManagement 
+                  persona={selectedPersona}
+                />
+              } 
+            />
+            
+            {/* System health */}
+            <Route 
+              path="/health" 
+              element={
+                <SystemHealth 
+                  systemStatus={systemStatus}
+                  onStatusUpdate={setSystemStatus}
+                />
+              } 
+            />
+            
+            {/* Persona selection (accessible anytime) */}
+            <Route 
+              path="/personas" 
+              element={
+                <PersonaSelection 
+                  onPersonaSelect={setSelectedPersona}
+                  currentPersona={selectedPersona}
+                />
+              } 
+            />
+          </Routes>
+        </DarkThemeLayout>
       </div>
     </Router>
   )
