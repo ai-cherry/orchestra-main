@@ -23,8 +23,6 @@
     "infrastructure": [
         "REDIS_HOST",
         "REDIS_PASSWORD",
-        "DRAGONFLY_HOST",
-        "DRAGONFLY_PASSWORD",
     ],
     "ai_providers": [
         "ANTHROPIC_API_KEY",

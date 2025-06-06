@@ -6,7 +6,6 @@
         input_key: Optional[str] = None,
         output_key: Optional[str] = None,
         return_messages: bool = True,
-        dragonfly_config: Optional[Dict[str, Any]] = None,
         firestore_config: Optional[Dict[str, Any]] = None,
         qdrant_config: Optional[Dict[str, Any]] = None,
         session_id: Optional[str] = None,
@@ -25,7 +24,6 @@
         self.session_id = session_id or "default"
 
         # Initialize memory tiers
-        self.hot_memory = DragonflyCache(dragonfly_config)
         self.warm_memory = FirestoreEpisodicMemory(firestore_config)
         self.cold_memory = QdrantSemanticMemory(qdrant_config)
 

@@ -27,7 +27,6 @@
             except Exception:
 
                 pass
-                print(f"DragonflyDB search error: {e}")
 
         # Firestore fallback (legacy)
         if self.firestore and isinstance(query, str) and not results:
@@ -100,9 +99,6 @@
                 print(f"PostgreSQL delete error: {e}")
                 self.postgres.rollback()
 
-        # Delete from DragonflyDB (cache)
-        if self.dragonfly:
-            deleted = self.dragonfly.delete(f"memory:{memory_id}") or deleted
 
         # Delete from Firestore (legacy)
         if self.firestore:
@@ -135,16 +131,12 @@ execute("SELECT 1")
                 pass
                 status["postgres"] = False
 
-        # DragonflyDB (cache)
-        if self.dragonfly:
             try:
 
                 pass
-                status["dragonfly"] = self.dragonfly.ping()
             except Exception:
 
                 pass
-                status["dragonfly"] = False
 
         # Firestore (legacy)
         if self.firestore:
@@ -164,7 +156,6 @@ execute("SELECT 1")
 # --- Example Usage ---
 if __name__ == "__main__":
     # Example: Initialize UnifiedMemory with Weaviate-first configuration
-    memory = UnifiedMemory(use_weaviate=True, use_postgres=True, use_dragonfly=False, use_firestore=False)
 
     # Example: Store a memory item in Personal domain
     item = MemoryItem(

@@ -21,22 +21,9 @@ class ServiceSettings(BaseSettings):
     max_retries: int = Field(default=3, description="Maximum retry attempts")
     retry_delay: float = Field(default=1.0, description="Initial retry delay in seconds")
 
-class MongoDBSettings(ServiceSettings):
-    """MongoDB configuration."""
-    uri: SecretStr = Field(..., env="MONGODB_URI")
-    database: str = Field(default="cherry_ai", env="MONGODB_DATABASE")
-    max_pool_size: int = Field(default=100, env="MONGODB_MAX_POOL_SIZE")
-    min_pool_size: int = Field(default=10, env="MONGODB_MIN_POOL_SIZE")
 
-    model_config = {"env_prefix": "MONGODB_"}
 
-class DragonflySettings(ServiceSettings):
-    """DragonflyDB (Redis-compatible) configuration."""
-    uri: SecretStr = Field(..., env="DRAGONFLY_URI")
-    decode_responses: bool = Field(default=True, env="DRAGONFLY_DECODE_RESPONSES")
-    max_connections: int = Field(default=50, env="DRAGONFLY_MAX_CONNECTIONS")
 
-    model_config = {"env_prefix": "DRAGONFLY_"}
 
 class WeaviateSettings(ServiceSettings):
     """Weaviate vector database configuration."""
@@ -109,8 +96,6 @@ class Settings(BaseSettings):
     log_level: LogLevel = Field(default=LogLevel.INFO, env="LOG_LEVEL")
 
     # Services - These will be initialized from environment variables
-    mongodb: MongoDBSettings = Field(default_factory=MongoDBSettings)
-    dragonfly: DragonflySettings = Field(default_factory=DragonflySettings)
     weaviate: WeaviateSettings = Field(default_factory=WeaviateSettings)
     llm: LLMProviderSettings = Field(default_factory=LLMProviderSettings)
 

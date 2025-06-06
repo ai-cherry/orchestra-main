@@ -28,9 +28,6 @@
     postgres_password: str = Field(default=None, env="POSTGRES_PASSWORD")
     postgres_db: str = Field(default=None, env="POSTGRES_DB")
 
-    # Dragonfly Configuration (Optional Micro-Cache)
-    dragonfly_url: str = Field(default=None, env="DRAGONFLY_URL")
-    dragonfly_uri: str = Field(default=None, env="DRAGONFLY_URI")  # Redis-compatible URI
     enable_micro_cache: bool = Field(default=False, env="ENABLE_MICRO_CACHE")
     use_redis: bool = Field(default=False, env="USE_REDIS")
 

@@ -219,7 +219,6 @@ async def optimized_semantic_search(
 
 
         pass
-        error_msg = f"Failed to perform semantic search in mongodb: {e}"
         logger.error(error_msg)
         raise StorageError(error_msg)
     except Exception:
@@ -269,7 +268,6 @@ async def cleanup_expired_items_with_progress(self) -> int:
             # Check if there are potentially more items
             has_more_items = batch_count == QUERY_BATCH_SIZE
 
-            # Delete items in sub-batches to stay within mongodb limits
             delete_batch = self._async_client.batch()
             items_in_batch = 0
 
@@ -307,7 +305,6 @@ async def cleanup_expired_items_with_progress(self) -> int:
     except Exception:
 
         pass
-        error_msg = f"Failed to cleanup expired items in mongodb: {e}"
         logger.error(error_msg)
         raise StorageError(error_msg)
     except Exception:
@@ -341,8 +338,6 @@ class ImprovedFirestoreMemoryAdapter(MemoryManager):
         except Exception:
 
             pass
-            logger.error(f"Failed to initialize mongodb adapter: {e}")
-            raise ConnectionError(f"Failed to initialize mongodb connection: {e}")
 
     def _initialize_sync(self):
         """Synchronous initialization for running in thread pool."""
@@ -363,7 +358,6 @@ class ImprovedFirestoreMemoryAdapter(MemoryManager):
         """Add a memory item to storage with retry and error handling."""
             raise ValidationError("user_id is required for memory items")
 
-        # Store in mongodb using ThreadPoolManager
         await ThreadPoolManager.run_in_thread(self._add_item_sync, item)
 
         return item.id
@@ -373,11 +367,9 @@ class ImprovedFirestoreMemoryAdapter(MemoryManager):
         """
         """
             "status": "healthy",
-            "mongodb": False,
             "redis": False,  # Not using Redis directly
             "error_count": 0,
             "details": {
-                "provider": "mongodb",
                 "adapter": "ImprovedFirestoreMemoryAdapter",
                 "namespace": self.namespace,
             },
@@ -401,22 +393,18 @@ class ImprovedFirestoreMemoryAdapter(MemoryManager):
 
             pass
             # Attempt a lightweight operation to verify connection
-            # In a real implementation, would check actual mongodb connection
             await ThreadPoolManager.run_in_thread(self._check_connection_sync)
 
-            health["mongodb"] = True
             return health
         except Exception:
 
             pass
             return {
                 "status": "error",
-                "mongodb": False,
                 "redis": False,
                 "error_count": 1,
                 "last_error": str(e),
                 "details": {
-                    "message": f"mongodb health check failed: {e}",
                     "namespace": self.namespace,
                 },
             }

@@ -7,8 +7,6 @@
         print("\n🔍 Testing Environment Variables...")
 
         required_vars = [
-            "MONGODB_URI",
-            "DRAGONFLY_URI",
             "WEAVIATE_URL",
             "WEAVIATE_API_KEY",
             "OPENROUTER_API_KEY",
@@ -27,18 +25,13 @@
 
         return all_good
 
-    async def test_mongodb_connection(self) -> bool:
-        """Test MongoDB connection."""
-        print("\n🔍 Testing MongoDB Connection...")
 
         try:
 
 
             pass
-            from core.conductor.src.agents.memory.mongodb_manager import MongoDBMemoryManager
-
+            
             # Try to connect
-            manager = MongoDBMemoryManager()
 
             # Test basic operations
             test_agent_id = "test_agent"
@@ -60,21 +53,15 @@
             # Close connection
             manager.close()
 
-            self.results["mongodb"] = (True, "MongoDB connection successful")
             return True
 
         except Exception:
 
 
             pass
-            self.results["mongodb"] = (False, f"MongoDB connection failed: {str(e)}")
-            print(f"  ✗ MongoDB connection failed: {e}")
-            self.critical_failures.append("MongoDB")
             return False
 
     async def test_redis_connection(self) -> bool:
-        """Test Redis connection (local or Dragonfly)."""
-        print("\n🔍 Testing Redis/Dragonfly Connection...")
 
         try:
 
@@ -110,20 +97,13 @@
 
 
             pass
-            print("  ⚠️  Local Redis failed, trying Dragonfly...")
 
-            # Try Dragonfly
             try:
 
                 pass
-                dragonfly_uri = os.getenv("DRAGONFLY_URI")
-                if dragonfly_uri:
                     # Parse URI and connect
-                    print("  ✓ Dragonfly URI configured")
-                    self.results["redis"] = (True, "Dragonfly configured (not tested)")
                     return True
                 else:
-                    raise Exception("No Dragonfly URI configured")
 
             except Exception:
 
@@ -131,9 +111,7 @@
                 pass
                 self.results["redis"] = (
                     False,
-                    f"Redis/Dragonfly connection failed: {str(e)}",
                 )
-                print(f"  ✗ Redis/Dragonfly connection failed: {e}")
                 return False
 
     async def test_weaviate_connection(self) -> bool:
@@ -328,7 +306,6 @@
         await self.test_environment_variables()
         await self.test_settings_import()
         await self.test_docker_compose()
-        await self.test_mongodb_connection()
         await self.test_redis_connection()
         await self.test_weaviate_connection()
         await self.test_llm_connections()

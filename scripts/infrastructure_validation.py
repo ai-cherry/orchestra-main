@@ -40,8 +40,6 @@ def test_digitalocean_api(token: str) -> Tuple[bool, str]:
         pass
         return False, str(e)
 
-def test_mongodb_connection(uri: str) -> Tuple[bool, str]:
-    """Test MongoDB connection"""
         return True, f"Connected, {len(db_names)} databases found"
     except Exception:
 
@@ -112,9 +110,6 @@ def main():
         "OPENAI_API_KEY": "OpenAI API Key",
         "WEAVIATE_API_KEY": "Weaviate API Key",
         "WEAVIATE_URL": "Weaviate Endpoint",
-        "MONGODB_CONNECTION_STRING": "MongoDB Connection String",
-        "MONGO_URI": "MongoDB URI (Alternative)",
-        "DRAGONFLY_URI": "DragonflyDB URI",
         "PULUMI_CONFIG_PASSPHRASE": "Pulumi Passphrase",
         "DO_ROOT_PASSWORD": "DigitalOcean Root Password",
         "GITHUB_PAT": "GitHub Personal Access Token",
@@ -136,13 +131,7 @@ def main():
     else:
         print_status("DigitalOcean API", False, "Token not set")
 
-    # Test MongoDB
-    mongo_uri = os.environ.get("MONGODB_CONNECTION_STRING") or os.environ.get("MONGO_URI")
-    if mongo_uri:
-        success, msg = test_mongodb_connection(mongo_uri)
-        print_status("MongoDB Connection", success, msg)
     else:
-        print_status("MongoDB Connection", False, "URI not set")
 
     # Test Weaviate
     if env_status.get("WEAVIATE_URL") and env_status.get("WEAVIATE_API_KEY"):

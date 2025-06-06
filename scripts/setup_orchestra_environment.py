@@ -53,8 +53,6 @@
         # Required variables
         required_vars = {
             "ENVIRONMENT": "development",
-            "MONGODB_URI": "",
-            "DRAGONFLY_URI": "",
             "WEAVIATE_URL": "",
             "WEAVIATE_API_KEY": "",
             "REDIS_HOST": "localhost",
@@ -99,15 +97,11 @@
         """Install Python dependencies."""
         print("\n📦 Installing dependencies...")
 
-        # Check if pymongo is in requirements
         req_file = self.root_dir / "requirements" / "base.txt"
         with open(req_file, "r") as f:
             requirements = f.read()
 
-        if "pymongo" not in requirements:
-            print("  Adding pymongo to requirements...")
             with open(req_file, "a") as f:
-                f.write("\n# MongoDB driver\npymongo==4.6.1\n")
 
         # Install requirements
         print("  Installing Python packages...")
@@ -189,7 +183,6 @@
 
         # Check key files exist
         key_files = [
-            "core/conductor/src/agents/memory/mongodb_manager.py",
             "core/conductor/src/config/settings.py",
             "docker-compose.yml",
             ".env",

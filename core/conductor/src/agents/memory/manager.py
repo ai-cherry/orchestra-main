@@ -3,7 +3,6 @@
 """
 T = TypeVar("T")
 
-# Optional: MongoDB integration for long-term memory
 
 class MemoryQuery(BaseModel):
     """
@@ -32,12 +31,9 @@ class MemoryQuery(BaseModel):
         """
         """
         """
-        """Initialize MongoDB client for memory persistence."""
-            logger.info("Initialized MongoDB memory backend")
         except Exception:
 
             pass
-            logger.warning(f"MongoDB initialization failed: {e}. Using in-memory storage only.")
             self.db = None
 
 class RedisMemoryStore(MemoryStore):
@@ -220,51 +216,38 @@ class RedisMemoryStore(MemoryStore):
             logger.error(f"Failed to clear items from Redis: {e}")
             raise ConnectionError(f"Redis clear failed: {e}")
 
-class MongoDBMemoryStore(MemoryStore):
     """
     """
-        """Initialize the MongoDB memory store."""
             collection = self.config.get("collection", "memory")
             project = self.config.get("project", "cherry-ai-project")
 
-            # Create MongoDB client
-            self._client = mongodb.AsyncClient(project=project)
             self._collection = self._client.collection(collection)
 
             # Set initialized flag
             self._initialized = True
 
-            logger.info(f"MongoDB memory store initialized: {project}/{collection}")
         except Exception:
 
             pass
-            logger.error("MongoDB package not installed. Install with: pip install google-cloud-mongodb")
             raise
         except Exception:
 
             pass
-            logger.error(f"Failed to initialize MongoDB memory store: {e}")
-            raise ConnectionError(f"MongoDB connection failed: {e}")
 
     async def close(self) -> None:
-        """Close the MongoDB memory store."""
 
     async def store(self, item: MemoryItem) -> str:
-        """Store a memory item in MongoDB."""
             item_id = item.id or f"mem:{int(time.time() * 1000)}"
 
             # Prepare item for storage
             item_dict = item.dict()
 
-            # Convert datetime to MongoDB timestamp
-            # Removed GCP import.mongodb import SERVER_TIMESTAMP
 
             if item_dict.get("timestamp"):
                 item_dict["timestamp"] = item_dict["timestamp"]
             else:
                 item_dict["timestamp"] = SERVER_TIMESTAMP
 
-            # Store in MongoDB
             doc_ref = self._collection.document(item_id)
             await doc_ref.set(item_dict)
 
@@ -289,11 +272,8 @@ class MongoDBMemoryStore(MemoryStore):
         except Exception:
 
             pass
-            logger.error(f"Failed to store item in MongoDB: {e}")
-            raise ConnectionError(f"MongoDB storage failed: {e}")
 
     async def retrieve(self, item_id: str) -> Optional[MemoryItem]:
-        """Retrieve a memory item from MongoDB."""
             if "timestamp" in item_dict and item_dict["timestamp"]:
                 item_dict["timestamp"] = item_dict["timestamp"].isoformat()
 
@@ -307,11 +287,8 @@ class MongoDBMemoryStore(MemoryStore):
         except Exception:
 
             pass
-            logger.error(f"Failed to retrieve item from MongoDB: {e}")
-            raise ConnectionError(f"MongoDB retrieval failed: {e}")
 
     async def query(self, query: MemoryQuery) -> List[MemoryItem]:
-        """Query for memory items in MongoDB."""
                 fs_query = fs_query.where(f"metadata.{key}", "==", value)
 
             # Apply time range filter
@@ -331,13 +308,11 @@ class MongoDBMemoryStore(MemoryStore):
             for doc in docs:
                 item_dict = doc.to_dict()
 
-                # Convert MongoDB timestamp to datetime
                 if "timestamp" in item_dict and item_dict["timestamp"]:
                     item_dict["timestamp"] = item_dict["timestamp"].isoformat()
 
                 item = MemoryItem.parse_obj(item_dict)
 
-                # Apply text filter (MongoDB doesn't support full-text search natively)
                 if query.text and query.text.lower() not in item.text_content.lower():
                     continue
 
@@ -351,21 +326,13 @@ class MongoDBMemoryStore(MemoryStore):
         except Exception:
 
             pass
-            logger.error(f"Failed to query items from MongoDB: {e}")
-            raise ConnectionError(f"MongoDB query failed: {e}")
 
     async def delete(self, item_id: str) -> bool:
-        """Delete a memory item from MongoDB."""
                 logger.warning(f"Failed to update item count: {count_err}")
 
             return True
         except Exception:
 
             pass
-            logger.error(f"Failed to delete item from MongoDB: {e}")
-            raise ConnectionError(f"MongoDB deletion failed: {e}")
 
     async def clear(self) -> int:
-        """Clear all memory items from MongoDB."""
-            logger.error(f"Failed to clear items from MongoDB: {e}")
-            raise ConnectionError(f"MongoDB clear failed: {e}")

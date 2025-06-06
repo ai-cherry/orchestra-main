@@ -6,8 +6,6 @@ import subprocess
 3. Execute tools instead of reimplementing: execute_tool_name(params)
 
 Available tool categories:
-- cache: Redis/DragonflyDB operations (cache_get, cache_set, cache_delete)
-- database: MongoDB operations (mongodb_query, mongodb_aggregate)
 - search: Vector search with Weaviate (vector_search)
 - system: Script execution (run_script)
 - ai: LLM operations (llm_query)
@@ -35,8 +33,6 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # External service connections
-import pymongo  # MongoDB
-import redis    # DragonflyDB
 import weaviate # Vector search
 
 # Type hints always
@@ -72,11 +68,8 @@ import pipenv  # NEVER
 
 EXTERNAL SERVICES CONFIG:
 ```python
-# MongoDB connection
-client = pymongo.MongoClient(os.getenv("MONGODB_URI", "mongodb://localhost:27017"))
 db = client.cherry_ai
 
-# Redis/DragonflyDB connection
 redis_client = redis.Redis(
     host=os.getenv("REDIS_HOST", "localhost"),
     port=int(os.getenv("REDIS_PORT", "6379")),

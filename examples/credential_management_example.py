@@ -118,7 +118,6 @@ async def example_memory_system():
         redis_port = "12345"
         redis_os.getenv("API_KEY")
 
-    # Get mongodb credentials
     try:
 
         pass
@@ -128,8 +127,6 @@ async def example_memory_system():
     except Exception:
 
         pass
-        print(f"\nError getting mongodb credentials: {str(e)}")
-        print("Creating mock mongodb credentials for demonstration purposes...")
         firestore_credentials = {
             "type": "service_account",
             "project_id": "cherry-ai-project",
@@ -150,15 +147,12 @@ async def example_memory_system():
     # )
     # r.set("test_key", "test_value")
 
-    # Use the credentials with mongodb
-    print("\nConnecting to mongodb...")
     print(f"Project ID: {firestore_credentials.get('project_id', 'cherry-ai-project')}")
     print(
         f"Service Account: {firestore_credentials.get('client_email', 'memory-system@cherry-ai-project.iam.gserviceaccount.com')}"
     )
 
     # This is just a demonstration - in a real application, you would do:
-    #     # db = mongodb.Client(
     #     project=firestore_credentials["project_id"],
     #     credentials=firestore_credentials
     # )
@@ -167,7 +161,6 @@ async def example_memory_system():
 
     return {
         "redis": {"host": redis_host, "port": redis_port, "password": redis_password},
-        "mongodb": firestore_credentials,
     }
 
 async def example_fastapi_integration():

@@ -18,34 +18,18 @@ mcp_service_registry: Optional["MCPServiceRegistry"] = None
 class MCPServiceRegistry(ServiceRegistry):
     """
     """
-        self._db_name_mongo = "cherry_ai_default_mongo_db"  # Default, can be from settings
 
     async def initialize_services(self):
         logger.info("MCPServiceRegistry: Initializing services...")
         try:
 
             pass
-            # Dragonfly (Redis-compatible)
-            if self._settings.dragonfly.enabled:
-                df_url = f"redis://{self._settings.dragonfly.host}:{self._settings.dragonfly.port}/{self._settings.dragonfly.db_index}"
-                if self._settings.dragonfly.password:
-                    df_url = f"redis://:{self._settings.dragonfly.password}@{self._settings.dragonfly.host}:{self._settings.dragonfly.port}/{self._settings.dragonfly.db_index}"
 
-                self.dragonfly_client = redis_async.from_url(
-                    df_url, max_connections=self._settings.dragonfly.max_connections or 50
                 )
-                await self.dragonfly_client.ping()
                 logger.info(
-                    f"Connected to DragonflyDB at {self._settings.dragonfly.host}:{self._settings.dragonfly.port}"
                 )
 
-            # MongoDB
-            if self._settings.mongodb.enabled:
-                self.mongodb_client = AsyncIOMotorClient(self._settings.mongodb.uri)
-                await self.mongodb_client.admin.command("ping")  # Verify connection
-                self._db_name_mongo = self.mongodb_client.get_default_database().name  # Get actual DB name
                 logger.info(
-                    f"Connected to MongoDB at {self._settings.mongodb.uri}, using database '{self._db_name_mongo}'"
                 )
 
             # Weaviate
@@ -90,21 +74,11 @@ class MCPServiceRegistry(ServiceRegistry):
             pass
             logger.error(f"MCPServiceRegistry: Error during service initialization: {e}", exc_info=True)
             # Ensure clients are None if they failed to initialize
-            if not (self.dragonfly_client and await self.dragonfly_client.ping()):
-                self.dragonfly_client = None
-            if not self.mongodb_client:
-                self.mongodb_client = None  # Ping is implicit
             if not (self.weaviate_client_instance and self.weaviate_client_instance.is_ready()):
                 self.weaviate_client_instance = None
             raise  # Re-raise to signal startup failure
 
     def get_service(self, service_name: str) -> Any:
-        if service_name == "dragonfly" and self._settings.dragonfly.enabled:
-            return self.dragonfly_client
-        elif service_name == "mongodb" and self._settings.mongodb.enabled:
-            # UnifiedMemoryService's MidTermStore expects a MongoDB database object, not the client
-            if self.mongodb_client:
-                return self.mongodb_client[self._settings.mongodb.database_name or self._db_name_mongo]
             return None
         elif (
             service_name == "weaviate_client" and self._settings.weaviate.enabled
@@ -115,12 +89,6 @@ class MCPServiceRegistry(ServiceRegistry):
 
     async def shutdown_services(self):
         logger.info("MCPServiceRegistry: Shutting down services...")
-        if self.dragonfly_client:
-            await self.dragonfly_client.close()
-            logger.info("DragonflyDB connection closed.")
-        if self.mongodb_client:
-            self.mongodb_client.close()  # Motor client close is synchronous
-            logger.info("MongoDB connection closed.")
         if self.weaviate_client_instance and self.weaviate_client_instance.is_connected():
             self.weaviate_client_instance.close()
             logger.info("Weaviate client connection closed.")

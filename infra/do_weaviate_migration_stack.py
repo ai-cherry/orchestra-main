@@ -33,7 +33,6 @@ postgres_password = config.require_secret("postgres_password")
 # SSH authentication
 ssh_private_key = config.require_secret("ssh_private_key")
 
-# MicroCache configuration (optional Dragonfly)
 enable_micro_cache = config.get_bool("enable_micro_cache") or False
 micro_cache_droplet_size = config.get("micro_cache_droplet_size") or "s-1vcpu-1gb"
 
@@ -90,10 +89,8 @@ app_node = PostgresComponent(
     ),
 )
 
-# --- MICRO-CACHE DROPLET (OPTIONAL DRAGONFLY) ---
 micro_cache_droplet = None
 if enable_micro_cache:
-    # Create a small droplet for Dragonfly micro-cache
     micro_cache_droplet = do.Droplet(
         f"micro-cache-{env}",
         name=f"micro-cache-{env}",
@@ -110,18 +107,12 @@ if enable_micro_cache:
         private_key=ssh_private_key,
     )
 
-    # Deploy Dragonfly container
-    deploy_dragonfly = command.remote.Command(
-        f"deploy-dragonfly-{env}",
         connection=micro_cache_connection,
         create="""
-find /root -name "dragonfly-*.dfs" -type f -mtime +7 -delete
 EOF
 
-            chmod +x /root/snapshot-dragonfly.sh
 
             # Add to crontab
-            (crontab -l 2>/dev/null || echo "") | grep -v "snapshot-dragonfly.sh" | { cat; echo "0 4 * * * /root/snapshot-dragonfly.sh > /var/log/dragonfly-snapshot.log 2>&1"; } | crontab -
         """
         f"micro-cache-firewall-{env}",
         droplet_ids=[micro_cache_droplet.id],
@@ -133,7 +124,6 @@ EOF
             ),
             do.FirewallInboundRuleArgs(
                 protocol="tcp",
-                port_range="6379",  # Dragonfly Redis port
                 source_addresses=[vpc_cidr],
             ),
         ],
@@ -228,7 +218,6 @@ cat > /opt/cherry_ai/migrations/run_migration.sh << 'EOF'
 cd /opt/cherry_ai
 source venv/bin/activate
 python scripts/setup_weaviate_collections.py
-python scripts/migrate_dragonfly_to_weaviate.py
 EOF
 
 chmod +x /opt/cherry_ai/migrations/run_migration.sh

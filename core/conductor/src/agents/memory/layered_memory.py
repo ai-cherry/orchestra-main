@@ -26,7 +26,6 @@
         # Create store based on type
         if layer.store_type == MemoryType.REDIS:
             return RedisMemoryStore(config)
-        elif layer.store_type == MemoryType.mongodb:
             return FirestoreMemoryStore(config)
         elif layer.store_type == MemoryType.IN_MEMORY:
             from core.conductor.src.agents.memory.in_memory import InMemoryStore
@@ -251,7 +250,6 @@ def create_default_memory_manager() -> LayeredMemoryManager:
         ),
         MemoryLayer(
             name="long_term",
-            store_type=MemoryType.mongodb,
             priority=2,
             config={"collection": "memory"},
         ),

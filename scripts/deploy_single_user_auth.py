@@ -103,7 +103,6 @@ if line.startswith("cherry_ai_API_KEY = os.getenv('ORCHESTRA_SCRIPT_API_KEY')
             categories = {
                 "Authentication": ["cherry_ai_API_KEY", "AUTH_MODE", "ENABLE_RBAC"],
                 "Context": ["cherry_ai_CONTEXT", "RATE_LIMIT_ENABLED"],
-                "Database": ["DATABASE_URL", "POSTGRES_", "REDIS_", "MONGODB_"],
                 "Services": ["API_", "MCP_", "WEAVIATE_"],
                 "Monitoring": ["GRAFANA_", "PROMETHEUS_", "LOG_"],
                 "Other": []

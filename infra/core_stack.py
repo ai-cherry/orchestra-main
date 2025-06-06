@@ -38,17 +38,12 @@
 
     def _setup_databases(self) -> None:
         """Provision database services with Paperspace support."""
-                f"{self._name}-dragonfly",
-                engine="dragonfly",
                 version="1.8",
                 node_count=3,
                 region=self.config["region"],
                 size="db-s-2vcpu-4gb",
             )
 
-            self.mongodb = do.DatabaseCluster(
-                f"{self._name}-mongodb",
-                engine="mongodb",
                 version="6.0",
                 node_count=3,
                 region=self.config["region"],
@@ -78,13 +73,9 @@
             )
 
             # Export DO service endpoints
-            pulumi.export("mongo_uri", self.mongodb.uri)
-            pulumi.export("dragonfly_uri", self.dragonfly.uri)
             pulumi.export("weaviate_url", Output.concat("https://", self.weaviate.default_ingress))
         else:
             # Paperspace local services
-            pulumi.export("mongo_uri", "mongodb://localhost:27017")
-            pulumi.export("dragonfly_uri", "redis://localhost:6379")
             pulumi.export("weaviate_url", "http://localhost:8080")
 
     def _setup_compute(self) -> None:

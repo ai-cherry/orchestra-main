@@ -3,7 +3,6 @@
 """
 """
     """Configuration for MCP servers"""
-    mongodb_endpoint: str = "http://mcp-mongodb:8080"
     weaviate_endpoint: str = "http://mcp-weaviate:8080"
     timeout: int = 30
     max_retries: int = 3
@@ -21,7 +20,6 @@ class MCPIntegration:
             logger.error(f"Failed to initialize MCP clients: {e}")
             raise
 
-    async def query_mongodb(self, natural_language_query: str) -> Dict[str, Any]:
         """
         - "Show all users created in the last 24 hours"
         - "Find agents with status 'active' and high memory usage"
@@ -46,7 +44,6 @@ class MCPIntegration:
 
 
             pass
-            logger.error(f"MongoDB query failed: {e}")
             return {"success": False, "error": str(e), "data": []}
 
     async def semantic_search(self, query: str, limit: int = 10) -> Dict[str, Any]:
@@ -87,15 +84,11 @@ class MCPIntegration:
             # Extract IDs from semantic results
             semantic_ids = [r["id"] for r in semantic_results["results"]]
 
-            # Query MongoDB with semantic IDs as filter
-            mongodb_query = f"Find documents with ids in {semantic_ids[:10]}"
-            mongodb_results = await self.query_mongodb(mongodb_query)
 
             # Combine results
             return {
                 "success": True,
                 "semantic_matches": semantic_results["results"],
-                "structured_data": mongodb_results["data"],
                 "query": query,
             }
 
@@ -108,7 +101,6 @@ class MCPIntegration:
 
     async def list_available_tools(self) -> Dict[str, List[Tool]]:
         """List all available MCP tools from both servers"""
-        tools = {"mongodb": [], "weaviate": []}
 
         if not self._initialized:
             await self.initialize()
@@ -117,16 +109,11 @@ class MCPIntegration:
 
 
             pass
-            # Get MongoDB tools
-            if self.mongodb_client:
-                mongodb_tools = await self.mongodb_client.list_tools()
-                tools["mongodb"] = [
                     {
                         "name": tool.name,
                         "description": tool.description,
                         "parameters": tool.input_schema,
                     }
-                    for tool in mongodb_tools
                 ]
 
             # Get Weaviate tools
@@ -172,12 +159,6 @@ class MCPIntegration:
                     results.append(f"{idx+1}. {result.get('title', 'Untitled')}: {result.get('summary', '')}")
 
         if use_structured:
-            # Use MongoDB for structured queries
-            mongodb_result = await self.mcp.query_mongodb(question)
-            if mongodb_result["success"]:
-                results.append(f"\nFound {mongodb_result['count']} matching documents")
-                results.append(f"Query interpretation: {mongodb_result['query_interpretation']}")
-                for doc in mongodb_result["data"][:3]:
                     results.append(f"- {json.dumps(doc, indent=2)}")
 
         if not results:
@@ -190,7 +171,6 @@ class MCPIntegration:
         """
         if memory_type in ["conversation", "short_term", "cache"]:
             query = f"Insert into {memory_type} collection: {json.dumps(content)}"
-            result = await self.mcp.query_mongodb(query)
             return result["success"]
 
         # Long-term memories go to Weaviate for semantic search
@@ -205,7 +185,6 @@ class MCPIntegration:
 # Example usage and testing
 async def main():
     """Example usage of MCP integration"""
-        mongodb_endpoint="http://localhost:8081",  # For local testing
         weaviate_endpoint="http://localhost:8082",
     )
 

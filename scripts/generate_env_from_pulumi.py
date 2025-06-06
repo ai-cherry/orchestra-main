@@ -27,8 +27,6 @@
 
 def generate_env_file(config: Dict[str, Any], output_path: Path) -> None:
     """Generate .env file from Pulumi config."""
-        "mongo_uri": "MONGODB_URI",
-        "dragonfly_uri": "DRAGONFLY_URI",
         "weaviate_url": "WEAVIATE_URL",
         "weaviate_api_key": "WEAVIATE_API_KEY",
         "openai_api_key": "OPENAI_API_KEY",
@@ -42,14 +40,8 @@ def generate_env_file(config: Dict[str, Any], output_path: Path) -> None:
     env_content = """
 """
     env_content += "# Database Services\n"
-    if "mongo_uri" in config:
-        env_content += f"MONGODB_URI={config['mongo_uri']['value']}\n"
-        env_content += f"MONGO_URI={config['mongo_uri']['value']}\n"
 
-    if "dragonfly_uri" in config:
-        env_content += f"DRAGONFLY_URI={config['dragonfly_uri']['value']}\n"
         # Parse host and port from URI
-        uri = config["dragonfly_uri"]["value"]
         if "://" in uri:
             parts = uri.split("://")[1].split("@")[1].split(":")
             host = parts[0]
@@ -91,9 +83,6 @@ def generate_env_file(config: Dict[str, Any], output_path: Path) -> None:
     # Also create .env.example with placeholders
     example_content = env_content
     for key in [
-        "MONGODB_URI",
-        "MONGO_URI",
-        "DRAGONFLY_URI",
         "WEAVIATE_API_KEY",
         "OPENAI_API_KEY",
         "ANTHROPIC_API_KEY",

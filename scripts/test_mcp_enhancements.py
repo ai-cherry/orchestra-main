@@ -95,12 +95,7 @@ def test_tool_registry():
         
         registry = ToolRegistry()
         
-        # Check that MongoDB tools are removed
-        mongodb_tools = [tool for tool in registry.tools.values() if 'mongodb' in tool.name.lower()]
-        if not mongodb_tools:
-            print("✅ MongoDB tools successfully removed")
         else:
-            print(f"❌ Found {len(mongodb_tools)} MongoDB tools still present")
         
         # Check PostgreSQL tools are present
         postgres_tools = [tool for tool in registry.tools.values() if 'postgres' in tool.name.lower()]
@@ -200,7 +195,6 @@ async def main():
     print("   ✅ PostgreSQL + Redis + Weaviate architecture")
     print("   ✅ Code Intelligence MCP Server")
     print("   ✅ Git Intelligence MCP Server")
-    print("   ✅ Updated tool registry (removed MongoDB)")
     print("   ✅ Enhanced MCP configurations")
     print("\n📖 See docs/MCP_ENHANCEMENT_ROADMAP.md for next steps")
 

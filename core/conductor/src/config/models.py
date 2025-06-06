@@ -16,7 +16,6 @@ from pydantic import BaseModel, Field, field_validator, model_validator
     """Memory storage types supported by the system."""
     REDIS = "redis"
     PGVECTOR = "pgvector"
-    mongodb = "mongodb"
     OPENAI_VECTOR = "vertex_vector"
     IN_MEMORY = "in_memory"
 

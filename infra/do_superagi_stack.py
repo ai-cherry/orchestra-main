@@ -13,8 +13,6 @@ ssh_pubkey_path = config.get("ssh_pubkey_path")  # Path to local SSH public key 
 ssh_private_key_path = config.get_secret("ssh_private_key_path")  # Path to local SSH private key file
 
 # --- SECRETS ---
-dragonfly_uri = config.require_secret("dragonfly_uri")
-mongo_uri = config.require_secret("mongo_uri")
 weaviate_url = config.require_secret("weaviate_url")
 weaviate_api_key = config.require_secret("weaviate_api_key")
 superagi_image = config.get("superagi_image") or "superagi/superagi:latest"
@@ -36,7 +34,6 @@ if ssh_pubkey_path:
 
 # --- DROPLET ---
 cloud_init = f"""
-  - pip3 install "pymongo[srv]" weaviate-client dragonfly
   - docker pull {superagi_image}
 """
     f"superagi-{env}-droplet",
@@ -79,15 +76,11 @@ run_superagi = command.remote.Command(
     connection=connection,
     # Use Output.all to ensure secrets are resolved before forming the command
     create=Output.all(
-        dragonfly_uri=dragonfly_uri,
-        mongo_uri=mongo_uri,
         weaviate_url=weaviate_url,
         weaviate_api_key=weaviate_api_key,
     ).apply(
         lambda args: f"""
 Environment="PYTHONPATH=/opt/cherry_ai"
-Environment="DRAGONFLY_URI={args['dragonfly_uri']}"
-Environment="MONGO_URI={args['mongo_uri']}"
 Environment="WEAVIATE_URL={args['weaviate_url']}"
 Environment="WEAVIATE_API_KEY={args['weaviate_api_key']}"
 ExecStart=/usr/bin/python3 -m uvicorn core.api.main:app --host 0.0.0.0 --port 8080

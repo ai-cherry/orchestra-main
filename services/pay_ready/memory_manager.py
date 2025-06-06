@@ -6,7 +6,6 @@ Redis is permitted and recommended for the warm cache tier and semantic caching.
 """
     """Memory tier levels"""
     HOT = "hot"  # In-memory cache (last 24 hours)
-    WARM = "warm"  # Redis/Dragonfly (last 7 days)
     COLD = "cold"  # PostgreSQL (everything)
     VECTOR = "vector"  # Weaviate (semantic search)
 

@@ -116,7 +116,6 @@
                 r"google-cloud-storage": "# google-cloud-storage (removed)",
                 r"gcr\.io/\$\{\{[^}]+\}\}": "registry.digitalocean.com/${DO_REGISTRY}",
                 r"gcp_project_id": "project_id",
-                r"firestore": "mongodb",
             }
 
             for pattern, replacement in replacements.items():

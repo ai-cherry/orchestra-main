@@ -59,11 +59,8 @@ GOOD PLANNING EXAMPLE:
 "I need to add health metrics collection. First, I'll search for monitoring tools
 with search_tools('monitor health metrics'). If none exist, I'll check
 scripts/health_monitor.py and extend it. I'll ensure it works with our external
-services (MongoDB, DragonflyDB) and uses only pip-installable dependencies."
 
 EXTERNAL SERVICES TO CONSIDER:
-- MongoDB Atlas: Document storage (agent memories)
-- DragonflyDB: High-performance caching
 - Weaviate: Vector search and embeddings
 - OpenRouter/Anthropic: LLM providers
 - DigitalOcean: Deployment infrastructure

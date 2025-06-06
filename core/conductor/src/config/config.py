@@ -19,7 +19,6 @@
 
     # Memory settings
     MEMORY_PROVIDER: str = "in_memory"
-    MEMORY_BACKEND_TYPE: str = "mongodb"
     CONVERSATION_HISTORY_LIMIT: int = 10
     MEMORY_CACHE_TTL: int = 3600  # 1 hour default
 
