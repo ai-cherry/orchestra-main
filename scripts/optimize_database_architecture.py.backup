@@ -46,6 +46,8 @@ class DatabaseArchitectureOptimizer:
             "postgresql": {
                 "host": os.getenv("POSTGRES_HOST", "localhost"),
                 "port": int(os.getenv("POSTGRES_PORT", "5432")),
+                "database": os.getenv("POSTGRES_DB", "multi_ai_collaboration"),
+                "user": os.getenv("POSTGRES_USER", "ai_collab"),
                 "password": os.getenv("POSTGRES_PASSWORD", ""),
                 "optimized_settings": {
                     "shared_buffers": "512MB",
@@ -255,6 +257,8 @@ syslog-ident redis-ai
                         "image": "postgres:15-alpine",
                         "container_name": "orchestra_ai_postgres",
                         "environment": {
+                            "POSTGRES_DB": "multi_ai_collaboration",
+                            "POSTGRES_USER": "ai_collab",
                             "POSTGRES_PASSWORD": "${POSTGRES_PASSWORD}",
                             "POSTGRES_INITDB_ARGS": "--encoding=UTF8 --lc-collate=C --lc-ctype=C"
                         },
@@ -269,6 +273,7 @@ syslog-ident redis-ai
                             "-c", "config_file=/etc/postgresql/postgresql.conf"
                         ],
                         "healthcheck": {
+                            "test": ["CMD-SHELL", "pg_isready -U ai_collab"],
                             "interval": "10s",
                             "timeout": "5s",
                             "retries": 5
@@ -321,13 +326,16 @@ syslog-ident redis-ai
                         "mem_limit": "2g",
                         "mem_reservation": "1g"
                     },
+                    "multi_ai_bridge": {
                         "build": {
                             "context": ".",
                             "dockerfile": "Dockerfile"
                         },
                         "container_name": "orchestra_ai_bridge",
+                        "command": "python sync-server/multi_ai_bridge.py",
                         "ports": ["8765:8765"],
                         "environment": [
+                            "POSTGRES_URL=postgresql://ai_collab:${POSTGRES_PASSWORD}@postgres:5432/multi_ai_collaboration",
                             "REDIS_URL=redis://redis:6379",
                             "WEAVIATE_URL=http://weaviate:8080",
                             "WEAVIATE_API_KEY=${WEAVIATE_API_KEY}",
@@ -384,6 +392,8 @@ syslog-ident redis-ai
 # PostgreSQL Configuration
 POSTGRES_HOST=localhost
 POSTGRES_PORT=5432
+POSTGRES_DB=multi_ai_collaboration
+POSTGRES_USER=ai_collab
 POSTGRES_PASSWORD=your_secure_postgres_password_here
 
 # Redis Configuration
@@ -633,6 +643,7 @@ if __name__ == "__main__":
                         }
                     }
                 },
+                "ai_collaboration": {
                     "session_creation": {
                         "current": "2-5 sec",
                         "optimized": "500ms-1sec",

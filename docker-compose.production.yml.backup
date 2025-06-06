@@ -116,8 +116,12 @@ services:
           memory: 2G
           cpus: '2'
 
+  # AI Coding Bridge (Your Manus AI Connector)
+  ai_bridge:
     build:
       context: .
+      dockerfile: Dockerfile.bridge
+    container_name: cherry_ai_bridge_prod
     restart: unless-stopped
     environment:
       - BRIDGE_HOST=0.0.0.0

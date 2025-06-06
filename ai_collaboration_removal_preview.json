@@ -1,0 +1,20 @@
+{
+  "preview_timestamp": "/Users/lynnmusil/orchestra-main-2",
+  "files_to_remove": {
+    "found": 27,
+    "missing": 1,
+    "total_size": 308219
+  },
+  "directories_to_remove": {
+    "found": 7,
+    "missing": 0,
+    "total_files": 45,
+    "total_size": 529459
+  },
+  "files_to_update": {
+    "found": 6,
+    "missing": 0
+  },
+  "total_size_to_free": 837678,
+  "core_features_intact": true
+}

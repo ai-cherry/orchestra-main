@@ -53,6 +53,8 @@ http {
         keepalive 32;
     }
     
+    upstream cherry_ai_bridge {
+        server ai_bridge:8765 max_fails=3 fail_timeout=30s;
         keepalive 16;
     }
     
@@ -145,6 +147,7 @@ http {
         location /bridge/ {
             limit_req zone=bridge burst=10 nodelay;
             
+            proxy_pass http://cherry_ai_bridge/;
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
             proxy_set_header Connection "upgrade";
