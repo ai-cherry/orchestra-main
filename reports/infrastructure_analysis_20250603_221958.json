@@ -6,7 +6,7 @@
         "docker-compose.local.yml",
         "docker-compose.yml",
         "docker-compose.prod.yml",
-        "deploy/docker-compose.vultr.yml",
+        "deploy/docker-compose.lambda.yml",
         "infrastructure/pulumi/migration/docker-compose.yml"
       ],
       "dockerfiles": [
@@ -119,7 +119,7 @@
           "image": "pulumi-migration:latest",
           "ports": [],
           "volumes": [
-            "${Vultr_CREDENTIALS_PATH:-./credentials}:/app/credentials:ro",
+            "${LAMBDA_CREDENTIALS_PATH:-./credentials}:/app/credentials:ro",
             "${PULUMI_HOME:-~/.pulumi}:/root/.pulumi",
             "./migration-state:/app/.pulumi-migration",
             "./reports:/app/reports",
@@ -169,7 +169,7 @@
       "active_workflows": [
         "deploy.yml",
         "next_phase_ci_cd.yml",
-        "deploy-to-vultr.yml",
+        "deploy-to-lambda.yml",
         "version-management.yml",
         "health-check.yml",
         "domain_infrastructure.yml",
@@ -180,12 +180,12 @@
         "security-audit.yml",
         "ai_codebase_hygiene.yml",
         "admin-ui-deploy.yml",
-        "sync-vultr.yml"
+        "sync-lambda.yml"
       ],
       "archived_workflows": [
         "pulumi-deploy.yml",
         "ci.yml",
-        "deploy-vultr.yml",
+        "deploy-lambda.yml",
         "deploy.yaml"
       ],
       "ci_cd_maturity": "advanced",
@@ -226,8 +226,8 @@
           "path": "infrastructure/pulumi/Pulumi.prod.yaml"
         },
         {
-          "name": "Pulumi.vultr",
-          "path": "infrastructure/pulumi/Pulumi.vultr.yaml"
+          "name": "Pulumi.Lambda",
+          "path": "infrastructure/pulumi/Pulumi.lambda.yaml"
         },
         {
           "name": "Pulumi",
@@ -247,7 +247,7 @@
         }
       ],
       "resources": {
-        "vultr": {
+        "Lambda": {
           "vpc": true,
           "kubernetes": true,
           "database": true,
@@ -255,14 +255,14 @@
         }
       },
       "cloud_providers": [
-        "vultr"
+        "Lambda"
       ],
       "issues": []
     },
     "deployment": {
       "scripts": [
         "deploy_real_agents_final.sh",
-        "deploy_to_vultr.sh",
+        "deploy_to_lambda.sh",
         "deploy_cherry_ai_api.sh",
         "deploy_cherry_permanent.sh",
         "deploy_mcp_enhancements.sh",
@@ -271,9 +271,9 @@
         "deploy.sh",
         "deploy-now.sh",
         "deploy_to_production.sh",
-        "infrastructure/deploy-to-vultr.sh",
+        "infrastructure/deploy-to-lambda.sh",
         "llm-chat/deploy-chat-interface.sh",
-        "scripts/deploy_to_vultr.sh",
+        "scripts/deploy_to_lambda.sh",
         "scripts/deploy_comprehensive_conductor.sh",
         "scripts/deploy_cherry_ai.sh",
         "scripts/deployment_readiness_check.sh",
@@ -285,7 +285,7 @@
         "scripts/deploy_real_agents.sh",
         "scripts/deploy_to_production.sh",
         "deploy/deploy_stack.sh",
-        "infrastructure/pulumi/migration/deploy-to-vultr.sh",
+        "infrastructure/pulumi/migration/deploy-to-lambda.sh",
         "infrastructure/pulumi/dashboard/deploy.sh",
         "deploy_via_api.py",
         "scripts/deployment_readiness_check.py",
@@ -310,8 +310,8 @@
         "Potential hardcoded secrets in deploy-with-ssh-setup.sh",
         "Potential hardcoded secrets in deploy.sh",
         "Potential hardcoded secrets in deploy-now.sh",
-        "Potential hardcoded secrets in deploy-to-vultr.sh",
-        "Potential hardcoded secrets in deploy_to_vultr.sh",
+        "Potential hardcoded secrets in deploy-to-lambda.sh",
+        "Potential hardcoded secrets in deploy_to_lambda.sh",
         "Potential hardcoded secrets in deploy_comprehensive_conductor.sh",
         "Potential hardcoded secrets in deploy_cherry_ai.sh",
         "Potential hardcoded secrets in deployment_readiness_check.sh",
@@ -320,7 +320,7 @@
         "Potential hardcoded secrets in deploy_weaviate_migration.sh",
         "Potential hardcoded secrets in deploy_real_agents.sh",
         "Potential hardcoded secrets in deploy_to_production.sh",
-        "Potential hardcoded secrets in deploy-to-vultr.sh",
+        "Potential hardcoded secrets in deploy-to-lambda.sh",
         "Potential hardcoded secrets in deploy.sh",
         "Potential hardcoded secrets in deployment_readiness_check.py",
         "Potential hardcoded secrets in deploy_cherry_ai_system.py",
@@ -418,7 +418,7 @@
         "name": "Kubernetes Migration",
         "duration": "2 weeks",
         "tasks": [
-          "Deploy Vultr Kubernetes cluster",
+          "Deploy Lambda Kubernetes cluster",
           "Containerize all services",
           "Implement Helm charts",
           "Set up container registry"
@@ -549,7 +549,7 @@
       "priority": "immediate",
       "category": "security",
       "action": "Remove hardcoded credentials",
-      "implementation": "\n# 1. Add to GitHub Secrets:\nVULTR_API_KEY\nPOSTGRES_PASSWORD\nJWT_SECRET\nOPENAI_API_KEY\nANTHROPIC_API_KEY\n\n# 2. Update deployment scripts to use:\nexport POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}\n"
+      "implementation": "\n# 1. Add to GitHub Secrets:\nLAMBDA_API_KEY\nPOSTGRES_PASSWORD\nJWT_SECRET\nOPENAI_API_KEY\nANTHROPIC_API_KEY\n\n# 2. Update deployment scripts to use:\nexport POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}\n"
     },
     {
       "priority": "immediate",
@@ -573,7 +573,7 @@
       "priority": "long_term",
       "category": "architecture",
       "action": "Implement multi-region HA",
-      "implementation": "\n# 1. Deploy to multiple Vultr regions\n# 2. Set up GeoDNS with Cloudflare\n# 3. Implement data replication\n"
+      "implementation": "\n# 1. Deploy to multiple Lambda regions\n# 2. Set up GeoDNS with Cloudflare\n# 3. Implement data replication\n"
     }
   ]
 }

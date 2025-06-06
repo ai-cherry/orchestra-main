@@ -21,7 +21,7 @@
                 "integration-preferred-over-standalone",
                 "performance-analysis-mandatory-for-db-io",
                 "adhere-to-project-structure",
-                "use-pulumi-python-vultr-for-iac"
+                "use-pulumi-python-Lambda-for-iac"
             ],
             "optimizationRules": {
                 "dependency-minimization": true,

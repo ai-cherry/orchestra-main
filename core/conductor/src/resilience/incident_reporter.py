@@ -133,7 +133,7 @@ _incident_reporter = None
 def get_incident_reporter() -> IncidentReporter:
     """
     """
-        project_id = os.environ.get("VULTR_PROJECT_ID", getattr(settings, "VULTR_PROJECT_ID", "cherry-ai-project"))
+        project_id = os.environ.get("LAMBDA_PROJECT_ID", getattr(settings, "LAMBDA_PROJECT_ID", "cherry-ai-project"))
 
         log_name = os.environ.get(
             "INCIDENT_LOG_NAME",

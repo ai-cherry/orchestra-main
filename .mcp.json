@@ -68,7 +68,7 @@
       "env": {
         "MCP_DEPLOYMENT_PORT": "${MCP_DEPLOYMENT_PORT:-8005}",
         "REDIS_URL": "${REDIS_URL:-redis://redis:6379}",
-        "VULTR_API_KEY": "${VULTR_API_KEY:-}"
+        "LAMBDA_API_KEY": "${LAMBDA_API_KEY:-}"
       },
       "capabilities": {
         "tools": true

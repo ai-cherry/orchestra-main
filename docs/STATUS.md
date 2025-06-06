@@ -3,7 +3,7 @@
 ## Completed Features
 - Core conductor with FastAPI API
 - MCP server scripts and management tools
-- Single-server Vultr deployment via Pulumi
+- Single-server Lambda deployment via Pulumi
 
 ## Ongoing Work
 - Consolidate automation targets in the Makefile

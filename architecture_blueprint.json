@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "generated_at": "2025-06-05T01:32:06.101359",
     "architecture_style": "Microservices with Domain-Driven Design",
-    "deployment_target": "Vultr Cloud Infrastructure"
+    "deployment_target": "Lambda Cloud Infrastructure"
   },
   "design_principles": [
     "Single Responsibility: Each component has one reason to change",
@@ -975,7 +975,7 @@
   },
   "deployment_strategy": {
     "infrastructure": "Pulumi with Python",
-    "provider": "Vultr",
+    "provider": "Lambda",
     "environments": [
       "dev",
       "staging",

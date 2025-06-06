@@ -113,6 +113,6 @@ REMEMBER:
 # Usage: Include this filename in your prompt when debugging.
 # Example: "Read ai_context_debugger.py and help debug this error"
 
-✅ Vultr CLI commands (`vultr-cli`)
-✅ Pulumi with Python for Vultr IaC
+✅ Lambda CLI commands (`Lambda-cli`)
+✅ Pulumi with Python for Lambda IaC
 """

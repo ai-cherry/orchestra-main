@@ -197,7 +197,7 @@
       "action": "Move 6 files from ai_components/coordination",
       "target": "domains/Personal/services/",
       "items": [
-        "ai_components/coordination/vultr_autoscaling.py",
+        "ai_components/coordination/Lambda_autoscaling.py",
         "ai_components/coordination/roo_mcp_adapter.py",
         "ai_components/coordination/intelligent_cache.py",
         "ai_components/coordination/mode_transition_manager.py",

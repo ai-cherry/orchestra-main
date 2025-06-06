@@ -9,13 +9,13 @@ echo "🔧 Fixing Cherry-AI.me Authentication Issues..."
 echo "📦 Building backend Docker image..."
 docker build -t cherry_ai-api:latest -f Dockerfile .
 
-# 2. Tag for Vultr registry (adjust registry URL as needed)
-echo "🏷️ Tagging for Vultr registry..."
-docker tag cherry_ai-api:latest registry.vultr.com/cherry_ai/api:latest
+# 2. Tag for Lambda registry (adjust registry URL as needed)
+echo "🏷️ Tagging for Lambda registry..."
+docker tag cherry_ai-api:latest registry.lambdalabs.com/cherry_ai/api:latest
 
 # 3. Push to registry
 echo "📤 Pushing to registry..."
-docker push registry.vultr.com/cherry_ai/api:latest
+docker push registry.lambdalabs.com/cherry_ai/api:latest
 
 # 4. Rebuild frontend with updated login
 echo "📦 Building frontend..."
@@ -30,13 +30,13 @@ docker build -t cherry_ai-admin-ui:latest -f admin-ui/Dockerfile ./admin-ui
 
 # 6. Tag and push frontend
 echo "🏷️ Tagging frontend for registry..."
-docker tag cherry_ai-admin-ui:latest registry.vultr.com/cherry_ai/admin-ui:latest
-docker push registry.vultr.com/cherry_ai/admin-ui:latest
+docker tag cherry_ai-admin-ui:latest registry.lambdalabs.com/cherry_ai/admin-ui:latest
+docker push registry.lambdalabs.com/cherry_ai/admin-ui:latest
 
 # 7. Restart services (adjust based on your deployment method)
 echo "🔄 Restarting services..."
-# If using docker-compose on Vultr:
-# ssh vultr-server "cd /app && docker-compose pull && docker-compose up -d"
+# If using docker-compose on Lambda:
+# ssh Lambda-server "cd /app && docker-compose pull && docker-compose up -d"
 
 # If using Kubernetes:
 # kubectl rollout restart deployment/cherry_ai-api

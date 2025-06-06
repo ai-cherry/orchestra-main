@@ -27,10 +27,10 @@ pip install -r requirements/base.txt
 
 ## 💻 Development Strategy
 
-### Local Development (On Vultr)
+### Local Development (On Lambda)
 ```bash
-# SSH to Vultr server
-ssh -i ~/.ssh/vultr_cherry_ai root@45.32.69.157
+# SSH to Lambda server
+ssh -i ~/.ssh/Lambda_cherry_ai root@45.32.69.157
 
 # Use screen/tmux for persistent sessions
 screen -S dev
@@ -66,14 +66,14 @@ git push origin main   # Triggers GitHub Actions
 ## 🚀 Deployment Strategy
 
 ### GitHub Actions (CI/CD)
-**File**: `.github/workflows/sync-vultr.yml`
+**File**: `.github/workflows/sync-lambda.yml`
 
 **Triggers**:
 - Push to main branch
 - Manual workflow dispatch
 
 **Process**:
-1. SSH to Vultr (45.32.69.157)
+1. SSH to Lambda (45.32.69.157)
 2. Pull latest from GitHub
 3. Activate venv
 4. Run validation
@@ -93,7 +93,7 @@ make restart-services
 ## 🏭 Production Strategy
 
 ### Server Architecture
-- **Single Vultr Server**: 45.32.69.157
+- **Single Lambda Server**: 45.32.69.157
 - **Combined Dev/Prod**: Same server, different ports
 - **User Separation**: 
   - `root` for production
@@ -157,7 +157,7 @@ cherry_ai-main/
    ```
 
 2. **GitHub Actions**:
-   - Automatically syncs to Vultr
+   - Automatically syncs to Lambda
    - Runs validation
    - Restarts services if needed
 
@@ -261,4 +261,4 @@ lsof -i :8000  # Check what's using ports
 - Nginx: `/var/log/nginx/`
 - Systemd: `journalctl -u cherry_ai-api`
 
-This strategy provides a unified, simple approach focusing on a single Vultr server with clear separation between development and production through ports and process management. 
+This strategy provides a unified, simple approach focusing on a single Lambda server with clear separation between development and production through ports and process management. 

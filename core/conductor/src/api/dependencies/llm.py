@@ -20,8 +20,8 @@
                 api_key_anthropic=os.environ.get("ANTHROPIC_API_KEY"),
                 api_key_openai=os.environ.get("OPENAI_API_KEY"),
                 api_key_google=os.environ.get("GEMINI_API_KEY"),
-                vertex_project=settings.vultr_project_id,
-                vertex_location=settings.vultr_region,
+                vertex_project=settings.LAMBDA_PROJECT_ID,
+                vertex_location=settings.LAMBDA_REGION,
             )
         except Exception:
 

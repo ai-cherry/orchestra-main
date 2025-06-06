@@ -102,7 +102,7 @@ fi
 # Install gcloud (if not exists or wrong version)
 echo -e "\n${YELLOW}Checking gcloud...${NC}"
 if command -v gcloud &> /dev/null; then
-    CURRENT_GCLOUD=$(gcloud version 2>/dev/null | grep 'Vultr SDK' | awk '{print $4}')
+    CURRENT_GCLOUD=$(gcloud version 2>/dev/null | grep 'Lambda SDK' | awk '{print $4}')
     if [[ "$CURRENT_GCLOUD" != "$GCLOUD_VERSION" ]]; then
         echo "Wrong gcloud version ($CURRENT_GCLOUD), please install $GCLOUD_VERSION manually"
     else
@@ -148,7 +148,7 @@ if command -v docker &> /dev/null; then
 fi
 
 if command -v gcloud &> /dev/null; then
-    echo "☁️  gcloud: $(gcloud version 2>/dev/null | grep 'Vultr SDK' | awk '{print $4}')"
+    echo "☁️  gcloud: $(gcloud version 2>/dev/null | grep 'Lambda SDK' | awk '{print $4}')"
 fi
 EOF
 chmod +x check_versions.sh

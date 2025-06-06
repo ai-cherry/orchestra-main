@@ -139,14 +139,14 @@
       "type": "deployment",
       "port": 8005,
       "capabilities": [
-        "vultr_deployment",
+        "Lambda_deployment",
         "infrastructure_management"
       ],
       "description": "Deployment and infrastructure management",
       "priority": 3,
       "health_endpoint": "/health",
       "environment_vars": {
-        "VULTR_API_KEY": "${VULTR_API_KEY}",
+        "LAMBDA_API_KEY": "${LAMBDA_API_KEY}",
         "cherry_ai_API_KEY": "${cherry_ai_API_KEY}",
         "cherry_ai_CONTEXT": "${cherry_ai_CONTEXT:-development}",
         "AUTH_MODE": "single_user",

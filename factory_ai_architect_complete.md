@@ -55,7 +55,7 @@ I have successfully completed the architectural design for integrating Factory A
 - **Resource Efficiency**: <10% overhead confirmed
 
 ### Infrastructure Design
-- **Vultr Deployment**: Complete Pulumi stack for all components
+- **Lambda Deployment**: Complete Pulumi stack for all components
 - **High Availability**: 3-node clusters for all critical services
 - **Monitoring**: Prometheus + Grafana with custom dashboards
 - **Security**: VPC isolation, TLS 1.3, RBAC implementation

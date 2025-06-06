@@ -5,7 +5,7 @@
 STARTING THE AI ASSISTANT
 ================================================================================
 
-From your terminal at (venv) root@vultr:~/orchestra-main#
+From your terminal at (venv) root@Lambda:~/orchestra-main#
 
 Option 1: Direct AI Code Assistant (RECOMMENDED - Simple & Direct)
 -----------------------------------------------------------------

@@ -29,10 +29,10 @@ if [[ "$response" =~ ^[Yy]$ ]]; then
     echo "Enter your keys (press Enter to skip any key you don't have):"
     echo
     
-    # Vultr API Key
-    echo -n "VULTR_API_KEY (for cloud deployment): "
-    read -r VULTR_KEY
-    add_to_env "VULTR_API_KEY" "$VULTR_KEY"
+    # Lambda API Key
+    echo -n "LAMBDA_API_KEY (for cloud deployment): "
+    read -r Lambda_KEY
+    add_to_env "LAMBDA_API_KEY" "$Lambda_KEY"
     
     # Pulumi Passphrase
     echo -n "PULUMI_CONFIG_PASSPHRASE (optional, for state encryption): "

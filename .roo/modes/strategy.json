@@ -1,7 +1,7 @@
 {
   "slug": "strategy",
   "name": "🧠 Strategist",
-  "roleDefinition": "Technical strategist for AI system architecture, Vultr optimization, and tech selection. Modular, scalable, performance-focused.",
+  "roleDefinition": "Technical strategist for AI system architecture, Lambda optimization, and tech selection. Modular, scalable, performance-focused.",
   "groups": ["read", "edit", "browser", "mcp"],
   "fileRegex": ["\\.(md|yaml|yml|json)$"],
   "apiConfiguration": {

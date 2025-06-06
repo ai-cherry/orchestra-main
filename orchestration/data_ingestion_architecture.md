@@ -241,22 +241,22 @@ retry_config = {
 ### 8. Pulumi Infrastructure as Code
 
 ```python
-# Vultr deployment configuration
+# Lambda deployment configuration
 import pulumi
-import pulumi_vultr as vultr
+import pulumi_lambda as Lambda
 
 # Database cluster
-postgres_cluster = vultr.DatabaseCluster("data-ingestion-postgres",
+postgres_cluster = lambda.DatabaseCluster("data-ingestion-postgres",
     database_engine="pg",
     database_engine_version="15",
     region="ewr",
-    plan="vultr-dbaas-startup-cc-1-55-2",
+    plan="Lambda-dbaas-startup-cc-1-55-2",
     cluster_size=3,
     tags=["data-ingestion", "postgres"]
 )
 
 # Kubernetes cluster for services
-k8s_cluster = vultr.Kubernetes("data-ingestion-k8s",
+k8s_cluster = lambda.Kubernetes("data-ingestion-k8s",
     region="ewr",
     version="v1.28.2",
     node_pools=[{
@@ -267,7 +267,7 @@ k8s_cluster = vultr.Kubernetes("data-ingestion-k8s",
 )
 
 # Object storage for files
-object_storage = vultr.ObjectStorage("data-ingestion-storage",
+object_storage = lambda.ObjectStorage("data-ingestion-storage",
     cluster_id=1,  # New Jersey cluster
     label="data-ingestion-files"
 )
@@ -578,22 +578,22 @@ retry_config = {
 ### 8. Pulumi Infrastructure as Code
 
 ```python
-# Vultr deployment configuration
+# Lambda deployment configuration
 import pulumi
-import pulumi_vultr as vultr
+import pulumi_lambda as Lambda
 
 # Database cluster
-postgres_cluster = vultr.DatabaseCluster("data-ingestion-postgres",
+postgres_cluster = lambda.DatabaseCluster("data-ingestion-postgres",
     database_engine="pg",
     database_engine_version="15",
     region="ewr",
-    plan="vultr-dbaas-startup-cc-1-55-2",
+    plan="Lambda-dbaas-startup-cc-1-55-2",
     cluster_size=3,
     tags=["data-ingestion", "postgres"]
 )
 
 # Kubernetes cluster for services
-k8s_cluster = vultr.Kubernetes("data-ingestion-k8s",
+k8s_cluster = lambda.Kubernetes("data-ingestion-k8s",
     region="ewr",
     version="v1.28.2",
     node_pools=[{
@@ -604,7 +604,7 @@ k8s_cluster = vultr.Kubernetes("data-ingestion-k8s",
 )
 
 # Object storage for files
-object_storage = vultr.ObjectStorage("data-ingestion-storage",
+object_storage = lambda.ObjectStorage("data-ingestion-storage",
     cluster_id=1,  # New Jersey cluster
     label="data-ingestion-files"
 )

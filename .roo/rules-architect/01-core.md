@@ -4,7 +4,7 @@
 - Always design for hot-swappable modules and clear interfaces
 - Use EXPLAIN ANALYZE for Postgres query optimization
 - Index all code and docs in Weaviate for rapid retrieval
-- Pulumi stacks must target Vultr and be modular
+- Pulumi stacks must target Lambda and be modular
 - Context sharing via MCP is required for all architecture diagrams and planning
 
 ## Architecture Standards

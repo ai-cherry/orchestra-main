@@ -61,7 +61,7 @@ The Orchestra AI advanced system implementation includes:
 
 🎯 Ready for:
   • Local development and testing
-  • Production deployment on Vultr
+  • Production deployment on Lambda
   • Integration with existing infrastructure
   • Scaling to handle enterprise workloads
 

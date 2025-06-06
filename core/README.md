@@ -221,11 +221,11 @@ When adding new features:
 
 [Your License Here]
 
-## Deployment (Vultr Single Node)
+## Deployment (Lambda Single Node)
 
 Run the unified stack using Pulumi and Docker Compose:
 
 ```bash
-pulumi preview --stack=vultr-dev
-docker compose -f deploy/docker-compose.vultr.yml config --quiet
+pulumi preview --stack=Lambda-dev
+docker compose -f deploy/docker-compose.lambda.yml config --quiet
 ```

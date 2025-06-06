@@ -3,7 +3,7 @@
 ## 🚀 Quick Start
 ```bash
 # SSH to server
-ssh -i ~/.ssh/vultr_cherry_ai root@45.32.69.157
+ssh -i ~/.ssh/Lambda_cherry_ai root@45.32.69.157
 
 # Start development
 cd /root/cherry_ai-main
@@ -105,4 +105,4 @@ API_KEY=4010007a9aa5443fc717b54e1fd7a463260965ec9e2fce297280cf86f1b3a4bd
 - **Health**: http://45.32.69.157:8000/health
 
 ---
-*Python 3.10 | PostgreSQL + Weaviate | Single Vultr Server* 
+*Python 3.10 | PostgreSQL + Weaviate | Single Lambda Server* 

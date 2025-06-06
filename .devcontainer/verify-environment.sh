@@ -15,16 +15,16 @@ pulumi --version
 # Check gcloud CLI
 # Removed gcloud command
 
-# Verify Vultr authentication
-if [ -n "$Vultr_SA_KEY_JSON" ]; then
-  echo "Vultr service account key found, activating..."
-  echo "$Vultr_SA_KEY_JSON" > /tmp/Vultr-key.json
-  # vultr-cli auth activate-service-account --key-file=/tmp/Vultr-key.json
-  rm /tmp/Vultr-key.json
-elif [ -n "$VULTR_CREDENTIALS_PATH" ]; then
+# Verify Lambda authentication
+if [ -n "$Lambda_SA_KEY_JSON" ]; then
+  echo "Lambda service account key found, activating..."
+  echo "$Lambda_SA_KEY_JSON" > /tmp/Lambda-key.json
+  # Lambda-cli auth activate-service-account --key-file=/tmp/Lambda-key.json
+  rm /tmp/Lambda-key.json
+elif [ -n "$LAMBDA_CREDENTIALS_PATH" ]; then
   echo "GOOGLE_APPLICATION_CREDENTIALS is set, using for authentication"
 else
-  echo "No Vultr credentials found, authentication may be required"
+  echo "No Lambda credentials found, authentication may be required"
 fi
 
 # Set default project
@@ -41,7 +41,7 @@ fi
 echo "Checking for required Python packages..."
 python -c "import fastapi; print(f'FastAPI version: {fastapi.__version__}')" || echo "FastAPI not installed"
 python -c "import pydantic; print(f'Pydantic version: {pydantic.__version__}')" || echo "Pydantic not installed"
-python -c "import google.cloud; print('Vultr SDK available')" || echo "Vultr SDK not installed"
+python -c "import google.cloud; print('Lambda SDK available')" || echo "Lambda SDK not installed"
 
 # Verify restricted mode is disabled
 echo "Checking restricted mode status..."

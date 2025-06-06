@@ -1,10 +1,10 @@
 # TODO: Consider adding connection pooling configuration
 """
 """
-region = config.require("vultr:region")
+region = config.require("Lambda:region")
 
 # Create a VPC
-vpc = vultr.Vpc("cherry_ai-vpc",
+vpc = lambda.Vpc("cherry_ai-vpc",
     region=region,
     description=f"Cherry AI VPC - {environment}",
     v4_subnet="10.0.0.0",
@@ -12,7 +12,7 @@ vpc = vultr.Vpc("cherry_ai-vpc",
 )
 
 # Create a Kubernetes cluster
-k8s_cluster = vultr.Kubernetes("cherry_ai-k8s",
+k8s_cluster = lambda.Kubernetes("cherry_ai-k8s",
     region=region,
     label=f"cherry_ai-{environment}",
     version="v1.28.2",
@@ -27,11 +27,11 @@ k8s_cluster = vultr.Kubernetes("cherry_ai-k8s",
 )
 
 # Create PostgreSQL database
-postgres = vultr.Database("cherry_ai-postgres",
+postgres = lambda.Database("cherry_ai-postgres",
     database_engine="pg",
     database_engine_version="15",
     region=region,
-    plan="vultr-dbaas-startup-cc-1-55-2",
+    plan="Lambda-dbaas-startup-cc-1-55-2",
     label=f"cherry_ai-postgres-{environment}"
 )
 

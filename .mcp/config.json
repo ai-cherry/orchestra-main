@@ -18,7 +18,7 @@
       ],
       "env": {
         "PYTHONPATH": "/var/www/cherry-ai",
-        "VULTR_API_KEY": "${VULTR_API_KEY}",
+        "LAMBDA_API_KEY": "${LAMBDA_API_KEY}",
         "PULUMI_ACCESS_TOKEN": "${PULUMI_ACCESS_TOKEN}"
       },
       "description": "Infrastructure management and deployment automation"

@@ -12,7 +12,7 @@ common_tags = {
 }
 
 # Network Configuration
-vpc = vultr.Vpc(f"{project_name}-vpc",
+vpc = lambda.Vpc(f"{project_name}-vpc",
     region="ewr",  # New Jersey for low latency
     description=f"VPC for {project_name} {environment}",
     v4_subnet="10.0.0.0",
@@ -21,7 +21,7 @@ vpc = vultr.Vpc(f"{project_name}-vpc",
 )
 
 # Kubernetes Cluster for Microservices
-k8s_cluster = vultr.Kubernetes(f"{project_name}-k8s",
+k8s_cluster = lambda.Kubernetes(f"{project_name}-k8s",
     region="ewr",
     version="v1.28.2+1",
     label=f"{project_name}-cluster",
@@ -58,11 +58,11 @@ k8s_cluster = vultr.Kubernetes(f"{project_name}-k8s",
 )
 
 # PostgreSQL Database Cluster
-postgres_cluster = vultr.Database(f"{project_name}-postgres",
+postgres_cluster = lambda.Database(f"{project_name}-postgres",
     database_engine="pg",
     database_engine_version="15",
     region="ewr",
-    plan="vultr-dbaas-hobbyist-cc-1-25-1",  # 1 vCPU, 1GB RAM, 25GB storage
+    plan="Lambda-dbaas-hobbyist-cc-1-25-1",  # 1 vCPU, 1GB RAM, 25GB storage
     label=f"{project_name}-db",
     cluster_time_zone="America/New_York",
     maintenance_dow="sunday",
@@ -74,7 +74,7 @@ postgres_cluster = vultr.Database(f"{project_name}-postgres",
 # Redis Cluster for Caching and Queues
 redis_instances = []
 for i, purpose in enumerate(["cache", "queue", "session"]):
-    redis = vultr.Instance(f"{project_name}-redis-{purpose}",
+    redis = lambda.Instance(f"{project_name}-redis-{purpose}",
         region="ewr",
         plan="vc2-1c-2gb",
         os_id=1743,  # Ubuntu 22.04
@@ -86,7 +86,7 @@ echo "requirepass {config.require_secret('redis_password')}" >> /etc/redis/redis
 systemctl restart redis-server
 """
 for domain in ["search", "personas", "knowledge"]:
-    weaviate = vultr.Instance(f"{project_name}-weaviate-{domain}",
+    weaviate = lambda.Instance(f"{project_name}-weaviate-{domain}",
         region="ewr",
         plan="vc2-2c-4gb",  # 2 vCPU, 4GB RAM
         os_id=1743,  # Ubuntu 22.04
@@ -107,7 +107,7 @@ for domain in ["search", "personas", "knowledge"]:
 EOF
 cd /opt/weaviate && docker-compose up -d
 """
-load_balancer = vultr.LoadBalancer(f"{project_name}-lb",
+load_balancer = lambda.LoadBalancer(f"{project_name}-lb",
     region="ewr",
     label=f"{project_name}-api-gateway",
     vpc_id=vpc.id,
@@ -141,7 +141,7 @@ load_balancer = vultr.LoadBalancer(f"{project_name}-lb",
 )
 
 # Object Storage for Multimedia
-object_storage = vultr.ObjectStorage(f"{project_name}-storage",
+object_storage = lambda.ObjectStorage(f"{project_name}-storage",
     cluster_id=1,  # New Jersey cluster
     label=f"{project_name}-multimedia",
     tags=common_tags
@@ -150,7 +150,7 @@ object_storage = vultr.ObjectStorage(f"{project_name}-storage",
 # Create storage buckets
 buckets = {}
 for bucket_name in ["images", "videos", "documents", "models"]:
-    bucket = vultr.ObjectStorageBucket(f"{project_name}-{bucket_name}",
+    bucket = lambda.ObjectStorageBucket(f"{project_name}-{bucket_name}",
         object_storage_cluster_id=object_storage.id,
         label=f"{project_name}-{bucket_name}",
         tags={**common_tags, "bucket": bucket_name}
@@ -158,7 +158,7 @@ for bucket_name in ["images", "videos", "documents", "models"]:
     buckets[bucket_name] = bucket
 
 # Firewall Rules
-firewall = vultr.Firewall(f"{project_name}-firewall",
+firewall = lambda.Firewall(f"{project_name}-firewall",
     description=f"Firewall for {project_name}",
     rules=[
         # Allow internal VPC traffic
@@ -202,7 +202,7 @@ firewall = vultr.Firewall(f"{project_name}-firewall",
 )
 
 # Monitoring Instance
-monitoring = vultr.Instance(f"{project_name}-monitoring",
+monitoring = lambda.Instance(f"{project_name}-monitoring",
     region="ewr",
     plan="vc2-2c-4gb",
     os_id=1743,  # Ubuntu 22.04

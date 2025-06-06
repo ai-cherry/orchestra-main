@@ -80,7 +80,7 @@ request = {
     "params": {
         "project_type": "microservices",
         "requirements": ["scalable", "fault-tolerant"],
-        "cloud_provider": "vultr"
+        "cloud_provider": "Lambda"
     }
 }
 response = await adapter.process_request(request)

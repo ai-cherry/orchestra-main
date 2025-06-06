@@ -11,7 +11,7 @@
 ### Infrastructure Providers
 | Secret Name | Description | Example Value |
 |-------------|-------------|---------------|
-| `ORG_VULTR_API_KEY` | Vultr API key | `dop_v1_1234567890abcdef` |
+| `ORG_LAMBDA_API_KEY` | Lambda API key | `dop_v1_1234567890abcdef` |
 | `ORG_MONGODB_ORG_ID` | MongoDB Atlas Organization ID | `1234567890abcdef12345678` |
 | `ORG_MONGODB_API_PUBLIC_KEY` | MongoDB Atlas API Public Key | `abcdefgh-1234-5678-90ab-cdef12345678` |
 | `ORG_MONGODB_API_PRIVATE_KEY` | MongoDB Atlas API Private Key | `12345678-90ab-cdef-1234-567890abcdef` |
@@ -28,7 +28,7 @@
 ### Using GitHub CLI
 ```bash
 gh secret set PULUMI_CONFIGURE_PASSPHRASE --body "your-passphrase" --org your-org
-gh secret set ORG_VULTR_API_KEY --body "your-do-token" --org your-org
+gh secret set ORG_LAMBDA_API_KEY --body "your-do-token" --org your-org
 ```
 
 ### Using the Provided Script

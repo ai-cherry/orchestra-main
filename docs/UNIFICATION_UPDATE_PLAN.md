@@ -1,7 +1,7 @@
 # Unification Update Plan
 
 ## Overview
-This document tracks the necessary updates to align all documentation, tools, and workflows with the unified Vultr server architecture where development, deployment, and production all occur on the same server.
+This document tracks the necessary updates to align all documentation, tools, and workflows with the unified Lambda server architecture where development, deployment, and production all occur on the same server.
 
 ## Current State
 - ✅ Server is operational at 45.32.69.157
@@ -57,7 +57,7 @@ This document tracks the necessary updates to align all documentation, tools, an
 
 ### 5. New Simplified Workflow
 ```yaml
-name: Sync to Vultr
+name: Sync to Lambda
 
 on:
   push:
@@ -69,7 +69,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Deploy to Vultr
+      - name: Deploy to Lambda
         uses: appleboy/ssh-action@v0.1.5
         with:
           host: 45.32.69.157
@@ -83,11 +83,11 @@ jobs:
 ```
 
 ### Obsolete Scripts (To Be Removed or Replaced)
-- `deploy_gcp_infra_quick.sh` - GCP specific, covered by Pulumi/Vultr
+- `deploy_gcp_infra_quick.sh` - GCP specific, covered by Pulumi/Lambda
 - `deploy_aws_infra.sh` - AWS specific
 - `quick_start_cloud_run.sh` - GCP specific
 - `scripts/migrate_firestore_to_postgres.py` - One-time migration script
-- Any scripts relying on `gcloud` or `aws` CLI heavily without Vultr alternatives.
+- Any scripts relying on `gcloud` or `aws` CLI heavily without Lambda alternatives.
 
 ### Monitoring & Logging (To Be Standardized)
 

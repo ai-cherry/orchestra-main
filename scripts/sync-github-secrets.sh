@@ -29,8 +29,8 @@ echo ""
 echo "The following secrets are configured in GitHub and should be added to your .env:"
 echo ""
 echo -e "${YELLOW}Critical for deployment:${NC}"
-echo "  - VULTR_API_KEY"
-echo "  - VULTR_IP_ADDRESS"
+echo "  - LAMBDA_API_KEY"
+echo "  - LAMBDA_IP_ADDRESS"
 echo "  - SSH_PRIVATE_KEY"
 echo "  - DOCKERHUB_USERNAME"
 echo "  - DOCKER_PERSONAL_ACCESS_TOKEN"
@@ -60,18 +60,18 @@ test_deployment_readiness() {
     # Check critical variables
     READY=true
     
-    if [ -z "$VULTR_API_KEY" ] || [ "$VULTR_API_KEY" = "your-vultr-api-key" ]; then
-        echo -e "${RED}✗ VULTR_API_KEY not set${NC}"
+    if [ -z "$LAMBDA_API_KEY" ] || [ "$LAMBDA_API_KEY" = "your-Lambda-api-key" ]; then
+        echo -e "${RED}✗ LAMBDA_API_KEY not set${NC}"
         READY=false
     else
-        echo -e "${GREEN}✓ VULTR_API_KEY set${NC}"
+        echo -e "${GREEN}✓ LAMBDA_API_KEY set${NC}"
     fi
     
-    if [ -z "$VULTR_IP_ADDRESS" ] || [ "$VULTR_IP_ADDRESS" = "your-vultr-server-ip" ]; then
-        echo -e "${RED}✗ VULTR_IP_ADDRESS not set${NC}"
+    if [ -z "$LAMBDA_IP_ADDRESS" ] || [ "$LAMBDA_IP_ADDRESS" = "your-Lambda-server-ip" ]; then
+        echo -e "${RED}✗ LAMBDA_IP_ADDRESS not set${NC}"
         READY=false
     else
-        echo -e "${GREEN}✓ VULTR_IP_ADDRESS set${NC}"
+        echo -e "${GREEN}✓ LAMBDA_IP_ADDRESS set${NC}"
     fi
     
     if [ -z "$SSH_PRIVATE_KEY" ] || [ "$SSH_PRIVATE_KEY" = "your-ssh-private-key" ]; then
@@ -92,7 +92,7 @@ test_deployment_readiness() {
         echo -e "${GREEN}✓ All critical variables are set!${NC}"
         echo ""
         echo "You can now:"
-        echo "1. Deploy manually: ./infrastructure/manual-deploy.sh $VULTR_IP_ADDRESS"
+        echo "1. Deploy manually: ./infrastructure/manual-deploy.sh $LAMBDA_IP_ADDRESS"
         echo "2. Push to GitHub to trigger automatic deployment"
     else
         echo -e "${RED}✗ Some critical variables are missing${NC}"

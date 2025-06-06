@@ -175,8 +175,8 @@
 
             # Check that GCP settings are gone
             gcp_attrs = [
-                "VULTR_PROJECT_ID",
-                "VULTR_PROJECT_ID",
+                "LAMBDA_PROJECT_ID",
+                "LAMBDA_PROJECT_ID",
                 "FIRESTORE_NAMESPACE",
             ]
             has_gcp = False
@@ -213,12 +213,12 @@
             with open("docker-compose.yml", "r") as f:
                 content = f.read()
 
-            if "VULTR_CREDENTIALS_PATH" in content:
+            if "LAMBDA_CREDENTIALS_PATH" in content:
                 self.results["docker"] = (
                     False,
                     "docker-compose.yml still contains GCP references",
                 )
-                print("  ✗ docker-compose.yml still contains VULTR_CREDENTIALS_PATH")
+                print("  ✗ docker-compose.yml still contains LAMBDA_CREDENTIALS_PATH")
                 return False
             else:
                 print("  ✓ docker-compose.yml is clean of GCP references")

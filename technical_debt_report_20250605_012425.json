@@ -183,7 +183,7 @@
     },
     {
       "type": "hardcoded_value",
-      "file": "scripts/deploy_vultr_now.py",
+      "file": "scripts/deploy_Lambda_now.py",
       "line": 13,
       "severity": "critical",
       "issue": "Found hardcoded credential",
@@ -273,7 +273,7 @@
     },
     {
       "type": "hardcoded_value",
-      "file": "infrastructure/vultr_manager.py",
+      "file": "infrastructure/Lambda_manager.py",
       "line": 73,
       "severity": "critical",
       "issue": "Found hardcoded credential",
@@ -761,8 +761,8 @@
     },
     {
       "type": "high_complexity",
-      "file": "scripts/setup_vultr_deployment.py",
-      "function": "setup_vultr_api_key",
+      "file": "scripts/setup_Lambda_deployment.py",
+      "function": "setup_LAMBDA_API_KEY",
       "severity": "high",
       "issue": "Cyclomatic complexity is 12 (max recommended: 10)",
       "recommendation": "Simplify logic, extract methods, use early returns",
@@ -2484,7 +2484,7 @@
     },
     {
       "type": "long_parameter_list",
-      "file": "scripts/vultr_provision.py",
+      "file": "scripts/Lambda_provision.py",
       "function": "create_instance",
       "severity": "medium",
       "issue": "Function has 6 parameters (max recommended: 5)",
@@ -2494,7 +2494,7 @@
     },
     {
       "type": "hardcoded_value",
-      "file": "scripts/vultr_provision.py",
+      "file": "scripts/Lambda_provision.py",
       "line": 4,
       "severity": "medium",
       "issue": "Found hardcoded URL",
@@ -2834,7 +2834,7 @@
     },
     {
       "type": "long_method",
-      "file": "scripts/vultr_direct_deploy.py",
+      "file": "scripts/Lambda_direct_deploy.py",
       "function": "run",
       "severity": "medium",
       "issue": "Function has 60 lines (max recommended: 50)",
@@ -2844,7 +2844,7 @@
     },
     {
       "type": "long_parameter_list",
-      "file": "scripts/vultr_direct_deploy.py",
+      "file": "scripts/Lambda_direct_deploy.py",
       "function": "create_instance",
       "severity": "medium",
       "issue": "Function has 7 parameters (max recommended: 5)",
@@ -2854,7 +2854,7 @@
     },
     {
       "type": "long_method",
-      "file": "scripts/vultr_direct_deploy.py",
+      "file": "scripts/Lambda_direct_deploy.py",
       "function": "configure_instance",
       "severity": "medium",
       "issue": "Function has 61 lines (max recommended: 50)",
@@ -2864,7 +2864,7 @@
     },
     {
       "type": "hardcoded_value",
-      "file": "scripts/vultr_direct_deploy.py",
+      "file": "scripts/Lambda_direct_deploy.py",
       "line": 30,
       "severity": "medium",
       "issue": "Found hardcoded URL",
@@ -2874,7 +2874,7 @@
     },
     {
       "type": "hardcoded_value",
-      "file": "scripts/vultr_direct_deploy.py",
+      "file": "scripts/Lambda_direct_deploy.py",
       "line": 148,
       "severity": "medium",
       "issue": "Found hardcoded IP",
@@ -2884,7 +2884,7 @@
     },
     {
       "type": "hardcoded_value",
-      "file": "scripts/vultr_direct_deploy.py",
+      "file": "scripts/Lambda_direct_deploy.py",
       "line": 149,
       "severity": "medium",
       "issue": "Found hardcoded IP",
@@ -2894,7 +2894,7 @@
     },
     {
       "type": "hardcoded_value",
-      "file": "scripts/vultr_direct_deploy.py",
+      "file": "scripts/Lambda_direct_deploy.py",
       "line": 150,
       "severity": "medium",
       "issue": "Found hardcoded IP",
@@ -2904,7 +2904,7 @@
     },
     {
       "type": "hardcoded_value",
-      "file": "scripts/vultr_direct_deploy.py",
+      "file": "scripts/Lambda_direct_deploy.py",
       "line": 151,
       "severity": "medium",
       "issue": "Found hardcoded IP",
@@ -2914,7 +2914,7 @@
     },
     {
       "type": "hardcoded_value",
-      "file": "scripts/vultr_direct_deploy.py",
+      "file": "scripts/Lambda_direct_deploy.py",
       "line": 152,
       "severity": "medium",
       "issue": "Found hardcoded IP",
@@ -2924,7 +2924,7 @@
     },
     {
       "type": "hardcoded_value",
-      "file": "scripts/vultr_direct_deploy.py",
+      "file": "scripts/Lambda_direct_deploy.py",
       "line": 153,
       "severity": "medium",
       "issue": "Found hardcoded IP",
@@ -2934,7 +2934,7 @@
     },
     {
       "type": "hardcoded_value",
-      "file": "scripts/vultr_direct_deploy.py",
+      "file": "scripts/Lambda_direct_deploy.py",
       "line": 154,
       "severity": "medium",
       "issue": "Found hardcoded IP",
@@ -2944,7 +2944,7 @@
     },
     {
       "type": "hardcoded_value",
-      "file": "scripts/vultr_direct_deploy.py",
+      "file": "scripts/Lambda_direct_deploy.py",
       "line": 155,
       "severity": "medium",
       "issue": "Found hardcoded IP",
@@ -2954,7 +2954,7 @@
     },
     {
       "type": "hardcoded_value",
-      "file": "scripts/vultr_direct_deploy.py",
+      "file": "scripts/Lambda_direct_deploy.py",
       "line": 177,
       "severity": "medium",
       "issue": "Found hardcoded IP",
@@ -2964,7 +2964,7 @@
     },
     {
       "type": "hardcoded_value",
-      "file": "scripts/vultr_direct_deploy.py",
+      "file": "scripts/Lambda_direct_deploy.py",
       "line": 203,
       "severity": "medium",
       "issue": "Found hardcoded URL",
@@ -3812,7 +3812,7 @@
     },
     {
       "type": "long_method",
-      "file": "scripts/deploy_to_vultr.py",
+      "file": "scripts/deploy_to_lambda.py",
       "function": "configure_server",
       "severity": "medium",
       "issue": "Function has 53 lines (max recommended: 50)",
@@ -3822,7 +3822,7 @@
     },
     {
       "type": "hardcoded_value",
-      "file": "scripts/deploy_to_vultr.py",
+      "file": "scripts/deploy_to_lambda.py",
       "line": 356,
       "severity": "medium",
       "issue": "Found hardcoded URL",
@@ -3892,7 +3892,7 @@
     },
     {
       "type": "long_method",
-      "file": "scripts/deploy_vultr_now.py",
+      "file": "scripts/deploy_Lambda_now.py",
       "function": "main",
       "severity": "medium",
       "issue": "Function has 104 lines (max recommended: 50)",
@@ -4002,8 +4002,8 @@
     },
     {
       "type": "long_method",
-      "file": "scripts/setup_vultr_deployment.py",
-      "function": "setup_vultr_api_key",
+      "file": "scripts/setup_Lambda_deployment.py",
+      "function": "setup_LAMBDA_API_KEY",
       "severity": "medium",
       "issue": "Function has 60 lines (max recommended: 50)",
       "recommendation": "Extract smaller functions with single responsibilities",
@@ -4662,7 +4662,7 @@
     },
     {
       "type": "hardcoded_value",
-      "file": "infrastructure/vultr_deployment.py",
+      "file": "infrastructure/Lambda_deployment.py",
       "line": 33,
       "severity": "medium",
       "issue": "Found hardcoded IP",
@@ -4672,7 +4672,7 @@
     },
     {
       "type": "hardcoded_value",
-      "file": "infrastructure/vultr_deployment.py",
+      "file": "infrastructure/Lambda_deployment.py",
       "line": 91,
       "severity": "medium",
       "issue": "Found hardcoded URL",
@@ -4822,7 +4822,7 @@
     },
     {
       "type": "long_method",
-      "file": "infrastructure/vultr_manager.py",
+      "file": "infrastructure/Lambda_manager.py",
       "function": "main",
       "severity": "medium",
       "issue": "Function has 60 lines (max recommended: 50)",
@@ -4832,7 +4832,7 @@
     },
     {
       "type": "hardcoded_value",
-      "file": "infrastructure/vultr_manager.py",
+      "file": "infrastructure/Lambda_manager.py",
       "line": 15,
       "severity": "medium",
       "issue": "Found hardcoded URL",
@@ -4842,7 +4842,7 @@
     },
     {
       "type": "hardcoded_value",
-      "file": "infrastructure/vultr_manager.py",
+      "file": "infrastructure/Lambda_manager.py",
       "line": 76,
       "severity": "medium",
       "issue": "Found hardcoded IP",
@@ -6641,7 +6641,7 @@
     },
     {
       "type": "print_statements",
-      "file": "scripts/vultr_provision.py",
+      "file": "scripts/Lambda_provision.py",
       "severity": "low",
       "issue": "Found 2 print statements",
       "recommendation": "Replace with proper logging",
@@ -6814,8 +6814,8 @@
     },
     {
       "type": "missing_docstring",
-      "file": "scripts/vultr_direct_deploy.py",
-      "class": "VultrDirectDeployment",
+      "file": "scripts/Lambda_direct_deploy.py",
+      "class": "LambdaDirectDeployment",
       "severity": "low",
       "issue": "Class lacks docstring",
       "recommendation": "Add comprehensive class documentation",
@@ -6824,7 +6824,7 @@
     },
     {
       "type": "print_statements",
-      "file": "scripts/vultr_direct_deploy.py",
+      "file": "scripts/Lambda_direct_deploy.py",
       "severity": "low",
       "issue": "Found 47 print statements",
       "recommendation": "Replace with proper logging",
@@ -7161,8 +7161,8 @@
     },
     {
       "type": "missing_docstring",
-      "file": "scripts/deploy_to_vultr.py",
-      "class": "VultrDeployment",
+      "file": "scripts/deploy_to_lambda.py",
+      "class": "LambdaDeployment",
       "severity": "low",
       "issue": "Class lacks docstring",
       "recommendation": "Add comprehensive class documentation",
@@ -7171,7 +7171,7 @@
     },
     {
       "type": "print_statements",
-      "file": "scripts/deploy_to_vultr.py",
+      "file": "scripts/deploy_to_lambda.py",
       "severity": "low",
       "issue": "Found 57 print statements",
       "recommendation": "Replace with proper logging",
@@ -7217,7 +7217,7 @@
     },
     {
       "type": "print_statements",
-      "file": "scripts/deploy_vultr_now.py",
+      "file": "scripts/deploy_Lambda_now.py",
       "severity": "low",
       "issue": "Found 32 print statements",
       "recommendation": "Replace with proper logging",
@@ -7308,7 +7308,7 @@
     },
     {
       "type": "print_statements",
-      "file": "scripts/setup_vultr_deployment.py",
+      "file": "scripts/setup_Lambda_deployment.py",
       "severity": "low",
       "issue": "Found 37 print statements",
       "recommendation": "Replace with proper logging",
@@ -7602,8 +7602,8 @@
     },
     {
       "type": "missing_docstring",
-      "file": "infrastructure/vultr_manager.py",
-      "class": "VultrManager",
+      "file": "infrastructure/Lambda_manager.py",
+      "class": "LambdaManager",
       "severity": "low",
       "issue": "Class lacks docstring",
       "recommendation": "Add comprehensive class documentation",
@@ -7612,7 +7612,7 @@
     },
     {
       "type": "print_statements",
-      "file": "infrastructure/vultr_manager.py",
+      "file": "infrastructure/Lambda_manager.py",
       "severity": "low",
       "issue": "Found 21 print statements",
       "recommendation": "Replace with proper logging",

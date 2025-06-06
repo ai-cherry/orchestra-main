@@ -1,6 +1,6 @@
+config:
+  Lambda:region: ewr
+  cherry_ai:environment: ${PULUMI_STACK}
+description: Cherry AI infrastructure on Lambda
 name: cherry_ai-ai
 runtime: python
-description: Cherry AI infrastructure on Vultr
-config:
-  vultr:region: ewr
-  cherry_ai:environment: ${PULUMI_STACK}

@@ -182,7 +182,9 @@ def main():
     print("   • API Server: http://localhost:8000")
     print("   • API Docs: http://localhost:8000/docs")
     print("   • Admin Interface: admin-interface/enhanced-production-interface.html")
-    print("\n⌨️  Press Ctrl+C to stop the system")
+    print("   • Chat Interface: admin-interface/chat.html")
+    print("\n💬 Quick Start: Open chat.html to start conversations with AI personas!")
+    print("⌨️  Press Ctrl+C to stop the system")
     
     try:
         # Keep the script running

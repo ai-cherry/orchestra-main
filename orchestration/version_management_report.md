@@ -128,7 +128,7 @@ graph TD
     J --> L[MCP SDK]
     
     M[Infrastructure] --> N[Docker 24.x]
-    M --> O[Vultr Provider]
+    M --> O[Lambda Provider]
     M --> E
     
     style A fill:#f9f,stroke:#333,stroke-width:4px
@@ -147,7 +147,7 @@ graph TD
 | PostgreSQL | 14.x | pgvector 0.5.x | Version not locked |
 | Weaviate | 1.24.x | Python client 3.24.x | Needs update to 1.25.x |
 | Docker | 24.x | All services | Good |
-| Pulumi | 3.x | Vultr provider | Version range too broad |
+| Pulumi | 3.x | Lambda provider | Version range too broad |
 
 ## Security Vulnerability Assessment
 

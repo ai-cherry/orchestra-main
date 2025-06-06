@@ -12,7 +12,7 @@ Created the complete `.factory/` directory structure with:
    - Performance settings (cache, rate limiting, circuit breakers)
    - Context management configuration
    - Monitoring and security settings
-   - Vultr infrastructure configuration
+   - Lambda infrastructure configuration
 
 2. **droids/** - Documentation for each Factory AI Droid:
    - `architect.md` - System design and architecture planning
@@ -49,7 +49,7 @@ Created `factory_integration/setup_bridge.sh` with:
    - Warns about optional variables
    - Clear error messages for missing configuration
 
-2. **Vultr API Integration**:
+2. **Lambda API Integration**:
    - Validates API access
    - Displays account information
    - Tests connection before proceeding

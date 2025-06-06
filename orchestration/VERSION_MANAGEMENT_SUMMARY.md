@@ -51,7 +51,7 @@ Python implementation providing:
 - **JavaScript packages**: 50+ npm dependencies in admin-ui
 - **Docker images**: 5 Dockerfiles with various base images
 - **Database schemas**: PostgreSQL with migration files
-- **Infrastructure**: Pulumi stacks for Vultr deployment
+- **Infrastructure**: Pulumi stacks for Lambda deployment
 
 ### Critical Issues Identified
 1. **Version Pinning**: Inconsistent version constraints (mix of exact, minimum, and range specifications)

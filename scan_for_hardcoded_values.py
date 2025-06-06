@@ -2,31 +2,31 @@
 """
 """
     """Pattern for detecting hardcoded values."""
-        name="Vultr API Key",
+        name="Lambda API Key",
         pattern=re.compile(r'["\'][A-Z0-9]{30,60}["\']'), # Generic strong API key pattern
-        env_var="VULTR_API_KEY",
-        description="Potential Vultr API Key or similar secret.",
+        env_var="LAMBDA_API_KEY",
+        description="Potential Lambda API Key or similar secret.",
         file_patterns=[r"\.sh$", r"\.ya?ml$", r"\.py$"],
     ),
     HardcodedPattern(
         name="Generic Project ID",
         pattern=re.compile(r'["\'][a-z0-9-]+-[a-z0-9]+(?:-[a-z0-9]+)?["\']'),
-        env_var="PROJECT_ID", # Generic, user can map to VULTR_PROJECT_ID
-        description="Potential cloud project ID. Verify if it relates to Vultr.",
+        env_var="PROJECT_ID", # Generic, user can map to LAMBDA_PROJECT_ID
+        description="Potential cloud project ID. Verify if it relates to lambda.",
         file_patterns=[r"\.sh$", r"\.ya?ml$", r"\.py$"],
     ),
     HardcodedPattern(
         name="Generic Region/Zone",
         pattern=re.compile(r'["\'][a-z]+(?:-[a-z]+)-\d[a-z]?["\']'), # e.g., fra-1, ams-1a
-        env_var="VULTR_REGION", # Or VULTR_ZONE
-        description="Potential cloud region/zone. Verify if it relates to Vultr.",
+        env_var="LAMBDA_REGION", # Or Lambda_ZONE
+        description="Potential cloud region/zone. Verify if it relates to lambda.",
         file_patterns=[r"\.sh$", r"\.ya?ml$", r"\.py$"],
     ),
     HardcodedPattern(
-        name="Vultr Resource Name",
-        pattern=re.compile(r'["\']vultr-[a-zA-Z0-9_.-]+["\']'),
-        env_var="VULTR_RESOURCE_NAME_VAR", # Placeholder for specific Vultr resource names
-        description="Potential hardcoded Vultr-specific resource name.",
+        name="Lambda Resource Name",
+        pattern=re.compile(r'["\']Lambda-[a-zA-Z0-9_.-]+["\']'),
+        env_var="Lambda_RESOURCE_NAME_VAR", # Placeholder for specific Lambda resource names
+        description="Potential hardcoded Lambda-specific resource name.",
         file_patterns=[r"\.sh$", r"\.ya?ml$", r"\.py$"],
     ),
     HardcodedPattern(

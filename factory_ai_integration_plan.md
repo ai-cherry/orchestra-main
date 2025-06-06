@@ -14,13 +14,13 @@ This plan details the integration of Factory AI Droid system into our existing c
 ### Existing Infrastructure
 - **MCP Servers**: 5 active servers (conductor, memory, weaviate, deployment, tools)
 - **Roo Modes**: 10 specialized modes with specific models and roles
-- **Tech Stack**: PostgreSQL, Weaviate, Pulumi, Vultr
+- **Tech Stack**: PostgreSQL, Weaviate, Pulumi, Lambda
 - **Context Management**: MCP-based with vector store integration
 
 ### Factory AI Requirements
 - **Droid Types**: Architect, Code, Debug, Reliability, Knowledge
 - **Infrastructure**: Factory Bridge CLI, context management
-- **Integration Points**: Vultr API, PostgreSQL, Weaviate
+- **Integration Points**: Lambda API, PostgreSQL, Weaviate
 
 ## Integration Architecture
 
@@ -38,7 +38,7 @@ This plan details the integration of Factory AI Droid system into our existing c
                       ↓
               Shared Resources
          • PostgreSQL • Weaviate
-         • Pulumi     • Vultr
+         • Pulumi     • Lambda
 ```
 
 ### 2. MCP Server Enhancement Strategy
@@ -121,8 +121,8 @@ droids:
       - documentation
 
 infrastructure:
-  vultr:
-    api_key: "${VULTR_API_KEY}"
+  Lambda:
+    api_key: "${LAMBDA_API_KEY}"
     pulumi_stack: "main"
   
   postgresql:
@@ -141,7 +141,7 @@ infrastructure:
 # Install Factory Bridge with our specific configuration
 
 curl -sSL https://factory.ai/install-bridge | bash -s -- \
-  --vultr-token=$VULTR_TOKEN \
+  --Lambda-token=$Lambda_TOKEN \
   --pulumi-passphrase=$PULUMI_PASSPHRASE \
   --config-path=.factory/config.yaml
 ```

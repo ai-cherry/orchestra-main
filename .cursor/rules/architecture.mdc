@@ -6,5 +6,5 @@ globs: "*"
 - FastAPI API with agents and MCP servers
 - Database layers: PostgreSQL (relational), Weaviate (vector/semantic)
 - All database access through shared.database.UnifiedDatabase
-- Deployment managed with Pulumi on Vultr
+- Deployment managed with Pulumi on Lambda Labs
 - NO MongoDB, Redis, or DragonflyDB (legacy references should be ignored)

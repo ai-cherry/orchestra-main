@@ -195,7 +195,7 @@ def init_providers(providers: Optional[List[str]] = None) -> bool:
 def init_secret_manager() -> bool:
     """
     """
-        project_id = os.environ.get("VULTR_PROJECT_ID")
+        project_id = os.environ.get("LAMBDA_PROJECT_ID")
 
         # Initialize the Secret Manager
         secret_manager = get_secret_manager(project_id=project_id)

@@ -4,22 +4,22 @@ Pulumi configuration for automated infrastructure management
 """
 
 import pulumi
-import pulumi_vultr as vultr
+import pulumi_lambda as Lambda
 import pulumi_random as random
 from pulumi import Config, Output
 
 # Configuration
 config = Config()
-vultr_api_key = config.require_secret("vultr_api_key")
+LAMBDA_API_KEY = config.require_secret("LAMBDA_API_KEY")
 
 # Create SSH key for server access
-ssh_key = vultr.SshKey("cherry-ai-ssh-key",
+ssh_key = lambda.SshKey("cherry-ai-ssh-key",
     name="cherry-ai-orchestrator",
     ssh_key=config.require("ssh_public_key")
 )
 
 # Production server
-production_server = vultr.Instance("cherry-ai-production",
+production_server = lambda.Instance("cherry-ai-production",
     plan="vc2-16c-64gb",  # 16 vCPUs, 64GB RAM
     region="lax",  # Los Angeles
     os_id=1743,  # Ubuntu 24.04 LTS
@@ -59,7 +59,7 @@ echo "✅ Server initialization completed"
 )
 
 # Database server
-database_server = vultr.Instance("cherry-ai-database",
+database_server = lambda.Instance("cherry-ai-database",
     plan="vc2-8c-32gb",  # 8 vCPUs, 32GB RAM
     region="lax",  # Los Angeles
     os_id=1743,  # Ubuntu 24.04 LTS
@@ -91,7 +91,7 @@ echo "✅ Database server setup completed"
 )
 
 # Staging server
-staging_server = vultr.Instance("cherry-ai-staging",
+staging_server = lambda.Instance("cherry-ai-staging",
     plan="vc2-4c-8gb",  # 4 vCPUs, 8GB RAM
     region="lax",  # Los Angeles
     os_id=1743,  # Ubuntu 24.04 LTS
@@ -116,7 +116,7 @@ echo "✅ Staging server setup completed"
 )
 
 # Load balancer
-load_balancer = vultr.LoadBalancer("cherry-ai-lb",
+load_balancer = lambda.LoadBalancer("cherry-ai-lb",
     region="lax",
     label="cherry-ai-load-balancer",
     balancing_algorithm="roundrobin",
@@ -148,7 +148,7 @@ load_balancer = vultr.LoadBalancer("cherry-ai-lb",
 )
 
 # Kubernetes cluster for scaling
-k8s_cluster = vultr.KubernetesCluster("cherry-ai-k8s",
+k8s_cluster = lambda.KubernetesCluster("cherry-ai-k8s",
     region="lax",
     version="v1.28.0+1",
     label="cherry-ai-k8s",
@@ -162,12 +162,12 @@ k8s_cluster = vultr.KubernetesCluster("cherry-ai-k8s",
     ]
 )
 
-# DNS records (if using Vultr DNS)
-# domain = vultr.DnsDomain("cherry-ai-me",
+# DNS records (if using Lambda DNS)
+# domain = lambda.DnsDomain("cherry-ai-me",
 #     domain="cherry-ai.me"
 # )
 
-# a_record = vultr.DnsRecord("cherry-ai-a-record",
+# a_record = lambda.DnsRecord("cherry-ai-a-record",
 #     domain=domain.domain,
 #     name="",
 #     type="A",
@@ -175,7 +175,7 @@ k8s_cluster = vultr.KubernetesCluster("cherry-ai-k8s",
 #     ttl=300
 # )
 
-# www_record = vultr.DnsRecord("cherry-ai-www-record",
+# www_record = lambda.DnsRecord("cherry-ai-www-record",
 #     domain=domain.domain,
 #     name="www",
 #     type="A",

@@ -87,3 +87,4 @@ activate.sh
 start.sh
 run.sh
 test_server.py
+cherry-ai-passwords.env

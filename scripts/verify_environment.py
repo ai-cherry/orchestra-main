@@ -45,7 +45,7 @@ def check_required_files() -> Dict[str, bool]:
 
 def check_environment_variables() -> Dict[str, bool]:
     """Check required environment variables."""
-    required_vars = ["VULTR_PROJECT_ID", "VULTR_PROJECT_ID"]
+    required_vars = ["LAMBDA_PROJECT_ID", "LAMBDA_PROJECT_ID"]
 
     optional_vars = ["OPENROUTER_API_KEY", "ANTHROPIC_API_KEY", "OPENAI_API_KEY"]
 

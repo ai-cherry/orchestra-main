@@ -80,7 +80,7 @@ def main() -> None:
     print("✅ Orchestra platform successfully deployed to Lambda Labs")
     print("✅ All core services are operational")
     print("✅ Cherry AI interface is the main entry point")
-    print("✅ Infrastructure correctly aligned with Lambda Labs (not Vultr)")
+    print("✅ Infrastructure correctly aligned with Lambda Labs (not Lambda)")
     print("✅ Local test UI available for development")
     print()
     
@@ -158,7 +158,7 @@ def main() -> None:
     print("   □ Implement log aggregation")
     print()
     print("4. CLEANUP:")
-    print("   □ Remove Vultr-specific files")
+    print("   □ Remove Lambda-specific files")
     print("   □ Archive unused deployment scripts")
     print("   □ Update documentation")
     print()

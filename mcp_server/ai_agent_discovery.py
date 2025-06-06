@@ -135,11 +135,11 @@ class AIAgentDiscoverySystem:
                 name="deployment",
                 type="deployment",
                 port=8005,
-                capabilities=["vultr_deployment", "infrastructure_management"],
+                capabilities=["Lambda_deployment", "infrastructure_management"],
                 description="Deployment and infrastructure management",
                 priority=3,
                 health_endpoint="/health",
-                environment_vars={"VULTR_API_KEY": "${VULTR_API_KEY}"}
+                environment_vars={"LAMBDA_API_KEY": "${LAMBDA_API_KEY}"}
             )
         }
 

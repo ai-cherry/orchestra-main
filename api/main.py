@@ -22,7 +22,8 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 import bcrypt
 import uvicorn
-from conversation_engine import ConversationEngine, ConversationMode
+from api.conversation_engine import ConversationEngine, ConversationMode
+from config.cherry_ai_config import get_config
 
 # Configure logging
 logging.basicConfig(
@@ -32,24 +33,25 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Configuration
-DATABASE_URL = os.getenv(
-    "DATABASE_URL", 
-    "postgresql://postgres:postgres@localhost:5432/cherry_ai"
-)
-JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "cherry-ai-secret-key-change-in-production")
-JWT_ALGORITHM = "HS256"
-JWT_EXPIRATION_HOURS = 24
+config = get_config()
+DATABASE_URL = config.get_database_url(async_driver=True)
+JWT_SECRET_KEY = config.security.secret_key
+JWT_ALGORITHM = config.security.jwt_algorithm
+JWT_EXPIRATION_HOURS = config.security.access_token_expire_minutes / 60
+
+logger.info(f"Loading configuration for environment: {config.environment}")
 
 # Security
 security = HTTPBearer()
 
 # Database connection pool
 db_pool: Optional[asyncpg.Pool] = None
+conversation_engine: Optional[ConversationEngine] = None
 
 # Models
 class UserRegistration(BaseModel):
     username: str = Field(..., min_length=3, max_length=100)
-    email: str = Field(..., regex=r'^[^@]+@[^@]+\.[^@]+$')
+    email: str = Field(..., pattern=r'^[^@]+@[^@]+\.[^@]+$')
     password: str = Field(..., min_length=8)
 
 class UserLogin(BaseModel):
@@ -114,6 +116,39 @@ class SystemMetrics(BaseModel):
     error_rate: float
     persona_performance: Dict[str, float]
 
+class ConversationRequest(BaseModel):
+    message: str = Field(..., min_length=1, max_length=2000)
+    persona_type: str = Field(..., pattern=r'^(cherry|sophia|karen)$')
+    session_id: Optional[str] = None
+    mode: str = Field(default="casual", pattern=r'^(casual|focused|coaching|analytical|supportive)$')
+
+class ConversationResponse(BaseModel):
+    response: str
+    persona_type: str
+    session_id: str
+    mode: str
+    response_time_ms: int
+    relationship_context: Dict[str, Any]
+    learning_applied: int
+
+class ConversationHistory(BaseModel):
+    message_type: str
+    content: str
+    context_data: Dict[str, Any]
+    mood_score: float
+    created_at: datetime
+    effectiveness_score: Optional[float] = None
+
+class RelationshipInsights(BaseModel):
+    relationship_stage: str
+    trust_score: float
+    familiarity_score: float
+    interaction_count: int
+    communication_effectiveness: float
+    learning_patterns_active: int
+    personality_adaptations: int
+    recent_mood_trend: float
+
 # Utility functions
 def hash_password(password: str) -> str:
     """Hash password using bcrypt"""
@@ -163,7 +198,7 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
 # Database functions
 async def init_database():
     """Initialize database connection and schema"""
-    global db_pool
+    global db_pool, conversation_engine
     
     try:
         db_pool = await asyncpg.create_pool(DATABASE_URL, min_size=5, max_size=20)
@@ -171,6 +206,11 @@ async def init_database():
         
         # Initialize schema
         await setup_database_schema()
+        
+        # Initialize conversation engine with config
+        conversation_engine = ConversationEngine(db_pool, config)
+        await conversation_engine.initialize()
+        logger.info("Conversation engine initialized with configuration")
         
     except Exception as e:
         logger.error(f"Failed to initialize database: {e}")
@@ -652,6 +692,144 @@ async def health_check():
             }
         )
 
+# Conversation endpoints
+@app.post("/api/conversation", response_model=ConversationResponse)
+async def chat_with_persona(
+    request: ConversationRequest, 
+    current_user: dict = Depends(get_current_user)
+):
+    """Send message to AI persona and get response with learning integration"""
+    try:
+        if not conversation_engine:
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="Conversation engine not available"
+            )
+        
+        # Convert string mode to ConversationMode enum
+        mode = ConversationMode(request.mode)
+        
+        response = await conversation_engine.generate_response(
+            user_id=current_user['id'],
+            persona_type=request.persona_type,
+            user_message=request.message,
+            session_id=request.session_id,
+            mode=mode
+        )
+        
+        return ConversationResponse(**response)
+        
+    except Exception as e:
+        logger.error(f"Conversation error: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to generate response"
+        )
+
+@app.get("/api/conversation/history/{persona_type}", response_model=List[ConversationHistory])
+async def get_conversation_history(
+    persona_type: str,
+    limit: int = 20,
+    current_user: dict = Depends(get_current_user)
+):
+    """Get conversation history with specific persona"""
+    if persona_type not in ['cherry', 'sophia', 'karen']:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid persona type"
+        )
+    
+    try:
+        if not conversation_engine:
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="Conversation engine not available"
+            )
+        
+        history = await conversation_engine.get_conversation_history(
+            user_id=current_user['id'],
+            persona_type=persona_type,
+            limit=min(limit, 100)  # Cap at 100 messages
+        )
+        
+        return [ConversationHistory(**conv) for conv in history]
+        
+    except Exception as e:
+        logger.error(f"History retrieval error: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to retrieve conversation history"
+        )
+
+@app.get("/api/relationship/insights/{persona_type}", response_model=RelationshipInsights)
+async def get_relationship_insights(
+    persona_type: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Get relationship development insights for specific persona"""
+    if persona_type not in ['cherry', 'sophia', 'karen']:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid persona type"
+        )
+    
+    try:
+        if not conversation_engine:
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="Conversation engine not available"
+            )
+        
+        insights = await conversation_engine.get_relationship_insights(
+            user_id=current_user['id'],
+            persona_type=persona_type
+        )
+        
+        return RelationshipInsights(**insights)
+        
+    except Exception as e:
+        logger.error(f"Insights retrieval error: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to retrieve relationship insights"
+        )
+
+@app.get("/api/conversation/active-sessions")
+async def get_active_sessions(current_user: dict = Depends(get_current_user)):
+    """Get user's active conversation sessions"""
+    try:
+        async with db_pool.acquire() as conn:
+            sessions = await conn.fetch("""
+                SELECT DISTINCT 
+                    persona_type,
+                    session_id,
+                    MAX(created_at) as last_activity,
+                    COUNT(*) as message_count
+                FROM shared.conversations 
+                WHERE user_id = $1 
+                AND created_at > CURRENT_TIMESTAMP - INTERVAL '24 hours'
+                GROUP BY persona_type, session_id
+                ORDER BY last_activity DESC
+                LIMIT 10
+            """, current_user['id'])
+            
+            return [
+                {
+                    "persona_type": session['persona_type'],
+                    "session_id": session['session_id'],
+                    "last_activity": session['last_activity'],
+                    "message_count": session['message_count']
+                }
+                for session in sessions
+            ]
+            
+    except Exception as e:
+        logger.error(f"Active sessions retrieval error: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to retrieve active sessions"
+        )
+
 # Root endpoint
 @app.get("/")
 async def root():
@@ -659,13 +837,20 @@ async def root():
     return {
         "name": "Cherry AI Admin Interface API",
         "version": "1.0.0",
-        "description": "Complete API for managing AI personas and supervisor agents",
+        "description": "Complete API for managing AI personas and conversations with learning",
         "endpoints": {
             "authentication": "/auth",
             "personas": "/api/personas",
             "agents": "/api/agents",
+            "conversations": "/api/conversation",
             "system": "/api/system",
             "docs": "/docs"
+        },
+        "features": {
+            "ai_conversations": "Real-time AI persona interactions",
+            "relationship_learning": "Progressive personality adaptation",
+            "conversation_memory": "Context-aware conversation history",
+            "multi_persona": "Three distinct AI personalities (Cherry, Sophia, Karen)"
         },
         "status": "operational",
         "timestamp": datetime.utcnow().isoformat()

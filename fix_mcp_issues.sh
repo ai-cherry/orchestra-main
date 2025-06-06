@@ -113,7 +113,7 @@ if gcloud projects describe cherry-ai-project --format="value(projectId)" 2>/dev
     echo "✅ Authentication working!"
 else
     echo "❌ Authentication failed. Trying alternative method..."
-    # vultr-cli auth application-default login
+    # Lambda-cli auth application-default login
 fi
 
 # Step 4: Make the service public (this is the fix for 403)

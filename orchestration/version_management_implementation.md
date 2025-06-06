@@ -108,7 +108,7 @@ infrastructure:
   pulumi:
     version: "3.94.2"
     providers:
-      vultr: "2.18.0"
+      Lambda: "2.18.0"
 
 core_dependencies:
   python:

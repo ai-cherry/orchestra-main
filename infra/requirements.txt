@@ -3,8 +3,8 @@
 
 # Pulumi core
 pulumi>=3.100.0,<4.0.0
-# Vultr provider
-pulumi-vultr>=0.0.7,<1.0.0
+# Lambda provider
+pulumi-lambda>=0.0.7,<1.0.0
 # pulumi-digitalocean is managed as a Pulumi plugin, not a PyPI package
 pulumi-command>=0.9.0,<1.0.0
 

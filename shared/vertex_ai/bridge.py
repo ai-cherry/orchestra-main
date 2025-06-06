@@ -15,7 +15,7 @@ class VertexAIBridge:
     def __init__(self, project_id: Optional[str] = None, location: str = "us-central1"):
         """
         """
-        self.project_id = project_id or os.environ.get("VULTR_PROJECT_ID")
+        self.project_id = project_id or os.environ.get("LAMBDA_PROJECT_ID")
         self.location = location
         self.environment = self._detect_environment()
         self.authenticated = False

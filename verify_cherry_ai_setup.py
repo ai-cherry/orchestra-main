@@ -61,7 +61,7 @@ class CherryAIVerifier:
             "WEAVIATE_URL": "Weaviate Database URL",
             "WEAVIATE_API_KEY": "Weaviate API Key",
             "PINECONE_API_KEY": "Pinecone API Key",
-            "VULTR_API_KEY": "Vultr Infrastructure API Key",
+            "LAMBDA_API_KEY": "Lambda Infrastructure API Key",
             "PULUMI_ACCESS_TOKEN": "Pulumi Access Token",
             "GITHUB_TOKEN": "GitHub Personal Access Token"
         }

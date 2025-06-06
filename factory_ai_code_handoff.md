@@ -6,7 +6,7 @@ The Architect has completed the detailed system design for Factory AI Droid inte
 ## Architecture Deliverables Received
 1. ✓ System Architecture (hexagonal pattern, hot-swappable modules)
 2. ✓ Implementation Specifications (API specs, adapters, caching)
-3. ✓ Deployment Architecture (Vultr infrastructure, monitoring)
+3. ✓ Deployment Architecture (Lambda infrastructure, monitoring)
 4. ✓ Performance targets exceeded in design
 
 ## Code Mode Implementation Tasks
@@ -35,7 +35,7 @@ The Architect has completed the detailed system design for Factory AI Droid inte
 #### Task 3.1.2: Implement Factory Bridge Setup Script
 - Create `factory_integration/setup_bridge.sh`
 - Implement environment variable validation
-- Add Vultr API integration
+- Add Lambda API integration
 - Include Pulumi passphrase handling
 
 ### Phase 3.2: MCP Server Adapters

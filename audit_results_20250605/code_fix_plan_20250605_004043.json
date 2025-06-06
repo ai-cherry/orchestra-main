@@ -198,7 +198,7 @@
       "scripts/smoke_tests.py",
       "scripts/verify_enhancements.py",
       "scripts/fix_remaining_issues.py",
-      "scripts/vultr_direct_deploy.py",
+      "scripts/Lambda_direct_deploy.py",
       "scripts/persona_config_consolidator.py",
       "scripts/deep_cleanup.py",
       "scripts/version_monitor.py",
@@ -269,7 +269,7 @@
       "scripts/demo_orchestrator.py",
       "scripts/auto_start_orchestra_roo.py",
       "scripts/comprehensive_validation.py",
-      "scripts/vultr_provision.py",
+      "scripts/Lambda_provision.py",
       "scripts/ui_integration_spec.py",
       "scripts/test_weaviate_simple.py",
       "scripts/test_orchestra_integration.py",
@@ -558,7 +558,7 @@
       "agent/app/services/audit_log.py"
     ],
     "ai_components/coordination": [
-      "ai_components/coordination/vultr_autoscaling.py",
+      "ai_components/coordination/Lambda_autoscaling.py",
       "ai_components/coordination/unified_api_router.py",
       "ai_components/coordination/ai_orchestrator.py",
       "ai_components/coordination/cursor_integration.py",
@@ -723,7 +723,7 @@
       "packages/agents/runtime/security/credentials_manager.py"
     ],
     "infra": [
-      "infra/vultr_deployment.py",
+      "infra/Lambda_deployment.py",
       "infra/do_weaviate_migration_stack.py",
       "infra/core_stack.py",
       "infra/mcp_server.py",
@@ -814,7 +814,7 @@
       "infra/components/database_component.py",
       "infra/components/weaviate_component.py",
       "infra/components/postgres_component.py",
-      "infra/components/vultr_server_component.py"
+      "infra/components/Lambda_server_component.py"
     ],
     "dashboard/components/ConversationalInterface": [
       "dashboard/components/ConversationalInterface/ConversationalInterface.tsx"
@@ -855,13 +855,13 @@
       "admin-interface/.next/server/app/_not-found/page_client-reference-manifest.js"
     ],
     "core/config": [
-      "core/config/settings_vultr.py",
+      "core/config/settings_lambda.py",
       "core/config/__init__.py",
       "core/config/unified_config.py"
     ],
     "infrastructure": [
       "infrastructure/database_stack_manager.py",
-      "infrastructure/vultr_deployment.py",
+      "infrastructure/Lambda_deployment.py",
       "infrastructure/pinecone_manager.py"
     ],
     "core/conductor/src/tools": [

@@ -34,7 +34,7 @@ try:
             # Check for GCP environment indicators
             # GCP environment indicator check (was unused variable)
             (
-                os.environ.get("VULTR_PROJECT_ID") is not None
+                os.environ.get("LAMBDA_PROJECT_ID") is not None
                 or os.environ.get("K_SERVICE") is not None
                 or os.path.exists("/var/run/secrets/kubernetes.io")
             )

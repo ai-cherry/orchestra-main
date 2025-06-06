@@ -36,7 +36,7 @@ This document presents a comprehensive version management strategy for the cherr
 - **Pulumi**: 
   - `infrastructure/pulumi/` directory structure
   - `Pulumi.yaml` configuration files
-  - TypeScript/Python stacks for Vultr deployment
+  - TypeScript/Python stacks for Lambda deployment
 
 ### 2. Component Inventory
 
@@ -95,7 +95,7 @@ databases:
 infrastructure:
   docker: "24.0.7"
   pulumi: "3.94.2"
-  vultr_cli: "2.19.0"
+  Lambda_cli: "2.19.0"
   
 frameworks:
   fastapi: "0.104.1"
@@ -300,7 +300,7 @@ application_images:
  */
 
 import * as pulumi from "@pulumi/pulumi";
-import * as vultr from "@pulumi/vultr";
+import * as Lambda from "@pulumi/Lambda";
 import { VersionRegistry } from "./version-registry";
 
 export class InfrastructureVersionManager {
@@ -319,8 +319,8 @@ export class InfrastructureVersionManager {
       issues: []
     };
     
-    // Check Vultr instance types
-    const instances = await this.getVultrInstances();
+    // Check Lambda instance types
+    const instances = await this.getLambdaInstances();
     for (const instance of instances) {
       if (!this.registry.isApprovedOS(instance.os)) {
         results.issues.push({

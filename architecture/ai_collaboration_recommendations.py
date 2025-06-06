@@ -236,7 +236,7 @@ class AICollaborationRecommendations:
                 estimated_effort="3 days"
             ),
             
-            # INFRASTRUCTURE - Pulumi/Vultr setup
+            # INFRASTRUCTURE - Pulumi/Lambda setup
             Recommendation(
                 id="REC-012",
                 category=RecommendationCategory.INFRASTRUCTURE.value,
@@ -245,7 +245,7 @@ class AICollaborationRecommendations:
                 rationale="Dedicated cache for AI collaboration data",
                 implementation="""
                 1. Use infrastructure/ai_collaboration_pulumi.py
-                2. Deploy 3-node Redis cluster on Vultr
+                2. Deploy 3-node Redis cluster on Lambda
                 3. Configure persistence and replication
                 4. Set up automatic failover
                 """,
@@ -261,7 +261,7 @@ class AICollaborationRecommendations:
                 priority="medium",
                 rationale="Separate analytics queries from operational load",
                 implementation="""
-                1. Create read replica using Vultr Database service
+                1. Create read replica using Lambda Database service
                 2. Route analytics queries to replica
                 3. Implement connection routing logic
                 4. Monitor replication lag
@@ -374,7 +374,7 @@ class AICollaborationRecommendations:
                 "success_criteria": [
                     "AICollaborationService operational",
                     "WebSocket connection stable",
-                    "Infrastructure deployed on Vultr"
+                    "Infrastructure deployed on Lambda"
                 ]
             },
             
@@ -466,7 +466,7 @@ class AICollaborationRecommendations:
                 "trade_offs": "More complex but enables real-time updates"
             },
             {
-                "decision": "Vultr Infrastructure",
+                "decision": "Lambda Infrastructure",
                 "rationale": "Cost-effective with good GPU support",
                 "alternatives_considered": ["AWS", "GCP", "Azure"],
                 "trade_offs": "Less managed services but more control"
@@ -550,7 +550,7 @@ Expected Outcomes:
 
 Investment Required:
 - Development: 7 weeks with current team
-- Infrastructure: ~$500/month on Vultr
+- Infrastructure: ~$500/month on Lambda
 - Ongoing: 10% of dev time for maintenance
 
 This will establish cherry-ai.me as the gold standard for AI collaboration

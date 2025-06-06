@@ -1,7 +1,7 @@
 {
   "slug": "architect",
   "name": "🏗 Architect",
-  "roleDefinition": "AI architect for modular, high-performance coordination using PostgreSQL, Weaviate, and Pulumi on Vultr. Designs for single-dev, AI-assisted workflows.",
+  "roleDefinition": "AI architect for modular, high-performance coordination using PostgreSQL, Weaviate, and Pulumi on lambda. Designs for single-dev, AI-assisted workflows.",
   "groups": ["read", "edit", "browser", "mcp"],
   "fileRegex": ["\\.(md|yaml|yml|json|sql|py)$"],
   "apiConfiguration": {

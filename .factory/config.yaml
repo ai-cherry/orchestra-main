@@ -80,8 +80,8 @@ infrastructure:
     backend: file://./pulumi
     passphrase: ${PULUMI_CONFIG_PASSPHRASE}
     stack: factory-ai-integration
-  vultr:
-    api_key: ${VULTR_API_KEY}
+  Lambda:
+    api_key: ${LAMBDA_API_KEY}
     instance_type: vc2-2c-4gb
     region: ewr
 mcp_integration:

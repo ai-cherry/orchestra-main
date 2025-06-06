@@ -47,11 +47,11 @@ PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 MCP_SERVER_DIR="$PROJECT_ROOT/mcp_server"
 
 # Ensure environment is loaded
-if [ -f ~/.Vultr_env_setup.sh ]; then
-    source ~/.Vultr_env_setup.sh
-    log_info "Loaded Vultr environment setup"
+if [ -f ~/.Lambda_env_setup.sh ]; then
+    source ~/.Lambda_env_setup.sh
+    log_info "Loaded Lambda environment setup"
 else
-    log_warning "Vultr environment setup not found at ~/.Vultr_env_setup.sh"
+    log_warning "Lambda environment setup not found at ~/.Lambda_env_setup.sh"
 fi
 
 # Load server registry if it exists
@@ -119,8 +119,8 @@ log_info "Starting MCP servers..."
 
 # Define available servers and their paths
 declare -A AVAILABLE_SERVERS=(
-    ["Vultr-cloud-run"]="$MCP_SERVER_DIR/servers/Vultr_cloud_run_server.py"
-    ["Vultr-secrets"]="$MCP_SERVER_DIR/servers/Vultr_secret_manager_server.py"
+    ["Lambda-cloud-run"]="$MCP_SERVER_DIR/servers/Lambda_cloud_run_server.py"
+    ["Lambda-secrets"]="$MCP_SERVER_DIR/servers/Lambda_secret_manager_server.py"
     ["dragonfly"]="$MCP_SERVER_DIR/servers/dragonfly_server.py"
     ["firestore"]="$MCP_SERVER_DIR/servers/firestore_server.py"
 )

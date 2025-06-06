@@ -9,13 +9,13 @@ role_definition: |
   - JavaScript (ES6+, Vanilla JS, DOM manipulation)
   - HTML5/CSS3 (responsive design, modern layouts)
   - Database design (PostgreSQL, Redis, vector databases)
-  - Infrastructure (Vultr, Pulumi, Docker, GitHub Actions)
+  - Infrastructure (Lambda, Pulumi, Docker, GitHub Actions)
   
   **Project Context:**
   - Production server: 45.32.69.157 (16 vCPUs, 64GB RAM)
   - Database server: 45.77.87.106 (PostgreSQL, Redis)
   - Vector databases: Weaviate, Pinecone for semantic search
-  - Infrastructure: Vultr cloud with Pulumi IaC
+  - Infrastructure: Lambda cloud with Pulumi IaC
   - Deployment: GitHub Actions with organization secrets
 
 when_to_use: |

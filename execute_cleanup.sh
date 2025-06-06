@@ -51,7 +51,7 @@ echo -e "${YELLOW}Step 1: Removing deprecated files...${NC}"
 # Updated list of files to remove based on current needs (May 2025)
 FILES_TO_REMOVE=(
     "updated_phidata_wrapper.py"
-    "setup_Vultr_auth.sh"
+    "setup_Lambda_auth.sh"
     "diagnose_environment.py"
     "deprecated_firestore_v1.py"
     "legacy_migration_script.sh"

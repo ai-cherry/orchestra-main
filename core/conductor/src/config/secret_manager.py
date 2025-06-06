@@ -18,11 +18,11 @@
         return os.environ[env_var_name]
 
     # Only try Secret Manager if GCP project ID is set
-    if settings.VULTR_PROJECT_ID:
+    if settings.LAMBDA_PROJECT_ID:
         try:
 
             pass
-            return _get_from_secret_manager(secret_name, settings.VULTR_PROJECT_ID, settings.ENVIRONMENT)
+            return _get_from_secret_manager(secret_name, settings.LAMBDA_PROJECT_ID, settings.ENVIRONMENT)
         except Exception:
 
             pass

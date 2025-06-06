@@ -6,7 +6,7 @@ anthropic==0.39.0
 chromadb==0.4.22
 fastapi==0.115.12
 # google-cloud-secret-manager==2.23.3  # Removed GCP package
-boto3>=1.26.0  # S3-compatible for Vultr Object Storage
+boto3>=1.26.0  # S3-compatible for Lambda Object Storage
 httpx==0.28.1
 litellm==1.70.4
 mcp==1.9.1

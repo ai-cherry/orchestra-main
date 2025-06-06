@@ -80,14 +80,14 @@ def create_memory_manager(settings: Settings) -> "MemoryManager":
 
     # Determine if we need cloud storage based on environment and project ID
         settings.ENVIRONMENT in ["prod", "production", "stage", "staging"]
-        and settings.get_vultr_project_id() is not None
+        and settings.get_LAMBDA_PROJECT_ID() is not None
     )
 
         try:
 
             pass
-                project_id=settings.get_vultr_project_id(),
-                credentials_path=settings.get_vultr_credentials_path(),
+                project_id=settings.get_LAMBDA_PROJECT_ID(),
+                credentials_path=settings.get_LAMBDA_CREDENTIALS_PATH(),
             )
         except Exception:
 
@@ -229,11 +229,11 @@ async def get_memory_service(
             # Determine storage type and configuration based on settings
             if (
                 settings.ENVIRONMENT in ["prod", "production", "stage", "staging"]
-                and settings.get_vultr_project_id() is not None
+                and settings.get_LAMBDA_PROJECT_ID() is not None
             ):
                 storage_config = {
-                    "project_id": settings.get_vultr_project_id(),
-                    "credentials_path": settings.get_vultr_credentials_path(),
+                    "project_id": settings.get_LAMBDA_PROJECT_ID(),
+                    "credentials_path": settings.get_LAMBDA_CREDENTIALS_PATH(),
                 }
             else:
                 # Use in-memory implementation for development

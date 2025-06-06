@@ -132,7 +132,7 @@
       "message": "Fixed 2 long lines"
     },
     {
-      "file": "scripts/vultr_provision.py",
+      "file": "scripts/Lambda_provision.py",
       "issues": 1,
       "success": false,
       "message": "No fixable long lines found"
@@ -162,7 +162,7 @@
       "message": "No fixable long lines found"
     },
     {
-      "file": "scripts/vultr_direct_deploy.py",
+      "file": "scripts/Lambda_direct_deploy.py",
       "issues": 1,
       "success": false,
       "message": "No fixable long lines found"
@@ -294,7 +294,7 @@
       "message": "No fixable long lines found"
     },
     {
-      "file": "infrastructure/vultr_deployment.py",
+      "file": "infrastructure/Lambda_deployment.py",
       "issues": 1,
       "success": false,
       "message": "No fixable long lines found"

@@ -103,13 +103,13 @@ if [ -f .env ]; then
     echo -e "\n🏗️ Infrastructure Keys:"
     
     # Try to set infrastructure keys if available
-    set_secret_from_env "VULTR_API_KEY"
+    set_secret_from_env "LAMBDA_API_KEY"
     
     # For local development, these are optional
     echo -e "\n📌 Infrastructure Keys Status:"
     echo "These keys are only needed for production deployment:"
     echo
-    echo "🔸 VULTR_API_KEY - Required for deploying to Vultr cloud"
+    echo "🔸 LAMBDA_API_KEY - Required for deploying to Lambda cloud"
     echo "   Priority: HIGH if deploying to production"
     echo "   Not needed for local development"
     echo

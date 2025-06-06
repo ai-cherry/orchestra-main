@@ -4,7 +4,7 @@
 
 1. [Architecture Overview](#architecture-overview)
 2. [Frontend Architecture & UI/UX Design](#frontend-architecture--uiux-design)
-3. [Backend Infrastructure with Vultr & Pulumi](#backend-infrastructure-with-vultr--pulumi)
+3. [Backend Infrastructure with Lambda & Pulumi](#backend-infrastructure-with-Lambda--pulumi)
 4. [File Structure & Organization](#file-structure--organization)
 5. [LLM Integration Architecture](#llm-integration-architecture)
 6. [Agent & Persona Management](#agent--persona-management)
@@ -65,7 +65,7 @@ graph TB
     
     subgraph "Infrastructure"
         K8S[Kubernetes]
-        VULTR[Vultr Cloud]
+        Lambda[Lambda Cloud]
         PULUMI[Pulumi IaC]
     end
     
@@ -262,14 +262,14 @@ export const designTokens = {
 
 ---
 
-## Backend Infrastructure with Vultr & Pulumi
+## Backend Infrastructure with Lambda & Pulumi
 
 ### 1. Pulumi Infrastructure Definition
 
 ```typescript
 // infrastructure/pulumi/index.ts
 import * as pulumi from "@pulumi/pulumi";
-import * as vultr from "@ediri/vultr";
+import * as Lambda from "@ediri/Lambda";
 import * as k8s from "@pulumi/kubernetes";
 import * as docker from "@pulumi/docker";
 
@@ -279,7 +279,7 @@ const environment = config.require("environment");
 const region = config.get("region") || "ewr";
 
 // VPC Network
-const vpc = new vultr.Vpc("cherry_ai-vpc", {
+const vpc = new lambda.Vpc("cherry_ai-vpc", {
     region: region,
     v4Subnet: "10.0.0.0",
     v4SubnetMask: 16,
@@ -287,7 +287,7 @@ const vpc = new vultr.Vpc("cherry_ai-vpc", {
 });
 
 // Kubernetes Cluster
-const cluster = new vultr.Kubernetes("cherry_ai-k8s", {
+const cluster = new lambda.Kubernetes("cherry_ai-k8s", {
     region: region,
     version: "v1.28.2+1",
     label: `cherry_ai-${environment}`,
@@ -303,11 +303,11 @@ const cluster = new vultr.Kubernetes("cherry_ai-k8s", {
 });
 
 // Database Instance
-const database = new vultr.Database("cherry_ai-db", {
+const database = new lambda.Database("cherry_ai-db", {
     databaseEngine: "pg",
     databaseEngineVersion: "15",
     region: region,
-    plan: "vultr-dbaas-hobbyist-cc-1-25-1",
+    plan: "Lambda-dbaas-hobbyist-cc-1-25-1",
     label: `cherry_ai-db-${environment}`,
     tag: environment,
     maintenanceDow: "sunday",
@@ -316,24 +316,24 @@ const database = new vultr.Database("cherry_ai-db", {
 });
 
 // Redis Instance
-const redis = new vultr.Database("cherry_ai-redis", {
+const redis = new lambda.Database("cherry_ai-redis", {
     databaseEngine: "redis",
     databaseEngineVersion: "7",
     region: region,
-    plan: "vultr-dbaas-hobbyist-cc-1-25-1",
+    plan: "Lambda-dbaas-hobbyist-cc-1-25-1",
     label: `cherry_ai-redis-${environment}`,
     tag: environment,
     redisEvictionPolicy: "allkeys-lru",
 });
 
 // Object Storage
-const objectStore = new vultr.ObjectStorage("cherry_ai-storage", {
+const objectStore = new lambda.ObjectStorage("cherry_ai-storage", {
     clusterId: 2, // NYC cluster
     label: `cherry_ai-storage-${environment}`,
 });
 
 // Load Balancer
-const loadBalancer = new vultr.LoadBalancer("cherry_ai-lb", {
+const loadBalancer = new lambda.LoadBalancer("cherry_ai-lb", {
     region: region,
     label: `cherry_ai-lb-${environment}`,
     balancingAlgorithm: "roundrobin",

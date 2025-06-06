@@ -104,7 +104,7 @@ def main():
     print("2. When SSH access is available, run:")
     print("   scp -r cherry_collab_deploy/ root@45.32.69.157:/tmp/")
     print("   ssh root@45.32.69.157 'cd /tmp/cherry_collab_deploy && python3 deploy_collaboration_bridge.py'")
-    print("\n3. Or use the Vultr web console to upload and run the deployment script")
+    print("\n3. Or use the Lambda web console to upload and run the deployment script")
 
 if __name__ == "__main__":
     main() 

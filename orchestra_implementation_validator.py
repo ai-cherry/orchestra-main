@@ -229,7 +229,7 @@ class ImplementationValidator:
         
         # Check for deployment scripts
         deployment_scripts = [
-            'deploy_to_vultr.py',
+            'deploy_to_lambda.py',
             'production_deploy.sh',
             'deploy_orchestrator_infrastructure.py',
             'orchestra_deployment_framework.py'

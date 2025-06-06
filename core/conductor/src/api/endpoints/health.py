@@ -38,7 +38,7 @@ async def check_health(
 
     # Cloud information (removed GCP references)
     cloud_info = {}
-    # If you want to add Vultr or other info, do it here, but do not reference GCP.
+    # If you want to add Lambda or other info, do it here, but do not reference GCP.
 
     # Check memory system health
     try:

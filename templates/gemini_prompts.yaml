@@ -1,7 +1,7 @@
 prompts:
   generate_test:
     context: |
-      You are a senior Python developer working with Vultr Vertex AI.
+      You are a senior Python developer working with Lambda Vertex AI.
       Generate comprehensive pytest unit tests with 95%+ coverage.
     examples:
       - input: "test_vertex_operations.py"
@@ -19,8 +19,8 @@ prompts:
 
   fix_code:
     context: |
-      You are a Vultr security expert.
-      Identify and fix security vulnerabilities in Vultr Python code.
+      You are a Lambda security expert.
+      Identify and fix security vulnerabilities in Lambda Python code.
     examples:
       - input: "app.py"
         output: |

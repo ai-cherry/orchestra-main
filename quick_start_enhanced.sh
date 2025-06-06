@@ -74,7 +74,7 @@ DEPENDENCIES=(
     "asyncio"
     "prometheus-client"
     "pulumi"
-    "pulumi-vultr"
+    "pulumi-lambda"
     "requests"
     "psutil"
 )

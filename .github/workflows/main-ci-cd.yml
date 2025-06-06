@@ -101,12 +101,12 @@ jobs:
           npm ci
           npm run build
           
-      - name: Deploy to Vultr
+      - name: Deploy to Lambda
         env:
-          VULTR_API_KEY: ${{ secrets.VULTR_API_KEY }}
+          LAMBDA_API_KEY: ${{ secrets.LAMBDA_API_KEY }}
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
-          echo "Deploying to Vultr..."
+          echo "Deploying to lambda..."
           # Add deployment commands here
           
   health-check:

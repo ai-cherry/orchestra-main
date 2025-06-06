@@ -61,7 +61,7 @@ elif [ -f "requirements/base.txt" ]; then
     pip install -r requirements/base.txt
 else
     print_status "warning" "No requirements file found, installing essential packages"
-    pip install fastapi uvicorn pulumi pulumi-vultr weaviate-client asyncio aiohttp pydantic
+    pip install fastapi uvicorn pulumi pulumi-lambda weaviate-client asyncio aiohttp pydantic
 fi
 
 # Install additional packages for the advanced system
@@ -151,8 +151,8 @@ WEBSOCKET_PORT=8001
 SECRET_KEY=$(openssl rand -hex 32)
 JWT_SECRET=$(openssl rand -hex 32)
 
-# Vultr (optional for local)
-# VULTR_API_KEY=your_key_here
+# Lambda (optional for local)
+# LAMBDA_API_KEY=your_key_here
 EOF
     print_status "success" ".env file created"
 else
@@ -271,7 +271,7 @@ echo "  3. Access the UI at http://localhost:3000"
 echo "  4. Test the API at http://localhost:8000/docs"
 echo ""
 echo "📚 For production deployment:"
-echo "  1. Set VULTR_API_KEY in .env"
+echo "  1. Set LAMBDA_API_KEY in .env"
 echo "  2. Run: python scripts/deploy_cherry_ai_local.py"
 echo ""
 echo "Completed at: $(date)"

@@ -27,7 +27,7 @@ The AI conductor is a comprehensive workflow coordination system that coordinate
 4. **Integration Layer**
    - **Airbyte Cloud**: Syncs data between PostgreSQL and Weaviate
    - **GitHub Actions**: Automated deployment pipeline
-   - **Pulumi**: Infrastructure as Code for Vultr deployment
+   - **Pulumi**: Infrastructure as Code for Lambda deployment
 
 ## Installation
 
@@ -37,7 +37,7 @@ The AI conductor is a comprehensive workflow coordination system that coordinate
 - PostgreSQL 15+
 - Access to Weaviate Cloud
 - Airbyte Cloud account (optional)
-- Vultr account (for deployment)
+- Lambda account (for deployment)
 - GitHub repository with Secrets configured
 
 ### Quick Start
@@ -113,8 +113,8 @@ EIGENCODE_API_KEY=your_eigencode_api_key
 CURSOR_AI_API_KEY=your_cursor_ai_api_key
 ROO_CODE_API_KEY=your_roo_code_api_key
 
-# Vultr (for deployment)
-VULTR_API_KEY=your_vultr_api_key
+# Lambda (for deployment)
+LAMBDA_API_KEY=your_LAMBDA_API_KEY
 ```
 
 ### conductor Configuration
@@ -246,7 +246,7 @@ The system includes a comprehensive GitHub Actions workflow for automated deploy
 3. **Runs tests** with coverage reporting
 4. **Builds** deployment artifacts
 5. **Deploys infrastructure** via Pulumi
-6. **Deploys application** to Vultr
+6. **Deploys application** to Lambda
 7. **Runs post-deployment** tasks (Weaviate init, Airbyte config)
 8. **Executes smoke tests**
 9. **Sends notifications** on completion

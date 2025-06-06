@@ -2,7 +2,7 @@
 
 ## Executive Architecture Vision
 
-We're building a **PERFORMANCE-FIRST** unified architecture that eliminates all duplicate code, maximizes throughput, and creates a blazing-fast AI coordination platform. With PostgreSQL on Vultr, Weaviate Cloud, and Airbyte Cloud as our foundation, we'll create a system that's 10x faster than the current implementation.
+We're building a **PERFORMANCE-FIRST** unified architecture that eliminates all duplicate code, maximizes throughput, and creates a blazing-fast AI coordination platform. With PostgreSQL on Lambda, Weaviate Cloud, and Airbyte Cloud as our foundation, we'll create a system that's 10x faster than the current implementation.
 
 ## Phase 1: AGGRESSIVE MEMORY CONSOLIDATION (Week 1-2)
 
@@ -58,8 +58,8 @@ class MemoryConfig:
     # L2: Shared Memory
     shared_memory_size: int = 4 * 1024 * 1024 * 1024  # 4GB
     
-    # L3: PostgreSQL on Vultr
-    postgres_url: str = "postgresql://user:pass@vultr-postgres:5432/cherry_ai"
+    # L3: PostgreSQL on Lambda
+    postgres_url: str = "postgresql://user:pass@Lambda-postgres:5432/cherry_ai"
     postgres_pool_size: int = 100
     
     # L4: Weaviate Cloud
@@ -360,9 +360,9 @@ class LightningDB:
     async def initialize(self):
         """Initialize with extreme optimization"""
         
-        # PostgreSQL on Vultr with maximum performance
+        # PostgreSQL on Lambda with maximum performance
         self.pg_pool = await asyncpg.create_pool(
-            'postgresql://cherry_ai:password@vultr-postgres:5432/cherry_ai',
+            'postgresql://cherry_ai:password@Lambda-postgres:5432/cherry_ai',
             min_size=50,
             max_size=200,
             max_queries=100000,
@@ -447,7 +447,7 @@ class QuantumCache:
         # L1: Plasma Shared Memory (microseconds)
         self._plasma_client = plasma.connect("/tmp/plasma")
         
-        # L2: Redis on Vultr (milliseconds)
+        # L2: Redis on Lambda (milliseconds)
         self._redis_pool = None
         
         # L3: PostgreSQL Materialized Views (milliseconds)
@@ -607,18 +607,18 @@ class NeuralLLMRouter(nn.Module):
 
 ## Phase 6: INFRASTRUCTURE AS CODE (Week 8)
 
-### 6.1 Pulumi Stack for Vultr
+### 6.1 Pulumi Stack for Lambda
 
 ```python
-# infrastructure/vultr_stack.py
+# infrastructure/Lambda_stack.py
 import pulumi
-import pulumi_vultr as vultr
+import pulumi_lambda as Lambda
 from pulumi import Config, Output, export
 import pulumi_kubernetes as k8s
 
 class cherry_aiInfrastructure:
     """
-    Complete infrastructure for Cherry AI on Vultr
+    Complete infrastructure for Cherry AI on Lambda
     """
     
     def __init__(self):
@@ -626,7 +626,7 @@ class cherry_aiInfrastructure:
         self.region = "ewr"  # New Jersey for low latency
         
         # Create VPC
-        self.vpc = vultr.Vpc(
+        self.vpc = lambda.Vpc(
             "cherry_ai-vpc",
             region=self.region,
             v4_subnet="10.0.0.0",
@@ -643,7 +643,7 @@ class cherry_aiInfrastructure:
         self.k8s_cluster = self._create_k8s_cluster()
         
         # Object Storage for backups
-        self.object_storage = vultr.ObjectStorage(
+        self.object_storage = lambda.ObjectStorage(
             "cherry_ai-storage",
             cluster_id=1,  # New Jersey
             label="cherry_ai-backups"
@@ -653,7 +653,7 @@ class cherry_aiInfrastructure:
         """Create high-performance PostgreSQL cluster"""
         
         # Primary node - Bare Metal for maximum performance
-        primary = vultr.BareMetalServer(
+        primary = lambda.BareMetalServer(
             "postgres-primary",
             region=self.region,
             plan="vbm-8c-132gb",  # 8 CPU, 132GB RAM, NVMe
@@ -668,7 +668,7 @@ class cherry_aiInfrastructure:
         # Read replicas
         replicas = []
         for i in range(2):
-            replica = vultr.Instance(
+            replica = lambda.Instance(
                 f"postgres-replica-{i}",
                 region=self.region,
                 plan="vhp-8c-32gb",  # High Performance

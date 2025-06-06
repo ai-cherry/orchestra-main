@@ -23,7 +23,7 @@ This document summarizes all updates made to transition Cherry AI from mock data
   - `requirements/constraints.txt` - Added psutil to constraints
 
 ### 4. Deployment Scripts
-- **File**: `deploy_to_vultr.sh`
+- **File**: `deploy_to_lambda.sh`
   - Updated all paths from `/opt/cherry_ai` to `/root/cherry_ai-main`
   - Updated systemd service configuration
   - Fixed Python environment setup
@@ -35,7 +35,7 @@ This document summarizes all updates made to transition Cherry AI from mock data
   - Added Redis dependency
 
 ### 6. GitHub Workflows
-- **File**: `.github/workflows/deploy-vultr.yml`
+- **File**: `.github/workflows/deploy-lambda.yml`
   - Updated deployment paths to `/root/cherry_ai-main`
   - Fixed SSH key handling
   - Updated service names to `cherry_ai-real`

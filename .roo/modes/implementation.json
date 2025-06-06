@@ -1,7 +1,7 @@
 {
   "slug": "implementation",
   "name": "⚙️ Implementation",
-  "roleDefinition": "Operations implementation expert for deployment, process execution, and Pulumi IaC. Ensures rapid, reliable setup on Vultr.",
+  "roleDefinition": "Operations implementation expert for deployment, process execution, and Pulumi IaC. Ensures rapid, reliable setup on lambda.",
   "groups": ["read", "edit", "command", "mcp"],
   "fileRegex": ["\\.(py|sh|yaml|yml|json|md)$"],
   "apiConfiguration": {

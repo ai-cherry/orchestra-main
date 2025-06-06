@@ -18,8 +18,8 @@ We have identified duplication in deployment scripts. **DO NOT** create new depl
 ENVIRONMENT=prod ./scripts/deploy_cherry_ai.sh
 ```
 
-### 2. `deploy/deploy_stack.sh` - Single-node Vultr stack
-Use this script on the Vultr server to run the unified Docker Compose stack.
+### 2. `deploy/deploy_stack.sh` - Single-node Lambda stack
+Use this script on the Lambda server to run the unified Docker Compose stack.
 
 ```bash
 cp deploy/.env.compose.example deploy/.env.compose

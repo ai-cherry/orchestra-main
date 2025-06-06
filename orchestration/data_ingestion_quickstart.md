@@ -26,8 +26,8 @@ This guide will help you quickly set up and start using the data ingestion syste
 # Install Pulumi
 curl -fsSL https://get.pulumi.com | sh
 
-# Set up Vultr provider
-export VULTR_API_KEY="your-vultr-api-key"
+# Set up Lambda provider
+export LAMBDA_API_KEY="your-Lambda-api-key"
 
 # Deploy infrastructure
 cd infrastructure/data-ingestion

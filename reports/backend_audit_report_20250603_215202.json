@@ -351,7 +351,7 @@
       },
       {
         "category": "syntax",
-        "file": "/root/cherry_ai-main/infrastructure/cherry_ai_vultr_stack.py",
+        "file": "/root/cherry_ai-main/infrastructure/cherry_ai_Lambda_stack.py",
         "line": 40,
         "issue": "Syntax error: '(' was never closed",
         "suggestion": "",
@@ -359,7 +359,7 @@
       },
       {
         "category": "security",
-        "file": "/root/cherry_ai-main/infrastructure/vultr_deployment.py",
+        "file": "/root/cherry_ai-main/infrastructure/Lambda_deployment.py",
         "line": 0,
         "issue": "Weak password hashing algorithm",
         "suggestion": "Use bcrypt, scrypt, or argon2",
@@ -1847,7 +1847,7 @@
       },
       {
         "category": "syntax",
-        "file": "/root/cherry_ai-main/infra/vultr_deployment.py",
+        "file": "/root/cherry_ai-main/infra/Lambda_deployment.py",
         "line": 132,
         "issue": "Syntax error: invalid syntax. Perhaps you forgot a comma?",
         "suggestion": "",
@@ -2671,7 +2671,7 @@
       },
       {
         "category": "syntax",
-        "file": "/root/cherry_ai-main/core/config/settings_vultr.py",
+        "file": "/root/cherry_ai-main/core/config/settings_lambda.py",
         "line": 4,
         "issue": "Syntax error: unexpected indent",
         "suggestion": "",
@@ -4063,7 +4063,7 @@
       },
       {
         "category": "syntax",
-        "file": "/root/cherry_ai-main/infra/components/vultr_server_component.py",
+        "file": "/root/cherry_ai-main/infra/components/Lambda_server_component.py",
         "line": 8,
         "issue": "Syntax error: unexpected indent",
         "suggestion": "",
@@ -4991,7 +4991,7 @@
       },
       {
         "category": "syntax",
-        "file": "/root/cherry_ai-main/ai_components/coordination/vultr_autoscaling.py",
+        "file": "/root/cherry_ai-main/ai_components/coordination/Lambda_autoscaling.py",
         "line": 5,
         "issue": "Syntax error: unexpected indent",
         "suggestion": "",
@@ -5447,7 +5447,7 @@
       },
       {
         "category": "security",
-        "file": "/root/cherry_ai-main/infra/pulumi.vultr.yaml",
+        "file": "/root/cherry_ai-main/infra/pulumi.lambda.yaml",
         "line": 0,
         "issue": "Potential exposed secret in config",
         "suggestion": "Use environment variables",
@@ -5519,7 +5519,7 @@
       },
       {
         "category": "security",
-        "file": "/root/cherry_ai-main/infrastructure/pulumi/Pulumi.vultr.yaml",
+        "file": "/root/cherry_ai-main/infrastructure/pulumi/Pulumi.lambda.yaml",
         "line": 0,
         "issue": "Potential exposed secret in config",
         "suggestion": "Use environment variables",
@@ -6809,7 +6809,7 @@
       },
       {
         "category": "security",
-        "file": "/root/cherry_ai-main/ai_components/coordination/vultr_autoscaling.py",
+        "file": "/root/cherry_ai-main/ai_components/coordination/Lambda_autoscaling.py",
         "line": 0,
         "issue": "Session cookies may lack security flags",
         "suggestion": "Set secure, httponly, and samesite flags",
@@ -10627,7 +10627,7 @@
       },
       {
         "category": "error_handling",
-        "file": "/root/cherry_ai-main/scripts/vultr_provision.py",
+        "file": "/root/cherry_ai-main/scripts/Lambda_provision.py",
         "line": 15,
         "issue": "HTTP request without error handling",
         "suggestion": "Wrap in try-except block",
@@ -10635,7 +10635,7 @@
       },
       {
         "category": "error_handling",
-        "file": "/root/cherry_ai-main/scripts/vultr_provision.py",
+        "file": "/root/cherry_ai-main/scripts/Lambda_provision.py",
         "line": 22,
         "issue": "HTTP request without error handling",
         "suggestion": "Wrap in try-except block",
@@ -11891,7 +11891,7 @@
       },
       {
         "category": "deprecated",
-        "file": "/root/cherry_ai-main/infra/components/vultr_server_component.py",
+        "file": "/root/cherry_ai-main/infra/components/Lambda_server_component.py",
         "line": 48,
         "issue": "Python 2 style print",
         "suggestion": "Use print()",
@@ -12291,7 +12291,7 @@
       },
       {
         "category": "error_handling",
-        "file": "/root/cherry_ai-main/ai_components/coordination/vultr_autoscaling.py",
+        "file": "/root/cherry_ai-main/ai_components/coordination/Lambda_autoscaling.py",
         "line": 222,
         "issue": "File operation without error handling",
         "suggestion": "Wrap in try-except block",
@@ -13699,7 +13699,7 @@
       },
       {
         "category": "security",
-        "file": "/root/cherry_ai-main/infra/pulumi.vultr.yaml",
+        "file": "/root/cherry_ai-main/infra/pulumi.lambda.yaml",
         "line": 0,
         "issue": "Missing CORS configuration",
         "suggestion": "Configure CORS properly",
@@ -13835,7 +13835,7 @@
       },
       {
         "category": "security",
-        "file": "/root/cherry_ai-main/infrastructure/pulumi/Pulumi.vultr.yaml",
+        "file": "/root/cherry_ai-main/infrastructure/pulumi/Pulumi.lambda.yaml",
         "line": 0,
         "issue": "Missing CORS configuration",
         "suggestion": "Configure CORS properly",
@@ -14027,7 +14027,7 @@
       },
       {
         "category": "security",
-        "file": "/root/cherry_ai-main/deploy/docker-compose.vultr.yml",
+        "file": "/root/cherry_ai-main/deploy/docker-compose.lambda.yml",
         "line": 0,
         "issue": "Missing CORS configuration",
         "suggestion": "Configure CORS properly",
@@ -14171,7 +14171,7 @@
       },
       {
         "category": "docker",
-        "file": "/root/cherry_ai-main/deploy/docker-compose.vultr.yml",
+        "file": "/root/cherry_ai-main/deploy/docker-compose.lambda.yml",
         "line": 0,
         "issue": "Using 'latest' tag",
         "suggestion": "",
@@ -14437,7 +14437,7 @@
       },
       {
         "category": "documentation",
-        "file": "/root/cherry_ai-main/infrastructure/vultr_deployment.py",
+        "file": "/root/cherry_ai-main/infrastructure/Lambda_deployment.py",
         "line": 96,
         "issue": "Missing docstring for create_user_data",
         "suggestion": "Add descriptive docstring",
@@ -16109,7 +16109,7 @@
       },
       {
         "category": "documentation",
-        "file": "/root/cherry_ai-main/scripts/vultr_provision.py",
+        "file": "/root/cherry_ai-main/scripts/Lambda_provision.py",
         "line": 6,
         "issue": "Missing docstring for _headers",
         "suggestion": "Add descriptive docstring",
@@ -16117,7 +16117,7 @@
       },
       {
         "category": "documentation",
-        "file": "/root/cherry_ai-main/scripts/vultr_provision.py",
+        "file": "/root/cherry_ai-main/scripts/Lambda_provision.py",
         "line": 9,
         "issue": "Missing docstring for create_instance",
         "suggestion": "Add descriptive docstring",
@@ -16125,7 +16125,7 @@
       },
       {
         "category": "documentation",
-        "file": "/root/cherry_ai-main/scripts/vultr_provision.py",
+        "file": "/root/cherry_ai-main/scripts/Lambda_provision.py",
         "line": 20,
         "issue": "Missing docstring for attach_volume",
         "suggestion": "Add descriptive docstring",
@@ -16133,7 +16133,7 @@
       },
       {
         "category": "documentation",
-        "file": "/root/cherry_ai-main/scripts/vultr_provision.py",
+        "file": "/root/cherry_ai-main/scripts/Lambda_provision.py",
         "line": 25,
         "issue": "Missing docstring for main",
         "suggestion": "Add descriptive docstring",
@@ -16141,7 +16141,7 @@
       },
       {
         "category": "logging",
-        "file": "/root/cherry_ai-main/scripts/vultr_provision.py",
+        "file": "/root/cherry_ai-main/scripts/Lambda_provision.py",
         "line": 0,
         "issue": "Using print() instead of logging",
         "suggestion": "Use logging module for better control",

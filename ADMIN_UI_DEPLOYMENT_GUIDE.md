@@ -1,10 +1,10 @@
 # Admin UI Deployment Guide
 
-This guide explains how to build and deploy the React Admin UI on the unified Vultr server.
+This guide explains how to build and deploy the React Admin UI on the unified Lambda server.
 
 ## Prerequisites
 - Node.js 20+ installed on the server
-- Direct SSH access to the Vultr server
+- Direct SSH access to the Lambda server
 
 ## 1. Local Build and Deploy
 ```bash

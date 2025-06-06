@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Deep cleanup script to analyze and remove files that don't fit current structure."""
     """Performs deep analysis and cleanup of GCP references."""
-            r"VULTR_PROJECT_ID",
-            r"VULTR_PROJECT_ID",
+            r"LAMBDA_PROJECT_ID",
+            r"LAMBDA_PROJECT_ID",
             r"google-cloud-",
             r"gcp-secret",
             r"secret-manager",

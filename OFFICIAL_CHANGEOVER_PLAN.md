@@ -1,4 +1,4 @@
-# Official Changeover Plan: Paperspace → Vultr
+# Official Changeover Plan: Paperspace → Lambda
 
 ## When: NOW (Everything is ready)
 
@@ -10,21 +10,21 @@ git status
 git add -A && git commit -m "Final Paperspace changes" && git push
 ```
 
-## Step 2: Verify Vultr is Ready (2 minutes)
+## Step 2: Verify Lambda is Ready (2 minutes)
 ```bash
 # Test from your local machine
-ssh -i ~/.ssh/vultr_cherry_ai root@45.32.69.157 "cd /root/cherry_ai-main && git pull && echo 'Vultr ready!'"
+ssh -i ~/.ssh/Lambda_cherry_ai root@45.32.69.157 "cd /root/cherry_ai-main && git pull && echo 'Lambda ready!'"
 ```
 
 ## Step 3: Update Cursor IDE (10 minutes)
 Choose one:
-- **Option A**: Set up Remote-SSH to Vultr (see CURSOR_VULTR_SETUP.md)
+- **Option A**: Set up Remote-SSH to Lambda (see CURSOR_Lambda_SETUP.md)
 - **Option B**: Clone fresh on your local machine and push to deploy
 
 ## Step 4: Fix the Website Cache Issue (15 minutes)
 ```bash
-# SSH to Vultr
-ssh -i ~/.ssh/vultr_cherry_ai root@45.32.69.157
+# SSH to Lambda
+ssh -i ~/.ssh/Lambda_cherry_ai root@45.32.69.157
 
 # Apply the new build configuration
 cd /root/cherry_ai-main
@@ -57,7 +57,7 @@ sudo cp -r dist/* /var/www/cherry_ai-admin/
 ## You're Done! 🎉
 
 From now on:
-- All development happens on Vultr (via SSH or Cursor Remote)
+- All development happens on Lambda (via SSH or Cursor Remote)
 - No more server confusion
 - Website updates immediately without cache issues
 - One server, one bill, one source of truth

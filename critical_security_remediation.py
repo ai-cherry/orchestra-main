@@ -311,7 +311,7 @@ WEAVIATE_API_KEY=your_weaviate_api_key_here
 # API Keys
 OPENAI_API_KEY=your_openai_api_key_here
 ANTHROPIC_API_KEY=your_anthropic_api_key_here
-VULTR_API_KEY=your_vultr_api_key_here
+LAMBDA_API_KEY=your_LAMBDA_API_KEY_here
 
 # Authentication
 JWT_SECRET_KEY=your_jwt_secret_key_here

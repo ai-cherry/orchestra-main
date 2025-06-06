@@ -76,7 +76,7 @@ This document summarizes the complete system architecture for integrating Factor
 
 ### Infrastructure Design
 
-1. **Vultr Deployment**
+1. **Lambda Deployment**
    - 3x Roo nodes (4vCPU/8GB each)
    - 3x Factory nodes (4vCPU/8GB each)
    - 2x Bridge nodes (2vCPU/4GB each)
@@ -178,7 +178,7 @@ This document summarizes the complete system architecture for integrating Factor
 
 ## Cost Analysis
 
-### Monthly Infrastructure Costs (Vultr)
+### Monthly Infrastructure Costs (Lambda)
 - Compute instances: $840/month
 - Block storage: $100/month
 - Load balancers: $20/month

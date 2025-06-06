@@ -239,7 +239,7 @@ class ConfigurationAuditor:
             # Check for consistent prefixing
             if not any(var_name.startswith(prefix) # TODO: Consider using list comprehension for better performance
  for prefix in 
-                      ["cherry_ai_", "PORTKEY_", "VULTR_", "POSTGRES_", "WEAVIATE_", "MCP_"]):
+                      ["cherry_ai_", "PORTKEY_", "Lambda_", "POSTGRES_", "WEAVIATE_", "MCP_"]):
                 issues.append("no_standard_prefix")
             
             if issues:

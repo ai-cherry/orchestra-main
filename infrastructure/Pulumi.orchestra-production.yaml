@@ -1,3 +1,3 @@
 config:
-  vultr:api_key:
+  Lambda:api_key:
     secure: AAABAOimEhQMH0ZeUSImy0dqKKnP0bvQaRIPGcJiNAY=

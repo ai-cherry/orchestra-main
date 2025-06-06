@@ -65,8 +65,8 @@
 • Fixed syntax in: /root/orchestra-main/examples/portkey_virtual_keys_demo.py
 • Fixed syntax in: /root/orchestra-main/examples/litellm_integration.py
 • Fixed syntax in: /root/orchestra-main/examples/memory_management_example.py
-• Fixed syntax in: /root/orchestra-main/infrastructure/orchestra_vultr_stack.py
-• Fixed syntax in: /root/orchestra-main/infrastructure/vultr_deployment.py
+• Fixed syntax in: /root/orchestra-main/infrastructure/orchestra_Lambda_stack.py
+• Fixed syntax in: /root/orchestra-main/infrastructure/Lambda_deployment.py
 • Fixed syntax in: /root/orchestra-main/infrastructure/__main__.py
 • Fixed syntax in: /root/orchestra-main/infrastructure/domain_separation.py
 • Fixed syntax in: /root/orchestra-main/shared/circuit_breaker.py
@@ -224,7 +224,7 @@
 • Fixed imports in: /root/orchestra-main/scripts/python_codebase_analyzer.py
 • Fixed syntax in: /root/orchestra-main/scripts/demo_orchestrator.py
 • Fixed syntax in: /root/orchestra-main/scripts/test_nl_and_agent.py
-• Fixed syntax in: /root/orchestra-main/scripts/vultr_provision.py
+• Fixed syntax in: /root/orchestra-main/scripts/Lambda_provision.py
 • Fixed syntax in: /root/orchestra-main/scripts/rapid_production_deploy.py
 • Fixed syntax in: /root/orchestra-main/scripts/roo_enhanced_launcher.py
 • Fixed syntax in: /root/orchestra-main/scripts/architect_advanced_system.py
@@ -261,7 +261,7 @@
 • Fixed syntax in: /root/orchestra-main/factory_integration/context_manager.py
 • Fixed syntax in: /root/orchestra-main/factory_integration/__init__.py
 • Fixed syntax in: /root/orchestra-main/factory_integration/cache_manager.py
-• Fixed syntax in: /root/orchestra-main/infra/vultr_deployment.py
+• Fixed syntax in: /root/orchestra-main/infra/Lambda_deployment.py
 • Fixed syntax in: /root/orchestra-main/infra/do_weaviate_migration_stack.py
 • Fixed syntax in: /root/orchestra-main/infra/__main__.py
 • Fixed syntax in: /root/orchestra-main/infra/mcp_server.py
@@ -375,7 +375,7 @@
 • Fixed syntax in: /root/orchestra-main/core/llm/unified_router.py
 • Fixed syntax in: /root/orchestra-main/core/llm/factory.py
 • Fixed syntax in: /root/orchestra-main/core/config/unified_config.py
-• Fixed syntax in: /root/orchestra-main/core/config/settings_vultr.py
+• Fixed syntax in: /root/orchestra-main/core/config/settings_lambda.py
 • Fixed syntax in: /root/orchestra-main/core/config/__init__.py
 • Fixed syntax in: /root/orchestra-main/core/persistency/mode_config_persistence.py
 • Fixed syntax in: /root/orchestra-main/core/persistency/__init__.py
@@ -567,7 +567,7 @@
 • Fixed syntax in: /root/orchestra-main/factory_integration/tests/test_context_manager.py
 • Fixed syntax in: /root/orchestra-main/factory_integration/tests/test_cache_manager.py
 • Fixed syntax in: /root/orchestra-main/infra/components/postgres_component.py
-• Fixed syntax in: /root/orchestra-main/infra/components/vultr_server_component.py
+• Fixed syntax in: /root/orchestra-main/infra/components/Lambda_server_component.py
 • Fixed syntax in: /root/orchestra-main/infra/components/weaviate_component.py
 • Fixed syntax in: /root/orchestra-main/infra/components/database_component.py
 • Fixed syntax in: /root/orchestra-main/infra/components/litellm_component.py
@@ -714,7 +714,7 @@
 • Fixed syntax in: /root/orchestra-main/ai_components/claude/claude_analyzer.py
 • Fixed syntax in: /root/orchestra-main/ai_components/eigencode/mock_analyzer.py
 • Fixed syntax in: /root/orchestra-main/ai_components/orchestration/orchestrator_integration_update.py
-• Fixed syntax in: /root/orchestra-main/ai_components/orchestration/vultr_autoscaling.py
+• Fixed syntax in: /root/orchestra-main/ai_components/orchestration/Lambda_autoscaling.py
 • Fixed syntax in: /root/orchestra-main/ai_components/orchestration/roo_mcp_adapter.py
 • Fixed syntax in: /root/orchestra-main/ai_components/orchestration/intelligent_cache.py
 • Fixed syntax in: /root/orchestra-main/ai_components/orchestration/coding_activity_monitor.py

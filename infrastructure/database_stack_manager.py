@@ -12,13 +12,13 @@ import json
 from typing import Dict, List
 
 class DatabaseStackManager:
-    def __init__(self, vultr_api_key: str):
-        self.vultr_api_key = vultr_api_key
+    def __init__(self, LAMBDA_API_KEY: str):
+        self.LAMBDA_API_KEY = LAMBDA_API_KEY
         self.headers = {
-            "Authorization": f"Bearer {vultr_api_key}",
+            "Authorization": f"Bearer {LAMBDA_API_KEY}",
             "Content-Type": "application/json"
         }
-        self.base_url = "https://api.vultr.com/v2"
+        self.base_url = "https://cloud.lambdalabs.com/api/v1"
         
         # Database server configuration
         self.db_server_ip = "45.77.87.106"
@@ -517,8 +517,8 @@ if __name__ == "__main__":
         return summary
 
 def main():
-vultr_api_key = os.getenv("INFRA_DATABASE_STACK_MANAGER_API_KEY", "")
-    manager = DatabaseStackManager(vultr_api_key)
+LAMBDA_API_KEY = os.getenv("INFRA_DATABASE_STACK_MANAGER_API_KEY", "")
+    manager = DatabaseStackManager(LAMBDA_API_KEY)
     
     print("🗄️  ORCHESTRA-MAIN DATABASE STACK DEPLOYMENT")
     print("=" * 55)

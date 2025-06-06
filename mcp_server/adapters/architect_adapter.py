@@ -33,7 +33,7 @@
             "options": {
                 "generate_diagrams": params.get("generate_diagrams", True),
                 "include_iac": params.get("include_iac", True),
-                "cloud_provider": params.get("cloud_provider", "vultr"),
+                "cloud_provider": params.get("cloud_provider", "Lambda"),
                 "output_format": params.get("output_format", "pulumi"),
             },
         }
@@ -204,14 +204,14 @@
             return {
                 "result": {
                     "infrastructure_code": """
-vpc = vultr.Vpc("main-vpc",
+vpc = lambda.Vpc("main-vpc",
     region="ewr",
     v4_subnet="10.0.0.0",
     v4_subnet_mask=24
 )
 
 # Create instances
-api_instance = vultr.Instance("api-server",
+api_instance = lambda.Instance("api-server",
     region="ewr",
     plan="vc2-1c-2gb",
     os_id=1743,  # Ubuntu 22.04
@@ -222,7 +222,7 @@ pulumi.export("api_ip", api_instance.main_ip)
 """
                     "pulumi_stack": "cherry_ai-main",
                     "pulumi_config": {
-                        "vultr:region": "ewr",
+                        "Lambda:region": "ewr",
                         "project:name": "cherry_ai",
                     },
                     "version": "1.0.0",

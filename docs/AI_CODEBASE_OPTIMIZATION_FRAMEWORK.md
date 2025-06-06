@@ -71,7 +71,7 @@ These configurations and guidelines should be implemented in the respective AI a
         "integration-preferred-over-standalone",
         "performance-analysis-mandatory-for-db-io",
         "adhere-to-project-structure",
-        "use-pulumi-python-vultr-for-iac"
+        "use-pulumi-python-Lambda-for-iac"
       ],
       "optimizationRules": {
         "dependency-minimization": true,
@@ -139,7 +139,7 @@ These configurations and guidelines should be implemented in the respective AI a
 - **Database:** Use only PostgreSQL (via `shared.database.UnifiedDatabase`) for relational data and Weaviate for vector data.
 - **Performance:** Design for performance. All database operations must be analyzed (`EXPLAIN ANALYZE`). CPU/memory intensive operations should be flagged.
 - **Simplicity:** Solutions should be simple, stable, and maintainable, leveraging existing project patterns.
-- **IaC:** Infrastructure as Code must use Pulumi with Python for Vultr.
+- **IaC:** Infrastructure as Code must use Pulumi with Python for lambda.
 - **File Management:**
     - Strictly no temporary files without explicit, automated lifecycle management (e.g., `transient_file` decorator, registration with cleanup service).
     - All significant generated files must declare purpose and an expiration/review date.

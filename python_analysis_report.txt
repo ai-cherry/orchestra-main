@@ -12,7 +12,7 @@
   "nginx.conf": """server {
 /root/orchestra-main/scripts/integration_plan.py:427: SyntaxWarning: invalid escape sequence '\.'
   nginx_config = """
-/root/orchestra-main/infra/vultr_deployment.py:139: SyntaxWarning: invalid escape sequence '\$'
+/root/orchestra-main/infra/Lambda_deployment.py:139: SyntaxWarning: invalid escape sequence '\$'
   script="""#!/bin/bash
 /root/orchestra-main/infrastructure/pulumi/__main__.py:76: SyntaxWarning: invalid escape sequence '\$'
   user_data="""#!/bin/bash
@@ -192,7 +192,7 @@ Files with Issues: 135
    - /root/orchestra-main/scripts/validate_environment.py:46
    - /root/orchestra-main/scripts/monitoring_improvements.py:678
    - /root/orchestra-main/scripts/python_codebase_analyzer.py:591
-   - /root/orchestra-main/scripts/vultr_provision.py:41
+   - /root/orchestra-main/scripts/Lambda_provision.py:41
    - /root/orchestra-main/scripts/roo_enhanced_launcher.py:134
    - /root/orchestra-main/scripts/test_roo_integration_simple.py:46
    - /root/orchestra-main/scripts/setup_postgres_schema.py:231
@@ -633,7 +633,7 @@ Files with Issues: 135
    - /root/orchestra-main/tests/mocks/concrete_memory_mock.py:9
    - /root/orchestra-main/tests/benchmarks/memory_benchmark.py:30
    - /root/orchestra-main/infra/components/postgres_component.py:40
-   - /root/orchestra-main/infra/components/vultr_server_component.py:9
+   - /root/orchestra-main/infra/components/Lambda_server_component.py:9
    - /root/orchestra-main/infra/components/weaviate_component.py:35
    - /root/orchestra-main/infra/components/database_component.py:11
    - /root/orchestra-main/infra/components/litellm_component.py:15
@@ -751,10 +751,10 @@ Files with Issues: 135
    - /root/orchestra-main/ai_components/claude/claude_analyzer.py:28
    - /root/orchestra-main/ai_components/eigencode/mock_analyzer.py:61
    - /root/orchestra-main/ai_components/orchestration/orchestrator_integration_update.py:29
-   - /root/orchestra-main/ai_components/orchestration/vultr_autoscaling.py:51
-   - /root/orchestra-main/ai_components/orchestration/vultr_autoscaling.py:168
-   - /root/orchestra-main/ai_components/orchestration/vultr_autoscaling.py:266
-   - /root/orchestra-main/ai_components/orchestration/vultr_autoscaling.py:346
+   - /root/orchestra-main/ai_components/orchestration/Lambda_autoscaling.py:51
+   - /root/orchestra-main/ai_components/orchestration/Lambda_autoscaling.py:168
+   - /root/orchestra-main/ai_components/orchestration/Lambda_autoscaling.py:266
+   - /root/orchestra-main/ai_components/orchestration/Lambda_autoscaling.py:346
    - /root/orchestra-main/ai_components/orchestration/roo_mcp_adapter.py:84
    - /root/orchestra-main/ai_components/orchestration/intelligent_cache.py:56
    - /root/orchestra-main/ai_components/orchestration/coding_activity_monitor.py:23

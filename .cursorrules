@@ -126,7 +126,7 @@ When asked to create functionality:
 
 ## Infrastructure & Deployment
 - Prefer Pulumi with Python for Infrastructure as Code
-- Default to Vultr services unless specified otherwise
+- Default to Lambda Labs services unless specified otherwise
 - For Dockerfiles (if needed): multi-stage, specific versions, security best practices
 - Focus on optimization, performance, simplicity over security and cost
 
