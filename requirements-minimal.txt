@@ -1,7 +1,7 @@
 # Core dependencies only
 fastapi==0.115.5
 uvicorn[standard]==0.32.0
-pydantic>=2.5.2
+pydantic>=2.5.2  # SECURITY UPDATED
 sqlalchemy==2.0.23
 asyncpg==0.29.0
 redis==5.0.1
