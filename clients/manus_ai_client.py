@@ -26,7 +26,8 @@ class ManusAIClient:
         bridge_host: str = "cherry-ai.me",
         bridge_port: int = 443,
         use_ssl: bool = True,
-        api_key: str = "manus-key-2024"
+        api_key: str = "manus-key-2024",
+        internal_mode: bool = False
     ):
         self.bridge_host = bridge_host
         self.bridge_port = bridge_port
@@ -35,11 +36,15 @@ class ManusAIClient:
         
         # Connection details
         protocol = "wss" if use_ssl else "ws"
-        self.bridge_url = f"{protocol}://{bridge_host}:{bridge_port}/bridge/ws"
+        # External connections go through Nginx at /bridge/ws
+        # Internal connections go directly to the service at /ws
+        path = "/bridge/ws" if not internal_mode else "/ws"
+        self.bridge_url = f"{protocol}://{bridge_host}:{bridge_port}{path}"
         
         self.websocket = None
         self.connected = False
         self.session_id = None
+        self._connection_event = asyncio.Event()  # Event to signal connection is ready
         
         # Capabilities - what your Manus AI can do
         self.capabilities = [
@@ -75,6 +80,7 @@ class ManusAIClient:
         """Connect to the Cherry AI Bridge"""
         try:
             self.logger.info(f"🔗 Connecting to Cherry AI Bridge at {self.bridge_url}")
+            self._connection_event.clear()
             
             # Connect to WebSocket
             self.websocket = await websockets.connect(self.bridge_url)
@@ -87,10 +93,13 @@ class ManusAIClient:
             }
             
             await self.websocket.send(json.dumps(auth_message))
-            self.logger.info("🔐 Authentication sent")
+            self.logger.info("🔐 Authentication sent, waiting for confirmation...")
             
             # Start message handler
             asyncio.create_task(self._message_handler_loop())
+            
+            # Wait for the connection to be confirmed by the server
+            await asyncio.wait_for(self._connection_event.wait(), timeout=10)
             
             self.logger.info("✅ Connected to Cherry AI Bridge!")
             
@@ -216,8 +225,11 @@ class ManusAIClient:
         self.session_id = message.get("session_id")
         bridge_info = message.get("bridge_info", {})
         
-        self.logger.info(f"✅ Connected! Bridge version: {bridge_info.get('version')}")
+        self.logger.info(f"✅ Connection Confirmed! Bridge version: {bridge_info.get('version')}")
         self.logger.info(f"🤖 Other AIs connected: {bridge_info.get('connected_ais', [])}")
+        
+        # Signal that the connection is fully established
+        self._connection_event.set()
     
     async def _handle_ai_joined(self, message: Dict):
         """Handle when another AI joins"""
