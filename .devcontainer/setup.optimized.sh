@@ -62,7 +62,7 @@ if [ -f ".env.example" ] && [ ! -f ".env" ]; then
   echo "Please update .env with your credentials"
 fi
 
-# Create Vultr credentials directory if it doesn't exist
+# Create Lambda credentials directory if it doesn't exist
 mkdir -p ~/.config/gcloud
 
 # Prevent VS Code restricted mode
@@ -198,16 +198,16 @@ fi
 
 # Verify gcloud CLI is installed
 if command -v gcloud &> /dev/null; then
-  echo "Vultr SDK is installed: $(gcloud --version | head -n 1)"
+  echo "Lambda SDK is installed: $(gcloud --version | head -n 1)"
 
   # Check if authenticated
-  if # vultr-cli auth list --filter=status=ACTIVE --format="value(account)" &> /dev/null; then
-    echo "Authenticated with Vultr as: $(# vultr-cli auth list --filter=status=ACTIVE --format="value(account)")"
+  if # Lambda-cli auth list --filter=status=ACTIVE --format="value(account)" &> /dev/null; then
+    echo "Authenticated with Lambda as: $(# Lambda-cli auth list --filter=status=ACTIVE --format="value(account)")"
   else
-    echo "WARNING: Not authenticated with Vultr. Run '# vultr-cli auth login' to authenticate."
+    echo "WARNING: Not authenticated with lambda. Run '# Lambda-cli auth login' to authenticate."
   fi
 else
-  echo "WARNING: Vultr SDK is not installed. Some features may not work."
+  echo "WARNING: Lambda SDK is not installed. Some features may not work."
 fi
 
 # Create a verification script
@@ -262,18 +262,18 @@ else
   echo "WARNING: Docker is not installed"
 fi
 
-# Check Vultr SDK
+# Check Lambda SDK
 if command -v gcloud &> /dev/null; then
-  echo "Vultr SDK is installed: $(gcloud --version | head -n 1)"
+  echo "Lambda SDK is installed: $(gcloud --version | head -n 1)"
 
   # Check if authenticated
-  if # vultr-cli auth list --filter=status=ACTIVE --format="value(account)" &> /dev/null; then
-    echo "Authenticated with Vultr as: $(# vultr-cli auth list --filter=status=ACTIVE --format="value(account)")"
+  if # Lambda-cli auth list --filter=status=ACTIVE --format="value(account)" &> /dev/null; then
+    echo "Authenticated with Lambda as: $(# Lambda-cli auth list --filter=status=ACTIVE --format="value(account)")"
   else
-    echo "WARNING: Not authenticated with Vultr"
+    echo "WARNING: Not authenticated with Lambda"
   fi
 else
-  echo "WARNING: Vultr SDK is not installed"
+  echo "WARNING: Lambda SDK is not installed"
 fi
 
 # Check if required Python packages are installed

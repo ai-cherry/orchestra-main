@@ -72,7 +72,7 @@
           "scripts/eigencode_installer_simple.py",
           "scripts/validate_environment.py",
           "scripts/monitoring_improvements.py",
-          "scripts/vultr_provision.py",
+          "scripts/Lambda_provision.py",
           "scripts/roo_enhanced_launcher.py",
           "scripts/test_roo_integration_simple.py",
           "scripts/setup_postgres_schema.py",
@@ -1847,7 +1847,7 @@
         "name": "Settings",
         "locations": [
           "core/config.py",
-          "core/config/settings_vultr.py",
+          "core/config/settings_lambda.py",
           "core/config/__init__.py",
           "core/infrastructure/config/settings.py",
           "core/conductor/src/config/settings_clean.py",
@@ -3058,10 +3058,10 @@
       },
       {
         "type": "file",
-        "name": "vultr_deployment",
+        "name": "Lambda_deployment",
         "locations": [
-          "infrastructure/vultr_deployment.py",
-          "infra/vultr_deployment.py"
+          "infrastructure/Lambda_deployment.py",
+          "infra/Lambda_deployment.py"
         ],
         "severity": "low"
       },
@@ -4126,7 +4126,7 @@
         "type": "reserved_name",
         "component": "Core",
         "name": "main",
-        "location": "scripts/vultr_provision.py",
+        "location": "scripts/Lambda_provision.py",
         "severity": "low"
       },
       {
@@ -4794,7 +4794,7 @@
           "MCP_GEMINI_TOKEN_LIMIT",
           "MCP_STORAGE_TYPE",
           "SENTRY_DSN",
-          "VULTR_PROJECT_ID",
+          "LAMBDA_PROJECT_ID",
           "MCP_COPILOT_USE_OPENAI_FALLBACK",
           "SETUP_FIGMA_KEY",
           "CI",
@@ -4882,7 +4882,7 @@
           "SETUP_GROK_KEY",
           "SMTP_SERVER",
           "SETUP_PORTKEY_KEY",
-          "VULTR_API_KEY",
+          "LAMBDA_API_KEY",
           "MCP_SERVER_URL"
         ],
         "severity": "high"
@@ -5905,7 +5905,7 @@
       },
       {
         "type": "missing_mcp_integration",
-        "module": "ai_components/coordination/vultr_autoscaling.py",
+        "module": "ai_components/coordination/Lambda_autoscaling.py",
         "severity": "medium"
       },
       {
@@ -6412,7 +6412,7 @@
         "severity": "high"
       },
       {
-        "package": "pulumi-vultr",
+        "package": "pulumi-lambda",
         "specifications": [
           {
             "file": "infrastructure/requirements.txt",
@@ -11182,31 +11182,31 @@
       },
       {
         "type": "bare_except",
-        "module": "ai_components/coordination/vultr_autoscaling.py",
+        "module": "ai_components/coordination/Lambda_autoscaling.py",
         "count": 1,
         "severity": "medium"
       },
       {
         "type": "unprotected_await",
-        "module": "ai_components/coordination/vultr_autoscaling.py",
+        "module": "ai_components/coordination/Lambda_autoscaling.py",
         "function": "create_instance",
         "severity": "low"
       },
       {
         "type": "unprotected_await",
-        "module": "ai_components/coordination/vultr_autoscaling.py",
+        "module": "ai_components/coordination/Lambda_autoscaling.py",
         "function": "delete_instance",
         "severity": "low"
       },
       {
         "type": "unprotected_await",
-        "module": "ai_components/coordination/vultr_autoscaling.py",
+        "module": "ai_components/coordination/Lambda_autoscaling.py",
         "function": "list_instances",
         "severity": "low"
       },
       {
         "type": "unprotected_await",
-        "module": "ai_components/coordination/vultr_autoscaling.py",
+        "module": "ai_components/coordination/Lambda_autoscaling.py",
         "function": "_ensure_minimum_instances",
         "severity": "low"
       },

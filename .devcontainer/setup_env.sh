@@ -49,7 +49,7 @@ add_env_var "WEAVIATE_API_KEY" "${WEAVIATE_API_KEY:-your_weaviate_api_key_here}"
 add_env_var "PINECONE_API_KEY" "${PINECONE_API_KEY:-your_pinecone_api_key_here}"
 
 # Infrastructure Configuration
-add_env_var "VULTR_API_KEY" "${VULTR_API_KEY:-your_vultr_api_key_here}"
+add_env_var "LAMBDA_API_KEY" "${LAMBDA_API_KEY:-your_LAMBDA_API_KEY_here}"
 add_env_var "PULUMI_ACCESS_TOKEN" "${PULUMI_ACCESS_TOKEN:-your_pulumi_token_here}"
 
 # MCP Server Configuration
@@ -222,7 +222,7 @@ cat > ~/.config/cursor/cherry-ai-config.json << 'EOF'
     "project_type": "AI Orchestrator",
     "personas": ["Cherry Personal", "Sophia Business", "Karen Healthcare"],
     "tech_stack": ["Python", "Flask", "FastAPI", "PostgreSQL", "Redis", "Weaviate"],
-    "infrastructure": ["Vultr", "Pulumi", "GitHub Actions"]
+    "infrastructure": ["Lambda", "Pulumi", "GitHub Actions"]
   },
   "mcp_servers": {
     "enabled": true,

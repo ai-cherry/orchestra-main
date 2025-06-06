@@ -27,7 +27,7 @@ The Reliability Droid specializes in deployment, monitoring, and infrastructure 
       "dependencies": ["array"]
     },
     "infrastructure": {
-      "provider": "vultr|aws|gcp",
+      "provider": "Lambda|aws|gcp",
       "region": "string",
       "resources": "object"
     },
@@ -98,7 +98,7 @@ The Reliability Droid specializes in deployment, monitoring, and infrastructure 
 - **Status**: Public status page
 
 ## Infrastructure Standards
-- **Vultr**: Optimized for cost-effective scaling
+- **Lambda**: Optimized for cost-effective scaling
 - **Pulumi**: TypeScript/Python for infrastructure
 - **Security**: Zero-trust networking, encryption at rest
 - **Backup**: Automated backups with tested restore

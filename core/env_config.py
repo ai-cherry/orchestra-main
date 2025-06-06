@@ -3,7 +3,7 @@
 """
     """
     """
-    gcp_service_account_key: str = Field(default=None, env="VULTR_CREDENTIALS_PATH")
+    gcp_service_account_key: str = Field(default=None, env="LAMBDA_CREDENTIALS_PATH")
 
     # GitHub and CI/CD
     github_token: str = Field(default=None, env="GITHUB_TOKEN")

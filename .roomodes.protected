@@ -8,7 +8,7 @@ modes:
       - browser
       - mcp
     role: AI architect for modular, high-performance orchestration using PostgreSQL,
-      Weaviate, and Pulumi on Vultr. Designs for single-dev, AI-assisted
+      Weaviate, and Pulumi on Lambda Labs. Designs for single-dev, AI-assisted
       workflows.
   code:
     model: google/gemini-2.5-flash-preview-05-20
@@ -50,7 +50,7 @@ modes:
       - edit
       - browser
       - mcp
-    role: Technical strategist for AI system architecture, Vultr optimization, and
+    role: Technical strategist for AI system architecture, Lambda Labs optimization, and
       tech selection. Modular, scalable, performance-focused.
   research:
     model: anthropic/claude-sonnet-4
@@ -80,7 +80,7 @@ modes:
       - command
       - mcp
     role: Operations implementation expert for deployment, process execution, and
-      Pulumi IaC. Ensures rapid, reliable setup on Vultr.
+      Pulumi IaC. Ensures rapid, reliable setup on Lambda Labs.
   quality:
     model: openai/gpt-4.1
     temperature: 0.1
@@ -126,12 +126,12 @@ customModes:
   - slug: architect
     name: 🏗 Architect
     roleDefinition: AI architect for modular, high-performance orchestration using
-      PostgreSQL, Weaviate, and Pulumi on Vultr. Designs for single-dev,
+      PostgreSQL, Weaviate, and Pulumi on Lambda Labs. Designs for single-dev,
       AI-assisted workflows.
     customInstructions: Always design for hot-swappable modules and clear
       interfaces. Use EXPLAIN ANALYZE for Postgres query optimization. Index all
       code and docs in Weaviate for rapid retrieval. Pulumi stacks must target
-      Vultr and be modular. Context sharing via MCP is required for all
+      Lambda Labs and be modular. Context sharing via MCP is required for all
       architecture diagrams and planning.
     groups:
       - read
@@ -187,7 +187,7 @@ customModes:
     model: anthropic/claude-sonnet-4
   - slug: strategy
     name: 🧠 Strategist
-    roleDefinition: Technical strategist for AI system architecture, Vultr optimization, and tech selection. Modular, scalable, performance-focused.
+    roleDefinition: Technical strategist for AI system architecture, Lambda Labs optimization, and tech selection. Modular, scalable, performance-focused.
     customInstructions: Prioritize proven, stable technologies. Consider maintenance
       burden over features. Evaluate community support and documentation. Plan
       for technology lifecycle. Document decision rationale thoroughly.
@@ -225,7 +225,7 @@ customModes:
   - slug: implementation
     name: ⚙️ Implementation
     roleDefinition: Operations implementation expert for deployment, process
-      execution, and Pulumi IaC. Ensures rapid, reliable setup on Vultr.
+      execution, and Pulumi IaC. Ensures rapid, reliable setup on Lambda Labs.
     customInstructions: Use Pulumi with Python for all infrastructure. Version
       control all IaC code. Test infrastructure changes in staging. Implement
       proper state management. Document all infrastructure decisions.

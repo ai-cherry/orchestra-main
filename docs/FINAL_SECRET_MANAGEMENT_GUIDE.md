@@ -50,7 +50,7 @@ Cherry AI now uses **Pulumi as the single source of truth** for all secrets. Thi
 - `perplexity_api_key` - Perplexity AI
 
 ✅ **Deployment**
-- `vultr:api_key` - Vultr API
+- `Lambda:api_key` - Lambda API
 - `pulumi_access_token` - Pulumi cloud
 
 ## 🔧 Daily Usage
@@ -149,14 +149,14 @@ The repository history contains exposed secrets in commit `e18ece0`. To fix:
 2. Rotate these exposed keys:
 - OpenAI API key
 - Anthropic API key
-- Vultr API key
+- Lambda API key
 
 3. Update in Pulumi:
 ```bash
 cd infra
 pulumi config set --secret openai_api_key "<new-key>"
 pulumi config set --secret anthropic_api_key "<new-key>"
-pulumi config set --secret vultr:api_key "<new-token>"
+pulumi config set --secret Lambda:api_key "<new-token>"
 ```
 
 ### CI/CD Setup

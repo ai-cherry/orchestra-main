@@ -21,7 +21,7 @@ Create a comprehensive architecture diagram showing:
 - Factory AI Droid integration points
 - MCP server connections
 - Data flow between Roo and Factory systems
-- Shared resource management (PostgreSQL, Weaviate, Vultr)
+- Shared resource management (PostgreSQL, Weaviate, Lambda)
 
 #### 2. Factory Bridge Integration Design
 Detail the technical implementation of:

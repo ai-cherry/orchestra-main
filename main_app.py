@@ -35,7 +35,7 @@ async def home():
         "status": "success",
         "message": "Orchestra AI deployment successful!",
         "environment": "Development",
-        "project": os.environ.get("VULTR_PROJECT_ID", "local"),
+        "project": os.environ.get("LAMBDA_PROJECT_ID", "local"),
         "service_account": os.environ.get("GOOGLE_SERVICE_ACCOUNT", "none"),
     }
 
@@ -86,7 +86,7 @@ async def health_detailed():
         "status": "healthy",
         "services": {
             "app": "running",
-            "gcp_project": os.environ.get("VULTR_PROJECT_ID", "not_set"),
+            "gcp_project": os.environ.get("LAMBDA_PROJECT_ID", "not_set"),
             "api_keys_loaded": {
                 "openai": bool(os.environ.get("OPENAI_API_KEY")),
                 "anthropic": bool(os.environ.get("ANTHROPIC_API_KEY")),

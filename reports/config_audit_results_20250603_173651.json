@@ -406,22 +406,22 @@
       "severity": "high"
     },
     {
-      "variable": "export VULTR_API_KEY",
+      "variable": "export LAMBDA_API_KEY",
       "occurrences": [
         {
           "file": "/root/cherry_ai-main/.env.deployment",
           "line": 3,
-          "value": "DEMO-VULTR-API-KEY-REPLACE-WITH-REAL"
+          "value": "DEMO-Lambda-API-KEY-REPLACE-WITH-REAL"
         },
         {
           "file": "/root/cherry_ai-main/.envrc",
           "line": 14,
-          "value": "${VULTR_API_KEY:-}"
+          "value": "${LAMBDA_API_KEY:-}"
         },
         {
           "file": "/root/cherry_ai-main/.envrc",
           "line": 14,
-          "value": "${VULTR_API_KEY:-}"
+          "value": "${LAMBDA_API_KEY:-}"
         }
       ],
       "different_values": true,
@@ -530,7 +530,7 @@
       "severity": "medium"
     },
     {
-      "variable": "export VULTR_SERVER_IP",
+      "variable": "export LAMBDA_SERVER_IP",
       "occurrences": [
         {
           "file": "/root/cherry_ai-main/.envrc",
@@ -1178,7 +1178,7 @@
       "severity": "low"
     },
     {
-      "variable": "export VULTR_API_KEY",
+      "variable": "export LAMBDA_API_KEY",
       "issues": [
         "not_uppercase",
         "invalid_characters",
@@ -1478,7 +1478,7 @@
       "severity": "low"
     },
     {
-      "variable": "export VULTR_SERVER_IP",
+      "variable": "export LAMBDA_SERVER_IP",
       "issues": [
         "not_uppercase",
         "invalid_characters",
@@ -1724,7 +1724,7 @@
       "severity": "high"
     },
     {
-      "variable": "VULTR_API_KEY",
+      "variable": "LAMBDA_API_KEY",
       "file": "/root/cherry_ai-main/.env.example",
       "line": 78,
       "sensitive_type": "api_key",
@@ -1784,7 +1784,7 @@
       "severity": "medium"
     },
     {
-      "variable": "export VULTR_API_KEY",
+      "variable": "export LAMBDA_API_KEY",
       "file": "/root/cherry_ai-main/.env.deployment",
       "line": 3,
       "sensitive_type": "api_key",
@@ -1794,7 +1794,7 @@
       "severity": "high"
     },
     {
-      "variable": "export VULTR_API_KEY",
+      "variable": "export LAMBDA_API_KEY",
       "file": "/root/cherry_ai-main/.envrc",
       "line": 14,
       "sensitive_type": "api_key",
@@ -1804,7 +1804,7 @@
       "severity": "medium"
     },
     {
-      "variable": "export VULTR_API_KEY",
+      "variable": "export LAMBDA_API_KEY",
       "file": "/root/cherry_ai-main/.envrc",
       "line": 14,
       "sensitive_type": "api_key",
@@ -1968,9 +1968,9 @@
     {
       "file": "/root/cherry_ai-main/infrastructure/pulumi/migration/docker-compose.yml",
       "file_type": "yaml",
-      "path": "services.pulumi-migration.environment.VULTR_CREDENTIALS_PATH",
+      "path": "services.pulumi-migration.environment.LAMBDA_CREDENTIALS_PATH",
       "issue": "hardcoded_sensitive_value",
-      "key": "VULTR_CREDENTIALS_PATH",
+      "key": "LAMBDA_CREDENTIALS_PATH",
       "severity": "high"
     },
     {

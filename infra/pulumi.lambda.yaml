@@ -1,0 +1,5 @@
+config:
+  cherry_ai-infra:env: dev
+  Lambda:apiKey:
+    secure: <encrypted>
+  cherry_ai-infra:ssh_key_ids: "12345"

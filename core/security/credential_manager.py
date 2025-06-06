@@ -103,7 +103,7 @@ class CredentialManager:
         """
         """
         """
-        return os.environ.get(f"{self.env_prefix}_PROJECT_ID") or os.environ.get("VULTR_PROJECT_ID")
+        return os.environ.get(f"{self.env_prefix}_PROJECT_ID") or os.environ.get("LAMBDA_PROJECT_ID")
 
     def secure_service_account_key(self, file_path: Union[str, Path]) -> bool:
         """

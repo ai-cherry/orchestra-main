@@ -47,7 +47,7 @@ This guide documents the improved, resilient admin UI deployment system that add
 ### Deployment Scripts
 - `deploy_admin_ui_safe.sh` - Safe deployment with validation
 - `check_admin_ui_health.sh` - Comprehensive health checks
-- `fix_admin_ui_vultr.sh` - Vultr-specific fixes
+- `fix_admin_ui_lambda.sh` - Lambda-specific fixes
 - `cleanup_cloud_references.sh` - Remove cloud provider dependencies
 
 ### Core Components

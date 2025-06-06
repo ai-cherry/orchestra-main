@@ -6,7 +6,7 @@ This document outlines when and why to consider the currently "Not Implemented" 
 
 ### Current Project State
 - **Team Size**: Small, experienced team
-- **Deployment**: Single production environment on Vultr
+- **Deployment**: Single production environment on Lambda
 - **Architecture**: Monolithic FastAPI + React admin
 - **Scale**: Growing but manageable
 - **Stability**: High priority (performance > complexity)

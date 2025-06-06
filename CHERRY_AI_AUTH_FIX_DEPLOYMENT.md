@@ -1,7 +1,7 @@
 # Cherry-AI.me Authentication Fix Deployment Guide
 
 ## Overview
-This guide provides step-by-step instructions to deploy the authentication fix for Cherry-AI.me on Vultr infrastructure.
+This guide provides step-by-step instructions to deploy the authentication fix for Cherry-AI.me on Lambda infrastructure.
 
 ## What Was Fixed
 
@@ -34,12 +34,12 @@ docker build -t cherry_ai-api-minimal:latest -f Dockerfile.minimal .
 # Save the Docker image
 docker save cherry_ai-api-minimal:latest | gzip > cherry_ai-api-minimal.tar.gz
 
-# Transfer to your Vultr server
-scp cherry_ai-api-minimal.tar.gz root@YOUR_VULTR_IP:/tmp/
+# Transfer to your Lambda server
+scp cherry_ai-api-minimal.tar.gz root@YOUR_Lambda_IP:/tmp/
 ```
 
-### 3. Deploy on Vultr Server
-SSH into your Vultr server and run:
+### 3. Deploy on Lambda Server
+SSH into your Lambda server and run:
 
 ```bash
 # Load the Docker image
@@ -168,8 +168,8 @@ docker logs cherry_ai-api
 
 ## Infrastructure as Code
 
-The Pulumi configuration for Vultr deployment is available in:
-- `infra/vultr_deployment.py` - Complete Vultr infrastructure setup
+The Pulumi configuration for Lambda deployment is available in:
+- `infra/Lambda_deployment.py` - Complete Lambda infrastructure setup
 - `infra/Pulumi.yaml` - Pulumi project configuration
 
 To deploy infrastructure:

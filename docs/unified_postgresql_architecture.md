@@ -402,4 +402,4 @@ The unified PostgreSQL architecture provides:
 4. **Comprehensive monitoring** with real-time dashboard
 5. **Zero duplication** in code and resources
 
-This architecture embodies the principles of simplicity, performance, and reliability, making it ideal for production deployment on Vultr servers.
+This architecture embodies the principles of simplicity, performance, and reliability, making it ideal for production deployment on Lambda servers.

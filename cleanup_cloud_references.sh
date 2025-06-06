@@ -2,8 +2,8 @@
 #
 # cleanup_cloud_references.sh
 #
-# This script helps identify and clean up DigitalOcean and Vultr references
-# from the Cherry AI codebase, ensuring only Vultr infrastructure is referenced
+# This script helps identify and clean up DigitalOcean and Lambda references
+# from the Cherry AI codebase, ensuring only Lambda infrastructure is referenced
 #
 
 set -e
@@ -78,15 +78,15 @@ echo -e "${BLUE}Scanning codebase for cloud provider references...${NC}"
 
 # Count references
 DO_COUNT=$(count_references "digitalocean\|digital ocean")
-Vultr_COUNT=$(count_references "Vultr\|Vultr\|google-cloud")
+Lambda_COUNT=$(count_references "Lambda\|Lambda\|google-cloud")
 
 echo -e "\n${BLUE}Summary:${NC}"
 echo -e "  DigitalOcean references: ${YELLOW}$DO_COUNT${NC}"
-echo -e "  Vultr references: ${YELLOW}$Vultr_COUNT${NC}"
+echo -e "  Lambda references: ${YELLOW}$Lambda_COUNT${NC}"
 
 # Find specific references
 find_references "digitalocean\|digital ocean" "DigitalOcean"
-find_references "Vultr\|Vultr\|google-cloud" "Vultr"
+find_references "Lambda\|Lambda\|google-cloud" "Lambda"
 
 # List specific files that need attention
 echo -e "\n${BLUE}High-priority files to clean up:${NC}"
@@ -95,7 +95,7 @@ PRIORITY_FILES=(
     "fix_admin_ui_blank_screen.sh"
     ".cursor/mcp.json"
     ".cursor/rules/ALWAYS_APPLY_main_directives.mdc"
-    ".cursor/rules/PULUMI_Vultr_PATTERNS.mdc"
+    ".cursor/rules/pulumi_lambda_PATTERNS.mdc"
     "infra/Pulumi.yaml"
     "infra/Pulumi.dev.yaml"
     "mcp_server/servers/deployment_server.py"
@@ -105,7 +105,7 @@ PRIORITY_FILES=(
 
 for file in "${PRIORITY_FILES[@]}"; do
     if [ -f "$file" ]; then
-        if grep -q -i "digitalocean\|Vultr\|Vultr" "$file" 2>/dev/null; then
+        if grep -q -i "digitalocean\|Lambda\|Lambda" "$file" 2>/dev/null; then
             echo -e "  ${YELLOW}⚠ $file${NC}"
         else
             echo -e "  ${GREEN}✓ $file${NC}"
@@ -115,12 +115,12 @@ done
 
 # Suggest actions
 echo -e "\n${BLUE}Recommended Actions:${NC}"
-echo -e "1. Replace fix_admin_ui_blank_screen.sh with fix_admin_ui_vultr.sh"
+echo -e "1. Replace fix_admin_ui_blank_screen.sh with fix_admin_ui_lambda.sh"
 echo -e "2. Update .cursor/mcp.json to use only local services (PostgreSQL + Weaviate)"
-echo -e "3. Update Cursor rules to reference Vultr instead of Vultr"
-echo -e "4. Remove any Pulumi configurations for DigitalOcean or Vultr"
-echo -e "5. Update deployment scripts to use Vultr infrastructure"
-echo -e "6. Clean up documentation to reflect Vultr-only architecture"
+echo -e "3. Update Cursor rules to reference Lambda instead of Lambda"
+echo -e "4. Remove any Pulumi configurations for DigitalOcean or Lambda"
+echo -e "5. Update deployment scripts to use Lambda infrastructure"
+echo -e "6. Clean up documentation to reflect Lambda-only architecture"
 
 echo -e "\n${CYAN}To automatically replace the most common references, run:${NC}"
 echo -e "${CYAN}  ./cleanup_cloud_references.sh --fix${NC}"
@@ -136,10 +136,10 @@ if [ "$1" == "--fix" ]; then
         echo -e "${GREEN}✓ Removed${NC}"
     fi
     
-    # Make the new Vultr fix script executable
-    if [ -f "fix_admin_ui_vultr.sh" ]; then
-        chmod +x fix_admin_ui_vultr.sh
-        echo -e "${GREEN}✓ Made fix_admin_ui_vultr.sh executable${NC}"
+    # Make the new Lambda fix script executable
+    if [ -f "fix_admin_ui_lambda.sh" ]; then
+        chmod +x fix_admin_ui_lambda.sh
+        echo -e "${GREEN}✓ Made fix_admin_ui_lambda.sh executable${NC}"
     fi
     
     # Update deploy_admin_ui.sh to use local deployment
@@ -147,7 +147,7 @@ if [ "$1" == "--fix" ]; then
         echo -e "${YELLOW}Updating deploy_admin_ui.sh...${NC}"
         cat > deploy_admin_ui.sh << 'EOF'
 #!/bin/bash
-# Deploy Admin UI to Vultr nginx
+# Deploy Admin UI to Lambda nginx
 set -e
 
 echo "🚀 Deploying Admin UI..."

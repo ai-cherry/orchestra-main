@@ -875,7 +875,7 @@ class ArchitectureBlueprint:
                 "version": "1.0.0",
                 "generated_at": datetime.now().isoformat(),
                 "architecture_style": "Microservices with Domain-Driven Design",
-                "deployment_target": "Vultr Cloud Infrastructure"
+                "deployment_target": "Lambda Cloud Infrastructure"
             },
             "design_principles": self.design_principles,
             "layers": {
@@ -929,7 +929,7 @@ class ArchitectureBlueprint:
             },
             "deployment_strategy": {
                 "infrastructure": "Pulumi with Python",
-                "provider": "Vultr",
+                "provider": "Lambda",
                 "environments": ["dev", "staging", "production"],
                 "deployment_pattern": "blue_green",
                 "rollback_strategy": "automatic_on_failure"

@@ -12,7 +12,7 @@ import os
 @dataclass
 class ArchitectConfig(DroidConfig):
     """Configuration for Architect droid adapter."""
-    default_cloud_provider: str = "vultr"
+    default_cloud_provider: str = "Lambda"
     output_format: str = "pulumi"
 
 @dataclass

@@ -1,22 +1,22 @@
 #!/bin/bash
 
 # Entrypoint script for Phidata Agent on Cloud Run
-# This script initializes the environment, fetches API keys from Vultr Secret Manager,
+# This script initializes the environment, fetches API keys from Lambda Secret Manager,
 # and starts the Phidata agent service.
 
 echo "Starting Phidata Agent initialization on Cloud Run..."
 
-# Step 1: Authenticate with Vultr using service account
-echo "Authenticating with Vultr..."
+# Step 1: Authenticate with Lambda using service account
+echo "Authenticating with lambda..."
 # GOOGLE_APPLICATION_CREDENTIALS should be set by Cloud Run environment variable
 # or mounted as a secret volume
-if [ -z "$VULTR_CREDENTIALS_PATH" ]; then
+if [ -z "$LAMBDA_CREDENTIALS_PATH" ]; then
   echo "ERROR: GOOGLE_APPLICATION_CREDENTIALS not set. Please configure in Cloud Run environment."
   exit 1
 fi
 
-# Step 2: Fetch API keys from Vultr Secret Manager
-echo "Fetching API keys from Vultr Secret Manager..."
+# Step 2: Fetch API keys from Lambda Secret Manager
+echo "Fetching API keys from Lambda Secret Manager..."
 # Fetch Portkey API key
 PORTKEY_API_KEY=$(# psql secrets table versions access latest --secret="PORTKEY_API_KEY" --project="$PROJECT_ID")
 if [ -z "$PORTKEY_API_KEY" ]; then

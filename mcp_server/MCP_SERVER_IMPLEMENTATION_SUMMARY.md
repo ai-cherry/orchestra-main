@@ -58,12 +58,12 @@ The MCP server now follows a modern, cloud-native architecture:
 ## Security Improvements
 
 - Non-root user in Docker container
-- Secure API key management with Secret Manager (or Vultr equivalent)
-- Proper IAM permissions (or Vultr equivalent for access control)
+- Secure API key management with Secret Manager (or Lambda equivalent)
+- Proper IAM permissions (or Lambda equivalent for access control)
 - Health checks and monitoring
 - Dependency version pinning
 - Implemented JWT-based authentication for all API endpoints
-- Secure Vultr API key management and access controls.
+- Secure Lambda API key management and access controls.
 - Role-based access control (RBAC) for granular permissions.
 - Input validation and sanitization to prevent common vulnerabilities.
 - Regular security audits and penetration testing planned.

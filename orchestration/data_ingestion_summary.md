@@ -130,9 +130,9 @@ A comprehensive, high-performance data ingestion system designed to handle large
 
 ## Deployment Architecture
 
-### Vultr Infrastructure (via Pulumi)
+### Lambda Infrastructure (via Pulumi)
 ```python
-# Key components deployed on Vultr:
+# Key components deployed on Lambda:
 - PostgreSQL Managed Database (3-node cluster)
 - Kubernetes cluster for services
 - Object Storage for files

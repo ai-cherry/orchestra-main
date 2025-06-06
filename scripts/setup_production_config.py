@@ -89,7 +89,7 @@ def update_env_file():
         
         categories = {
             "Security": ["SECRET_KEY", "JWT_SECRET", "ENCRYPTION_KEY", "API_KEY", "PASSWORD_SALT", "SESSION_SECRET", "COOKIE_SECRET"],
-            "API Keys": ["OPENAI_API_KEY", "ANTHROPIC_API_KEY", "OPENROUTER_API_KEY", "GEMINI_API_KEY", "PORTKEY_API_KEY", "VULTR_API_KEY"],
+            "API Keys": ["OPENAI_API_KEY", "ANTHROPIC_API_KEY", "OPENROUTER_API_KEY", "GEMINI_API_KEY", "PORTKEY_API_KEY", "LAMBDA_API_KEY"],
             "Services": ["WEAVIATE_", "MCP_", "API_"],
             "Monitoring": ["PROMETHEUS_", "GRAFANA_", "METRICS_", "SENTRY_", "LOG_LEVEL"],
             "Communication": ["SMTP_", "SLACK_", "ALERT_", "MONITOR_"],
@@ -130,7 +130,7 @@ def update_env_file():
         f.write("# Copy this to .env and fill in your actual values\n\n")
         
         critical_vars = {
-            "VULTR_API_KEY": "<your-vultr-api-key>",
+            "LAMBDA_API_KEY": "<your-Lambda-api-key>",
             "OPENAI_API_KEY": "<your-openai-api-key>",
             "ANTHROPIC_API_KEY": "<your-anthropic-api-key>",
             "SMTP_PASSWORD": "<your-smtp-password>",
@@ -157,9 +157,9 @@ def setup_pulumi():
         print("  ⚠️  Pulumi not logged in. Logging in to local backend...")
         subprocess.run(["pulumi", "login", "--local"], check=True)
     
-    # Install Pulumi Vultr plugin
-    print("  📦 Installing Pulumi Vultr plugin...")
-    subprocess.run(["pulumi", "plugin", "install", "resource", "vultr"], check=True)
+    # Install Pulumi Lambda plugin
+    print("  📦 Installing Pulumi Lambda plugin...")
+    subprocess.run(["pulumi", "plugin", "install", "resource", "Lambda"], check=True)
     print("  ✓ Pulumi setup complete")
 
 def create_deployment_checklist():
@@ -200,7 +200,7 @@ check_requirement "Docker installed" "which docker" "Install: curl -fsSL https:/
 check_requirement "Python 3.8+" "python3 --version | grep -E '3\.(8|9|10|11|12)'" "Install Python 3.8 or higher" || ((FAILED++))
 check_requirement "SSH key exists" "test -f ~/.ssh/cherry_ai_deploy" "Run: python3 scripts/setup_production_config.py" || ((FAILED++))
 check_requirement ".env file exists" "test -f .env" "Copy .env.example to .env" || ((FAILED++))
-check_requirement "VULTR_API_KEY set" "grep -q 'VULTR_API_KEY=.' .env" "Add your Vultr API key to .env" || ((FAILED++))
+check_requirement "LAMBDA_API_KEY set" "grep -q 'LAMBDA_API_KEY=.' .env" "Add your Lambda API key to .env" || ((FAILED++))
 
 echo ""
 if [ $FAILED -eq 0 ]; then
@@ -208,7 +208,7 @@ if [ $FAILED -eq 0 ]; then
     echo ""
     echo "Next steps:"
     echo "1. Review and update .env with production values"
-    echo "2. Run: python3 scripts/deploy_to_vultr.py"
+    echo "2. Run: python3 scripts/deploy_to_lambda.py"
 else
     echo "❌ $FAILED requirement(s) failed. Please fix before deploying."
     exit 1
@@ -241,14 +241,14 @@ def main():
     print("\n✅ Production setup complete!")
     print("\n📋 Next steps:")
     print("1. Update .env with your production API keys:")
-    print("   - VULTR_API_KEY (required)")
+    print("   - LAMBDA_API_KEY (required)")
     print("   - OPENAI_API_KEY / ANTHROPIC_API_KEY (for AI features)")
     print("   - SMTP_PASSWORD (for email alerts)")
     print("   - SLACK_WEBHOOK_URL (for Slack alerts)")
     print("\n2. Run deployment checklist:")
     print("   ./scripts/deployment_checklist.sh")
-    print("\n3. Deploy to Vultr:")
-    print("   python3 scripts/deploy_to_vultr.py")
+    print("\n3. Deploy to Lambda:")
+    print("   python3 scripts/deploy_to_lambda.py")
     
     # Set SSH key path in environment
     print(f"\n💡 SSH key path: {ssh_key_path}")

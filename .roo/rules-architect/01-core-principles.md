@@ -28,7 +28,7 @@
 
 ## Infrastructure as Code
 - **Tool**: Pulumi with Python
-- **Provider**: Vultr (default)
+- **Provider**: Lambda (default)
 - **Principles**: Declarative, version-controlled, testable
 
 ## File Lifecycle Management
@@ -86,7 +86,7 @@ Design for performance. All database operations must be analyzed (`EXPLAIN ANALY
 Solutions should be simple, stable, and maintainable, leveraging existing project patterns.
 
 ## IaC:
-Infrastructure as Code must use Pulumi with Python for Vultr.
+Infrastructure as Code must use Pulumi with Python for lambda.
 
 ## File Management:
 - Strictly no temporary files without explicit, automated lifecycle management (e.g., `transient_file` decorator, registration with cleanup service).

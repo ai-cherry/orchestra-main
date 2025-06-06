@@ -118,7 +118,7 @@ class TestArchitectAdapter:
             "params": {
                 "project_type": "microservices",
                 "requirements": ["scalable", "fault-tolerant"],
-                "cloud_provider": "vultr",
+                "cloud_provider": "Lambda",
             },
         }
 
@@ -127,7 +127,7 @@ class TestArchitectAdapter:
         assert factory_request["droid"] == "architect"
         assert factory_request["action"] == "design_architecture"
         assert factory_request["context"]["project_type"] == "microservices"
-        assert factory_request["options"]["cloud_provider"] == "vultr"
+        assert factory_request["options"]["cloud_provider"] == "Lambda"
 
     @pytest.mark.asyncio
     async def test_infrastructure_generation(self, architect_adapter):

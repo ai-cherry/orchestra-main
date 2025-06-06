@@ -1,5 +1,5 @@
 #!/bin/bash
-# Quick script to fix cache issues on Vultr
+# Quick script to fix cache issues on Lambda
 
 echo "🔧 Fixing cherry_ai Admin cache issues..."
 

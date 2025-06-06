@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document outlines the complete migration from multiple data stores (Redis, MongoDB, DragonflyDB, Firestore) and cloud providers (GCP, AWS) to a simplified, high-performance stack using only PostgreSQL and Weaviate on Vultr.
+This document outlines the complete migration from multiple data stores (Redis, MongoDB, DragonflyDB, Firestore) and cloud providers (GCP, AWS) to a simplified, high-performance stack using only PostgreSQL and Weaviate on lambda.
 
 ## Architecture Changes
 
@@ -27,7 +27,7 @@ This document outlines the complete migration from multiple data stores (Redis, 
 ├─────────────────────────────────────────────────────────┤
 │  All Data:        PostgreSQL (with JSONB)               │
 │  Vector Search:   Weaviate                              │
-│  Infrastructure:  Vultr (single server)                 │
+│  Infrastructure:  Lambda (single server)                 │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -336,7 +336,7 @@ nodes = client.nodes.get()
 1. **Simplicity**: Only two data stores to manage
 2. **Performance**: PostgreSQL JSONB is extremely fast with proper indexes
 3. **Reliability**: PostgreSQL's ACID guarantees
-4. **Cost**: Single Vultr server, no cloud provider fees
+4. **Cost**: Single Lambda server, no cloud provider fees
 5. **Maintenance**: Fewer moving parts, easier backups
 6. **Flexibility**: JSONB supports any document structure
 

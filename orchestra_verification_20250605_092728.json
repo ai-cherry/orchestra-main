@@ -47,8 +47,8 @@
       ],
       "incorrect_files": [
         "deploy_orchestrator_infrastructure.py",
-        "infrastructure/vultr_deployment.py",
-        "infrastructure/vultr_manager.py"
+        "infrastructure/Lambda_deployment.py",
+        "infrastructure/Lambda_manager.py"
       ],
       "recommendations": []
     }
@@ -57,8 +57,8 @@
     "Critical service Weaviate Vector DB is not responding properly"
   ],
   "recommendations": [
-    "Remove or archive Vultr-specific file: deploy_orchestrator_infrastructure.py",
-    "Remove or archive Vultr-specific file: infrastructure/vultr_deployment.py",
-    "Remove or archive Vultr-specific file: infrastructure/vultr_manager.py"
+    "Remove or archive Lambda-specific file: deploy_orchestrator_infrastructure.py",
+    "Remove or archive Lambda-specific file: infrastructure/Lambda_deployment.py",
+    "Remove or archive Lambda-specific file: infrastructure/Lambda_manager.py"
   ]
 }

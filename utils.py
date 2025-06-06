@@ -29,11 +29,11 @@ class APIKeyManager:
         """Set API key for a service (runtime only)."""
         logger.info(f"Updated API key for {service}")
 
-def get_vultr_project_id() -> str:
-    """Get the Vultr project ID from environment or default."""
-    project_id = os.getenv("VULTR_PROJECT_ID")
+def get_LAMBDA_PROJECT_ID() -> str:
+    """Get the Lambda project ID from environment or default."""
+    project_id = os.getenv("LAMBDA_PROJECT_ID")
     if not project_id:
-        logger.warning("VULTR_PROJECT_ID not set, using default 'cherry-ai-project'")
+        logger.warning("LAMBDA_PROJECT_ID not set, using default 'cherry-ai-project'")
         return "cherry-ai-project"
     return project_id
 

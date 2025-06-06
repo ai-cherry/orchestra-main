@@ -2,7 +2,7 @@
 
 ## 1. Project Overview
 
-The goal of this project was to create, clean up, and establish a deployment pipeline for a world-class Admin UI for the Cherry-AI platform. This involved inventory of existing assets, designing a new architecture, implementing key UI pages and features, and setting up a robust CI/CD pipeline for deployment to a Vultr host.
+The goal of this project was to create, clean up, and establish a deployment pipeline for a world-class Admin UI for the Cherry-AI platform. This involved inventory of existing assets, designing a new architecture, implementing key UI pages and features, and setting up a robust CI/CD pipeline for deployment to a Lambda host.
 
 ## 2. Key Decisions & Achievements
 
@@ -33,9 +33,9 @@ The goal of this project was to create, clean up, and establish a deployment pip
     *   Playwright for E2E tests (authentication flow).
 
 ### 2.3. CI/CD Pipeline & Deployment
-*   **Workflow File**: `.github/workflows/sync-vultr.yml` provides automatic code synchronization.
+*   **Workflow File**: `.github/workflows/sync-lambda.yml` provides automatic code synchronization.
 *   **Build Process**: The admin UI is built directly on the server when needed.
-*   **Deployment Target**: Single Vultr server at 45.32.69.157.
+*   **Deployment Target**: Single Lambda server at 45.32.69.157.
 *   **Deployment Method**: Direct file sync via git pull - no complex CI/CD needed.
 *   **Environments**: Single unified environment - no dev/staging/prod separation.
 *   **Post-Deployment**: Health checks ensure services are running properly.

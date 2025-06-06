@@ -143,8 +143,8 @@ _monitoring_client_lock = threading.RLock()
 def get_monitoring_client() -> PrometheusClient:
     """
     """
-                "VULTR_PROJECT_ID",
-                getattr(settings, "VULTR_PROJECT_ID", "cherry-ai-project"),
+                "LAMBDA_PROJECT_ID",
+                getattr(settings, "LAMBDA_PROJECT_ID", "cherry-ai-project"),
             )
 
             _monitoring_client = PrometheusClient(project_id)

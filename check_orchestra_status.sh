@@ -103,7 +103,7 @@ echo "📊 SUMMARY"
 echo "=========="
 echo "1. Complete security remediation (if not done)"
 echo "2. Create .env file from .env.template"
-echo "3. Configure Vultr API credentials"
+echo "3. Configure Lambda API credentials"
 echo "4. Run validation tests"
 echo "5. Deploy to staging environment"
 echo

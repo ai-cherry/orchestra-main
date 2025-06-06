@@ -101,7 +101,7 @@ This document outlines conflicts, redundancies, and optimization opportunities i
 Multiple deployment scripts with overlapping functionality:
 - `deploy_admin_ui.sh`
 - `deploy_admin_ui_quick.sh`
-- `deploy_to_vultr.sh`
+- `deploy_to_lambda.sh`
 - `quick_deploy.sh`
 
 ### Recommended Action

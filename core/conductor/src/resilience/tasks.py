@@ -176,8 +176,8 @@ _fallback_handler_lock = threading.Lock()
 def get_task_queue_manager() -> TaskQueueManager:
     """
     """
-                "VULTR_PROJECT_ID",
-                getattr(settings, "VULTR_PROJECT_ID", "cherry-ai-project"),
+                "LAMBDA_PROJECT_ID",
+                getattr(settings, "LAMBDA_PROJECT_ID", "cherry-ai-project"),
             )
 
             location_id = os.environ.get(

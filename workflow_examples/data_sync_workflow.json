@@ -6,12 +6,12 @@
   {
     "type": "mode",
     "mode": "architect",
-    "task": "Design a data synchronization system for our multi-agent AI system that securely transfers data between Vultr services and our application using containers as the coordination layer. Consider our existing infrastructure using Pulumi modules and the current GitHub-Vultr integration workflow."
+    "task": "Design a data synchronization system for our multi-agent AI system that securely transfers data between Lambda services and our application using containers as the coordination layer. Consider our existing infrastructure using Pulumi modules and the current GitHub-Lambda integration workflow."
   },
   {
     "type": "mode",
     "mode": "code",
-    "task": "Implement a Python module that handles the data synchronization logic. Include error handling, logging, and authentication against Vultr services."
+    "task": "Implement a Python module that handles the data synchronization logic. Include error handling, logging, and authentication against Lambda services."
   },
   {
     "type": "vs_code_task",
@@ -21,7 +21,7 @@
   {
     "type": "mode",
     "mode": "reviewer",
-    "task": "Review the implemented data synchronization code for security vulnerabilities, focusing on authentication handling, data encryption, and secure Vultr access patterns."
+    "task": "Review the implemented data synchronization code for security vulnerabilities, focusing on authentication handling, data encryption, and secure Lambda access patterns."
   },
   {
     "type": "mode",
@@ -48,7 +48,7 @@
     "type": "github",
     "operation": "commit_changes",
     "parameters": {
-      "message": "Add data synchronization service with secure Vultr integration",
+      "message": "Add data synchronization service with secure Lambda integration",
       "files": [
         "src/data_sync_service.py",
         "tests/test_data_sync_service.py",
@@ -57,7 +57,7 @@
     }
   },
   {
-    "type": "vultr",
+    "type": "Lambda",
     "operation": "container_build",
     "parameters": {
       "config_path": "container_build_data_sync.yaml"
@@ -73,7 +73,7 @@
     "operation": "create_pr",
     "parameters": {
       "title": "Data Synchronization Service Implementation",
-      "body": "This PR adds a secure data synchronization service that transfers data between Vultr services and our application using containers. Includes Pulumi configuration, Python implementation, tests, and documentation.",
+      "body": "This PR adds a secure data synchronization service that transfers data between Lambda services and our application using containers. Includes Pulumi configuration, Python implementation, tests, and documentation.",
       "base_branch": "main"
     }
   }

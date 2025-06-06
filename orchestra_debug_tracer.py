@@ -16,7 +16,7 @@ class OrchestraDebugTracer:
         self.corrections = []
         
     def trace_infrastructure_mismatch(self):
-        """Document the infrastructure mismatch between Vultr and Lambda Labs"""
+        """Document the infrastructure mismatch between Lambda and Lambda Labs"""
         
         print("🔍 ORCHESTRA INFRASTRUCTURE DEBUG TRACE")
         print("=" * 60)
@@ -29,15 +29,15 @@ class OrchestraDebugTracer:
             "severity": "CRITICAL",
             "details": {
                 "expected": "Lambda Labs (as per user requirement)",
-                "found": "Vultr (in deployment scripts)",
+                "found": "Lambda (in deployment scripts)",
                 "affected_files": [
                     "deploy_orchestrator_infrastructure.py",
                     "deploy-cherry-orchestrator.sh",
-                    "infrastructure/vultr_deployment.py",
-                    "infrastructure/vultr_manager.py"
+                    "infrastructure/Lambda_deployment.py",
+                    "infrastructure/Lambda_manager.py"
                 ]
             },
-            "root_cause": "Implementation mode created Vultr-specific deployment instead of Lambda Labs"
+            "root_cause": "Implementation mode created Lambda-specific deployment instead of Lambda Labs"
         }
         self.findings.append(finding1)
         
@@ -93,10 +93,10 @@ class OrchestraDebugTracer:
         # Correction 1: Lambda Labs Deployment Script
         correction1 = {
             "action": "Create Lambda Labs deployment script",
-            "description": "Replace Vultr deployment with Lambda Labs-specific deployment",
+            "description": "Replace Lambda deployment with Lambda Labs-specific deployment",
             "new_file": "deploy_orchestra_lambda.py",
             "changes": [
-                "Use Lambda Labs API instead of Vultr",
+                "Use Lambda Labs API instead of Lambda",
                 "Deploy to existing production instance (150.136.94.139)",
                 "Integrate with existing services (PostgreSQL, Redis, Weaviate)",
                 "Use SSH deployment instead of cloud provisioning"
@@ -111,7 +111,7 @@ class OrchestraDebugTracer:
             "files_to_update": [
                 ".env.template (add LAMBDA_LABS_API_KEY)",
                 "Pulumi.yaml (change provider to custom Lambda Labs)",
-                "Remove Vultr-specific configurations"
+                "Remove Lambda-specific configurations"
             ]
         }
         self.corrections.append(correction2)
@@ -217,12 +217,12 @@ class OrchestraDebugTracer:
             "debug_type": "Infrastructure Alignment",
             "findings": self.findings,
             "corrections": self.corrections,
-            "recommendation": "Use Lambda Labs deployment instead of Vultr",
+            "recommendation": "Use Lambda Labs deployment instead of Lambda",
             "next_steps": [
                 "Create deploy_orchestra_lambda.py script",
                 "Update all infrastructure references to Lambda Labs",
                 "Test deployment on existing Lambda Labs instance",
-                "Remove Vultr-specific code"
+                "Remove Lambda-specific code"
             ]
         }
         

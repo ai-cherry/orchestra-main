@@ -170,7 +170,7 @@
     },
     {
       "success": true,
-      "issue": "Hardcoded API_KEY in scripts/deploy_vultr_now.py:13",
+      "issue": "Hardcoded API_KEY in scripts/deploy_Lambda_now.py:13",
       "root_cause": "Credential hardcoded in source code",
       "fix_applied": "Replaced with os.getenv('ORCHESTRA_SCRIPT_API_KEY')",
       "prevention": "Use environment variables for all credentials",
@@ -251,7 +251,7 @@
     },
     {
       "success": true,
-      "issue": "Hardcoded API_KEY in infrastructure/vultr_manager.py:73",
+      "issue": "Hardcoded API_KEY in infrastructure/Lambda_manager.py:73",
       "root_cause": "Credential hardcoded in source code",
       "fix_applied": "Replaced with os.getenv('ORCHESTRA_INFRA_API_KEY')",
       "prevention": "Use environment variables for all credentials",
@@ -629,7 +629,7 @@
     },
     {
       "success": true,
-      "issue": "Synchronous sleep in ./scripts/vultr_direct_deploy.py:330",
+      "issue": "Synchronous sleep in ./scripts/Lambda_direct_deploy.py:330",
       "root_cause": "Blocking sleep in potentially async context",
       "fix_applied": "Added async alternative reminder",
       "prevention": "Use asyncio.sleep() in async functions",
@@ -638,7 +638,7 @@
     },
     {
       "success": true,
-      "issue": "Synchronous sleep in ./scripts/vultr_direct_deploy.py:423",
+      "issue": "Synchronous sleep in ./scripts/Lambda_direct_deploy.py:423",
       "root_cause": "Blocking sleep in potentially async context",
       "fix_applied": "Added async alternative reminder",
       "prevention": "Use asyncio.sleep() in async functions",
@@ -791,7 +791,7 @@
     },
     {
       "success": true,
-      "issue": "Synchronous sleep in ./scripts/deploy_to_vultr.py:191",
+      "issue": "Synchronous sleep in ./scripts/deploy_to_lambda.py:191",
       "root_cause": "Blocking sleep in potentially async context",
       "fix_applied": "Added async alternative reminder",
       "prevention": "Use asyncio.sleep() in async functions",
@@ -800,7 +800,7 @@
     },
     {
       "success": true,
-      "issue": "Synchronous sleep in ./scripts/deploy_to_vultr.py:295",
+      "issue": "Synchronous sleep in ./scripts/deploy_to_lambda.py:295",
       "root_cause": "Blocking sleep in potentially async context",
       "fix_applied": "Added async alternative reminder",
       "prevention": "Use asyncio.sleep() in async functions",
@@ -881,7 +881,7 @@
     },
     {
       "success": true,
-      "issue": "Synchronous sleep in ./infrastructure/vultr_manager.py:114",
+      "issue": "Synchronous sleep in ./infrastructure/Lambda_manager.py:114",
       "root_cause": "Blocking sleep in potentially async context",
       "fix_applied": "Added async alternative reminder",
       "prevention": "Use asyncio.sleep() in async functions",
@@ -1466,7 +1466,7 @@
     },
     {
       "success": true,
-      "issue": "Bare except in ./scripts/vultr_direct_deploy.py:421",
+      "issue": "Bare except in ./scripts/Lambda_direct_deploy.py:421",
       "root_cause": "Catches all exceptions including system exits",
       "fix_applied": "Replaced with 'except Exception as e:' and added logging",
       "prevention": "Always catch specific exceptions",
@@ -1475,7 +1475,7 @@
     },
     {
       "success": false,
-      "issue": "Bare except in ./scripts/vultr_direct_deploy.py:499",
+      "issue": "Bare except in ./scripts/Lambda_direct_deploy.py:499",
       "root_cause": "Could not fix automatically",
       "fix_applied": "None",
       "prevention": "Manual fix required",
@@ -1601,7 +1601,7 @@
     },
     {
       "success": true,
-      "issue": "Bare except in ./scripts/deploy_to_vultr.py:81",
+      "issue": "Bare except in ./scripts/deploy_to_lambda.py:81",
       "root_cause": "Catches all exceptions including system exits",
       "fix_applied": "Replaced with 'except Exception as e:' and added logging",
       "prevention": "Always catch specific exceptions",
@@ -1610,7 +1610,7 @@
     },
     {
       "success": false,
-      "issue": "Bare except in ./scripts/deploy_to_vultr.py:103",
+      "issue": "Bare except in ./scripts/deploy_to_lambda.py:103",
       "root_cause": "Could not fix automatically",
       "fix_applied": "None",
       "prevention": "Manual fix required",
@@ -1619,7 +1619,7 @@
     },
     {
       "success": false,
-      "issue": "Bare except in ./scripts/deploy_to_vultr.py:187",
+      "issue": "Bare except in ./scripts/deploy_to_lambda.py:187",
       "root_cause": "Could not fix automatically",
       "fix_applied": "None",
       "prevention": "Manual fix required",

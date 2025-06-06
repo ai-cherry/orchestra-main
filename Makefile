@@ -45,8 +45,8 @@ after-ai-coding:
 	$(MAKE) ai-review-changes
 	$(MAKE) validate
 
-vultr-deploy:
-	$(PYTHON) scripts/vultr_provision.py $(ARGS)
+Lambda Labs-deploy:
+	$(PYTHON) scripts/Lambda Labs_provision.py $(ARGS)
 
 # Code formatting commands
 format:

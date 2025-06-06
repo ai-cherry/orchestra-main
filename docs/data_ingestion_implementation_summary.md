@@ -43,7 +43,7 @@ I have successfully implemented a comprehensive data ingestion system for the ch
 ### 4. Infrastructure as Code
 
 **[`infrastructure/data_ingestion/__init__.py`](infrastructure/data_ingestion/__init__.py)**
-- Complete Pulumi deployment for Vultr:
+- Complete Pulumi deployment for Lambda:
   - PostgreSQL cluster (3-node HA)
   - Kubernetes cluster with auto-scaling
   - Weaviate StatefulSet for vector storage

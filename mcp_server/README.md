@@ -1,6 +1,6 @@
 # AI cherry_ai MCP Server Implementation
 
-**Note:** The MCP components described herein are now integrated as modules within the main application running on a single Vultr server. This documentation requires further updates to fully reflect the simplified single-server architecture.
+**Note:** The MCP components described herein are now integrated as modules within the main application running on a single Lambda server. This documentation requires further updates to fully reflect the simplified single-server architecture.
 
 ## Overview
 
@@ -35,7 +35,7 @@ The Model Context Protocol (MCP) implementation for AI cherry_ai provides a comp
 # Install required packages
 pip install -r requirements.txt
 
-# Ensure necessary environment variables for the Vultr deployment are set
+# Ensure necessary environment variables for the Lambda deployment are set
 # (e.g., POSTGRES_URL, WEAVIATE_ENDPOINT, REDIS_URL, OPENAI_API_KEY, etc.)
 ```
 
@@ -322,11 +322,11 @@ pytest mcp_server/tests/test_memory_server.py
 
 ## Deployment to Production
 
-The MCP services run as integrated modules within the main application, deployed to the Vultr server via Pulumi and application deployment scripts.
+The MCP services run as integrated modules within the main application, deployed to the Lambda server via Pulumi and application deployment scripts.
 
 ## Environment Variables for Production
 
-Environment variables are configured according to the Vultr deployment, including credentials for PostgreSQL, Weaviate, Redis, and LLM providers.
+Environment variables are configured according to the Lambda deployment, including credentials for PostgreSQL, Weaviate, Redis, and LLM providers.
 
 ## Next Steps
 

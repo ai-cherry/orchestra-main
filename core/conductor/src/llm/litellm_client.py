@@ -30,8 +30,8 @@ class LLMMessage(BaseModel):
         self.api_base_azure = api_base_azure or os.environ.get("AZURE_OPENAI_API_BASE")
 
         # Set Vertex AI project and location
-        self.vertex_project = vertex_project or settings.vultr_project_id
-        self.vertex_location = vertex_location or settings.vultr_region
+        self.vertex_project = vertex_project or settings.LAMBDA_PROJECT_ID
+        self.vertex_location = vertex_location or settings.LAMBDA_REGION
 
         # Set default models
         self.default_model = default_model or "gpt-3.5-turbo"

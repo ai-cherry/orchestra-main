@@ -23,7 +23,7 @@
         """
                 logger.info(f"Initialized Firestore client with credentials from {credentials_path}")
             else:
-                # Otherwise, rely on default authentication (VULTR_CREDENTIALS_PATH env var)
+                # Otherwise, rely on default authentication (LAMBDA_CREDENTIALS_PATH env var)
                 self.db = postgresql.Client()
                 logger.info("Initialized Firestore client with default credentials")
 

@@ -2,7 +2,7 @@ import os
 #!/usr/bin/env python3
 """
 Orchestra-Main Tier 2 Enterprise Infrastructure Deployment (Fixed)
-Multi-cloud architecture with Vultr + Paperspace integration
+Multi-cloud architecture with Lambda + Paperspace integration
 """
 
 import requests
@@ -15,14 +15,14 @@ from typing import Dict, List, Optional
 class Tier2InfrastructureManager:
     def __init__(self, api_key: str):
         self.api_key = api_key
-        self.base_url = "https://api.vultr.com/v2"
+        self.base_url = "https://cloud.lambdalabs.com/api/v1"
         self.headers = {
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json"
         }
         
         # Infrastructure configuration
-        self.ssh_key_id = "5e0549f8-d7cd-4ecd-9935-291d0965cc5b"  # orchestra-vultr
+        self.ssh_key_id = "5e0549f8-d7cd-4ecd-9935-291d0965cc5b"  # orchestra-Lambda
         self.region = "lax"  # Los Angeles - same as main server
         self.main_server_ip = "45.32.69.157"
         
@@ -154,7 +154,7 @@ echo "Staging server setup complete" > /root/setup_complete.txt
             return {}
     
     def deploy_kubernetes_cluster(self) -> Dict:
-        """Deploy Vultr Kubernetes Engine cluster"""
+        """Deploy Lambda Kubernetes Engine cluster"""
         print("☸️  Deploying Kubernetes cluster...")
         
         # Get available versions first

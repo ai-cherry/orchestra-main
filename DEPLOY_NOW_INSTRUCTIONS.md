@@ -2,10 +2,10 @@
 
 ## Quick Deploy Command
 
-Replace `YOUR_VULTR_IP` with your actual Vultr server IP from GitHub secrets:
+Replace `YOUR_Lambda_IP` with your actual Lambda server IP from GitHub secrets:
 
 ```bash
-./infrastructure/manual-deploy.sh YOUR_VULTR_IP
+./infrastructure/manual-deploy.sh YOUR_Lambda_IP
 ```
 
 For example, if your IP is 45.32.123.456:
@@ -46,6 +46,6 @@ If you prefer automatic deployment:
 2. The workflow will trigger automatically
 3. It will use your GitHub secrets to deploy
 
-## Need Your Vultr IP?
+## Need Your Lambda IP?
 
-Check your GitHub secrets page for `VULTR_IP_ADDRESS` or your Vultr dashboard.
+Check your GitHub secrets page for `LAMBDA_IP_ADDRESS` or your Lambda dashboard.

@@ -57,11 +57,11 @@ class CherryAIApiClient {
     /**
      * Authentication methods
      */
-    async login(username, password) {
+    async login(credentials) {
         try {
             const response = await this.request('/auth/login', {
                 method: 'POST',
-                body: { username, password }
+                body: credentials
             });
 
             this.token = response.access_token;
@@ -74,11 +74,11 @@ class CherryAIApiClient {
         }
     }
 
-    async register(username, email, password) {
+    async register(userData) {
         try {
             const response = await this.request('/auth/register', {
                 method: 'POST',
-                body: { username, email, password }
+                body: userData
             });
             
             return response;
@@ -196,6 +196,57 @@ class CherryAIApiClient {
                 error: error.message,
                 timestamp: new Date().toISOString()
             };
+        }
+    }
+
+    /**
+     * Conversation methods
+     */
+    async sendMessage(messageData) {
+        try {
+            return await this.request('/api/conversation', {
+                method: 'POST',
+                body: messageData
+            });
+        } catch (error) {
+            throw new Error(`Failed to send message: ${error.message}`);
+        }
+    }
+
+    async getConversationHistory(personaType, limit = 20) {
+        try {
+            return await this.request(`/api/conversation/history/${personaType}?limit=${limit}`);
+        } catch (error) {
+            console.error(`Failed to fetch conversation history for ${personaType}:`, error);
+            return []; // Return empty array as fallback
+        }
+    }
+
+    async getRelationshipInsights(personaType) {
+        try {
+            return await this.request(`/api/relationship/insights/${personaType}`);
+        } catch (error) {
+            console.error(`Failed to fetch relationship insights for ${personaType}:`, error);
+            // Return mock insights as fallback
+            return {
+                relationship_stage: 'developing',
+                trust_score: 0.5,
+                familiarity_score: 0.5,
+                interaction_count: 0,
+                communication_effectiveness: 0.5,
+                learning_patterns_active: 0,
+                personality_adaptations: 0,
+                recent_mood_trend: 0.5
+            };
+        }
+    }
+
+    async getActiveSessions() {
+        try {
+            return await this.request('/api/conversation/active-sessions');
+        } catch (error) {
+            console.error('Failed to fetch active sessions:', error);
+            return []; // Return empty array as fallback
         }
     }
 
@@ -407,4 +458,4 @@ class CherryAIApiClient {
 }
 
 // Create global instance
-window.cherryAPI = new CherryAIApiClient(); 
+window.apiClient = new CherryAIApiClient(); 

@@ -21,7 +21,7 @@ The current system consists of:
 1. **Stub Implementations**: Core services (workflow_runner.py) contain only placeholder code
 2. **No Error Recovery**: Lack of circuit breakers, retry logic, or fallback mechanisms
 3. **Manual Deployment**: Direct SSH deployment without proper CI/CD pipeline
-4. **Single Point of Failure**: All services on one Vultr server (45.32.69.157)
+4. **Single Point of Failure**: All services on one Lambda server (45.32.69.157)
 
 #### B. Scalability Limitations
 1. **No Load Balancing**: Single server architecture
@@ -56,7 +56,7 @@ The current system consists of:
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                         Load Balancer                             │
-│                    (Vultr Load Balancer)                         │
+│                    (Lambda Load Balancer)                         │
 └─────────────────────┬───────────────────┬───────────────────────┘
                       │                   │
         ┌─────────────▼─────────┐ ┌──────▼──────────────┐
@@ -193,18 +193,18 @@ services:
 ```python
 # infrastructure/pulumi/__main__.py
 import pulumi
-from pulumi_vultr import Instance, LoadBalancer, Database
+from pulumi_lambda import Instance, LoadBalancer, Database
 import pulumi_kubernetes as k8s
 
 # Create VPC
-vpc = vultr.Vpc("admin-vpc",
+vpc = lambda.Vpc("admin-vpc",
     region="ewr",
     v4_subnet="10.0.0.0",
     v4_subnet_mask=24
 )
 
 # Create Kubernetes cluster
-cluster = vultr.Kubernetes("admin-cluster",
+cluster = lambda.Kubernetes("admin-cluster",
     region="ewr",
     version="1.28",
     node_pools=[{
@@ -315,7 +315,7 @@ groups:
 | Component | Monthly Cost | Notes |
 |-----------|-------------|-------|
 | Kubernetes Cluster | $180 | 3 nodes |
-| Load Balancer | $10 | Vultr LB |
+| Load Balancer | $10 | Lambda LB |
 | Database | $60 | PostgreSQL managed |
 | Redis | $30 | Managed Redis |
 | Monitoring | $20 | Metrics storage |
@@ -392,7 +392,7 @@ This comprehensive redesign addresses all identified pain points while providing
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                         Load Balancer                             │
-│                    (Vultr Load Balancer)                         │
+│                    (Lambda Load Balancer)                         │
 └─────────────────────┬───────────────────┬───────────────────────┘
                       │                   │
         ┌─────────────▼─────────┐ ┌──────▼──────────────┐
@@ -529,18 +529,18 @@ services:
 ```python
 # infrastructure/pulumi/__main__.py
 import pulumi
-from pulumi_vultr import Instance, LoadBalancer, Database
+from pulumi_lambda import Instance, LoadBalancer, Database
 import pulumi_kubernetes as k8s
 
 # Create VPC
-vpc = vultr.Vpc("admin-vpc",
+vpc = lambda.Vpc("admin-vpc",
     region="ewr",
     v4_subnet="10.0.0.0",
     v4_subnet_mask=24
 )
 
 # Create Kubernetes cluster
-cluster = vultr.Kubernetes("admin-cluster",
+cluster = lambda.Kubernetes("admin-cluster",
     region="ewr",
     version="1.28",
     node_pools=[{
@@ -651,7 +651,7 @@ groups:
 | Component | Monthly Cost | Notes |
 |-----------|-------------|-------|
 | Kubernetes Cluster | $180 | 3 nodes |
-| Load Balancer | $10 | Vultr LB |
+| Load Balancer | $10 | Lambda LB |
 | Database | $60 | PostgreSQL managed |
 | Redis | $30 | Managed Redis |
 | Monitoring | $20 | Metrics storage |

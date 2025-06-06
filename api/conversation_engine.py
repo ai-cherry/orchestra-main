@@ -7,15 +7,28 @@ Implements sophisticated relationship development and learning framework
 import asyncio
 import json
 import logging
+import sys
 from datetime import datetime, timedelta
 from typing import Dict, List, Any, Optional, Tuple
 from dataclasses import dataclass, field
 from enum import Enum
 import re
 import hashlib
+from pathlib import Path
 
 import asyncpg
 from pydantic import BaseModel
+
+# Add parent directory to path for config import
+parent_dir = Path(__file__).parent.parent
+sys.path.insert(0, str(parent_dir))
+
+try:
+    from config.cherry_ai_config import get_config, CherryAIConfig
+    HAS_CONFIG = True
+except ImportError:
+    logging.warning("Could not import cherry_ai_config, using fallback configuration")
+    HAS_CONFIG = False
 
 logger = logging.getLogger(__name__)
 
@@ -63,16 +76,30 @@ class LearningPattern:
 class PersonaPersonality:
     """Base personality framework for AI personas"""
     
-    def __init__(self, persona_type: str, base_traits: Dict[str, float]):
+    def __init__(self, persona_type: str, base_traits: Dict[str, float], config: Optional['CherryAIConfig'] = None):
         self.persona_type = persona_type
         self.base_traits = base_traits
         self.learned_adjustments: Dict[str, float] = {}
         self.communication_patterns: Dict[str, Any] = {}
-        self.adaptation_limits = {
-            'max_trait_adjustment': 0.2,  # Maximum 20% adjustment from base
-            'learning_rate': 0.05,  # Gradual 5% learning rate
-            'confidence_threshold': 0.7  # Minimum confidence for adaptation
-        }
+        
+        # Load adaptation limits from config if available
+        if config and HAS_CONFIG:
+            ai_config = config.ai
+            persona_config = config.get_persona_config(persona_type)
+            learning_config = persona_config.learning_config
+            
+            self.adaptation_limits = {
+                'max_trait_adjustment': learning_config.get('max_trait_adjustment', ai_config.max_trait_adjustment),
+                'learning_rate': learning_config.get('adaptation_rate', ai_config.learning_rate),
+                'confidence_threshold': learning_config.get('confidence_threshold', ai_config.confidence_threshold)
+            }
+        else:
+            # Fallback defaults
+            self.adaptation_limits = {
+                'max_trait_adjustment': 0.2,  # Maximum 20% adjustment from base
+                'learning_rate': 0.05,  # Gradual 5% learning rate
+                'confidence_threshold': 0.7  # Minimum confidence for adaptation
+            }
     
     def get_effective_trait(self, trait_name: str) -> float:
         """Get effective trait value with learned adjustments"""
@@ -306,13 +333,14 @@ class RelationshipMemory:
 class ConversationEngine:
     """Main conversation engine with learning and adaptation"""
     
-    def __init__(self, db_pool: asyncpg.Pool):
+    def __init__(self, db_pool: asyncpg.Pool, config: Optional['CherryAIConfig'] = None):
         self.db_pool = db_pool
         self.memory = RelationshipMemory(db_pool)
         self.personalities: Dict[str, PersonaPersonality] = {}
         self.active_sessions: Dict[str, ConversationContext] = {}
+        self.config = config or (get_config() if HAS_CONFIG else None)
         
-        # Initialize persona personalities
+        # Initialize persona personalities with config
         self._initialize_personalities()
     
     async def initialize(self):
@@ -321,24 +349,37 @@ class ConversationEngine:
         logger.info("Conversation engine initialized")
     
     def _initialize_personalities(self):
-        """Initialize base personality configurations"""
-        self.personalities = {
-            'cherry': PersonaPersonality('cherry', {
-                'playful': 0.9, 'flirty': 0.8, 'creative': 0.9, 
-                'smart': 0.95, 'empathetic': 0.9, 'supportive': 0.95,
-                'energetic': 0.8, 'optimistic': 0.9, 'warm': 0.95
-            }),
-            'sophia': PersonaPersonality('sophia', {
-                'strategic': 0.95, 'professional': 0.9, 'intelligent': 0.95, 
-                'confident': 0.9, 'analytical': 0.9, 'decisive': 0.85,
-                'focused': 0.9, 'competent': 0.95, 'results_oriented': 0.9
-            }),
-            'karen': PersonaPersonality('karen', {
-                'knowledgeable': 0.95, 'trustworthy': 0.95, 'patient_centered': 0.9,
-                'detail_oriented': 0.95, 'authoritative': 0.8, 'careful': 0.9,
-                'systematic': 0.9, 'reliable': 0.95, 'thorough': 0.9
-            })
-        }
+        """Initialize base personality configurations from config"""
+        if self.config and HAS_CONFIG:
+            # Load personalities from configuration
+            self.personalities = {}
+            for persona_type, persona_config in self.config.personas.items():
+                self.personalities[persona_type] = PersonaPersonality(
+                    persona_type, 
+                    persona_config.personality_traits, 
+                    self.config
+                )
+                logger.info(f"Initialized {persona_type} personality from config")
+        else:
+            # Fallback to hardcoded personalities
+            self.personalities = {
+                'cherry': PersonaPersonality('cherry', {
+                    'playful': 0.9, 'flirty': 0.8, 'creative': 0.9, 
+                    'smart': 0.95, 'empathetic': 0.9, 'supportive': 0.95,
+                    'energetic': 0.8, 'optimistic': 0.9, 'warm': 0.95
+                }),
+                'sophia': PersonaPersonality('sophia', {
+                    'strategic': 0.95, 'professional': 0.9, 'intelligent': 0.95, 
+                    'confident': 0.9, 'analytical': 0.9, 'decisive': 0.85,
+                    'focused': 0.9, 'competent': 0.95, 'results_oriented': 0.9
+                }),
+                'karen': PersonaPersonality('karen', {
+                    'knowledgeable': 0.95, 'trustworthy': 0.95, 'patient_centered': 0.9,
+                    'detail_oriented': 0.95, 'authoritative': 0.8, 'careful': 0.9,
+                    'systematic': 0.9, 'reliable': 0.95, 'thorough': 0.9
+                })
+            }
+            logger.info("Initialized personalities from fallback configuration")
     
     async def generate_response(self, user_id: int, persona_type: str, 
                               user_message: str, session_id: str = None,

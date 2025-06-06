@@ -8,7 +8,7 @@ echo ""
 echo "📡 Nameserver Status:"
 CURRENT_NS=$(dig NS cherry-ai.me +short @8.8.8.8 | head -1)
 if [[ "$CURRENT_NS" == *"ns-cloud-c"* ]]; then
-    echo "✅ Using correct Vultr nameservers"
+    echo "✅ Using correct Lambda nameservers"
 else
     echo "⏳ Nameservers still updating (currently: ${CURRENT_NS:-none})"
     echo "   Waiting for: ns-cloud-c1.googledomains.com"

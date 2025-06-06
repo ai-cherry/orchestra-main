@@ -147,14 +147,14 @@ memory:
 
   # Firestore configuration for mid/long-term memory
   postgresql:
-    project_id: ${Vultr_PROJECT_ID}
+    project_id: ${LAMBDA_PROJECT_ID}
     mid_term_collection: cherry_ai_mid_term
     long_term_collection: cherry_ai_long_term
 
   # Vertex AI configuration for semantic memory
   weaviate:
-    project_id: ${Vultr_PROJECT_ID}
-    region: ${Vultr_REGION}
+    project_id: ${LAMBDA_PROJECT_ID}
+    region: ${LAMBDA_REGION}
     index_name: cherry_ai-semantic-memory
     endpoint_name: cherry_ai-semantic-memory-endpoint
     embedding_model: textembedding-gecko@003

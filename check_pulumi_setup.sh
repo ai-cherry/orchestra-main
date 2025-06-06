@@ -30,11 +30,11 @@ else
     echo "✅ PULUMI_ACCESS_TOKEN is set"
 fi
 
-# Check Vultr authentication
-if # vultr-cli auth list --filter=status:ACTIVE --format="value(account)" &> /dev/null; then
-    echo "✅ Vultr authenticated as: $(# vultr-cli auth list --filter=status:ACTIVE --format='value(account)')"
+# Check Lambda authentication
+if # Lambda-cli auth list --filter=status:ACTIVE --format="value(account)" &> /dev/null; then
+    echo "✅ Lambda authenticated as: $(# Lambda-cli auth list --filter=status:ACTIVE --format='value(account)')"
 else
-    echo "❌ Not authenticated to Vultr"
+    echo "❌ Not authenticated to Lambda"
 fi
 
 echo

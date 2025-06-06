@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
 Pulumi Infrastructure as Code for AI Collaboration Dashboard
-Targets Vultr provider with modular, hot-swappable components
+Targets Lambda provider with modular, hot-swappable components
 """
 
 import pulumi
-import pulumi_vultr as vultr
+import pulumi_lambda as Lambda
 from pulumi import Config, Output, export
 import json
 
@@ -14,8 +14,8 @@ config = Config()
 project_name = "ai-collaboration"
 environment = config.get("environment") or "production"
 
-# Vultr configuration
-vultr_config = {
+# Lambda configuration
+Lambda_config = {
     "region": "ewr",  # New Jersey datacenter for low latency
     "plan": "vc2-4c-8gb",  # 4 vCPU, 8GB RAM for services
     "os_id": 387,  # Ubuntu 22.04 LTS
@@ -37,22 +37,22 @@ class AICollaborationInfrastructure:
         
     def _create_vpc(self):
         """Create isolated VPC for AI collaboration services"""
-        vpc = vultr.Vpc(
+        vpc = lambda.Vpc(
             f"{project_name}-vpc",
-            region=vultr_config["region"],
+            region=Lambda_config["region"],
             description="AI Collaboration Services VPC",
             v4_subnet="10.10.0.0",
             v4_subnet_mask=24
         )
         
         # Security group for internal services
-        security_group = vultr.FirewallGroup(
+        security_group = lambda.FirewallGroup(
             f"{project_name}-internal-sg",
             description="Internal services security group"
         )
         
         # Allow internal communication
-        vultr.FirewallRule(
+        lambda.FirewallRule(
             f"{project_name}-internal-rule",
             firewall_group_id=security_group.id,
             protocol="tcp",
@@ -67,11 +67,11 @@ class AICollaborationInfrastructure:
     def _create_redis_cluster(self):
         """Create Redis cluster for real-time AI collaboration data"""
         # Master node
-        redis_master = vultr.Instance(
+        redis_master = lambda.Instance(
             f"{project_name}-redis-master",
-            plan=vultr_config["plan"],
-            region=vultr_config["region"],
-            os_id=vultr_config["os_id"],
+            plan=Lambda_config["plan"],
+            region=Lambda_config["region"],
+            os_id=Lambda_config["os_id"],
             vpc_ids=[self.vpc.id],
             label="AI Collaboration Redis Master",
             tag="ai-collaboration",
@@ -83,11 +83,11 @@ class AICollaborationInfrastructure:
         # Replica nodes for high availability
         redis_replicas = []
         for i in range(2):
-            replica = vultr.Instance(
+            replica = lambda.Instance(
                 f"{project_name}-redis-replica-{i}",
                 plan="vc2-2c-4gb",  # Smaller instances for replicas
-                region=vultr_config["region"],
-                os_id=vultr_config["os_id"],
+                region=Lambda_config["region"],
+                os_id=Lambda_config["os_id"],
                 vpc_ids=[self.vpc.id],
                 label=f"AI Collaboration Redis Replica {i}",
                 tag="ai-collaboration",
@@ -103,13 +103,13 @@ class AICollaborationInfrastructure:
         
     def _create_postgres_replica(self):
         """Create PostgreSQL read replica for analytics queries"""
-        # Using Vultr Database service for managed PostgreSQL
-        postgres_replica = vultr.Database(
+        # Using Lambda Database service for managed PostgreSQL
+        postgres_replica = lambda.Database(
             f"{project_name}-postgres-replica",
             database_engine="pg",
             database_engine_version="14",
-            region=vultr_config["region"],
-            plan="vultr-dbaas-startup-cc-1-55-2",
+            region=Lambda_config["region"],
+            plan="Lambda-dbaas-startup-cc-1-55-2",
             label="AI Collaboration Analytics DB",
             tag="ai-collaboration",
             cluster_time_zone="America/New_York",
@@ -135,9 +135,9 @@ class AICollaborationInfrastructure:
         }
         
         # Load balancer for WebSocket and API traffic
-        lb = vultr.LoadBalancer(
+        lb = lambda.LoadBalancer(
             f"{project_name}-lb",
-            region=vultr_config["region"],
+            region=Lambda_config["region"],
             label="AI Collaboration Load Balancer",
             balancing_algorithm="roundrobin",
             health_check=health_check,
@@ -167,13 +167,13 @@ class AICollaborationInfrastructure:
         
     def _create_cdn(self):
         """Create CDN configuration for dashboard assets"""
-        # Vultr doesn't have native CDN, so we'll use a dedicated instance
+        # Lambda doesn't have native CDN, so we'll use a dedicated instance
         # with nginx and caching configured
-        cdn_instance = vultr.Instance(
+        cdn_instance = lambda.Instance(
             f"{project_name}-cdn",
             plan="vc2-1c-2gb",  # Small instance for static assets
-            region=vultr_config["region"],
-            os_id=vultr_config["os_id"],
+            region=Lambda_config["region"],
+            os_id=Lambda_config["os_id"],
             label="AI Collaboration CDN",
             tag="ai-collaboration",
             user_data=self._get_cdn_userdata(),
@@ -182,9 +182,9 @@ class AICollaborationInfrastructure:
         )
         
         # Reserved IP for CDN
-        cdn_ip = vultr.ReservedIp(
+        cdn_ip = lambda.ReservedIp(
             f"{project_name}-cdn-ip",
-            region=vultr_config["region"],
+            region=Lambda_config["region"],
             ip_type="v4",
             label="AI Collaboration CDN IP",
             instance_id=cdn_instance.id
@@ -197,11 +197,11 @@ class AICollaborationInfrastructure:
         
     def _create_monitoring(self):
         """Create monitoring infrastructure"""
-        monitoring_instance = vultr.Instance(
+        monitoring_instance = lambda.Instance(
             f"{project_name}-monitoring",
             plan="vc2-2c-4gb",
-            region=vultr_config["region"],
-            os_id=vultr_config["os_id"],
+            region=Lambda_config["region"],
+            os_id=Lambda_config["os_id"],
             vpc_ids=[self.vpc.id],
             label="AI Collaboration Monitoring",
             tag="ai-collaboration",

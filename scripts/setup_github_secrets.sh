@@ -103,7 +103,7 @@ set_secret "GH_FINE_GRAINED_TOKEN" "$(get_api_key GH_FINE_GRAINED_TOKEN)"
 
 # Infrastructure Keys (for deployment)
 echo -e "\n=== Infrastructure Keys ==="
-set_secret "VULTR_API_KEY" "$(get_api_key VULTR_API_KEY)"
+set_secret "LAMBDA_API_KEY" "$(get_api_key LAMBDA_API_KEY)"
 set_secret "AIRBYTE_API_KEY" "$(get_api_key AIRBYTE_API_KEY)"
 set_secret "AIRBYTE_API_URL" "$(get_api_key AIRBYTE_API_URL)"
 set_secret "AIRBYTE_WORKSPACE_ID" "$(get_api_key AIRBYTE_WORKSPACE_ID)"

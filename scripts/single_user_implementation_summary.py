@@ -155,8 +155,8 @@ cherry_ai_API_KEY = os.getenv("SCRIPT_SINGLE_USER_IMPLEMENTATION_SUMMARY_API_KEY
     print("docker-compose -f docker-compose.single-user.yml logs -f")
     print("\n# Stop services:")
     print("docker-compose -f docker-compose.single-user.yml down")
-    print("\n# Deploy to Vultr:")
-    print("python3 scripts/vultr_direct_deploy.py")
+    print("\n# Deploy to Lambda:")
+    print("python3 scripts/Lambda_direct_deploy.py")
     
     print("\n✅ Implementation Complete!")
     print("The system is optimized for single-user operation with")

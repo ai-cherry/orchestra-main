@@ -100,8 +100,8 @@ class GitHubSecretsManager:
         
         # Infrastructure secrets to create
         secrets = {
-            # Vultr API
-            "VULTR_API_KEY": "7L34HOKF25HYDT7WHETR7QZTHQX6M5YP36MQ",
+            # Lambda API
+            "LAMBDA_API_KEY": "7L34HOKF25HYDT7WHETR7QZTHQX6M5YP36MQ",
             
             # Database connections
             "DATABASE_URL": "postgresql://orchestra:OrchAI_DB_2024!@45.77.87.106:5432/orchestra_main",
@@ -220,7 +220,7 @@ API_SECRET_KEY=OrchAI_API_Secret_2024_For_Internal_Services
 ENCRYPTION_KEY=OrchAI_Encryption_2024_For_Sensitive_Data_Storage
 
 # Infrastructure
-VULTR_API_KEY=7L34HOKF25HYDT7WHETR7QZTHQX6M5YP36MQ
+LAMBDA_API_KEY=7L34HOKF25HYDT7WHETR7QZTHQX6M5YP36MQ
 PRODUCTION_HOST=45.32.69.157
 DATABASE_HOST=45.77.87.106
 STAGING_HOST=207.246.108.201

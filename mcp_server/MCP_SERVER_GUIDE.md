@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Model Context Protocol (MCP) servers provide specialized tools and capabilities to AI agents like Claude Code within the Cursor IDE. This guide covers setup, management, and troubleshooting of MCP servers, primarily focusing on a Vultr-hosted environment with PostgreSQL and Weaviate Cloud.
+The Model Context Protocol (MCP) servers provide specialized tools and capabilities to AI agents like Claude Code within the Cursor IDE. This guide covers setup, management, and troubleshooting of MCP servers, primarily focusing on a Lambda-hosted environment with PostgreSQL and Weaviate Cloud.
 
 ## Quick Start
 
@@ -53,11 +53,11 @@ The `manage_mcp_servers.sh` script provides comprehensive server control:
 
 ### Available Servers (Reflecting Actual Deployed Services)
 
-This list reflects the MCP servers typically active in your Vultr-based Cherry AI environment. Refer to `mcp_server/server_registry.json` and individual server scripts in `mcp_server/servers/` for precise details.
+This list reflects the MCP servers typically active in your Lambda-based Cherry AI environment. Refer to `mcp_server/server_registry.json` and individual server scripts in `mcp_server/servers/` for precise details.
 
 1.  **`conductor` / `conductor-mcp`**
     *   **Likely Role**: Core workflow execution and task management. Coordinates other MCP services and AI agents.
-    *   Required: `POSTGRES_URL` (for state), `WEAVIATE_URL`, `VULTR_API_KEY` (potentially for dynamic resource management).
+    *   Required: `POSTGRES_URL` (for state), `WEAVIATE_URL`, `LAMBDA_API_KEY` (potentially for dynamic resource management).
     *   Capabilities: Workflow definition, task queuing, agent dispatch, context aggregation.
 
 2.  **`memory` / `memory-mcp` / `enhanced-memory` / `cherry_ai-memory-mcp`**
@@ -75,8 +75,8 @@ This list reflects the MCP servers typically active in your Vultr-based Cherry A
     *   Capabilities: Vector search, object storage/retrieval, schema management in Weaviate.
 
 4.  **`deployment`**
-    *   **Likely Role**: Handles application deployment tasks, possibly interacting with Vultr instances or container registries.
-    *   Required: `VULTR_API_KEY`, potentially container registry credentials.
+    *   **Likely Role**: Handles application deployment tasks, possibly interacting with Lambda instances or container registries.
+    *   Required: `LAMBDA_API_KEY`, potentially container registry credentials.
     *   Capabilities: Deploy services, update instances, manage deployment configurations.
 
 5.  **`tools`**
@@ -120,18 +120,18 @@ grep -i ERROR ~/.cherry_ai-ai/logs/*.log
 ### Common Issues and Solutions
 
 1.  **Server won't start**
-    *   Check if required environment variables are set (e.g., `VULTR_API_KEY`, `POSTGRES_URL`).
+    *   Check if required environment variables are set (e.g., `LAMBDA_API_KEY`, `POSTGRES_URL`).
     *   Verify Python dependencies are installed (`poetry install`).
     *   Check log files for specific errors.
 
 2.  **Server crashes immediately**
     *   Run syntax check: `python -m py_compile <server_file.py>`
     *   Check for missing imports or dependencies.
-    *   Verify Vultr API key and other credentials if services interact with Vultr.
+    *   Verify Lambda API key and other credentials if services interact with lambda.
 
 3.  **Connection refused**
-    *   Ensure backend services are running (PostgreSQL, Weaviate Cloud, Cache DB on Vultr).
-    *   Check firewall/network settings on Vultr and within instances.
+    *   Ensure backend services are running (PostgreSQL, Weaviate Cloud, Cache DB on Lambda).
+    *   Check firewall/network settings on Lambda and within instances.
     *   Verify connection parameters in environment variables.
 
 ## Server Registry
@@ -176,13 +176,13 @@ Use the template at `mcp_server/servers/example_server.py.template` as a startin
 Set these in a `.env` file or your shell profile (e.g., `~/.bashrc.cherry_ai`):
 
 ```bash
-export VULTR_API_KEY="your_vultr_api_key"
-export POSTGRES_URL="postgresql://user:pass@your_vultr_postgres_host:port/dbname"
+export LAMBDA_API_KEY="your_LAMBDA_API_KEY"
+export POSTGRES_URL="postgresql://user:pass@your_Lambda_postgres_host:port/dbname"
 export WEAVIATE_URL="your_weaviate_cloud_url"
 export WEAVIATE_API_KEY="your_weaviate_api_key"
 
-# Optional for Cache DB (e.g., Redis/DragonflyDB on Vultr)
-export CACHE_HOST="your_vultr_cache_db_host"
+# Optional for Cache DB (e.g., Redis/DragonflyDB on Lambda)
+export CACHE_HOST="your_Lambda_cache_db_host"
 export CACHE_PORT="6379"
 export CACHE_PASSWORD="your_cache_password"
 ```
@@ -197,8 +197,8 @@ Ensure your scripts source the environment file or that variables are present in
 Once MCP servers are running, you can use their tools in your AI agents:
 
 ```
-# Deploy application to Vultr
-"Deploy my FastAPI app to a Vultr instance using the vultr-app-deployer tool"
+# Deploy application to Lambda
+"Deploy my FastAPI app to a Lambda instance using the Lambda-app-deployer tool"
 
 # Secret Management (example with a generic tool)
 "Get the database password using the secret-manager-tool"
@@ -239,7 +239,7 @@ ps aux | grep memory_cache_server.py # Specific server
 1.  **Always check logs** when servers fail to start.
 2.  **Set up environment variables** correctly before running servers.
 3.  **Use the management script** for consistent server control.
-4.  **Monitor resource usage** on Vultr instances hosting MCP servers.
+4.  **Monitor resource usage** on Lambda instances hosting MCP servers.
 5.  **Restart servers** if they become unresponsive, using the management script.
 6.  **Keep server dependencies updated** using Poetry.
 
@@ -252,8 +252,8 @@ python --version
 # Verify imports for a specific server script
 # python -c "import mcp_server.servers.your_server_module"
 
-# Test Vultr API key (if vultr-cli is installed)
-# vultr-cli account
+# Test Lambda API key (if Lambda-cli is installed)
+# Lambda-cli account
 
 # Check if ports are in use (e.g., for a service on port 8001)
 ss -tulnp | grep :8001

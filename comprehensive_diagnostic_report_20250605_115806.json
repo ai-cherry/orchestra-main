@@ -2095,9 +2095,9 @@
       {
         "type": "syntax_error",
         "subtype": "indentation_error",
-        "file": "infra/components/vultr_server_component.py",
+        "file": "infra/components/Lambda_server_component.py",
         "line": 8,
-        "error": "unexpected indent (vultr_server_component.py, line 8)",
+        "error": "unexpected indent (Lambda_server_component.py, line 8)",
         "impact": {
           "total_affected_files": 627,
           "core_system_affected": true,
@@ -4162,9 +4162,9 @@
       {
         "type": "syntax_error",
         "subtype": "indentation_error",
-        "file": "core/config/settings_vultr.py",
+        "file": "core/config/settings_lambda.py",
         "line": 4,
-        "error": "unexpected indent (settings_vultr.py, line 4)",
+        "error": "unexpected indent (settings_lambda.py, line 4)",
         "impact": {
           "total_affected_files": 627,
           "core_system_affected": true,
@@ -17836,9 +17836,9 @@
       {
         "type": "syntax_error",
         "subtype": "indentation_error",
-        "file": "ai_components/coordination/vultr_autoscaling.py",
+        "file": "ai_components/coordination/Lambda_autoscaling.py",
         "line": 5,
-        "error": "unexpected indent (vultr_autoscaling.py, line 5)",
+        "error": "unexpected indent (Lambda_autoscaling.py, line 5)",
         "impact": {
           "total_affected_files": 627,
           "core_system_affected": true,
@@ -33477,9 +33477,9 @@
       {
         "type": "syntax_error",
         "subtype": "syntax_error",
-        "file": "infra/vultr_deployment.py",
+        "file": "infra/Lambda_deployment.py",
         "line": 132,
-        "error": "invalid syntax. Perhaps you forgot a comma? (vultr_deployment.py, line 132)",
+        "error": "invalid syntax. Perhaps you forgot a comma? (Lambda_deployment.py, line 132)",
         "impact": {
           "total_affected_files": 4,
           "core_system_affected": true,
@@ -33876,7 +33876,7 @@
           "core/utils/optimization.py",
           "core/utils/stability.py",
           "scripts/system_monitor.py",
-          "scripts/vultr_provision.py",
+          "scripts/Lambda_provision.py",
           "src/ui/web/react_app/src/components/ChatInterface.tsx",
           "src/personas/sophia_persona.py",
           "admin-interface/.next/static/chunks/webpack-3f64a0537c7bc8a3.js",
@@ -33974,7 +33974,7 @@
         "infra/components/litellm_component.py",
         "infra/components/monitoring_component.py",
         "infra/components/ingress_component.py",
-        "infra/components/vultr_server_component.py",
+        "infra/components/Lambda_server_component.py",
         "infra/components/database_component.py",
         "infra/components/vector_droplet_component.py",
         "infra/components/postgres_component.py",
@@ -34013,7 +34013,7 @@
         "core/memory/implementations/storage/postgresql.py",
         "core/memory/implementations/storage/factory.py",
         "core/memory/implementations/storage/inmemory.py",
-        "core/config/settings_vultr.py",
+        "core/config/settings_lambda.py",
         "core/config/__init__.py",
         "core/config/unified_config.py",
         "core/security/credential_manager.py",
@@ -34271,7 +34271,7 @@
         "ai_components/coordination/roo_mcp_adapter.py",
         "ai_components/coordination/comprehensive_orchestrator.py",
         "ai_components/coordination/intelligent_cache.py",
-        "ai_components/coordination/vultr_autoscaling.py",
+        "ai_components/coordination/Lambda_autoscaling.py",
         "ai_components/coordination/ai_orchestrator_enhanced.py",
         "ai_components/coordination/coding_activity_monitor.py",
         "ai_components/coordination/ai_orchestrator.py",
@@ -34631,7 +34631,7 @@
       "count": 4,
       "files": [
         "test_mcp_data.py",
-        "infra/vultr_deployment.py",
+        "infra/Lambda_deployment.py",
         "core/persistency/mode_config_persistence.py",
         "src/infrastructure/pulumi/advanced_system_stack.py"
       ],
@@ -35417,7 +35417,7 @@
             "core/utils/optimization.py",
             "core/utils/stability.py",
             "scripts/system_monitor.py",
-            "scripts/vultr_provision.py",
+            "scripts/Lambda_provision.py",
             "src/ui/web/react_app/src/components/ChatInterface.tsx",
             "src/personas/sophia_persona.py",
             "admin-interface/.next/static/chunks/webpack-3f64a0537c7bc8a3.js",

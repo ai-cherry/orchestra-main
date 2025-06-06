@@ -30,7 +30,7 @@ add_key "PORTKEY_API_KEY" "hPxFZGd8AN269n4bznDf2/Onbi8I"
 add_key "PORTKEY_CONFIG" "pc-portke-b43e56"
 
 # Infrastructure keys
-add_key "VULTR_API_KEY" "7L34HOKF25HYDT7WHETR7QZTHQX6M5YP36MQ"
+add_key "LAMBDA_API_KEY" "7L34HOKF25HYDT7WHETR7QZTHQX6M5YP36MQ"
 
 # Airbyte configuration
 add_key "AIRBYTE_CLIENT_ID" "9630134c-359d-4c9c-aa97-95ab3a2ff8f5"

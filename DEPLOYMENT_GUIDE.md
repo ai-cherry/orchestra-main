@@ -1,12 +1,12 @@
 # AI cherry_ai Deployment Guide
 
-This guide covers all deployment options for the AI cherry_ai API to Vultr, using GitHub secrets and automated workflows.
+This guide covers all deployment options for the AI cherry_ai API to Lambda, using GitHub secrets and automated workflows.
 
 ## Prerequisites
 
 - Docker image built: `cherry_ai-api-minimal.tar.gz` (64MB) ✅
-- GitHub secrets configured (VULTR_API_KEY, VULTR_IP_ADDRESS, etc.) ✅
-- Vultr server (Ubuntu 22.04, 2 vCPU, 4GB RAM)
+- GitHub secrets configured (LAMBDA_API_KEY, LAMBDA_IP_ADDRESS, etc.) ✅
+- Lambda server (Ubuntu 22.04, 2 vCPU, 4GB RAM)
 
 ## Deployment Options
 
@@ -16,13 +16,13 @@ Push to main branch to trigger automatic deployment:
 
 ```bash
 git add .
-git commit -m "Deploy to Vultr"
+git commit -m "Deploy to Lambda"
 git push origin main
 ```
 
 The GitHub Action will:
 1. Build and push Docker image to Docker Hub
-2. Deploy to Vultr server using SSH
+2. Deploy to Lambda server using SSH
 3. Configure personas and environment variables
 4. Run health checks
 
@@ -42,7 +42,7 @@ The GitHub Action will:
 
 ### Option 3: Manual Deployment to Existing Server
 
-If you already have a Vultr server:
+If you already have a Lambda server:
 
 ```bash
 ./infrastructure/manual-deploy.sh YOUR_SERVER_IP
@@ -53,8 +53,8 @@ If you already have a Vultr server:
 For complete infrastructure automation:
 
 ```bash
-export VULTR_API_KEY="your-api-key"
-./infrastructure/deploy-to-vultr.sh
+export LAMBDA_API_KEY="your-api-key"
+./infrastructure/deploy-to-lambda.sh
 ```
 
 ## What Gets Deployed
@@ -69,7 +69,7 @@ export VULTR_API_KEY="your-api-key"
 The following secrets are used from GitHub:
 
 ### Required
-- `VULTR_IP_ADDRESS` - Your Vultr server IP
+- `LAMBDA_IP_ADDRESS` - Your Lambda server IP
 - `SSH_PRIVATE_KEY` - SSH key for server access
 - `DOCKERHUB_USERNAME` - Docker Hub username
 - `DOCKER_PERSONAL_ACCESS_TOKEN` - Docker Hub access token
@@ -103,16 +103,16 @@ The following secrets are used from GitHub:
 
 ```
 .
-├── .github/workflows/deploy-to-vultr.yml    # GitHub Actions workflow
+├── .github/workflows/deploy-to-lambda.yml    # GitHub Actions workflow
 ├── .env.example                             # Environment template
 ├── cherry_ai-api-minimal.tar.gz             # Docker image
 ├── infrastructure/
 │   ├── pulumi/                              # Pulumi IaC
 │   │   ├── Pulumi.yaml
 │   │   └── __main__.py
-│   ├── deploy-to-vultr.sh                   # Automated Pulumi deployment
+│   ├── deploy-to-lambda.sh                   # Automated Pulumi deployment
 │   ├── manual-deploy.sh                     # Manual deployment script
-│   ├── VULTR_DEPLOYMENT.md                  # Detailed deployment docs
+│   ├── Lambda_DEPLOYMENT.md                  # Detailed deployment docs
 │   └── QUICK_DEPLOY.md                      # Quick start guide
 └── scripts/
     ├── sync-github-secrets.sh               # Sync GitHub secrets locally

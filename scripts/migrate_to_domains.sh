@@ -21,7 +21,7 @@ mkdir -p domains/{Personal,PayReady,ParagonRX}/{services,models,api,config}
 # mv ai_components/claude/claude_analyzer.py domains/Personal/services/
 
 # Migrate Personal files
-# mv ai_components/coordination/vultr_autoscaling.py domains/Personal/services/
+# mv ai_components/coordination/Lambda_autoscaling.py domains/Personal/services/
 # mv ai_components/coordination/roo_mcp_adapter.py domains/Personal/services/
 # mv ai_components/coordination/intelligent_cache.py domains/Personal/services/
 # mv ai_components/coordination/mode_transition_manager.py domains/Personal/services/

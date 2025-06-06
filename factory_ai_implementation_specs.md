@@ -339,7 +339,7 @@ class conductorAdapter(FactoryMCPAdapter):
         # Add conductor-specific enhancements
         factory_request['optimization_hints'] = {
             'prefer_modular_design': True,
-            'target_platform': 'vultr',
+            'target_platform': 'Lambda',
             'use_pulumi': True
         }
         

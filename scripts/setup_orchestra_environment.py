@@ -145,7 +145,7 @@
             with open(docker_compose, "r") as f:
                 content = f.read()
 
-            if "VULTR_CREDENTIALS_PATH" not in content:
+            if "LAMBDA_CREDENTIALS_PATH" not in content:
                 print("  ✓ docker-compose.yml is clean")
             else:
                 self.warnings.append("docker-compose.yml may still have GCP references")

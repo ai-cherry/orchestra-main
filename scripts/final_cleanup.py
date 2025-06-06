@@ -2,8 +2,8 @@
 #!/usr/bin/env python3
 """Final cleanup script to remove GCP references and outdated files."""
     """Handles final cleanup of GCP references and outdated files."""
-            r"VULTR_PROJECT_ID",
-            r"VULTR_PROJECT_ID",
+            r"LAMBDA_PROJECT_ID",
+            r"LAMBDA_PROJECT_ID",
             r"google-cloud-",
             r"gcp-secret",
             r"secret-manager",
@@ -109,8 +109,8 @@
 
             # Replace GCP references
             replacements = {
-                r"VULTR_PROJECT_ID": "PROJECT_ID",
-                r"VULTR_PROJECT_ID": "PROJECT_ID",
+                r"LAMBDA_PROJECT_ID": "PROJECT_ID",
+                r"LAMBDA_PROJECT_ID": "PROJECT_ID",
                 r"google-cloud-secret-manager": "# google-cloud-secret-manager (removed)",
                 r"google-cloud-firestore": "# google-cloud-firestore (removed)",
                 r"google-cloud-storage": "# google-cloud-storage (removed)",
@@ -204,8 +204,8 @@
     def update_config_files(self):
         """Update specific configuration files."""
             "docker-compose.yml": [
-                ("VULTR_PROJECT_ID:", "# VULTR_PROJECT_ID: (removed)"),
-                ("VULTR_PROJECT_ID:", "# VULTR_PROJECT_ID: (removed)"),
+                ("LAMBDA_PROJECT_ID:", "# LAMBDA_PROJECT_ID: (removed)"),
+                ("LAMBDA_PROJECT_ID:", "# LAMBDA_PROJECT_ID: (removed)"),
             ],
             # Update .github/workflows/main.yml
             ".github/workflows/main.yml": [

@@ -9,10 +9,10 @@
 ### Local Development Machine (macOS)
 - **Git** installed and configured
 - **Cursor IDE** installed ([download here](https://cursor.sh/))
-- **SSH access** to your Vultr servers
+- **SSH access** to your Lambda servers
 - **GitHub access** to ai-cherry/orchestra-main repository
 
-### Remote Servers (Vultr Infrastructure)
+### Remote Servers (Lambda Infrastructure)
 - **Production Server:** 45.32.69.157 (4 CPU, 8GB RAM)
 - **Database Server:** 45.77.87.106 (8 CPU, 32GB RAM)
 - **Staging Server:** 207.246.108.201 (4 CPU, 8GB RAM)

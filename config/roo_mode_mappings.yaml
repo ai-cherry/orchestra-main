@@ -26,7 +26,7 @@ roo_modes:
     agent_id: roo_architect_agent
     display_name: "🏗 Architect"
     model: anthropic/claude-opus-4
-    role: "AI architect for modular, high-performance coordination using PostgreSQL, Weaviate, and Pulumi on Vultr"
+    role: "AI architect for modular, high-performance coordination using PostgreSQL, Weaviate, and Pulumi on Lambda"
     capabilities:
       - system_design
       - architecture_review
@@ -79,7 +79,7 @@ roo_modes:
     agent_id: roo_strategy_agent
     display_name: "🧠 Strategist"
     model: anthropic/claude-opus-4
-    role: "Technical strategist for AI system architecture, Vultr optimization, and tech selection"
+    role: "Technical strategist for AI system architecture, Lambda optimization, and tech selection"
     capabilities:
       - technology_selection
       - optimization_planning

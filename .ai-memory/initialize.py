@@ -22,11 +22,11 @@ PRIORITIES = {
     "tokens": {
         "github": ["GH_CLASSIC_PAT_TOKEN", "GH_FINE_GRAINED_TOKEN"],
         "gcp": [
-            "VULTR_CREDENTIALS",
+            "Lambda_CREDENTIALS",
             "GCP_PROJECT_AUTHENTICATION_EMAIL",
-            "VULTR_PROJECT_ID",
-            "VULTR_REGION",
-            "VULTR_SECRET_KEY",
+            "LAMBDA_PROJECT_ID",
+            "LAMBDA_REGION",
+            "Lambda_SECRET_KEY",
             "",
             "OPENAI_AGENT_KEY",
         ],

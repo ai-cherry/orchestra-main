@@ -581,23 +581,23 @@
       "issue": "Module not found"
     },
     {
-      "file": "/root/cherry_ai-main/infrastructure/cherry_ai_vultr_stack.py",
+      "file": "/root/cherry_ai-main/infrastructure/cherry_ai_Lambda_stack.py",
       "line": 7,
-      "module": "pulumi_vultr",
+      "module": "pulumi_lambda",
       "type": "standard",
       "issue": "Module not found"
     },
     {
-      "file": "/root/cherry_ai-main/infrastructure/vultr_deployment.py",
+      "file": "/root/cherry_ai-main/infrastructure/Lambda_deployment.py",
       "line": 7,
-      "module": "pulumi_vultr",
+      "module": "pulumi_lambda",
       "type": "standard",
       "issue": "Module not found"
     },
     {
       "file": "/root/cherry_ai-main/infrastructure/__main__.py",
       "line": 7,
-      "module": "pulumi_vultr",
+      "module": "pulumi_lambda",
       "type": "standard",
       "issue": "Module not found"
     },
@@ -843,9 +843,9 @@
       "issue": "Module not found"
     },
     {
-      "file": "/root/cherry_ai-main/infra/vultr_deployment.py",
+      "file": "/root/cherry_ai-main/infra/Lambda_deployment.py",
       "line": 6,
-      "module": "pulumi_vultr",
+      "module": "pulumi_lambda",
       "type": "standard",
       "issue": "Module not found"
     },
@@ -882,15 +882,15 @@
     {
       "file": "/root/cherry_ai-main/infra/__main__.py",
       "line": 5,
-      "module": "pulumi_vultr",
+      "module": "pulumi_lambda",
       "type": "standard",
       "issue": "Module not found"
     },
     {
-      "file": "/root/cherry_ai-main/infra/vultr_single_node_stack.py",
+      "file": "/root/cherry_ai-main/infra/Lambda_single_node_stack.py",
       "line": 3,
-      "module": "components.vultr_server_component",
-      "item": "VultrServerComponent",
+      "module": "components.Lambda_server_component",
+      "item": "LambdaServerComponent",
       "type": "from",
       "issue": "Module not found"
     },
@@ -1155,7 +1155,7 @@
     {
       "file": "/root/cherry_ai-main/infrastructure/pulumi/__main__.py",
       "line": 5,
-      "module": "pulumi_vultr",
+      "module": "pulumi_lambda",
       "type": "standard",
       "issue": "Module not found"
     },
@@ -1169,14 +1169,14 @@
     {
       "file": "/root/cherry_ai-main/infrastructure/pulumi/__init__.py",
       "line": 9,
-      "module": "pulumi_vultr",
+      "module": "pulumi_lambda",
       "type": "standard",
       "issue": "Module not found"
     },
     {
       "file": "/root/cherry_ai-main/infrastructure/data_ingestion/__init__.py",
       "line": 9,
-      "module": "pulumi_vultr",
+      "module": "pulumi_lambda",
       "type": "standard",
       "issue": "Module not found"
     },
@@ -1190,7 +1190,7 @@
     {
       "file": "/root/cherry_ai-main/infrastructure/pulumi/memory_system/__main__.py",
       "line": 9,
-      "module": "pulumi_vultr",
+      "module": "pulumi_lambda",
       "type": "standard",
       "issue": "Module not found"
     },
@@ -1797,14 +1797,14 @@
       "issue": "Module not found"
     },
     {
-      "file": "/root/cherry_ai-main/infra/components/vultr_server_component.py",
+      "file": "/root/cherry_ai-main/infra/components/Lambda_server_component.py",
       "line": 2,
-      "module": "pulumi_vultr",
+      "module": "pulumi_lambda",
       "type": "standard",
       "issue": "Module not found"
     },
     {
-      "file": "/root/cherry_ai-main/infra/components/vultr_server_component.py",
+      "file": "/root/cherry_ai-main/infra/components/Lambda_server_component.py",
       "line": 3,
       "module": "pulumi_command",
       "type": "standard",
@@ -2435,7 +2435,7 @@
     {
       "file": "/root/cherry_ai-main/src/infrastructure/pulumi/advanced_system_stack.py",
       "line": 7,
-      "module": "pulumi_vultr",
+      "module": "pulumi_lambda",
       "type": "standard",
       "issue": "Module not found"
     },
@@ -2544,8 +2544,8 @@
     {
       "file": "/root/cherry_ai-main/ai_components/coordination/comprehensive_conductor.py",
       "line": 23,
-      "module": "coordination.vultr_autoscaling",
-      "item": "Vultrconductor",
+      "module": "coordination.Lambda_autoscaling",
+      "item": "Lambdaconductor",
       "type": "from",
       "issue": "Module not found"
     },
@@ -4259,7 +4259,7 @@
       "line": 321
     },
     {
-      "file": "/root/cherry_ai-main/core/config/settings_vultr.py",
+      "file": "/root/cherry_ai-main/core/config/settings_lambda.py",
       "name": "get_credentials_path",
       "line": 62
     },
@@ -8436,7 +8436,7 @@
       "line": 52
     },
     {
-      "file": "/root/cherry_ai-main/core/config/settings_vultr.py",
+      "file": "/root/cherry_ai-main/core/config/settings_lambda.py",
       "name": "Settings",
       "line": 9
     },
@@ -10446,8 +10446,8 @@
       "line": 33
     },
     {
-      "file": "/root/cherry_ai-main/infra/components/vultr_server_component.py",
-      "name": "VultrServerComponent",
+      "file": "/root/cherry_ai-main/infra/components/Lambda_server_component.py",
+      "name": "LambdaServerComponent",
       "line": 6
     },
     {
@@ -11881,38 +11881,38 @@
       "line": 26
     },
     {
-      "file": "/root/cherry_ai-main/ai_components/coordination/vultr_autoscaling.py",
+      "file": "/root/cherry_ai-main/ai_components/coordination/Lambda_autoscaling.py",
       "name": "ScalingMetric",
       "line": 18
     },
     {
-      "file": "/root/cherry_ai-main/ai_components/coordination/vultr_autoscaling.py",
+      "file": "/root/cherry_ai-main/ai_components/coordination/Lambda_autoscaling.py",
       "name": "ScalingPolicy",
       "line": 27
     },
     {
-      "file": "/root/cherry_ai-main/ai_components/coordination/vultr_autoscaling.py",
-      "name": "VultrInstance",
+      "file": "/root/cherry_ai-main/ai_components/coordination/Lambda_autoscaling.py",
+      "name": "LambdaInstance",
       "line": 38
     },
     {
-      "file": "/root/cherry_ai-main/ai_components/coordination/vultr_autoscaling.py",
-      "name": "VultrAPIClient",
+      "file": "/root/cherry_ai-main/ai_components/coordination/Lambda_autoscaling.py",
+      "name": "LambdaAPIClient",
       "line": 48
     },
     {
-      "file": "/root/cherry_ai-main/ai_components/coordination/vultr_autoscaling.py",
+      "file": "/root/cherry_ai-main/ai_components/coordination/Lambda_autoscaling.py",
       "name": "AutoScaler",
       "line": 165
     },
     {
-      "file": "/root/cherry_ai-main/ai_components/coordination/vultr_autoscaling.py",
+      "file": "/root/cherry_ai-main/ai_components/coordination/Lambda_autoscaling.py",
       "name": "LoadBalancer",
       "line": 263
     },
     {
-      "file": "/root/cherry_ai-main/ai_components/coordination/vultr_autoscaling.py",
-      "name": "Vultrconductor",
+      "file": "/root/cherry_ai-main/ai_components/coordination/Lambda_autoscaling.py",
+      "name": "Lambdaconductor",
       "line": 343
     },
     {
@@ -13161,7 +13161,7 @@
           591
         ],
         [
-          "/root/cherry_ai-main/scripts/vultr_provision.py",
+          "/root/cherry_ai-main/scripts/Lambda_provision.py",
           41
         ],
         [
@@ -14935,7 +14935,7 @@
           40
         ],
         [
-          "/root/cherry_ai-main/infra/components/vultr_server_component.py",
+          "/root/cherry_ai-main/infra/components/Lambda_server_component.py",
           9
         ],
         [
@@ -15407,19 +15407,19 @@
           29
         ],
         [
-          "/root/cherry_ai-main/ai_components/coordination/vultr_autoscaling.py",
+          "/root/cherry_ai-main/ai_components/coordination/Lambda_autoscaling.py",
           51
         ],
         [
-          "/root/cherry_ai-main/ai_components/coordination/vultr_autoscaling.py",
+          "/root/cherry_ai-main/ai_components/coordination/Lambda_autoscaling.py",
           168
         ],
         [
-          "/root/cherry_ai-main/ai_components/coordination/vultr_autoscaling.py",
+          "/root/cherry_ai-main/ai_components/coordination/Lambda_autoscaling.py",
           266
         ],
         [
-          "/root/cherry_ai-main/ai_components/coordination/vultr_autoscaling.py",
+          "/root/cherry_ai-main/ai_components/coordination/Lambda_autoscaling.py",
           346
         ],
         [
@@ -16410,14 +16410,14 @@
       "count": 3
     },
     {
-      "name": "get_vultr_project_id",
+      "name": "get_LAMBDA_PROJECT_ID",
       "locations": [
         [
           "/root/cherry_ai-main/utils.py",
           67
         ],
         [
-          "/root/cherry_ai-main/core/config/settings_vultr.py",
+          "/root/cherry_ai-main/core/config/settings_lambda.py",
           49
         ]
       ],
@@ -19705,7 +19705,7 @@
           190
         ],
         [
-          "/root/cherry_ai-main/core/config/settings_vultr.py",
+          "/root/cherry_ai-main/core/config/settings_lambda.py",
           58
         ],
         [
@@ -22219,7 +22219,7 @@
           14
         ],
         [
-          "/root/cherry_ai-main/core/config/settings_vultr.py",
+          "/root/cherry_ai-main/core/config/settings_lambda.py",
           9
         ],
         [
@@ -29826,7 +29826,7 @@
             "decorators": []
           },
           {
-            "name": "get_vultr_project_id",
+            "name": "get_LAMBDA_PROJECT_ID",
             "line": 67,
             "is_private": false,
             "is_dunder": false,
@@ -31551,7 +31551,7 @@
         }
       ]
     },
-    "/root/cherry_ai-main/infrastructure/cherry_ai_vultr_stack.py": {
+    "/root/cherry_ai-main/infrastructure/cherry_ai_Lambda_stack.py": {
       "imports": {
         "standard": [
           {
@@ -31560,8 +31560,8 @@
             "line": 6
           },
           {
-            "module": "pulumi_vultr",
-            "alias": "vultr",
+            "module": "pulumi_lambda",
+            "alias": "Lambda",
             "line": 7
           }
         ],
@@ -31592,15 +31592,15 @@
       },
       "broken_imports": [
         {
-          "file": "/root/cherry_ai-main/infrastructure/cherry_ai_vultr_stack.py",
+          "file": "/root/cherry_ai-main/infrastructure/cherry_ai_Lambda_stack.py",
           "line": 7,
-          "module": "pulumi_vultr",
+          "module": "pulumi_lambda",
           "type": "standard",
           "issue": "Module not found"
         }
       ]
     },
-    "/root/cherry_ai-main/infrastructure/vultr_deployment.py": {
+    "/root/cherry_ai-main/infrastructure/Lambda_deployment.py": {
       "imports": {
         "standard": [
           {
@@ -31609,8 +31609,8 @@
             "line": 6
           },
           {
-            "module": "pulumi_vultr",
-            "alias": "vultr",
+            "module": "pulumi_lambda",
+            "alias": "Lambda",
             "line": 7
           },
           {
@@ -31666,9 +31666,9 @@
       },
       "broken_imports": [
         {
-          "file": "/root/cherry_ai-main/infrastructure/vultr_deployment.py",
+          "file": "/root/cherry_ai-main/infrastructure/Lambda_deployment.py",
           "line": 7,
-          "module": "pulumi_vultr",
+          "module": "pulumi_lambda",
           "type": "standard",
           "issue": "Module not found"
         }
@@ -31683,8 +31683,8 @@
             "line": 6
           },
           {
-            "module": "pulumi_vultr",
-            "alias": "vultr",
+            "module": "pulumi_lambda",
+            "alias": "Lambda",
             "line": 7
           },
           {
@@ -31734,7 +31734,7 @@
         {
           "file": "/root/cherry_ai-main/infrastructure/__main__.py",
           "line": 7,
-          "module": "pulumi_vultr",
+          "module": "pulumi_lambda",
           "type": "standard",
           "issue": "Module not found"
         },
@@ -52176,7 +52176,7 @@
       },
       "broken_imports": []
     },
-    "/root/cherry_ai-main/scripts/vultr_provision.py": {
+    "/root/cherry_ai-main/scripts/Lambda_provision.py": {
       "imports": {
         "standard": [
           {
@@ -57313,7 +57313,7 @@
       },
       "broken_imports": []
     },
-    "/root/cherry_ai-main/infra/vultr_deployment.py": {
+    "/root/cherry_ai-main/infra/Lambda_deployment.py": {
       "imports": {
         "standard": [
           {
@@ -57322,8 +57322,8 @@
             "line": 5
           },
           {
-            "module": "pulumi_vultr",
-            "alias": "vultr",
+            "module": "pulumi_lambda",
+            "alias": "Lambda",
             "line": 6
           }
         ],
@@ -57361,9 +57361,9 @@
       },
       "broken_imports": [
         {
-          "file": "/root/cherry_ai-main/infra/vultr_deployment.py",
+          "file": "/root/cherry_ai-main/infra/Lambda_deployment.py",
           "line": 6,
-          "module": "pulumi_vultr",
+          "module": "pulumi_lambda",
           "type": "standard",
           "issue": "Module not found"
         }
@@ -57481,8 +57481,8 @@
             "line": 4
           },
           {
-            "module": "pulumi_vultr",
-            "alias": "vultr",
+            "module": "pulumi_lambda",
+            "alias": "Lambda",
             "line": 5
           }
         ],
@@ -57515,7 +57515,7 @@
         {
           "file": "/root/cherry_ai-main/infra/__main__.py",
           "line": 5,
-          "module": "pulumi_vultr",
+          "module": "pulumi_lambda",
           "type": "standard",
           "issue": "Module not found"
         }
@@ -57639,7 +57639,7 @@
       },
       "broken_imports": []
     },
-    "/root/cherry_ai-main/infra/vultr_single_node_stack.py": {
+    "/root/cherry_ai-main/infra/Lambda_single_node_stack.py": {
       "imports": {
         "standard": [
           {
@@ -57657,8 +57657,8 @@
             "level": 0
           },
           {
-            "module": "components.vultr_server_component",
-            "item": "VultrServerComponent",
+            "module": "components.Lambda_server_component",
+            "item": "LambdaServerComponent",
             "alias": null,
             "line": 3,
             "level": 0
@@ -57670,15 +57670,15 @@
       "definitions": {
         "functions": [],
         "classes": [],
-        "function_calls": "{'get_secret', 'get_int', 'VultrServerComponent', 'export', 'require', 'get', 'split', 'Config'}",
+        "function_calls": "{'get_secret', 'get_int', 'LambdaServerComponent', 'export', 'require', 'get', 'split', 'Config'}",
         "class_instantiations": "set()"
       },
       "broken_imports": [
         {
-          "file": "/root/cherry_ai-main/infra/vultr_single_node_stack.py",
+          "file": "/root/cherry_ai-main/infra/Lambda_single_node_stack.py",
           "line": 3,
-          "module": "components.vultr_server_component",
-          "item": "VultrServerComponent",
+          "module": "components.Lambda_server_component",
+          "item": "LambdaServerComponent",
           "type": "from",
           "issue": "Module not found"
         }
@@ -63221,8 +63221,8 @@
             "line": 4
           },
           {
-            "module": "pulumi_vultr",
-            "alias": "vultr",
+            "module": "pulumi_lambda",
+            "alias": "Lambda",
             "line": 5
           },
           {
@@ -63267,7 +63267,7 @@
         {
           "file": "/root/cherry_ai-main/infrastructure/pulumi/__main__.py",
           "line": 5,
-          "module": "pulumi_vultr",
+          "module": "pulumi_lambda",
           "type": "standard",
           "issue": "Module not found"
         },
@@ -63289,8 +63289,8 @@
             "line": 8
           },
           {
-            "module": "pulumi_vultr",
-            "alias": "vultr",
+            "module": "pulumi_lambda",
+            "alias": "Lambda",
             "line": 9
           },
           {
@@ -63434,7 +63434,7 @@
         {
           "file": "/root/cherry_ai-main/infrastructure/pulumi/__init__.py",
           "line": 9,
-          "module": "pulumi_vultr",
+          "module": "pulumi_lambda",
           "type": "standard",
           "issue": "Module not found"
         }
@@ -63449,8 +63449,8 @@
             "line": 8
           },
           {
-            "module": "pulumi_vultr",
-            "alias": "vultr",
+            "module": "pulumi_lambda",
+            "alias": "Lambda",
             "line": 9
           },
           {
@@ -63606,7 +63606,7 @@
         {
           "file": "/root/cherry_ai-main/infrastructure/data_ingestion/__init__.py",
           "line": 9,
-          "module": "pulumi_vultr",
+          "module": "pulumi_lambda",
           "type": "standard",
           "issue": "Module not found"
         },
@@ -63628,8 +63628,8 @@
             "line": 8
           },
           {
-            "module": "pulumi_vultr",
-            "alias": "vultr",
+            "module": "pulumi_lambda",
+            "alias": "Lambda",
             "line": 9
           },
           {
@@ -63692,7 +63692,7 @@
         {
           "file": "/root/cherry_ai-main/infrastructure/pulumi/memory_system/__main__.py",
           "line": 9,
-          "module": "pulumi_vultr",
+          "module": "pulumi_lambda",
           "type": "standard",
           "issue": "Module not found"
         },
@@ -74392,7 +74392,7 @@
       },
       "broken_imports": []
     },
-    "/root/cherry_ai-main/core/config/settings_vultr.py": {
+    "/root/cherry_ai-main/core/config/settings_lambda.py": {
       "imports": {
         "standard": [
           {
@@ -74430,14 +74430,14 @@
       "definitions": {
         "functions": [
           {
-            "name": "get_vultr_project_id",
+            "name": "get_LAMBDA_PROJECT_ID",
             "line": 49,
             "is_private": false,
             "is_dunder": false,
             "decorators": []
           },
           {
-            "name": "get_vultr_credentials_path",
+            "name": "get_LAMBDA_CREDENTIALS_PATH",
             "line": 53,
             "is_private": false,
             "is_dunder": false,
@@ -90652,7 +90652,7 @@
           }
         ],
         "classes": [],
-        "function_calls": "{'MemoryConnectionError', 'warning', 'MemoryError', 'get_memory_manager', 'str', 'MongoDBMemoryAdapter', 'error', 'Depends', 'create_memory_service', 'InMemoryMemoryManager', 'DependencyError', 'create_memory_manager', 'close', 'isinstance', 'get_settings', 'initialize', 'get_vultr_credentials_path', '_initialize_imports', 'MemoryService', 'type', 'get_vultr_project_id', 'getLogger', 'error_boundary', 'hasattr', 'health_check', 'info', 'MemoryOperationError'}",
+        "function_calls": "{'MemoryConnectionError', 'warning', 'MemoryError', 'get_memory_manager', 'str', 'MongoDBMemoryAdapter', 'error', 'Depends', 'create_memory_service', 'InMemoryMemoryManager', 'DependencyError', 'create_memory_manager', 'close', 'isinstance', 'get_settings', 'initialize', 'get_LAMBDA_CREDENTIALS_PATH', '_initialize_imports', 'MemoryService', 'type', 'get_LAMBDA_PROJECT_ID', 'getLogger', 'error_boundary', 'hasattr', 'health_check', 'info', 'MemoryOperationError'}",
         "class_instantiations": "set()"
       },
       "broken_imports": [
@@ -100858,7 +100858,7 @@
         }
       ]
     },
-    "/root/cherry_ai-main/infra/components/vultr_server_component.py": {
+    "/root/cherry_ai-main/infra/components/Lambda_server_component.py": {
       "imports": {
         "standard": [
           {
@@ -100867,8 +100867,8 @@
             "line": 1
           },
           {
-            "module": "pulumi_vultr",
-            "alias": "vultr",
+            "module": "pulumi_lambda",
+            "alias": "Lambda",
             "line": 2
           },
           {
@@ -100908,7 +100908,7 @@
         ],
         "classes": [
           {
-            "name": "VultrServerComponent",
+            "name": "LambdaServerComponent",
             "line": 6,
             "bases": [
               "ComponentResource"
@@ -100921,14 +100921,14 @@
       },
       "broken_imports": [
         {
-          "file": "/root/cherry_ai-main/infra/components/vultr_server_component.py",
+          "file": "/root/cherry_ai-main/infra/components/Lambda_server_component.py",
           "line": 2,
-          "module": "pulumi_vultr",
+          "module": "pulumi_lambda",
           "type": "standard",
           "issue": "Module not found"
         },
         {
-          "file": "/root/cherry_ai-main/infra/components/vultr_server_component.py",
+          "file": "/root/cherry_ai-main/infra/components/Lambda_server_component.py",
           "line": 3,
           "module": "pulumi_command",
           "type": "standard",
@@ -119831,8 +119831,8 @@
             "line": 6
           },
           {
-            "module": "pulumi_vultr",
-            "alias": "vultr",
+            "module": "pulumi_lambda",
+            "alias": "Lambda",
             "line": 7
           },
           {
@@ -119877,7 +119877,7 @@
         {
           "file": "/root/cherry_ai-main/src/infrastructure/pulumi/advanced_system_stack.py",
           "line": 7,
-          "module": "pulumi_vultr",
+          "module": "pulumi_lambda",
           "type": "standard",
           "issue": "Module not found"
         }
@@ -120815,7 +120815,7 @@
       },
       "broken_imports": []
     },
-    "/root/cherry_ai-main/ai_components/coordination/vultr_autoscaling.py": {
+    "/root/cherry_ai-main/ai_components/coordination/Lambda_autoscaling.py": {
       "imports": {
         "standard": [
           {
@@ -120968,7 +120968,7 @@
             ]
           },
           {
-            "name": "VultrInstance",
+            "name": "LambdaInstance",
             "line": 38,
             "bases": [],
             "decorators": [
@@ -120976,7 +120976,7 @@
             ]
           },
           {
-            "name": "VultrAPIClient",
+            "name": "LambdaAPIClient",
             "line": 48,
             "bases": [],
             "decorators": []
@@ -120994,13 +120994,13 @@
             "decorators": []
           },
           {
-            "name": "Vultrconductor",
+            "name": "Lambdaconductor",
             "line": 343,
             "bases": [],
             "decorators": []
           }
         ],
-        "function_calls": "{'range', 'delete', '_update_nginx_config', 'evaluate_scaling', 'getenv', 'max', 'sort', '_ensure_minimum_instances', 'error', 'create_instance', 'write', 'ClientTimeout', 'info', 'LoadBalancer', 'get', 'ClientSession', 'fromisoformat', 'Exception', 'sleep', 'post', 'VultrAPIClient', 'text', 'min', 'now', 'system', 'startswith', 'AutoScaler', 'ScalingPolicy', 'delete_instance', 'VultrInstance', '_generate_user_data', 'json', 'open', '_check_instance_health', 'len', 'get_instance_metrics', 'update_backend_pool', 'timestamp', 'append', '_initialize_policies', 'getLogger', 'execute_scaling', 'list_instances'}",
+        "function_calls": "{'range', 'delete', '_update_nginx_config', 'evaluate_scaling', 'getenv', 'max', 'sort', '_ensure_minimum_instances', 'error', 'create_instance', 'write', 'ClientTimeout', 'info', 'LoadBalancer', 'get', 'ClientSession', 'fromisoformat', 'Exception', 'sleep', 'post', 'LambdaAPIClient', 'text', 'min', 'now', 'system', 'startswith', 'AutoScaler', 'ScalingPolicy', 'delete_instance', 'LambdaInstance', '_generate_user_data', 'json', 'open', '_check_instance_health', 'len', 'get_instance_metrics', 'update_backend_pool', 'timestamp', 'append', '_initialize_policies', 'getLogger', 'execute_scaling', 'list_instances'}",
         "class_instantiations": "set()"
       },
       "broken_imports": []
@@ -122601,8 +122601,8 @@
             "level": 0
           },
           {
-            "module": "coordination.vultr_autoscaling",
-            "item": "Vultrconductor",
+            "module": "coordination.Lambda_autoscaling",
+            "item": "Lambdaconductor",
             "alias": null,
             "line": 23,
             "level": 0
@@ -122657,7 +122657,7 @@
             "decorators": []
           }
         ],
-        "function_calls": "{'stop', 'initialize_components', 'MCPContextManager', 'getenv', 'execute_workflow', 'start', '_load_configuration', 'cancel', 'error', 'coordinate_workflow', 'CherryAIConductor', 'get_agent_status', 'now', 'FactoryAIAgent', 'run', 'register_agent', 'signal', 'MCPCoordinator', 'CursorIntegrationServer', 'dirname', 'len', 'CodingActivityMonitor', 'basicConfig', 'AICoordinator', 'ScheduledAutomation', 'int', 'timestamp', 'append', 'getLogger', 'lower', 'abspath', 'RooAgent', 'gather', 'isoformat', 'MCPWebSocketServer', 'broadcast', 'create_task', 'info', 'Vultrconductor', 'main'}",
+        "function_calls": "{'stop', 'initialize_components', 'MCPContextManager', 'getenv', 'execute_workflow', 'start', '_load_configuration', 'cancel', 'error', 'coordinate_workflow', 'CherryAIConductor', 'get_agent_status', 'now', 'FactoryAIAgent', 'run', 'register_agent', 'signal', 'MCPCoordinator', 'CursorIntegrationServer', 'dirname', 'len', 'CodingActivityMonitor', 'basicConfig', 'AICoordinator', 'ScheduledAutomation', 'int', 'timestamp', 'append', 'getLogger', 'lower', 'abspath', 'RooAgent', 'gather', 'isoformat', 'MCPWebSocketServer', 'broadcast', 'create_task', 'info', 'Lambdaconductor', 'main'}",
         "class_instantiations": "set()"
       },
       "broken_imports": [
@@ -122728,8 +122728,8 @@
         {
           "file": "/root/cherry_ai-main/ai_components/coordination/comprehensive_conductor.py",
           "line": 23,
-          "module": "coordination.vultr_autoscaling",
-          "item": "Vultrconductor",
+          "module": "coordination.Lambda_autoscaling",
+          "item": "Lambdaconductor",
           "type": "from",
           "issue": "Module not found"
         },

@@ -4,7 +4,7 @@
     "core": [
         "OPENAI_API_KEY",
         "PORTKEY_API_KEY",
-        "VULTR_PROJECT_ID",
+        "LAMBDA_PROJECT_ID",
     ],
     "data_sources": [
         "GONG_API_KEY",
@@ -436,7 +436,7 @@ def status(ctx):
     table.add_column("Property", style="cyan")
     table.add_column("Value", style="white")
 
-    table.add_row("Project ID", os.getenv("VULTR_PROJECT_ID", "Not set"))
+    table.add_row("Project ID", os.getenv("LAMBDA_PROJECT_ID", "Not set"))
     table.add_row("Environment", os.getenv("ENVIRONMENT", "development"))
     table.add_row("Redis Host", os.getenv("REDIS_HOST", "Not set"))
     table.add_row(

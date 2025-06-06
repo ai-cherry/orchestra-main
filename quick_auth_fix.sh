@@ -81,13 +81,13 @@ docker stop test-api
 docker rm test-api
 
 # 5. Deploy to server
-echo "🚀 Ready to deploy. Run these commands on your Vultr server:"
+echo "🚀 Ready to deploy. Run these commands on your Lambda server:"
 echo ""
 echo "# Save the image"
 echo "docker save cherry_ai-api-minimal:latest | gzip > cherry_ai-api-minimal.tar.gz"
 echo ""
 echo "# Copy to server"
-echo "scp cherry_ai-api-minimal.tar.gz root@your-vultr-ip:/tmp/"
+echo "scp cherry_ai-api-minimal.tar.gz root@your-Lambda-ip:/tmp/"
 echo ""
 echo "# On the server:"
 echo "cd /tmp"

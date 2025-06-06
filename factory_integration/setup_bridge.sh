@@ -2,7 +2,7 @@
 
 # Factory AI Bridge Setup Script
 # This script sets up the Factory AI integration bridge with proper
-# environment validation, Vultr API integration, and Pulumi configuration
+# environment validation, Lambda API integration, and Pulumi configuration
 
 set -euo pipefail
 
@@ -48,7 +48,7 @@ validate_environment() {
     
     local required_vars=(
         "FACTORY_AI_API_KEY"
-        "VULTR_API_KEY"
+        "LAMBDA_API_KEY"
         "POSTGRES_CONNECTION_STRING"
         "WEAVIATE_URL"
         "WEAVIATE_API_KEY"
@@ -96,27 +96,27 @@ validate_environment() {
     log_success "All required environment variables are set"
 }
 
-# Validate Vultr API access
-validate_vultr_api() {
-    log_info "Validating Vultr API access..."
+# Validate Lambda API access
+validate_Lambda_api() {
+    log_info "Validating Lambda API access..."
     
-    # Test Vultr API connection
-    local response=$(curl -s -w "\n%{http_code}" -H "Authorization: Bearer ${VULTR_API_KEY}" \
-        "https://api.vultr.com/v2/account")
+    # Test Lambda API connection
+    local response=$(curl -s -w "\n%{http_code}" -H "Authorization: Bearer ${LAMBDA_API_KEY}" \
+        "https://cloud.lambdalabs.com/api/v1/account")
     
     local http_code=$(echo "$response" | tail -n1)
     local body=$(echo "$response" | head -n-1)
     
     if [[ "$http_code" == "200" ]]; then
-        log_success "Vultr API access validated"
+        log_success "Lambda API access validated"
         
         # Extract account info
         local email=$(echo "$body" | jq -r '.account.email // "unknown"')
         local balance=$(echo "$body" | jq -r '.account.balance // "0"')
         
-        log_info "Vultr Account: $email (Balance: \$$balance)"
+        log_info "Lambda Account: $email (Balance: \$$balance)"
     else
-        log_error "Failed to validate Vultr API access (HTTP $http_code)"
+        log_error "Failed to validate Lambda API access (HTTP $http_code)"
         echo "$body" | jq . 2>/dev/null || echo "$body"
         exit 1
     fi
@@ -146,7 +146,7 @@ setup_pulumi() {
     fi
     
     # Set Pulumi configuration
-    pulumi config set vultr:api_key "${VULTR_API_KEY}" --secret
+    pulumi config set Lambda:api_key "${LAMBDA_API_KEY}" --secret
     pulumi config set postgres:connection_string "${POSTGRES_CONNECTION_STRING}" --secret
     pulumi config set weaviate:url "${WEAVIATE_URL}"
     pulumi config set weaviate:api_key "${WEAVIATE_API_KEY}" --secret
@@ -184,7 +184,7 @@ setup_python_env() {
             aiohttp \
             pydantic \
             pulumi \
-            pulumi-vultr \
+            pulumi-lambda \
             redis \
             asyncpg \
             weaviate-client \
@@ -318,8 +318,8 @@ create_config_files() {
 FACTORY_AI_API_KEY=${FACTORY_AI_API_KEY}
 FACTORY_AI_BASE_URL=${FACTORY_AI_BASE_URL:-https://api.factoryai.com/v1}
 
-# Vultr Configuration
-VULTR_API_KEY=${VULTR_API_KEY}
+# Lambda Configuration
+LAMBDA_API_KEY=${LAMBDA_API_KEY}
 
 # Database Configuration
 POSTGRES_CONNECTION_STRING=${POSTGRES_CONNECTION_STRING}
@@ -357,8 +357,8 @@ main() {
     validate_environment
     echo ""
     
-    # Validate Vultr API
-    validate_vultr_api
+    # Validate Lambda API
+    validate_Lambda_api
     echo ""
     
     # Setup Pulumi

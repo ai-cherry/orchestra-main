@@ -282,7 +282,7 @@ def main():
         print("- Metrics collector with aggregation")
         print("- Intelligent task router")
         print("- Comprehensive API endpoints")
-        print("- Pulumi infrastructure for Vultr deployment")
+        print("- Pulumi infrastructure for Lambda deployment")
         print("\nNext steps:")
         print("1. Create concrete implementations for database/cache/vector store adapters")
         print("2. Write comprehensive unit tests")

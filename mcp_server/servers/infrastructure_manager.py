@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Cherry AI Orchestrator - Infrastructure Management MCP Server
-Manages Vultr infrastructure, deployments, and monitoring
+Manages Lambda infrastructure, deployments, and monitoring
 """
 
 import asyncio
@@ -27,18 +27,18 @@ class InfrastructureManager:
     """Manages infrastructure operations"""
     
     def __init__(self):
-        self.vultr_api_key = os.getenv("VULTR_API_KEY")
+        self.LAMBDA_API_KEY = os.getenv("LAMBDA_API_KEY")
         self.pulumi_token = os.getenv("PULUMI_ACCESS_TOKEN")
-        self.base_url = "https://api.vultr.com/v2"
+        self.base_url = "https://cloud.lambdalabs.com/api/v1"
         
     def get_headers(self):
         return {
-            "Authorization": f"Bearer {self.vultr_api_key}",
+            "Authorization": f"Bearer {self.LAMBDA_API_KEY}",
             "Content-Type": "application/json"
         }
     
     async def get_instances(self) -> Dict[str, Any]:
-        """Get all Vultr instances"""
+        """Get all Lambda instances"""
         try:
             response = requests.get(
                 f"{self.base_url}/instances",
@@ -149,21 +149,21 @@ async def handle_list_resources() -> list[types.Resource]:
     """List infrastructure resources"""
     return [
         types.Resource(
-            uri=AnyUrl("infrastructure://vultr/instances"),
-            name="Vultr Instances",
-            description="All Vultr compute instances",
+            uri=AnyUrl("infrastructure://Lambda/instances"),
+            name="Lambda Instances",
+            description="All Lambda compute instances",
             mimeType="application/json",
         ),
         types.Resource(
-            uri=AnyUrl("infrastructure://vultr/load-balancers"),
+            uri=AnyUrl("infrastructure://Lambda/load-balancers"),
             name="Load Balancers",
-            description="Vultr load balancers",
+            description="Lambda load balancers",
             mimeType="application/json",
         ),
         types.Resource(
             uri=AnyUrl("infrastructure://kubernetes/clusters"),
             name="Kubernetes Clusters",
-            description="Vultr Kubernetes clusters",
+            description="Lambda Kubernetes clusters",
             mimeType="application/json",
         ),
         types.Resource(
@@ -183,11 +183,11 @@ async def handle_read_resource(uri: AnyUrl) -> str:
     
     path = uri.path
     
-    if path == "/vultr/instances":
+    if path == "/Lambda/instances":
         instances = await infrastructure_manager.get_instances()
         return json.dumps(instances, indent=2)
     
-    elif path == "/vultr/load-balancers":
+    elif path == "/Lambda/load-balancers":
         load_balancers = await infrastructure_manager.get_load_balancers()
         return json.dumps(load_balancers, indent=2)
     
@@ -223,7 +223,7 @@ async def handle_list_tools() -> list[types.Tool]:
         ),
         types.Tool(
             name="scale_instance",
-            description="Scale a Vultr instance",
+            description="Scale a Lambda instance",
             inputSchema={
                 "type": "object",
                 "properties": {
@@ -283,7 +283,7 @@ async def handle_call_tool(
         if not instance_id or not plan:
             raise ValueError("instance_id and plan are required")
         
-        # Implementation would call Vultr API to scale instance
+        # Implementation would call Lambda API to scale instance
         result = {"message": f"Scaling instance {instance_id} to plan {plan}"}
         
         return [types.TextContent(

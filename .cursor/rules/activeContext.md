@@ -5,7 +5,7 @@ The following context should be provided to the AI assistant for every session.
 ---
 
 ## Project Context
-• Single unified Vultr server (45.32.69.157)
+• Single unified Lambda server (45.32.69.157)
 • Development, deployment, and production all on same server
 • Direct SSH/Cursor development - no CI/CD needed
 • Python 3.10 with pip/venv (no Poetry)

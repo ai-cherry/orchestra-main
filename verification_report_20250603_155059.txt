@@ -106,5 +106,5 @@ FUNCTIONALITY:
 5. Test API endpoints: http://localhost:8080/docs
 
 For production deployment:
-- Set VULTR_API_KEY environment variable
+- Set LAMBDA_API_KEY environment variable
 - Run: python3 scripts/deploy_orchestra_system.py --environment production

@@ -195,7 +195,7 @@ class EnvConsolidator:
             categories["Service URLs & Endpoints"].append(var_info)
         elif any(keyword in var_lower for keyword in ["debug", "log", "dev", "test"]):
             categories["Development & Debug"].append(var_info)
-        elif any(keyword in var_lower for keyword in ["gcp", "aws", "vultr", "cloud", "project"]):
+        elif any(keyword in var_lower for keyword in ["gcp", "aws", "Lambda", "cloud", "project"]):
             categories["Infrastructure"].append(var_info)
         elif any(keyword in var_lower for keyword in ["app_", "environment", "mode", "config"]):
             categories["Application Settings"].append(var_info)

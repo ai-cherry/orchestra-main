@@ -40,7 +40,7 @@ The Factory AI integration implements a bridge pattern that allows Factory AI Dr
 - PostgreSQL database
 - Weaviate vector store
 - Redis cache
-- Vultr API access (for infrastructure)
+- Lambda API access (for infrastructure)
 - Factory AI API key
 
 ### Environment Variables
@@ -48,7 +48,7 @@ The Factory AI integration implements a bridge pattern that allows Factory AI Dr
 Required environment variables:
 ```bash
 FACTORY_AI_API_KEY=your-factory-ai-key
-VULTR_API_KEY=your-vultr-api-key
+LAMBDA_API_KEY=your-Lambda-api-key
 POSTGRES_CONNECTION_STRING=postgresql://user:pass@host:port/db
 WEAVIATE_URL=http://localhost:8080
 WEAVIATE_API_KEY=your-weaviate-key
@@ -73,7 +73,7 @@ cd factory_integration
 
 2. The script will:
    - Validate environment variables
-   - Test Vultr API access
+   - Test Lambda API access
    - Configure Pulumi for infrastructure
    - Create Python virtual environment
    - Install dependencies

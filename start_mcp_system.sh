@@ -1,6 +1,6 @@
 #!/bin/bash
 # MCP System Startup Script - PostgreSQL + Weaviate ONLY
-# NO Vultr, NO Redis, NO Firestore, NO MongoDB, NO DragonflyDB!
+# NO Lambda, NO Redis, NO Firestore, NO MongoDB, NO DragonflyDB!
 
 set -e  # Exit on any error
 

@@ -61,10 +61,10 @@
         )
         self.components["cursor_server"] = cursor_server
         
-        # 9. Initialize Vultr conductor (if enabled)
+        # 9. Initialize Lambda conductor (if enabled)
         if self.config["enable_autoscaling"]:
-            vultr_conductor = Vultrconductor()
-            self.components["vultr_conductor"] = vultr_conductor
+            Lambda_conductor = Lambdaconductor()
+            self.components["Lambda_conductor"] = Lambda_conductor
         
         logger.info("All components initialized successfully")
     
@@ -249,10 +249,10 @@
         )
         self.tasks.append(task)
         
-        # Start Vultr conductor if enabled
-        if "vultr_conductor" in self.components:
+        # Start Lambda conductor if enabled
+        if "Lambda_conductor" in self.components:
             task = asyncio.create_task(
-                self.components["vultr_conductor"].start()
+                self.components["Lambda_conductor"].start()
             )
             self.tasks.append(task)
         
@@ -310,11 +310,11 @@
                 self.components["mcp_conductor"].active_workflows
             )
         
-        # Get Vultr status
-        if "vultr_conductor" in self.components:
-            status["components"]["vultr"] = {
+        # Get Lambda status
+        if "Lambda_conductor" in self.components:
+            status["components"]["Lambda"] = {
                 "autoscaling_enabled": True,
-                "policies": len(self.components["vultr_conductor"].policies)
+                "policies": len(self.components["Lambda_conductor"].policies)
             }
         
         return status

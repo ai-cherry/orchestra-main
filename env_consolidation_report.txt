@@ -29,10 +29,10 @@ HIGH PRIORITY (Security-related):
    📁 .env: test-weaviate-key-789
    📁 .env.example: your-weaviate-api-key
 
-❌ export VULTR_API_KEY:
-   📁 .env.deployment: "DEMO-VULTR-API-KEY-REPLACE-WITH-REAL"
-   📁 .envrc: "${VULTR_API_KEY:-}"
-   📁 .envrc: "${VULTR_API_KEY:-}"
+❌ export LAMBDA_API_KEY:
+   📁 .env.deployment: "DEMO-Lambda-API-KEY-REPLACE-WITH-REAL"
+   📁 .envrc: "${LAMBDA_API_KEY:-}"
+   📁 .envrc: "${LAMBDA_API_KEY:-}"
 
 ❌ OPENAI_API_KEY:
    📁 .env.development: sk-dummy-key-for-development-only

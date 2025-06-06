@@ -152,7 +152,7 @@ class DatabaseRedundancyCleanup:
         config_files = [
             "core/env_config.py",
             "core/config/unified_config.py", 
-            "core/config/settings_vultr.py",
+            "core/config/settings_lambda.py",
             "agent/app/core/config.py"
         ]
         

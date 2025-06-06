@@ -81,7 +81,7 @@ def check_critical_files():
         'test_validation_framework.py': 'Test validation framework',
         'orchestra_implementation_validator.py': 'Implementation validator',
         'implementation_checklist.py': 'Implementation checklist',
-        'orchestra_deployment_framework.py': 'Deployment framework (Vultr)',
+        'orchestra_deployment_framework.py': 'Deployment framework (Lambda)',
         '.env.template': 'Environment template',
         'docker-compose.yml': 'Docker compose config',
         'Pulumi.yaml': 'Pulumi configuration'
@@ -170,9 +170,9 @@ def main():
     
     print("⚠️  CRITICAL FINDING:")
     print("-" * 40)
-    print("The infrastructure was mistakenly configured for Vultr instead of Lambda Labs.")
+    print("The infrastructure was mistakenly configured for Lambda instead of Lambda Labs.")
     print("Use deploy_orchestra_lambda_fixed.py for correct Lambda Labs deployment.")
-    print("Do NOT use the Vultr deployment scripts!")
+    print("Do NOT use the Lambda deployment scripts!")
     print()
     
     print("✅ Debug status report complete!")

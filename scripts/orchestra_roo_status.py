@@ -38,7 +38,7 @@ def show_integration_status():
         "Deployment": {
             "port": 3004,
             "purpose": "Infrastructure deployment automation",
-            "platforms": ["Vultr", "Docker", "Kubernetes"],
+            "platforms": ["Lambda", "Docker", "Kubernetes"],
             "status": "✅ Configured"
         },
         "Weaviate Direct": {
@@ -114,7 +114,7 @@ def show_integration_status():
     print('  - "Build a SaaS app with user auth and payments"')
     print('  - "Debug why the API is slow in production"')
     print('  - "Optimize database queries for better performance"')
-    print('  - "Deploy the application to Vultr with monitoring"')
+    print('  - "Deploy the application to Lambda with monitoring"')
     
     # Create status file
     status = {

@@ -45,7 +45,7 @@ def check_env_file():
     required_vars = {
         "PORTKEY_API_KEY": "Required for LLM integration",
         "OPENROUTER_API_KEY": "Alternate LLM provider (recommended as fallback)",
-        "VULTR_CREDENTIALS_PATH": "Required for Firestore memory storage",
+        "LAMBDA_CREDENTIALS_PATH": "Required for Firestore memory storage",
     }
 
     found_vars = {}

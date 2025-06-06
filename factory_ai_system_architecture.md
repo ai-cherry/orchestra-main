@@ -59,7 +59,7 @@ graph TB
     end
     
     subgraph "Infrastructure Layer"
-        VU[Vultr Compute]
+        VU[Lambda Compute]
         PU[Pulumi IaC]
         MN[Monitoring]
     end
@@ -720,16 +720,16 @@ class IntegratedAuthManager:
 
 ## Infrastructure as Code (Pulumi)
 
-### Vultr Deployment Stack
+### Lambda Deployment Stack
 ```python
 # infra/factory_ai_stack.py
 import pulumi
-from pulumi_vultr import Instance, BlockStorage, LoadBalancer
+from pulumi_lambda import Instance, BlockStorage, LoadBalancer
 import pulumi_kubernetes as k8s
 
 class FactoryAIStack(pulumi.ComponentResource):
     """
-    Pulumi stack for Factory AI integration on Vultr
+    Pulumi stack for Factory AI integration on Lambda
     """
     def __init__(self, name: str, opts: pulumi.ResourceOptions = None):
         super().__init__('factory-ai:stack', name, None, opts)
@@ -791,7 +791,7 @@ class FactoryAIStack(pulumi.ComponentResource):
 ## Deployment Strategy
 
 ### Phase 1: Infrastructure Setup
-1. Deploy Vultr instances using Pulumi
+1. Deploy Lambda instances using Pulumi
 2. Configure PostgreSQL with optimized schema
 3. Set up Weaviate with Factory AI collections
 4. Deploy Redis cluster for caching

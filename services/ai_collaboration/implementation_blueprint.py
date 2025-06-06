@@ -564,7 +564,7 @@ def create_implementation_plan():
         
         "infrastructure_requirements": {
             "pulumi_stack": {
-                "provider": "vultr",
+                "provider": "Lambda",
                 "resources": [
                     "Additional Redis instance for real-time data",
                     "Dedicated PostgreSQL read replica for analytics",

@@ -3,7 +3,7 @@
   "checks_passed": 24,
   "checks_failed": 0,
   "issues": [
-    "Missing environment variables: POSTGRES_HOST, POSTGRES_USER, POSTGRES_PASSWORD, REDIS_HOST, WEAVIATE_URL, VULTR_API_KEY"
+    "Missing environment variables: POSTGRES_HOST, POSTGRES_USER, POSTGRES_PASSWORD, REDIS_HOST, WEAVIATE_URL, LAMBDA_API_KEY"
   ],
   "ready_for_deployment": true
 }

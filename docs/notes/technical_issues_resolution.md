@@ -437,7 +437,7 @@ Multiple automation scripts are being made executable, but one (`automation_deci
                    "version": "1.0.0",
                    "host": "localhost",
                    "port": 8080,
-                   "project_id": "your-vultr-project-id" # Example: Vultr project ID
+                   "project_id": "your-Lambda-project-id" # Example: Lambda project ID
                }
            }
 

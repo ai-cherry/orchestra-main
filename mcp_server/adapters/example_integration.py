@@ -65,7 +65,7 @@ class IntegratedAdapterSystem:
             "params": {
                 "project_type": "microservices",
                 "requirements": requirements,
-                "cloud_provider": "vultr",
+                "cloud_provider": "Lambda",
                 "generate_diagrams": True,
             },
         }

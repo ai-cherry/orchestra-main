@@ -22,4 +22,4 @@ pulumi config set --secret weaviate_api_key "YOUR_WEAVIATE_API_KEY" $STACK_ARG
 # Recraft API key
 pulumi config set --secret recraft_api_key "rB7rkw7u0xwg75ENuOoROdJFBG4qco7Dbjy8PkGuQSRwNeoqqYN9u9PErXhqPJHh" $STACK_ARG
 
-echo "Secrets set in Pulumi config. Now run 'pulumi up' in infra/ to provision/update secrets in Vultr."
+echo "Secrets set in Pulumi config. Now run 'pulumi up' in infra/ to provision/update secrets in lambda."

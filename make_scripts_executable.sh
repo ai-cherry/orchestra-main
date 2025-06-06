@@ -11,7 +11,7 @@ BOLD='\033[1m'
 NC='\033[0m' # No Color
 
 echo -e "${BLUE}${BOLD}========================================================================${NC}"
-echo -e "${BLUE}${BOLD}   MAKING BADASS Vultr-GITHUB TOOLKIT SCRIPTS EXECUTABLE   ${NC}"
+echo -e "${BLUE}${BOLD}   MAKING BADASS Lambda-GITHUB TOOLKIT SCRIPTS EXECUTABLE   ${NC}"
 echo -e "${BLUE}${BOLD}========================================================================${NC}"
 
 # List of all scripts to make executable
@@ -19,15 +19,15 @@ SCRIPTS=(
   "authenticate_codespaces.sh"
   "apply_pulumi_sequence.sh"
   "create_badass_service_keys.sh"
-  "deploy_Vultr_infra_complete.sh"
+  "deploy_Lambda_infra_complete.sh"
   "secure_setup_workload_identity.sh"
   "switch_to_wif_authentication.sh"
   "secure_integration.sh"
   "secure_service_key_creation.sh"
   "verify_deployment.sh"
-  "Vultr_github_secret_manager.sh"
+  "Lambda_github_secret_manager.sh"
   "get_wif_values.sh"
-  "github_to_Vultr_secret_sync.sh"
+  "github_to_Lambda_secret_sync.sh"
 )
 
 # Make each script executable
@@ -43,4 +43,4 @@ done
 
 echo -e "\n${GREEN}${BOLD}All scripts are now executable!${NC}"
 echo -e "${YELLOW}You can run any script using: ./<script_name>${NC}"
-echo -e "${YELLOW}For a list of available tools and documentation, see: ${BOLD}BADASS_Vultr_GITHUB_TOOLKIT.md${NC}"
+echo -e "${YELLOW}For a list of available tools and documentation, see: ${BOLD}BADASS_Lambda_GITHUB_TOOLKIT.md${NC}"
