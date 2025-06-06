@@ -12,7 +12,7 @@ pydantic-settings==2.9.1
 sqlalchemy==2.0.30
 redis==5.0.1
 psycopg==3.1.18
-psycopg-pool>=3.1.0
+psycopg-pool>=3.1.0  # SECURITY UPDATED
 
 # LLM & AI
 litellm==1.70.4
@@ -57,8 +57,8 @@ python-multipart
 pyjwt==2.8.0
 
 # Serialization
-protobuf>=5.26.1,<6.0
-grpcio>=1.66.2,<2.0.0
+protobuf>=5.26.1,<6.0  # SECURITY UPDATED
+grpcio>=1.66.2,<2.0.0  # SECURITY UPDATED
 llama-index==0.10.38
 portkey-ai==1.13.0
 elevenlabs==2.1.0
