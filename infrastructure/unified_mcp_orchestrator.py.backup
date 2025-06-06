@@ -51,6 +51,7 @@ except ImportError:
 
 # Import multi-AI bridge
 try:
+    from multi_ai_bridge import SimpleMultiAIBridge, AICapability
 except ImportError:
     SimpleMultiAIBridge = None
 
@@ -62,6 +63,7 @@ class MCPOperationType(Enum):
     """Types of MCP operations for routing"""
     KNOWLEDGE_STORAGE = "knowledge_storage"
     KNOWLEDGE_RETRIEVAL = "knowledge_retrieval" 
+    AI_COLLABORATION = "ai_collaboration"
     DEPLOYMENT_CONTEXT = "deployment_context"
     ARCHITECTURE_ANALYSIS = "architecture_analysis"
     DEBUGGING_ASSISTANCE = "debugging_assistance"
@@ -120,6 +122,7 @@ class UnifiedMCPOrchestrator:
         self.db_manager = None
         self.vector_router = None
         self.implementation_tracker = None
+        self.collaboration_bridge = None
         
         # MCP server registry
         self.mcp_servers = {}
@@ -154,6 +157,7 @@ class UnifiedMCPOrchestrator:
             await self._initialize_implementation_tracking()
             
             # 4. Initialize collaboration bridge
+            await self._initialize_collaboration_bridge()
             
             # 5. Initialize MCP servers
             await self._initialize_mcp_servers()
@@ -226,16 +230,19 @@ class UnifiedMCPOrchestrator:
         self.implementation_tracker = ImplementationTracker()
         logger.info("✅ Implementation tracking ready")
     
+    async def _initialize_collaboration_bridge(self):
         """Initialize multi-AI collaboration bridge"""
         logger.info("🌉 Initializing collaboration bridge...")
         
         # Create enhanced bridge with database integration
+        self.collaboration_bridge = EnhancedCollaborationBridge(
             self.db_manager,
             host=self.config.bridge_host,
             port=self.config.bridge_port
         )
         
         # Start bridge in background
+        asyncio.create_task(self.collaboration_bridge.start_server())
         
         logger.info("✅ Enhanced collaboration bridge ready")
     
@@ -345,6 +352,7 @@ class UnifiedMCPOrchestrator:
                 result = await self._handle_knowledge_storage(request)
             elif operation_type == MCPOperationType.KNOWLEDGE_RETRIEVAL:
                 result = await self._handle_knowledge_retrieval(request)
+            elif operation_type == MCPOperationType.AI_COLLABORATION:
                 result = await self._handle_ai_collaboration(request)
             elif operation_type == MCPOperationType.MANUS_INTEGRATION:
                 result = await self._handle_manus_integration(request)
@@ -386,6 +394,8 @@ class UnifiedMCPOrchestrator:
             }
         elif operation == "sync":
             # Trigger immediate sync with Manus
+            if self.collaboration_bridge:
+                await self.collaboration_bridge.sync_with_manus(request)
             return {"success": True, "sync_triggered": True}
         
         return {"success": False, "error": f"Unknown Manus operation: {operation}"}
@@ -420,6 +430,8 @@ class UnifiedMCPOrchestrator:
     
     async def _handle_ai_collaboration(self, request: Dict[str, Any]) -> Dict[str, Any]:
         """Handle AI collaboration operations"""
+        if self.collaboration_bridge:
+            return await self.collaboration_bridge.handle_collaboration_request(request)
         
         return {"success": False, "error": "Collaboration bridge not initialized"}
     
@@ -453,6 +465,7 @@ class UnifiedMCPOrchestrator:
                 status["components"]["database"] = "unavailable"
         
         # Check collaboration bridge
+        status["components"]["collaboration_bridge"] = "active" if self.collaboration_bridge else "inactive"
         
         # Check MCP servers
         status["components"]["mcp_servers"] = {
@@ -486,6 +499,8 @@ class UnifiedMCPOrchestrator:
         """Continuously sync collaboration state"""
         while True:
             try:
+                if self.collaboration_bridge:
+                    active_sessions = len(self.collaboration_bridge.active_sessions)
                     self.metrics["collaboration_sessions"] = active_sessions
                 
                 await asyncio.sleep(10)  # Sync every 10 seconds
@@ -535,6 +550,7 @@ class EnhancedCollaborationBridge:
         logger.info(f"🌉 Starting enhanced collaboration bridge on {self.host}:{self.port}")
         # Implementation would start WebSocket server with database integration
     
+    async def handle_collaboration_request(self, request: Dict[str, Any]) -> Dict[str, Any]:
         """Handle collaboration request with database persistence"""
         session_id = request.get("session_id", "default")
         self.active_sessions[session_id] = request
