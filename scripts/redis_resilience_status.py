@@ -80,7 +80,7 @@ def main():
     # 3. Management Tools
     print(f"\n{BOLD}3. Management Tools:{RESET}")
     tools = [
-        ("scripts/test_redis_resilience.py", "Resilience test suite"),
+        (""),
         ("scripts/redis_health_monitor.py", "Health monitoring dashboard"),
         ("scripts/integrate_redis_resilience.py", "MCP server integration"),
         ("scripts/deploy_redis_resilience.py", "Deployment orchestrator"),

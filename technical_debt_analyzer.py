@@ -34,7 +34,7 @@ class TechnicalDebtAnalyzer:
         self.skip_dirs = {
             "__pycache__", ".git", "node_modules", ".venv", "venv",
             "dist", "build", ".pytest_cache", ".mypy_cache", "logs",
-            ".idea", ".vscode", "coverage", ".coverage", "audit_results_20250605"
+            ""
         }
         
         # Code smell patterns

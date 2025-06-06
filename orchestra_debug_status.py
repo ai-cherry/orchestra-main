@@ -78,7 +78,7 @@ def check_critical_files():
     
     critical_files = {
         'architecture_blueprint.json': 'Architecture blueprint',
-        'test_validation_framework.py': 'Test validation framework',
+        "",
         'orchestra_implementation_validator.py': 'Implementation validator',
         'implementation_checklist.py': 'Implementation checklist',
         'orchestra_deployment_framework.py': 'Deployment framework (Lambda)',

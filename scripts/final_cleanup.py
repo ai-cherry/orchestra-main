@@ -49,7 +49,7 @@
             "prevent_restricted_mode.sh",
             "mode_indicator.sh",
             # Old test files
-            "test_mcp_implementation.py",
+            "",
             "codespaces_*.py",
             "connection_test_config.json",
             "credential_scan_report.json",

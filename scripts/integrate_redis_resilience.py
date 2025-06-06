@@ -169,7 +169,7 @@ def main():
     if updated_count > 0:
         print("\n📋 Next steps:")
         print("1. Test the updated services:")
-        print("   python scripts/test_redis_resilience.py")
+        print("")
         print("\n2. Restart MCP servers to use new Redis client:")
         print("   docker-compose -f docker-compose.single-user.yml restart")
         print("\n3. Monitor Redis health:")

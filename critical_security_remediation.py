@@ -382,7 +382,7 @@ ALLOWED_ORIGINS=http://localhost:3000,https://yourdomain.com
                 "Create .env file from template (never commit this file)",
                 "Review SQL injection warnings and refactor to use parameterized queries",
                 "Test all modified files to ensure functionality",
-                "Run test_validation_framework.py again to verify fixes"
+                ""
             ]
         }
         
@@ -416,7 +416,7 @@ def main():
     print("  2. Create your .env file with actual values")
     print("  3. Review SQL injection warnings in modified files")
     print("  4. Test all changes thoroughly")
-    print("  5. Run test_validation_framework.py to verify fixes")
+    print("")
 
 if __name__ == "__main__":
     main()

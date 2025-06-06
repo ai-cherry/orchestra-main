@@ -16,7 +16,7 @@ class Task:
     """Current migration state"""
     """Main conductor for the refactoring process"""
         self.state_file = project_root / ".refactoring_state.json"
-        self.backup_dir = project_root / ".refactoring_backups"
+        self.backup_dir = project_root / ""
         self.state = self._load_state()
         self.tasks = self._define_tasks()
     

@@ -305,7 +305,7 @@ def main():
     
     parser = argparse.ArgumentParser(description='Fix Python syntax errors')
     parser.add_argument('--audit-report', 
-                       default='audit_results_20250605/code_audit_report_20250605_004043.json',
+                       default="",
                        help='Path to audit report')
     parser.add_argument('--single-file', help='Fix a single file')
     parser.add_argument('--dry-run', action='store_true', help='Test without making changes')

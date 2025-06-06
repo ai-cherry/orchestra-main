@@ -110,7 +110,7 @@ def main() -> None:
         "Verification Tools": [
             "verify_orchestra_deployment.py",
             "check_weaviate_status.py",
-            "orchestra_debug_tracer.py"
+            ""
         ],
         "Configuration": [
             "lambda_deployment_strategy.json",

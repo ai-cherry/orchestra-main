@@ -497,7 +497,7 @@ class CodebaseAnalyzer:
 def main():
     """Main execution function"""
     # Use the audit report from the previous scan
-    audit_report_path = "audit_results_20250605/code_audit_report_20250605_004043.json"
+    audit_report_path = ""
     
     if not os.path.exists(audit_report_path):
         logger.error(f"Audit report not found: {audit_report_path}")
