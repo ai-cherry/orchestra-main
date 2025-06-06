@@ -1,9 +1,0 @@
-{
-  "timestamp": "2025-06-05T14:28:41.786426",
-  "checks_passed": 24,
-  "checks_failed": 0,
-  "issues": [
-    "Missing environment variables: POSTGRES_HOST, POSTGRES_USER, POSTGRES_PASSWORD, REDIS_HOST, WEAVIATE_URL, LAMBDA_API_KEY"
-  ],
-  "ready_for_deployment": true
-}
