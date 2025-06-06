@@ -5,6 +5,7 @@ import { Header } from './components/layout/Header'
 import { Dashboard } from './components/pages/Dashboard'
 import { PersonaHub } from './components/pages/PersonaHub'
 import { SearchCenter } from './components/pages/SearchCenter'
+import EnhancedSearchCenter from './components/pages/EnhancedSearchCenter'
 import { WorkflowBuilder } from './components/pages/WorkflowBuilder'
 import { MultiModalSuite } from './components/pages/MultiModalSuite'
 import { SystemMonitor } from './components/pages/SystemMonitor'
@@ -55,7 +56,7 @@ function App() {
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/personas" element={<PersonaHub />} />
               <Route path="/personas/:personaId" element={<PersonaHub />} />
-              <Route path="/search" element={<SearchCenter />} />
+              <Route path="/search" element={<EnhancedSearchCenter />} />
               <Route path="/workflows" element={<WorkflowBuilder />} />
               <Route path="/workflows/:workflowId" element={<WorkflowBuilder />} />
               <Route path="/generate" element={<MultiModalSuite />} />
