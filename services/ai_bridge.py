@@ -204,7 +204,7 @@ class CherryAIBridge:
                 self.connected_ais[sender_name].message_count += 1
                 self.connected_ais[sender_name].last_ping = time.time()
             
-            logger.info(f"📨 {sender_name} -> {message_type}")
+            logger.info(f"📨 MSG IN: {sender_name} -> {message_type} | Data: {json.dumps(data, indent=2)}")
             
             # Handle different message types
             if message_type == "ping":
@@ -220,9 +220,22 @@ class CherryAIBridge:
                 await self.broadcast_to_others(sender_name, data)
                 
         except json.JSONDecodeError:
-            logger.error(f"❌ Invalid JSON from {sender_name}")
+            logger.error(f"❌ Invalid JSON from {sender_name}: {message}")
+            if sender_name in self.connected_ais:
+                await self.connected_ais[sender_name].websocket.send_text(json.dumps({
+                    "type": "error",
+                    "message": "Invalid JSON format."
+                }))
         except Exception as e:
-            logger.error(f"❌ Error handling message from {sender_name}: {e}")
+            logger.error(f"❌ Error handling message from {sender_name}: {e}", exc_info=True)
+            if sender_name in self.connected_ais:
+                try:
+                    await self.connected_ais[sender_name].websocket.send_text(json.dumps({
+                        "type": "error",
+                        "message": f"Server-side error: {str(e)}"
+                    }))
+                except Exception as send_e:
+                    logger.error(f"❌ Failed to send error to client: {send_e}")
     
     async def handle_ping(self, sender_name: str):
         """Handle ping from AI (keep-alive)"""
