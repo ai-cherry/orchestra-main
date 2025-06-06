@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react'
 import { useParams } from 'react-router-dom'
-import ReactFlow, {
+import {
+  ReactFlow,
   MiniMap,
   Controls,
   Background,
@@ -283,7 +284,7 @@ function WorkflowList({ workflows, onWorkflowSelect, onCreateNew }) {
 }
 
 // Main workflow builder component
-function WorkflowBuilder() {
+function WorkflowBuilderCanvas() {
   const { workflowId } = useParams()
   const [nodes, setNodes, onNodesChange] = useNodesState([])
   const [edges, setEdges, onEdgesChange] = useEdgesState([])
@@ -470,7 +471,7 @@ export function WorkflowBuilder() {
   }
 
   if (workflowId) {
-    return <WorkflowBuilder />
+    return <WorkflowBuilderCanvas />
   }
 
   return (
