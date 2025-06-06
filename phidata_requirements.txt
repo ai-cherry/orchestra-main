@@ -1,5 +1,0 @@
-phidata>=2.7.0
-fastapi[standard]>=0.115.0
-sqlalchemy>=2.0.0
-duckduckgo-search>=5.0.0
-wikipedia>=1.4.0
