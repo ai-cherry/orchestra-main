@@ -9,9 +9,6 @@
         self._setup_database()
 
     def _setup_database(self):
-        """Provision MongoDB cluster on DigitalOcean"""
-            f"{self._name}-mongodb",
-            engine="mongodb",
             version=self.version,
             size=self.cluster_size,
             region=self.region,
@@ -36,9 +33,7 @@
 
         # Export connection details
         pulumi.export(
-            "mongodb_uri",
             Output.concat(
-                "mongodb+srv://",
                 self.db_user.name,
                 ":",
                 self.db_user.password,
@@ -47,4 +42,3 @@
                 "/admin?retryWrites=true&w=majority",
             ),
         )
-        pulumi.export("mongodb_host", self.cluster.private_host)

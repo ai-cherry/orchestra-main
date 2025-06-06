@@ -3,7 +3,6 @@
 """
 - Stores "episodes" as nodes in Neo4j, with embeddings, timestamps, metadata, and group_id namespacing.
 - Extracts entities using LLM (OpenAI/Gemini) and links them in the graph.
-- Supports hybrid semantic+graph search, robust health checks, and optional Redis/Dragonfly caching.
 - All configuration/secrets via environment variables or config files.
 - Exposes a clean, tool-based API for agent integration.
 """

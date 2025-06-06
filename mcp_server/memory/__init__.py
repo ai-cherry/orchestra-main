@@ -5,7 +5,6 @@
     "MemoryEntry",
     "MemoryMetadata",
     "MemorySearchResult",
-    "DragonflyCache",
     "FirestoreEpisodicMemory",
     "QdrantSemanticMemory",
     "LangChainMemoryWrapper",

@@ -32,13 +32,10 @@ GOOD EXAMPLE:
 import os
 from typing import Optional
 from typing_extensions import Optional
-import pymongo
 from dotenv import load_dotenv
 
 load_dotenv()
 
-def get_db_connection() -> Optional[pymongo.database.Database]:
-    \"\"\"Get MongoDB connection.
 
     Returns:
         Database instance or None if connection fails
@@ -46,7 +43,6 @@ def get_db_connection() -> Optional[pymongo.database.Database]:
     try:
 
         pass
-        client = pymongo.MongoClient(os.getenv("MONGODB_URI"))
         return client.cherry_ai
     except Exception:
 

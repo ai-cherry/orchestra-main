@@ -66,37 +66,19 @@
         print("-" * 40)
         print("Let's configure your external services.\n")
 
-        # MongoDB
-        print("1️⃣ MongoDB Atlas")
-        if self.config.get("MONGODB_URI"):
             print("   ✓ Already configured")
-            self.services_status["mongodb"] = True
         else:
-            print("   ℹ️  Sign up at: https://www.mongodb.com/cloud/atlas")
             print("   Create a free cluster and get your connection string")
-            uri = input("   Enter MongoDB URI (or press Enter to skip): ").strip()
             if uri:
-                self.config["MONGODB_URI"] = uri
-                self.services_status["mongodb"] = True
             else:
-                self.services_status["mongodb"] = False
 
         print()
 
-        # DragonflyDB
-        print("2️⃣ DragonflyDB (Aiven)")
-        if self.config.get("DRAGONFLY_URI"):
             print("   ✓ Already configured")
-            self.services_status["dragonfly"] = True
         else:
-            print("   ℹ️  Sign up at: https://aiven.io/dragonfly")
             print("   Create a free instance and get your connection string")
-            uri = input("   Enter Dragonfly URI (or press Enter to skip): ").strip()
             if uri:
-                self.config["DRAGONFLY_URI"] = uri
-                self.services_status["dragonfly"] = True
             else:
-                self.services_status["dragonfly"] = False
 
         print()
 
@@ -158,8 +140,6 @@
             categories = {
                 "Environment": ["ENVIRONMENT"],
                 "External Services": [
-                    "MONGODB_URI",
-                    "DRAGONFLY_URI",
                     "WEAVIATE_URL",
                     "WEAVIATE_API_KEY",
                 ],
@@ -223,9 +203,7 @@
         print("📋 Step 4: Running Validation Tests")
         print("-" * 40)
 
-        if not all([self.services_status.get("mongodb"), self.services_status.get("llm")]):
             print("⚠️  Skipping tests - not all services configured")
-            print("   Configure MongoDB and at least one LLM API to run tests")
             return
 
         print("Running test suite...")
@@ -256,8 +234,6 @@
         print("=" * 60)
 
         print("\n🔧 Service Configuration:")
-        print(f"  MongoDB Atlas: {'✅ Configured' if self.services_status.get('mongodb') else '❌ Not configured'}")
-        print(f"  DragonflyDB:   {'✅ Configured' if self.services_status.get('dragonfly') else '❌ Not configured'}")
         print(f"  Weaviate:      {'✅ Configured' if self.services_status.get('weaviate') else '❌ Not configured'}")
         print(
             f"  LLM APIs:      {'✅ At least one configured' if self.services_status.get('llm') else '❌ None configured'}"
@@ -265,12 +241,8 @@
 
         print("\n🚀 Next Steps:")
 
-        if not self.services_status.get("mongodb"):
-            print("  1. Sign up for MongoDB Atlas (free): https://www.mongodb.com/cloud/atlas")
             print("     Then run this wizard again to configure")
 
-        if not self.services_status.get("dragonfly"):
-            print("  2. (Optional) Sign up for DragonflyDB: https://aiven.io/dragonfly")
             print("     Or use local Redis for development")
 
         if not self.services_status.get("weaviate"):

@@ -1,8 +1,6 @@
 # TODO: Consider adding connection pooling configuration
 """
-   python -c "import pymongo; print(pymongo.MongoClient('$MONGODB_URI').server_info())"
-
-   # Test Redis/DragonflyDB
+   python -c "
    python -c "import redis; r=redis.Redis(host='$REDIS_HOST'); print(r.ping())"
 
    # Check service status
@@ -35,28 +33,23 @@
    python -v scripts/script.py
 
    # Check environment variables
-   python -c "import os; print(os.environ.get('MONGODB_URI'))"
-
+   python -c "
    # Test specific functions
    python -c "from scripts.module import function; function()"
    ```
 
 6. SERVICE-SPECIFIC DEBUGGING:
 
-   **MongoDB Issues:**
    ```python
-   import pymongo
-   import os
+      import os
 
    # Debug connection
-   uri = os.getenv("MONGODB_URI", "mongodb://localhost:27017")
    print(f"Connecting to: {uri}")
 
    try:
 
 
        pass
-       client = pymongo.MongoClient(uri, serverSelectionTimeoutMS=5000)
        print(client.server_info())
    except Exception:
 
@@ -64,7 +57,6 @@
        print(f"Connection failed: {e}")
    ```
 
-   **Redis/DragonflyDB Issues:**
    ```python
    import redis
    import os

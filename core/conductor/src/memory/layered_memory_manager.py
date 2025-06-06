@@ -8,8 +8,6 @@
         self.redis_url = redis_url or os.environ.get("REDIS_URL", f"redis://localhost:6379")  # Standard Redis config
         self.redis_pool = None  # Will be initialized in connect()
 
-        # Initialize MongoDB for mid-term and long-term memory
-        self.mongodb_client = mongodb.Client(project=self.project_id)
 
         # Initialize Vector Search for semantic search
         self.vector_index_endpoint = vector_index_endpoint
@@ -28,8 +26,6 @@
         """
                 raise ValueError("Embedding is required for LONG_TERM memory")
 
-            # Store in MongoDB without expiration
-            self._store_in_mongodb(memory_entry)
 
         return memory_id
 
@@ -120,28 +116,19 @@
 
         return True
 
-    # Private methods for MongoDB operations
 
-    def _store_in_mongodb(self, memory: MemoryEntry, ttl_seconds: Optional[int] = None) -> None:
-        """Store a memory in MongoDB with optional TTL."""
         memory_dict = memory.model_dump(exclude={"embedding"})
 
         # Add TTL if provided
         if ttl_seconds:
             memory_dict["expiry_time"] = datetime.utcnow().timestamp() + ttl_seconds
 
-        # Store in MongoDB
-        self.mongodb_client.collection("memories").document(memory.id).set(memory_dict)
 
-    def _retrieve_from_mongodb(self, memory_id: str) -> Optional[MemoryEntry]:
-        """Retrieve a memory from MongoDB."""
-        doc_ref = self.mongodb_client.collection("memories").document(memory_id)
         doc = doc_ref.get()
 
         if not doc.exists:
             return None
 
-        # Convert MongoDB document to MemoryEntry
         memory_data = doc.to_dict()
 
         # Check if memory has expired
@@ -156,7 +143,6 @@
 
         return MemoryEntry(**memory_data)
 
-    def _search_in_mongodb(
         self,
         query: str,
         memory_type: MemoryType,
@@ -165,17 +151,14 @@
     ) -> List[MemorySearchResult]:
         """
         """
-            self.mongodb_client.collection("memories")
             .where("memory_type", "==", memory_type.value)
             .where("agent_id", "==", self.agent_id)
         )
 
         # Add conversation_id filter if provided
         if self.conversation_id:
-            mongodb_query = mongodb_query.where("conversation_id", "==", self.conversation_id)
 
         # Execute query
-        docs = mongodb_query.limit(limit * 2).stream()  # Get more than needed for filtering
 
         # Process results
         for doc in docs:
@@ -212,9 +195,6 @@
         results.sort(key=lambda x: x.relevance, reverse=True)
         return results[:limit]
 
-    def _delete_from_mongodb(self, memory_id: str) -> bool:
-        """Delete a memory from MongoDB."""
-        doc_ref = self.mongodb_client.collection("memories").document(memory_id)
         doc = doc_ref.get()
 
         if not doc.exists:

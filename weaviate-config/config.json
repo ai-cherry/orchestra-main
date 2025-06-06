@@ -1,0 +1,19 @@
+{
+  "authentication": {
+    "anonymous_access": {
+      "enabled": true
+    }
+  },
+  "authorization": {
+    "admin_list": {
+      "enabled": false
+    }
+  },
+  "query_defaults": {
+    "limit": 25
+  },
+  "debug": false,
+  "persistence": {
+    "data_path": "./data"
+  }
+}

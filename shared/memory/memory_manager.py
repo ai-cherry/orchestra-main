@@ -95,7 +95,6 @@ class MemoryManagerFactory:
         """
         if memory_type.lower() == "in-memory":
             return InMemoryMemoryManager()
-        elif memory_type.lower() == "mongodb":
             collection = kwargs.get("collection_name", "memories")
             creds_path = kwargs.get("credentials_path", settings.gcp_service_account_key)
             return FirestoreMemoryManager(collection_name=collection, credentials_path=creds_path)

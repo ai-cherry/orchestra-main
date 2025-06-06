@@ -89,7 +89,6 @@ def update_env_file():
         
         categories = {
             "Security": ["SECRET_KEY", "JWT_SECRET", "ENCRYPTION_KEY", "API_KEY", "PASSWORD_SALT", "SESSION_SECRET", "COOKIE_SECRET"],
-            "Database": ["DATABASE_URL", "POSTGRES_", "REDIS_URL", "MONGODB_URI"],
             "API Keys": ["OPENAI_API_KEY", "ANTHROPIC_API_KEY", "OPENROUTER_API_KEY", "GEMINI_API_KEY", "PORTKEY_API_KEY", "VULTR_API_KEY"],
             "Services": ["WEAVIATE_", "MCP_", "API_"],
             "Monitoring": ["PROMETHEUS_", "GRAFANA_", "METRICS_", "SENTRY_", "LOG_LEVEL"],

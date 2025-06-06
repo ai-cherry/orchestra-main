@@ -21,7 +21,6 @@ class APICallMetrics:
 class ClaudeMonitor:
     """
     """
-        storage_backend: Optional[str] = "memory",  # memory, redis, mongodb
     ):
         self.log_responses = log_responses
         self.log_prompts = log_prompts
@@ -52,8 +51,6 @@ class ClaudeMonitor:
         if self.storage_backend == "redis":
             # TODO: Initialize Redis connection
             pass
-        elif self.storage_backend == "mongodb":
-            # TODO: Initialize mongodb client
             pass
         # Default to in-memory storage
 
@@ -198,8 +195,6 @@ class ClaudeMonitor:
         if self.storage_backend == "redis":
             # TODO: Store in Redis
             pass
-        elif self.storage_backend == "mongodb":
-            # TODO: Store in mongodb
             pass
 
     async def _send_cost_alert(self, session_id: str, total_cost: float):

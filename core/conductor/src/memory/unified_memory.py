@@ -59,13 +59,7 @@ class MemoryAdapterRegistry:
     def get_adapter(cls, name: str) -> Optional[Type]:
         return cls._registry.get(name)
 
-# --- MongoDB Adapter (Sync) ---
-class MongoDBMemoryAdapter:
-    """MongoDB-backed memory adapter with connection pooling."""
-    def __init__(self, mongo_uri: str, db_name: str = "cherry_ai", collection: str = "memory"):
-        from pymongo import MongoClient
-
-        self.client = MongoClient(mongo_uri, maxPoolSize=10)
+        
         self.collection = self.client[db_name][collection]
 
     @log_and_handle_errors
@@ -86,7 +80,6 @@ class MongoDBMemoryAdapter:
         results = self.collection.find({"value": {"$regex": query, "$options": "i"}}).limit(top_k)
         return [doc["value"] for doc in results]
 
-MemoryAdapterRegistry.register("mongodb", MongoDBMemoryAdapter)
 
 # --- Weaviate Adapter (Async) ---
 class WeaviateMemoryAdapter:
@@ -120,14 +113,10 @@ class WeaviateMemoryAdapter:
 
 MemoryAdapterRegistry.register("weaviate", WeaviateMemoryAdapter)
 
-# --- Dragonfly Adapter (Sync) ---
-class DragonflyMemoryAdapter:
-    """DragonflyDB-backed key-value memory adapter."""
         keys = self.client.keys("*")
         matches = [k for k in keys if query in k]
         return [self.client.get(k) for k in matches[:top_k]]
 
-MemoryAdapterRegistry.register("dragonfly", DragonflyMemoryAdapter)
 
 # --- Unified Memory Manager ---
 class UnifiedMemoryManager:

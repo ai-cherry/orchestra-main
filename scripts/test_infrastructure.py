@@ -95,7 +95,6 @@ def test_services():
     """Test service endpoints"""
     print("\n🔍 Checking service endpoints...")
 
-    services = ["superagi", "mcp-mongodb", "mcp-weaviate", "dragonfly"]
     available_services = []
 
     for service in services:

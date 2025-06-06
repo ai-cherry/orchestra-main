@@ -17,12 +17,9 @@ class DatabaseCommand(BaseModel):
 
     def _verify_connection(self) -> None:
         """Test database connection on startup."""
-                raise ConnectionError("Failed to connect to DragonflyDB")
-            logger.info("Connected to DragonflyDB successfully")
         except Exception:
 
             pass
-            logger.error("DragonflyDB connection failed: %s", str(e))
             raise
 
     def execute_command(self, db_command: DatabaseCommand) -> Any:
@@ -57,13 +54,11 @@ class DatabaseCommand(BaseModel):
         }
 
 def get_redis_config() -> Dict[str, Any]:
-    """Get Redis/DragonflyDB configuration based on environment."""
     if os.getenv("PAPERSPACE_ENV") == "true":
         # Paperspace local configuration
         return {
             "host": "localhost",
             "port": int(os.getenv("MCP_REDIS_SERVER_PORT", "6379")),
-            "password": os.getenv("PAPERSPACE_DRAGONFLYDB_PASSWORD"),
         }
     else:
         # DigitalOcean production configuration
@@ -73,7 +68,6 @@ def get_redis_config() -> Dict[str, Any]:
         }
 
 # FastAPI application setup
-app = FastAPI(title="DragonflyDB MCP Server")
 server = MCPRedisServer(get_redis_config())
 
 @app.post("/execute")

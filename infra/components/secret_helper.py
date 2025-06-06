@@ -1,8 +1,6 @@
 # TODO: Consider adding connection pooling configuration
 """
-        name="mongodb-secrets",
         namespace="superagi",
-        keys=["mongodb_password", "mongodb_uri"]
     )
 """
     config_prefix: str = "",

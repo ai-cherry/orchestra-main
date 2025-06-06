@@ -107,14 +107,7 @@
 
         # Service configurations with instructions
         services = {
-            "MongoDB Atlas": {
-                "url": "https://www.mongodb.com/cloud/atlas",
-                "vars": {"MONGODB_URI": "mongodb://localhost:27017/cherry_ai"},  # Local default
-                "note": "Using local MongoDB for development",
             },
-            "DragonflyDB": {
-                "url": "https://aiven.io/dragonfly",
-                "vars": {"DRAGONFLY_URI": "redis://localhost:6379"},  # Local Redis default
                 "note": "Using local Redis for development",
             },
             "Weaviate": {
@@ -171,8 +164,6 @@
             categories = {
                 "Environment": ["ENVIRONMENT", "PYTHONPATH"],
                 "Database Services": [
-                    "MONGODB_URI",
-                    "DRAGONFLY_URI",
                     "REDIS_HOST",
                     "REDIS_PORT",
                 ],
@@ -228,7 +219,6 @@
                     "command": "python",
                     "args": ["mcp_server/servers/memory_server.py"],
                     "env": {
-                        "MONGODB_URI": "${MONGODB_URI}",
                         "REDIS_HOST": "${REDIS_HOST}",
                         "REDIS_PORT": "${REDIS_PORT}",
                     },
@@ -373,7 +363,6 @@ echo "✓ Cherry AI stopped"
         checks = {
             ".env exists": self.env_file.exists(),
             ".mcp.json exists": (self.root_dir / ".mcp.json").exists(),
-            "MongoDB configured": bool(self.config.get("MONGODB_URI")),
             "Redis configured": bool(self.config.get("REDIS_HOST")),
             "No archive directories": not (self.root_dir / "scripts" / "archive").exists(),
             "MCP servers created": (self.root_dir / "mcp_server" / "servers" / "conductor_server.py").exists(),

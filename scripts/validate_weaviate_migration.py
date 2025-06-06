@@ -26,9 +26,6 @@ def parse_args():
         help="PostgreSQL connection string (default: env POSTGRES_DSN)",
     )
     parser.add_argument(
-        "--dragonfly-uri",
-        default=os.environ.get("DRAGONFLY_URI"),
-        help="Dragonfly Redis URI (default: env DRAGONFLY_URI)",
     )
     parser.add_argument(
         "--skip-performance",
@@ -100,13 +97,10 @@ def connect_to_postgres(dsn: str) -> psycopg2.extensions.connection:
         logger.error(f"Failed to connect to PostgreSQL: {str(e)}")
         raise
 
-def connect_to_dragonfly(uri: str) -> Optional[redis.Redis]:
     """
     """
-        logger.info("Skipping Dragonfly connection (not configured or redis package not installed)")
         return None
 
-    logger.info(f"Connecting to Dragonfly at {uri}")
 
     try:
 
@@ -114,15 +108,12 @@ def connect_to_dragonfly(uri: str) -> Optional[redis.Redis]:
         pass
         client = redis.from_url(uri, decode_responses=True)
         if client.ping():
-            logger.info("Successfully connected to Dragonfly")
             return client
         else:
-            logger.warning("Dragonfly ping failed")
             return None
     except Exception:
 
         pass
-        logger.warning(f"Failed to connect to Dragonfly: {str(e)}")
         return None
 
 def load_embedding_model() -> SentenceTransformer:
@@ -470,15 +461,11 @@ def test_postgres_integration(
             pass
             logger.warning(f"Failed to clean up PostgreSQL test table: {str(e)}")
 
-def test_dragonfly_integration(
-    dragonfly_client: redis.Redis, weaviate_client: weaviate.Client, collection_name: str, object_id: str
 ) -> bool:
     """
     """
-        logger.info("Skipping Dragonfly integration test (not configured)")
         return True
 
-    logger.info(f"Testing Dragonfly integration...")
 
     try:
 
@@ -488,38 +475,28 @@ def test_dragonfly_integration(
         obj = weaviate_client.data_object.get_by_id(uuid=object_id, class_name=collection_name)
 
         if not obj:
-            logger.error(f"Failed to get object from Weaviate for Dragonfly test")
             return False
 
-        # Store in Dragonfly
         cache_key = f"memory:{object_id}"
 
         # Convert obj to string values for Redis
         redis_obj = {k: json.dumps(v) if isinstance(v, (dict, list)) else str(v) for k, v in obj.items()}
 
-        dragonfly_client.hset(cache_key, mapping=redis_obj)
 
-        # Retrieve from Dragonfly
-        cached = dragonfly_client.hgetall(cache_key)
 
         if not cached:
-            logger.error(f"Failed to retrieve object from Dragonfly")
             return False
 
         # Check if content matches (accounting for string conversion)
         if cached.get("content") != obj.get("content", ""):
-            logger.error(f"Retrieved content from Dragonfly does not match")
             return False
 
         # Clean up
-        dragonfly_client.delete(cache_key)
 
-        logger.info(f"Dragonfly integration test successful")
         return True
     except Exception:
 
         pass
-        logger.error(f"Failed to test Dragonfly integration: {str(e)}")
         return False
 
 def run_performance_tests(weaviate_client: weaviate.Client, embedding_model: SentenceTransformer) -> Dict[str, Any]:
@@ -630,7 +607,6 @@ def main():
             "vector_search": {},
             "hybrid_search": {},
             "postgres_integration": False,
-            "dragonfly_integration": False,
             "performance": {},
         }
 
@@ -670,10 +646,6 @@ def main():
                 postgres_conn, weaviate_client, "Session", test_objects["Session"]
             )
 
-        # Test Dragonfly integration
-        if dragonfly_client and "Session" in test_objects:
-            results["dragonfly_integration"] = test_dragonfly_integration(
-                dragonfly_client, weaviate_client, "Session", test_objects["Session"]
             )
 
         # Run performance tests
@@ -704,7 +676,6 @@ def main():
             f"\nPostgreSQL integration: {'✅' if results['postgres_integration'] else '❌' if postgres_conn else 'SKIPPED'}"
         )
         logger.info(
-            f"Dragonfly integration: {'✅' if results['dragonfly_integration'] else '❌' if dragonfly_client else 'SKIPPED'}"
         )
 
         if "vector_search_latency_ms_avg" in results["performance"]:
@@ -718,7 +689,6 @@ def main():
             p95_latency = results["performance"].get("vector_search_latency_ms_p95", 0)
             if p95_latency > 50:
                 logger.warning(f"\n⚠️ p95 latency ({p95_latency:.2f} ms) exceeds 50ms threshold")
-                logger.warning("Consider enabling micro-cache with Dragonfly for improved performance")
             else:
                 logger.info(f"\n✅ p95 latency ({p95_latency:.2f} ms) is below 50ms threshold")
                 logger.info("No micro-cache needed for optimal performance")
@@ -736,7 +706,6 @@ def main():
             and all_vector_search
             and all_hybrid_search
             and (results["postgres_integration"] or not postgres_conn)
-            and (results["dragonfly_integration"] or not dragonfly_client)
         )
 
         logger.info(f"\nOverall validation: {'✅ PASSED' if overall_success else '❌ FAILED'}")

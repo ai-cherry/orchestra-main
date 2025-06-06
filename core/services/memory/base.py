@@ -5,8 +5,6 @@ T = TypeVar("T")
 
 class MemoryLayer(Enum):
     """Memory layer types."""
-    SHORT_TERM = "short_term"  # Hot cache (DragonflyDB)
-    MID_TERM = "mid_term"  # Document store (MongoDB)
     LONG_TERM = "long_term"  # Vector store (Weaviate)
 
 @dataclass

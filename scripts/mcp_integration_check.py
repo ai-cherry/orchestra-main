@@ -30,7 +30,6 @@ class MCPIntegrationChecker:
         required_patterns = [
             (r"Python 3\.10", "Python 3.10 requirement"),
             (r"pip/venv", "pip/venv workflow"),
-            (r"MongoDB", "MongoDB reference"),
             (r"External Services", "External services mention"),
         ]
 

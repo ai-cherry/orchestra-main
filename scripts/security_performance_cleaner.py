@@ -671,7 +671,6 @@ subprocess.run([',
                 content = file_path.read_text(encoding='utf-8')
                 
                 # Check for database connection patterns
-                if any(keyword in content.lower() for keyword in ['database', 'postgres', 'mysql', 'mongodb']):
                     # Check if pooling is configured
                     pooling_keywords = ['pool_size', 'max_connections', 'connection_pool']
                     

@@ -29,38 +29,20 @@ class cherry_aiCore:
 
 async def _initialize_connections(self) -> None:
         """Initialize all service connections."""
-                    "connection_string": self.settings.mongodb.uri.get_secret_value(),
-                    "database": self.settings.mongodb.database,
                 }
-                mongodb_conn = MongoDBConnection("mongodb-main", mongodb_config)
-                await mongodb_conn.connect()
-                self.service_registry.register_service("mongodb", mongodb_conn)
-                logger.info("MongoDB connection established")
             except Exception:
 
                 pass
-                logger.error(f"Failed to connect to MongoDB: {e}")
                 if self.settings.is_production:
                     raise
 
-        # DragonflyDB connection
-        if self.settings.dragonfly.enabled:
             try:
 
                 pass
-                dragonfly_config = {
-                    "connection_string": self.settings.dragonfly.uri.get_secret_value(),
-                    "decode_responses": self.settings.dragonfly.decode_responses,
-                    "max_connections": self.settings.dragonfly.max_connections,
                 }
-                dragonfly_conn = DragonflyConnection("dragonfly-main", dragonfly_config)
-                await dragonfly_conn.connect()
-                self.service_registry.register_service("dragonfly", dragonfly_conn)
-                logger.info("DragonflyDB connection established")
             except Exception:
 
                 pass
-                logger.error(f"Failed to connect to DragonflyDB: {e}")
                 if self.settings.is_production:
                     raise
 

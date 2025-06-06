@@ -53,15 +53,12 @@ try:
                 pass
                 logger.warning(f"Failed to initialize Cloud Storage client: {str(e)}")
 
-            # Initialize mongodb client
             try:
 
                 pass
-                self.firestore_client = mongodb.Client(project=self.project_id)
             except Exception:
 
                 pass
-                logger.warning(f"Failed to initialize mongodb client: {str(e)}")
 
         except Exception:
 
@@ -237,7 +234,6 @@ try:
                     logger.error(f"Failed to save mode definitions to Cloud Storage: {str(e)}")
                     success = False
 
-            # 4. Save to mongodb
             if self.gcp_enabled and self.firestore_client:
                 try:
 
@@ -248,15 +244,12 @@ try:
                         {
                             "environment": self.environment,
                             "content": content,
-                            "updated_at": mongodb.SERVER_TIMESTAMP,
                             "version": hashlib.md5(content.encode()).hexdigest(),
                         }
                     )
-                    logger.info(f"Saved mode definitions to mongodb collection: {self.collection_name}")
                 except Exception:
 
                     pass
-                    logger.error(f"Failed to save mode definitions to mongodb: {str(e)}")
                     success = False
 
             return success
@@ -322,7 +315,6 @@ try:
                     logger.error(f"Failed to save workflow state to Cloud Storage: {str(e)}")
                     success = False
 
-            # 2. Save to mongodb
             if self.firestore_client:
                 try:
 
@@ -332,14 +324,11 @@ try:
                         {
                             "environment": self.environment,
                             "content": content,
-                            "updated_at": mongodb.SERVER_TIMESTAMP,
                         }
                     )
-                    logger.info("Saved workflow state to mongodb")
                 except Exception:
 
                     pass
-                    logger.error(f"Failed to save workflow state to mongodb: {str(e)}")
                     success = False
 
             return success
@@ -380,7 +369,6 @@ try:
                 pass
                 logger.error(f"Failed to load mode definitions from Cloud Storage: {str(e)}")
 
-        # 4. Try mongodb
         if not content and self.gcp_enabled and self.firestore_client:
             try:
 
@@ -389,14 +377,10 @@ try:
                 doc = doc_ref.get()
                 if doc.exists:
                     content = doc.to_dict().get("content")
-                    source = "mongodb"
-                    logger.info("Loaded mode definitions from mongodb")
                 else:
-                    logger.warning("Mode definitions not found in mongodb")
             except Exception:
 
                 pass
-                logger.error(f"Failed to load mode definitions from mongodb: {str(e)}")
 
         # If content was loaded, parse and validate
         if content:
@@ -464,7 +448,6 @@ try:
                 pass
                 logger.error(f"Failed to load workflow state from Cloud Storage: {str(e)}")
 
-        # 3. Try mongodb
         if not content and self.gcp_enabled and self.firestore_client:
             try:
 
@@ -473,14 +456,10 @@ try:
                 doc = doc_ref.get()
                 if doc.exists:
                     content = doc.to_dict().get("content")
-                    source = "mongodb"
-                    logger.info("Loaded workflow state from mongodb")
                 else:
-                    logger.warning("Workflow state not found in mongodb")
             except Exception:
 
                 pass
-                logger.error(f"Failed to load workflow state from mongodb: {str(e)}")
 
         # If content was loaded, parse
         if content:
@@ -572,7 +551,6 @@ try:
                 pass
                 logger.error(f"Failed to load mode definitions from Cloud Storage: {str(e)}")
 
-        # 4. mongodb
         if self.gcp_enabled and self.firestore_client:
             try:
 
@@ -583,13 +561,10 @@ try:
                     firestore_content = doc.to_dict().get("content")
                     self._validate_yaml_config(firestore_content)
                     firestore_hash = hashlib.md5(firestore_content.encode()).hexdigest()
-                    sources.append(("mongodb", firestore_content, firestore_hash))
                 else:
-                    logger.warning("Mode definitions not found in mongodb")
             except Exception:
 
                 pass
-                logger.error(f"Failed to load mode definitions from mongodb: {str(e)}")
 
         # If no sources found, return False
         if not sources:
@@ -707,8 +682,6 @@ try:
                 logger.error(f"Failed to sync configuration to Cloud Storage: {str(e)}")
                 return False
 
-        # 4. Sync to mongodb
-        if self.gcp_enabled and self.firestore_client and source_to_use[0] != "mongodb":
             try:
 
                 pass
@@ -717,15 +690,12 @@ try:
                     {
                         "environment": self.environment,
                         "content": content_to_sync,
-                        "updated_at": mongodb.SERVER_TIMESTAMP,
                         "version": hashlib.md5(content_to_sync.encode()).hexdigest(),
                     }
                 )
-                logger.info(f"Synced configuration to mongodb collection: {self.collection_name}")
             except Exception:
 
                 pass
-                logger.error(f"Failed to sync configuration to mongodb: {str(e)}")
                 return False
 
         return True

@@ -6,7 +6,6 @@
 class TestMCPServers:
     """Test MCP server connectivity and functionality"""
         """Create MCP integration instance"""
-            mongodb_endpoint=os.getenv("MCP_MONGODB_ENDPOINT", "http://localhost:8081"),
             weaviate_endpoint=os.getenv("MCP_WEAVIATE_ENDPOINT", "http://localhost:8082"),
             timeout=10,
         )
@@ -20,9 +19,6 @@ class TestMCPServers:
             pytest.skip(f"MCP servers not available: {e}")
 
     @pytest.mark.asyncio
-    async def test_mongodb_natural_language_query(self, mcp_integration):
-        """Test natural language queries to MongoDB"""
-            result = await mcp_integration.query_mongodb("Show all agents with status active")
 
             assert isinstance(result, dict)
             assert "success" in result
@@ -32,7 +28,6 @@ class TestMCPServers:
 
 
             pass
-            pytest.skip(f"MongoDB MCP not available: {e}")
 
     @pytest.mark.asyncio
     async def test_weaviate_semantic_search(self, mcp_integration):
@@ -51,7 +46,6 @@ class TestMCPServers:
 
     @pytest.mark.asyncio
     async def test_hybrid_query(self, mcp_integration):
-        """Test hybrid query combining MongoDB and Weaviate"""
             result = await mcp_integration.hybrid_query("Find active agents similar to research assistant")
 
             assert isinstance(result, dict)
@@ -80,7 +74,6 @@ class TestMCPServers:
 @pytest.mark.asyncio
 async def test_mcp_server_health():
     """Test MCP server health endpoints"""
-        "mongodb": os.getenv("MCP_MONGODB_ENDPOINT", "http://localhost:8081"),
         "weaviate": os.getenv("MCP_WEAVIATE_ENDPOINT", "http://localhost:8082"),
     }
 

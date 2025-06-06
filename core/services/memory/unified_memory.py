@@ -1,8 +1,6 @@
 # TODO: Consider adding connection pooling configuration
 """
 """
-    """Short-term memory store using DragonflyDB."""
-        """Store item in DragonflyDB."""
                 "content": item.content,
                 "metadata": item.metadata,
                 "timestamp": item.timestamp.isoformat(),
@@ -21,7 +19,6 @@
             return False
 
     async def retrieve(self, item_id: str) -> Optional[MemoryItem]:
-        """Retrieve item from DragonflyDB."""
                     content=parsed["content"],
                     metadata=parsed["metadata"],
                     timestamp=datetime.fromisoformat(parsed["timestamp"]),
@@ -34,23 +31,18 @@
         return None
 
     async def delete(self, item_id: str) -> bool:
-        """Delete item from DragonflyDB."""
             logger.error(f"Error deleting from short-term memory: {e}")
             return False
 
     async def search(self, query: str, limit: int = 10, filters: Optional[Dict[str, Any]] = None) -> List[SearchResult]:
         """Search is not supported in short-term memory."""
-        """Check if DragonflyDB is healthy."""
             logger.error(f"Short-term store health check failed: {e}")
             return False
 
 class MidTermStore(MemoryStore):
-    """Mid-term memory store using MongoDB."""
-        self.collection_name = getattr(settings.mongodb, "collection_name", "memory_items")
         self.collection = self.db_connection[self.collection_name]
 
     async def store(self, item: MemoryItem) -> bool:
-        """Store item in MongoDB."""
                 "_id": item.id,
                 "content": item.content,
                 "metadata": item.metadata,
@@ -67,7 +59,6 @@ class MidTermStore(MemoryStore):
             return False
 
     async def retrieve(self, item_id: str) -> Optional[MemoryItem]:
-        """Retrieve item from MongoDB."""
             document = await self.collection.find_one({"_id": item_id})
             if document:
                 return MemoryItem(
@@ -85,7 +76,6 @@ class MidTermStore(MemoryStore):
         return None
 
     async def delete(self, item_id: str) -> bool:
-        """Delete item from MongoDB."""
             result = await self.collection.delete_one({"_id": item_id})
             return result.deleted_count > 0
         except Exception:
@@ -95,13 +85,10 @@ class MidTermStore(MemoryStore):
             return False
 
     async def search(self, query: str, limit: int = 10, filters: Optional[Dict[str, Any]] = None) -> List[SearchResult]:
-        """Search in MongoDB using text search."""
             search_query: Dict[str, Any] = {"$text": {"$search": query}}
-            if filters:  # Assuming filters are MongoDB compatible
                 search_query.update(filters)
 
             # Execute search
-            # Ensure text index exists on 'content' or relevant fields in MongoDB
             cursor = self.collection.find(search_query).limit(limit)
             # Add sort by text score: .sort([("score", {"$meta": "textScore"})])
             # Requires text index and projection of score.
@@ -115,7 +102,6 @@ class MidTermStore(MemoryStore):
                     timestamp=doc["timestamp"],
                     layer=MemoryLayer(doc["layer"]),
                 )
-                # MongoDB text search score can be accessed via {"$meta": "textScore"}
                 # For simplicity, using 1.0. A real score would be better.
                 score = doc.get("score", 1.0)  # if $meta textScore is projected
                 results.append(SearchResult(item=item, score=score))
@@ -128,7 +114,6 @@ class MidTermStore(MemoryStore):
             return []
 
     async def health_check(self) -> bool:
-        """Check if MongoDB is healthy."""
             await self.db_connection.command("ping")  # Use the database object for ping
             return True
         except Exception:  # Broad except Exception:
@@ -297,16 +282,7 @@ class UnifiedMemoryService(MemoryService):
     """
     """
         """Initialize all memory stores."""
-            dragonfly_conn = self.registry.get_service("dragonfly")
-            if dragonfly_conn:
-                self.stores[MemoryLayer.SHORT_TERM] = ShortTermStore(dragonfly_conn)
-                logger.info("Initialized short-term memory store (DragonflyDB)")
 
-        if settings.mongodb.enabled:
-            mongodb_db_obj = self.registry.get_service("mongodb")  # Expects a Database object
-            if mongodb_db_obj:
-                self.stores[MemoryLayer.MID_TERM] = MidTermStore(mongodb_db_obj)
-                logger.info("Initialized mid-term memory store (MongoDB)")
 
         if settings.weaviate.enabled:
             weaviate_client_conn = self.registry.get_service("weaviate_client")  # Expects a WeaviateClient
@@ -475,12 +451,9 @@ class UnifiedMemoryService(MemoryService):
                     query_properties=weaviate_query_properties,
                 )
             elif isinstance(store, MidTermStore):
-                # MongoDB uses dict-based filters directly for $text search context
                 # Or requires a different translation for its find() query filter document.
-                mongo_filters = filters  # Assuming simple filters are for MongoDB if it's the target
                 if search_type != "keyword" and layer_enum == MemoryLayer.MID_TERM:  # Only keyword search for Mongo
                     continue
-                task = store.search(query, limit, mongo_filters)
             elif isinstance(store, ShortTermStore):
                 continue  # ShortTermStore does not support search
             else:  # Generic store, pass filters as is

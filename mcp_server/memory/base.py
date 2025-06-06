@@ -1,7 +1,6 @@
 """
 """
     """Memory storage tiers with different performance characteristics."""
-    HOT = "hot"  # DragonflyDB - Sub-millisecond access
     WARM = "warm"  # Firestore - Millisecond access
     COLD = "cold"  # Qdrant - Vector search optimized
 

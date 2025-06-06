@@ -6,8 +6,6 @@
             "os.environ",
             {
                 "SECRET_KEY": "test-secret",
-                "MONGODB_URI": "mongodb://localhost",
-                "DRAGONFLY_URI": "redis://localhost",
                 "WEAVIATE_URL": "http://localhost:8080",
                 "WEAVIATE_API_KEY": "test-key",
             },
@@ -25,8 +23,6 @@
             {
                 "ENVIRONMENT": "prod",
                 "SECRET_KEY": "test-secret",
-                "MONGODB_URI": "mongodb://localhost",
-                "DRAGONFLY_URI": "redis://localhost",
                 "WEAVIATE_URL": "http://localhost:8080",
                 "WEAVIATE_API_KEY": "test-key",
             },

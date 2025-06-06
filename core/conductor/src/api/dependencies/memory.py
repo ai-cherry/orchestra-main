@@ -10,21 +10,13 @@
         MEMORY_MANAGER_AVAILABLE = True
         logger.info("Successfully imported memory managers")
 
-        # Try to import the MongoDB adapter
-        try:
+        # Try to         try:
 
             pass
-            logger.info("Attempting to import MongoDBMemoryAdapter")
-            global MongoDBMemoryAdapter
-            from packages.shared.src.memory.mongodb_adapter import MongoDBMemoryAdapter
-
-            MONGODB_AVAILABLE = True
-            logger.info("Successfully imported MongoDBMemoryAdapter")
+            
         except Exception:
 
             pass
-            logger.warning(f"Failed to import MongoDBMemoryAdapter, MongoDB storage will not be available: {str(e)}")
-            MONGODB_AVAILABLE = False
 
         # Using main implementation, not stubs
         USE_STUBS = False
@@ -46,7 +38,6 @@
             from packages.shared.src.memory.stubs import InMemoryMemoryManagerStub as InMemoryMemoryManager
 
             MEMORY_MANAGER_AVAILABLE = True
-            MONGODB_AVAILABLE = False
             USE_STUBS = True
             logger.info("Using stub memory manager implementation")
         except Exception:
@@ -60,9 +51,7 @@
 
         pass
         logger.info("Attempting to import hexagonal architecture components for memory service")
-        global MemoryService, MemoryServiceFactory, MongoDBStorageAdapter, PostgresStorageAdapter
-        from packages.shared.src.memory.adapters.mongodb_adapter import MongoDBStorageAdapter
-        from packages.shared.src.memory.adapters.postgres_adapter import PostgresStorageAdapter
+                from packages.shared.src.memory.adapters.postgres_adapter import PostgresStorageAdapter
         from packages.shared.src.memory.services.memory_service import MemoryService
         from packages.shared.src.memory.services.memory_service_factory import MemoryServiceFactory
 
@@ -90,33 +79,23 @@ def create_memory_manager(settings: Settings) -> "MemoryManager":
         raise DependencyError("Memory manager components are not available")
 
     # Determine if we need cloud storage based on environment and project ID
-    use_mongodb = (
         settings.ENVIRONMENT in ["prod", "production", "stage", "staging"]
         and settings.get_vultr_project_id() is not None
-        and MONGODB_AVAILABLE
     )
 
-    # Use MongoDB if available and configured
-    if use_mongodb:
         try:
 
             pass
-            logger.info(f"Creating MongoDB memory adapter for environment: {settings.ENVIRONMENT}")
-            return MongoDBMemoryAdapter(
                 project_id=settings.get_vultr_project_id(),
                 credentials_path=settings.get_vultr_credentials_path(),
-                namespace=settings.MONGODB_NAMESPACE or f"cherry_ai-{settings.ENVIRONMENT}",
             )
         except Exception:
 
             pass
-            logger.error(f"Failed to create MongoDB memory adapter: {str(e)}")
             logger.warning("Falling back to in-memory implementation")
             # Convert general exception to a specific memory error
-            raise MemoryConnectionError(f"Failed to connect to MongoDB: {str(e)}", original_error=e)
 
     # Use in-memory implementation
-    namespace = settings.MONGODB_NAMESPACE or f"cherry_ai-{settings.ENVIRONMENT}"
     logger.info(f"Using in-memory memory manager with namespace: {namespace}")
     return InMemoryMemoryManager(namespace=namespace)
 
@@ -137,9 +116,7 @@ async def get_memory_manager(
         except Exception:
 
             pass
-            # If we can't create the MongoDB adapter, fall back to in-memory
             logger.warning(f"Creating in-memory manager due to error: {str(e)}")
-            namespace = settings.MONGODB_NAMESPACE or f"cherry_ai-{settings.ENVIRONMENT}"
             _memory_manager = InMemoryMemoryManager(namespace=namespace)
 
         try:
@@ -159,7 +136,6 @@ async def get_memory_manager(
                 try:
 
                     pass
-                    namespace = settings.MONGODB_NAMESPACE or f"cherry_ai-{settings.ENVIRONMENT}"
                     _memory_manager = InMemoryMemoryManager(namespace=namespace)
                     await _memory_manager.initialize()
                 except Exception:
@@ -195,7 +171,6 @@ async def initialize_memory_manager(settings: Settings = None) -> None:
             pass
             # If we can't create the preferred adapter, fall back to in-memory
             logger.warning(f"Creating in-memory manager due to error: {str(e)}")
-            namespace = settings.MONGODB_NAMESPACE or f"cherry_ai-{settings.ENVIRONMENT}"
             _memory_manager = InMemoryMemoryManager(namespace=namespace)
 
     # Initialize the memory manager
@@ -211,7 +186,6 @@ async def initialize_memory_manager(settings: Settings = None) -> None:
         # If initialization fails with a specific type, fall back to in-memory
         if not isinstance(_memory_manager, InMemoryMemoryManager):
             logger.warning(f"Falling back to in-memory implementation after error: {str(e)}")
-            namespace = settings.MONGODB_NAMESPACE or f"cherry_ai-{settings.ENVIRONMENT}"
             _memory_manager = InMemoryMemoryManager(namespace=namespace)
             await _memory_manager.initialize()
         else:
@@ -257,11 +231,9 @@ async def get_memory_service(
                 settings.ENVIRONMENT in ["prod", "production", "stage", "staging"]
                 and settings.get_vultr_project_id() is not None
             ):
-                storage_type = "mongodb"
                 storage_config = {
                     "project_id": settings.get_vultr_project_id(),
                     "credentials_path": settings.get_vultr_credentials_path(),
-                    "namespace": settings.MONGODB_NAMESPACE or f"cherry_ai-{settings.ENVIRONMENT}",
                 }
             else:
                 # Use in-memory implementation for development

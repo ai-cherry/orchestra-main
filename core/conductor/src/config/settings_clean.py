@@ -13,8 +13,6 @@
     PORTKEY_API_KEY: Optional[str] = None
 
     # External Services (Non-GCP)
-    DRAGONFLY_URI: Optional[str] = None  # Aiven DragonflyDB
-    MONGODB_URI: Optional[str] = None  # MongoDB Atlas
     WEAVIATE_URL: Optional[str] = None  # Weaviate Cloud
     WEAVIATE_API_KEY: Optional[str] = None
 

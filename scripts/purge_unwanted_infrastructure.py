@@ -20,19 +20,9 @@ import subprocess
         r"REDIS_PORT",
         r"REDIS_PASSWORD",
         r"REDIS_.*",
-        r"dragonfly",
-        r"DragonflyDB",
-        r"DRAGONFLY_.*",
     ],
-    # MongoDB patterns
-    "mongodb": [
-        r"import pymongo",
-        r"from pymongo import",
-        r"from motor import",
-        r"mongodb_client",
+        r"        r"        r"from motor import",
         r"MongoClient",
-        r"MONGODB_URI",
-        r"MONGODB_.*",
     ],
     # Firestore/Firebase patterns
     "firestore": [
@@ -199,13 +189,10 @@ class InfrastructurePurger:
             if any(re.search(pattern, line) for patterns in REMOVE_PATTERNS.values() for pattern in patterns):
                 continue
 
-            # Skip Redis/MongoDB/Firestore related code blocks
             if any(
                 keyword in line.lower()
-                for keyword in ["redis", "mongodb", "firestore", "dragonfly", "gcp", "cloud run"]
             ):
                 # Check if this is a comment about removing these services
-                if "no redis" in line.lower() or "no mongodb" in line.lower() or "postgresql only" in line.lower():
                     cleaned_lines.append(line)
                 continue
 
@@ -224,7 +211,6 @@ class InfrastructurePurger:
                 continue
 
             # Skip environment variables for unwanted services
-            if any(var in line for var in ["REDIS_", "MONGODB_", "GCP_", "FIRESTORE_", "DRAGONFLY_"]):
                 continue
 
             cleaned_lines.append(line)
@@ -234,7 +220,6 @@ class InfrastructurePurger:
     def _clean_doc_content(self, content: str) -> str:
         """Clean documentation content."""
         content = re.sub(r"## Redis.*?(?=##|\Z)", "", content, flags=re.DOTALL)
-        content = re.sub(r"## MongoDB.*?(?=##|\Z)", "", content, flags=re.DOTALL)
         content = re.sub(r"## GCP.*?(?=##|\Z)", "", content, flags=re.DOTALL)
         content = re.sub(r"## Google Cloud.*?(?=##|\Z)", "", content, flags=re.DOTALL)
 
@@ -248,7 +233,6 @@ class InfrastructurePurger:
 
         for line in lines:
             # Check if we're entering a section to skip
-            if any(service in line.lower() for service in ["redis:", "mongodb:", "firestore:", "dragonfly:"]):
                 skip_section = True
                 continue
 
@@ -270,7 +254,6 @@ class InfrastructurePurger:
             # Skip unwanted environment variables
             if any(
                 line.startswith(prefix)
-                for prefix in ["REDIS_", "MONGODB_", "GCP_", "FIRESTORE_", "DRAGONFLY_", "GOOGLE_CLOUD_"]
             ):
                 continue
 

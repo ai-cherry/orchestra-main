@@ -34,13 +34,11 @@ import os
           summary: "High error rate in agent executions"
           description: "Error rate is {{ $value }} errors per second"
 
-      - alert: DragonflyHighMemoryUsage
         expr: redis_memory_used_bytes / redis_memory_max_bytes > 0.9
         for: 10m
         labels:
           severity: critical
         annotations:
-          summary: "DragonflyDB memory usage above 90%"
           description: "Memory usage is {{ $value }}%"
 
       - alert: SuperAGIPodNotReady
@@ -341,7 +339,6 @@ key = os.getenv("ORCHESTRA_MONITORING_COMPONENT_KEY", "")
         "id": 3,
         "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
         "type": "graph",
-        "title": "DragonflyDB Memory Usage",
         "targets": [
           {
             "expr": "redis_memory_used_bytes",
