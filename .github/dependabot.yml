@@ -36,9 +36,9 @@ updates:
       prefix: "deps(requirements)"
       include: "scope"
     
-  # Node.js dependencies (admin-ui)
+  # Node.js dependencies (admin-interface)
   - package-ecosystem: "npm"
-    directory: "/admin-ui"
+    directory: "/admin-interface"
     schedule:
       interval: "weekly"
       day: "monday"
@@ -49,9 +49,9 @@ updates:
     assignees:
       - "scoobyjava"
     commit-message:
-      prefix: "deps(admin-ui)"
+      prefix: "deps(admin-interface)"
       include: "scope"
-    # Auto-merge patch updates for admin-ui
+    # Auto-merge patch updates for admin-interface
     allow:
       - dependency-type: "direct"
         update-type: "version-update:semver-patch"
