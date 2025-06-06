@@ -29,8 +29,8 @@ jobs:
           
       - name: Run security audit
         run: |
-          pip-audit --desc --format=json --output=security_audit.json || true
-          safety check --json --output=safety_report.json || true
+          pip-audit --desc --format=json --output=security_audit.json -r production-api/requirements.txt || true
+          safety check --json --output=safety_report.json -r production-api/requirements.txt || true
           bandit -r . -f json -o bandit_report.json || true
           
       - name: Upload security reports
@@ -57,7 +57,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -r production-api/requirements.txt
           pip install pytest pytest-cov pytest-asyncio
           
       - name: Run tests
@@ -93,13 +93,13 @@ jobs:
       - name: Install Python dependencies
         run: |
           pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -r production-api/requirements.txt
           
-      - name: Build admin UI
+      - name: Build admin interface
         run: |
-          cd admin-ui
-          npm ci
-          npm run build
+          cd admin-interface
+          pnpm install
+          pnpm run build
           
       - name: Deploy to Lambda
         env:
