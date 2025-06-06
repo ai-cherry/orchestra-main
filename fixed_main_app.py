@@ -10,7 +10,6 @@ import logging
 from datetime import datetime
 from typing import Dict, List, Optional
 
-from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -119,20 +118,11 @@ personas = {
     )
 }
 
-# WebSocket connection manager
 class ConnectionManager:
     def __init__(self):
-        self.active_connections: List[WebSocket] = []
 
-    async def connect(self, websocket: WebSocket):
-        await websocket.accept()
-        self.active_connections.append(websocket)
 
-    def disconnect(self, websocket: WebSocket):
-        self.active_connections.remove(websocket)
 
-    async def send_personal_message(self, message: str, websocket: WebSocket):
-        await websocket.send_text(message)
 
     async def broadcast(self, message: str):
         for connection in self.active_connections:
@@ -319,16 +309,9 @@ async def chat_with_persona(persona_name: str, message: dict):
     
     return response
 
-@app.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket):
-    """WebSocket endpoint for real-time collaboration"""
-    await manager.connect(websocket)
     try:
         while True:
-            data = await websocket.receive_text()
             await manager.broadcast(f"Collaboration update: {data}")
-    except WebSocketDisconnect:
-        manager.disconnect(websocket)
 
 if __name__ == "__main__":
     uvicorn.run(

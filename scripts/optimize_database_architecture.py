@@ -325,7 +325,6 @@ syslog-ident redis-ai
                             "context": ".",
                             "dockerfile": "Dockerfile"
                         },
-                        "container_name": "orchestra_ai_bridge",
                         "ports": ["8765:8765"],
                         "environment": [
                             "REDIS_URL=redis://redis:6379",

@@ -84,7 +84,6 @@ export default App;
 """
             "src/services/api.ts": """
 """
-            "src/services/websocket.ts": """
 """
             "src/pages/HomePage.tsx": """
     <div className="min-h-screen bg-background-primary">
@@ -274,7 +273,6 @@ CMD ["nginx", "-g", "daemon off;"]
         
         print("\n🎯 Integration Points:")
         print("  • API v2 endpoints via RTK Query")
-        print("  • WebSocket for real-time updates")
         print("  • Existing auth system integration")
         print("  • Progressive Web App capabilities")
         

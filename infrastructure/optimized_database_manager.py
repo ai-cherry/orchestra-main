@@ -550,7 +550,6 @@ class MCPKnowledgePopulator:
         return [
             {
                 "key": "react_ai_patterns",
-                "content": "React patterns for AI interfaces: use React Query for AI API calls, implement optimistic updates for real-time collaboration, WebSocket connections for live AI communication.",
                 "metadata": {"tags": ["react", "ai", "patterns"], "quality_score": 0.8},
                 "high_frequency": False
             }

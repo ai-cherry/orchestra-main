@@ -115,8 +115,6 @@ app.include_router(multimedia_router, prefix="/api/v2/multimedia", tags=["multim
                     "code": """
 """
                     "id": "3.3",
-                    "task": "WebSocket integration",
-                    "description": "Connect to existing WebSocket infrastructure",
                     "endpoints": [
                         "/ws/search-progress",
                         "/ws/ingestion-status",
@@ -264,9 +262,7 @@ if __name__ == "__main__":
         add_header Access-Control-Allow-Headers "Content-Type, Authorization";
     }
     
-    # WebSocket routes
     location /ws/ {
-        proxy_pass http://websocket_backend;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";

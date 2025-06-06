@@ -39,7 +39,6 @@
         {
             "id": "realtime_setup",
             "name": "Setup Real-time Updates",
-            "description": "Configure WebSocket connections",
             "agent": AgentRole.IMPLEMENTER,
             "inputs": ["processed_data", "ui_design"],
             "outputs": ["realtime_config"],

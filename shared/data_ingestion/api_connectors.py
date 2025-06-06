@@ -252,8 +252,6 @@ class GraphQLProcessor(APIProcessor):
 
     def _extract_items(self, data: Any, items: Optional[List[Any]] = None) -> List[Any]:
         """Extract individual items from nested GraphQL response."""
-    """Process streaming data from WebSocket connections."""
-        return ["websocket", "ws", "wss"]
 
     async def process(
         self,
@@ -263,7 +261,6 @@ class GraphQLProcessor(APIProcessor):
         timeout: Optional[float] = None,
         **kwargs,
     ) -> AsyncIterator[ProcessedData]:
-        """Process streaming data from WebSocket."""
                                     parsed_data = {"raw_message": data}
                                     content = data
 
@@ -277,7 +274,6 @@ class GraphQLProcessor(APIProcessor):
                                 yield ProcessedData(
                                     raw_content=data,
                                     processed_content=content,
-                                    source_type="websocket",
                                     source_url=ws_url,
                                     metadata={
                                         "message_type": "text",
@@ -297,11 +293,8 @@ class GraphQLProcessor(APIProcessor):
                             elif msg.type == aiohttp.WSMsgType.ERROR:
                                 yield ProcessedData(
                                     raw_content=str(ws.exception()),
-                                    processed_content=f"WebSocket Error: {ws.exception()}",
-                                    source_type="websocket",
                                     source_url=ws_url,
                                     metadata={
-                                        "error_type": "websocket_error",
                                         "error": str(ws.exception()),
                                     },
                                     checksum="",
@@ -320,7 +313,6 @@ class GraphQLProcessor(APIProcessor):
                 yield ProcessedData(
                     raw_content="",
                     processed_content=f"Connection Error: {str(e)}",
-                    source_type="websocket",
                     source_url=ws_url,
                     metadata={
                         "error_type": "connection_error",

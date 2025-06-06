@@ -237,7 +237,6 @@ class HealthMonitor:
             return False
     
     def _check_bridge(self) -> bool:
-        """Check AI Bridge health"""
         try:
             return response.status_code == 200
         except:

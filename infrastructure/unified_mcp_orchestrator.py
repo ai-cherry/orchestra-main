@@ -49,10 +49,8 @@ try:
 except ImportError:
     ImplementationTracker = None
 
-# Import multi-AI bridge
 try:
 except ImportError:
-    SimpleMultiAIBridge = None
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -108,7 +106,6 @@ class UnifiedMCPOrchestrator:
     - Optimized database architecture (PostgreSQL + Redis + Weaviate only)
     - Intelligent vector routing (adapted for Weaviate-only)
     - Implementation tracking and monitoring
-    - Multi-AI collaboration bridge
     - Manus integration structure
     """
     
@@ -226,7 +223,6 @@ class UnifiedMCPOrchestrator:
         self.implementation_tracker = ImplementationTracker()
         logger.info("✅ Implementation tracking ready")
     
-        """Initialize multi-AI collaboration bridge"""
         logger.info("🌉 Initializing collaboration bridge...")
         
         # Create enhanced bridge with database integration
@@ -302,7 +298,6 @@ class UnifiedMCPOrchestrator:
             {
                 "domain": "manus_integration", 
                 "key": "manus_capabilities",
-                "content": "Manus integration: deployment automation, server management, live collaboration bridge, real-time sync with Cursor AI.",
                 "metadata": {"priority": "high", "type": "integration"}
             },
             {
@@ -533,7 +528,6 @@ class EnhancedCollaborationBridge:
     async def start_server(self):
         """Start enhanced collaboration bridge"""
         logger.info(f"🌉 Starting enhanced collaboration bridge on {self.host}:{self.port}")
-        # Implementation would start WebSocket server with database integration
     
         """Handle collaboration request with database persistence"""
         session_id = request.get("session_id", "default")

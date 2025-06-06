@@ -297,7 +297,6 @@
                     "framework": "React 18 + TypeScript",
                     "state_management": "Redux Toolkit",
                     "styling": "Tailwind CSS + custom dark theme",
-                    "real_time": "WebSocket + Server-Sent Events"
                 },
                 "pages": {
                     "HomePage.tsx": {

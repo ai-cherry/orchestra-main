@@ -45,9 +45,6 @@ async def process_text_command(command: TextCommand, api_key: str = Depends(veri
 @router.post("/voice", response_model=NLResponse)
 async def process_voice_command(command: VoiceCommand, api_key: str = Depends(verify_api_key)) -> NLResponse:
     """Process natural language voice command"""
-@router.websocket("/stream")
-async def websocket_nl_interface(websocket: WebSocket, api_key: str = Depends(verify_api_key)):
-    """WebSocket interface for real-time natural language interaction"""
             if data.get("type") == "text":
                 command = TextCommand(**data.get("payload", {}))
                 response = await process_text_command(command, api_key)
@@ -58,7 +55,6 @@ async def websocket_nl_interface(websocket: WebSocket, api_key: str = Depends(ve
                 response = {"error": "Unknown command type"}
 
             # Send response
-            await websocket.send_json(
                 {"type": "response", "payload": response.dict() if hasattr(response, "dict") else response}
             )
 
@@ -66,9 +62,7 @@ async def websocket_nl_interface(websocket: WebSocket, api_key: str = Depends(ve
 
 
         pass
-        await websocket.send_json({"type": "error", "payload": {"error": str(e)}})
     finally:
-        await websocket.close()
 
 # Handler functions
 async def handle_agent_command(intent, context):

@@ -48,8 +48,6 @@
         )
         self.components["scheduled_automation"] = scheduled_automation
         
-        # 7. Initialize MCP WebSocket Server
-        mcp_server = MCPWebSocketServer(
             mcp_conductor,
             port=self.config["mcp_port"]
         )
@@ -237,7 +235,6 @@
         )
         self.tasks.append(task)
         
-        # Start MCP WebSocket server
         task = asyncio.create_task(
             self.components["mcp_server"].start()
         )
