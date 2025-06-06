@@ -211,7 +211,7 @@
 
             pass
             result = subprocess.run(
-                [sys.executable, "scripts/test_new_setup.py"],
+                [sys.executable, ""],
                 capture_output=True,
                 text=True,
             )
@@ -220,7 +220,7 @@
                 print("✓ All tests passed!")
             else:
                 print("⚠️  Some tests failed")
-                print("   Run 'python scripts/test_new_setup.py' for details")
+                print("")
         except Exception:
 
             pass
@@ -249,7 +249,7 @@
             print("  3. (Optional) Sign up for Weaviate: https://console.weaviate.cloud")
 
         print("\n📚 Quick Start Commands:")
-        print("  - Run tests:        python scripts/test_new_setup.py")
+        print("")
         print("  - Start locally:    docker-compose up")
         print("  - Deploy:           cd infra/digitalocean_deployment && pulumi up")
 

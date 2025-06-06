@@ -116,8 +116,11 @@ services:
           memory: 2G
           cpus: '2'
 
+  # AI Bridge Service for WebSocket Communication
+  ai_bridge:
     build:
       context: .
+      dockerfile: Dockerfile.bridge
     restart: unless-stopped
     environment:
       - BRIDGE_HOST=0.0.0.0

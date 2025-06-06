@@ -1,0 +1,516 @@
+{
+  "timestamp": "2025-06-06T09:58:55.156698",
+  "summary": {
+    "files_analyzed": 0,
+    "issues_found": 0,
+    "issues_fixed": 0,
+    "patterns_applied": []
+  },
+  "issues": [
+    {
+      "file": ".env.production",
+      "type": "security",
+      "line": 0,
+      "description": "Replaced hardcoded secrets with placeholders",
+      "severity": "critical",
+      "fixed": true
+    },
+    {
+      "file": "migration_orchestrator.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "ai_context_planner.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "wisdom_based_restoration_framework.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "code_audit_processor.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "orchestra_final_status.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "critical_security_remediation.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "orchestra_implementation_validator.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "technical_debt_analyzer.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "orchestra_debug_status.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "comprehensive_codebase_analyzer.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "automated_syntax_fixer.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "refactor_orchestra_architecture.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "scripts/integrate_redis_resilience.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "scripts/system_monitor.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "scripts/setup_orchestra_environment.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "scripts/test_roo_integration_simple.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "scripts/redis_resilience_status.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "scripts/refactoring_orchestrator.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "scripts/verify_enhancements.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "scripts/cleanup_engine.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "scripts/final_cleanup.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "scripts/orchestra_setup_wizard.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "scripts/symphony_orchestrator.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "scripts/orchestra_status.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "scripts/initialize_unified_postgresql.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "venv/lib/python3.10/site-packages/aiohttp/_websocket/reader_py.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "venv/lib/python3.10/site-packages/aiohttp/_websocket/reader_c.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "venv/lib/python3.10/site-packages/redis/client.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "venv/lib/python3.10/site-packages/redis/asyncio/client.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "venv/lib/python3.10/site-packages/websockets/sync/connection.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "venv/lib/python3.10/site-packages/websockets/asyncio/connection.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "venv/lib/python3.10/site-packages/sqlalchemy/testing/provision.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "venv/lib/python3.10/site-packages/sqlalchemy/testing/suite/test_insert.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "venv/lib/python3.10/site-packages/sqlalchemy/dialects/mysql/mariadbconnector.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "venv/lib/python3.10/site-packages/sqlalchemy/dialects/mssql/base.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "venv/lib/python3.10/site-packages/sqlalchemy/orm/query.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "venv/lib/python3.10/site-packages/sqlalchemy/orm/strategies.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "venv/lib/python3.10/site-packages/sqlalchemy/orm/strategy_options.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "venv/lib/python3.10/site-packages/sqlalchemy/orm/session.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "venv/lib/python3.10/site-packages/sqlalchemy/orm/context.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "venv/lib/python3.10/site-packages/sqlalchemy/engine/create.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "venv/lib/python3.10/site-packages/sqlalchemy/engine/default.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "venv/lib/python3.10/site-packages/sqlalchemy/sql/compiler.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "venv/lib/python3.10/site-packages/sqlalchemy/sql/util.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "venv/lib/python3.10/site-packages/sqlalchemy/sql/elements.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "venv/lib/python3.10/site-packages/sqlalchemy/sql/selectable.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "venv/lib/python3.10/site-packages/sqlalchemy/sql/base.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "venv/lib/python3.10/site-packages/sqlalchemy/sql/crud.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "venv/lib/python3.10/site-packages/fastapi/dependencies/utils.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "venv/lib/python3.10/site-packages/setuptools/_distutils/version.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "venv/lib/python3.10/site-packages/pydantic/_internal/_validators.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "venv/lib/python3.10/site-packages/psutil/tests/test_contracts.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "venv/lib/python3.10/site-packages/psutil/tests/runner.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "venv/lib/python3.10/site-packages/passlib/tests/_test_bad_register.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "venv/lib/python3.10/site-packages/passlib/tests/test_ext_django_source.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "venv/lib/python3.10/site-packages/passlib/tests/test_utils_pbkdf2.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "venv/lib/python3.10/site-packages/passlib/tests/test_context_deprecated.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "infrastructure/database_stack_manager.py",
+      "type": "reference_cleanup",
+      "line": 0,
+      "description": "Removed references to deleted files",
+      "severity": "high",
+      "fixed": true
+    },
+    {
+      "file": "api/main.py",
+      "type": "separation_of_concerns",
+      "line": 7149,
+      "description": "Database schema should be in separate migration files",
+      "severity": "high",
+      "fixed": false
+    }
+  ],
+  "recommendations": [
+    "Implement comprehensive testing suite",
+    "Add API documentation with OpenAPI/Swagger",
+    "Implement rate limiting for API endpoints",
+    "Add distributed tracing for debugging",
+    "Implement proper logging strategy",
+    "Add performance benchmarks",
+    "Create CI/CD pipeline with quality gates"
+  ]
+}

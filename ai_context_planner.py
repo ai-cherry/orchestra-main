@@ -31,7 +31,7 @@ python scripts/cherry_ai.py services status
 python scripts/cherry_ai_status.py
 
 # Check available tools
-python scripts/test_tool_system.py
+python scripts/cleaned_reference
 cat docs/AVAILABLE_TOOLS.md
 ```
 

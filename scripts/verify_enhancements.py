@@ -38,7 +38,7 @@ def main():
         "shared/database/unified_compat.py",
         # Scripts
         "scripts/initialize_enhanced_system.py",
-        "tests/test_enhanced_methods.py",
+        "",
         # Documentation
         "docs/unified_postgresql_architecture.md",
         "docs/UNIFIED_POSTGRESQL_REMEDIATION_SUMMARY.md",

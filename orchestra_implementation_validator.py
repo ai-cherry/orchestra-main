@@ -556,7 +556,7 @@ class ImplementationValidator:
             "handoff_package": self.handoff_package,
             "next_steps": [
                 "Address all critical issues before deployment",
-                "Run test_validation_framework.py after fixes",
+                "",
                 "Execute deployment using orchestra_deployment_framework.py",
                 "Monitor deployment with provided alerts",
                 "Use debugging priorities for troubleshooting"
@@ -617,7 +617,7 @@ python3 implementation_checklist.py
 
 # Run tests
 echo "=== Running Tests ==="
-python3 test_validation_framework.py
+python3 cleaned_reference
 
 # Deploy infrastructure
 echo "=== Deploy Infrastructure ==="

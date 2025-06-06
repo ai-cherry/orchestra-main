@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# cleanup_engine.py - Intelligent file cleanup with safety checks for Project Symphony
+# cleaned_reference - Intelligent file cleanup with safety checks for Project Symphony
 
 import json
 import os

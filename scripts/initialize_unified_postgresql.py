@@ -189,7 +189,7 @@ class UnifiedPostgreSQLInitializer:
         print("2. Start the performance monitoring dashboard:")
         print("   python monitoring/postgresql_performance_dashboard.py")
         print("3. Run tests to verify functionality:")
-        print("   pytest tests/test_unified_postgresql.py -v")
+        print("")
         print("=" * 60 + "\n")
 
     async def run(self):

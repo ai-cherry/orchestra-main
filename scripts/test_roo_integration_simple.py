@@ -53,7 +53,7 @@ def main():
         ("shared/utils/performance.py", "Performance utilities"),
         ("migrations/add_roo_integration_tables.sql", "Database migrations"),
         ("scripts/initialize_roo_integration.py", "Initialization script"),
-        ("scripts/test_roo_integration.py", "Test script"),
+        (""),
         ("requirements/roo_integration.txt", "Requirements file"),
     ]
     

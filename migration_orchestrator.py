@@ -30,7 +30,7 @@ class MigrationOrchestrator:
     
     def __init__(self, workspace_root: Path = None):
         self.workspace_root = workspace_root or Path.cwd()
-        self.backup_dir = self.workspace_root / ".migration_backups"
+        self.backup_dir = self.workspace_root / ""
         self.state_file = self.workspace_root / ".migration_state.json"
         self.state = self._load_state()
         

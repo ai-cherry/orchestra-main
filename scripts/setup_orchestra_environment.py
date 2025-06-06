@@ -223,7 +223,7 @@
             print("\n✅ Setup completed successfully!")
             print("\n🚀 Next steps:")
             print("1. Configure missing environment variables in .env")
-            print("2. Run tests: python scripts/test_new_setup.py")
+            print("")
             print("3. Start locally: docker-compose up")
             print("4. Deploy: cd infra/digitalocean_deployment && pulumi up")
         else:

@@ -80,7 +80,7 @@ def main():
         "start_cherry_ai.sh": "Start script",
         "stop_cherry_ai.sh": "Stop script",
         "scripts/cherry_ai_complete_setup.py": "Setup wizard",
-        "scripts/test_new_setup.py": "Test suite",
+        "",
     }
 
     for script, desc in scripts.items():

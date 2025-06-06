@@ -261,7 +261,7 @@ echo "🗃️  Initializing Orchestra database..."
 sudo -u postgres psql -d orchestra_main -f /root/init_orchestra_db.sql
 
 # Create connection test script
-cat > /root/test_connections.py << 'EOF'
+cat > /root/cleaned_reference << 'EOF'
 #!/usr/bin/env python3
 import psycopg2
 import redis
@@ -313,7 +313,7 @@ if __name__ == "__main__":
     print(test_weaviate())
 EOF
 
-chmod +x /root/test_connections.py
+chmod +x /root/cleaned_reference
 
 # Install Python dependencies for testing
 echo "🐍 Installing Python dependencies..."
@@ -331,13 +331,13 @@ echo "   Weaviate: $(hostname -I | awk '{print $1}'):8080"
 echo ""
 echo "🛠️  Management scripts:"
 echo "   Health check: /root/health_check.sh"
-echo "   Test connections: /root/test_connections.py"
+echo ""
 echo ""
 echo "📊 Run health check now:"
 /root/health_check.sh
 echo ""
 echo "🧪 Run connection tests:"
-python3 /root/test_connections.py
+python3 /root/cleaned_reference
 """
         
         # Save deployment script
@@ -504,7 +504,7 @@ if __name__ == "__main__":
             },
             "management_scripts": {
                 "health_check": "/root/health_check.sh",
-                "connection_test": "/root/test_connections.py",
+                "",
                 "database_init": "/root/init_orchestra_db.sql"
             },
             "connection_strings": {

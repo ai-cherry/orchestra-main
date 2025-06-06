@@ -54,7 +54,7 @@ class Task:
                 },
                 {
                     "name": "cleanup_analysis",
-                    "command": "python scripts/cleanup_engine.py cleanup_inventory.json --report-only",
+                    "",
                     "schedule": "30 2 * * *",  # Daily at 2:30 AM
                     "dependencies": ["inventory_scan"],
                     "timeout": 1800,
@@ -62,7 +62,7 @@ class Task:
                 },
                 {
                     "name": "cleanup_execution",
-                    "command": "python scripts/cleanup_engine.py cleanup_inventory.json --execute --non-interactive",
+                    "",
                     "schedule": "0 3 * * 0",  # Weekly on Sunday at 3 AM
                     "dependencies": ["cleanup_analysis"],
                     "timeout": 3600,

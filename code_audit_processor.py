@@ -204,12 +204,12 @@ if __name__ == "__main__":
         for file_path in sys.argv[1:]:
             fix_python_file(file_path)
     else:
-        print("Usage: python fix_python_formatting.py <file1> <file2> ...")
+        print("")
 '''
         
-        with open("fix_python_formatting.py", "w") as f:
+        with open("") as f:
             f.write(script_content)
-        os.chmod("fix_python_formatting.py", 0o755)
+        os.chmod("", 0o755)
     
     def _create_javascript_formatter(self):
         """Create JavaScript/TypeScript formatting fix script"""
@@ -264,7 +264,7 @@ def fix_indentation_issues(files):
     
     if python_files:
         print(f"Fixing indentation in {len(python_files)} Python files...")
-        subprocess.run([sys.executable, "fix_python_formatting.py"] + python_files)
+        subprocess.run([sys.executable, ""] + python_files)
     
     if js_files:
         print(f"Fixing indentation in {len(js_files)} JS/TS files...")
@@ -272,7 +272,7 @@ def fix_indentation_issues(files):
 
 def main():
     if len(sys.argv) < 2:
-        print("Usage: python batch_fix_runner.py <fix_plan.json>")
+        print("")
         sys.exit(1)
     
     plan = load_fix_plan(sys.argv[1])
@@ -292,9 +292,9 @@ if __name__ == "__main__":
     main()
 '''
         
-        with open("batch_fix_runner.py", "w") as f:
+        with open("") as f:
             f.write(script_content)
-        os.chmod("batch_fix_runner.py", 0o755)
+        os.chmod("", 0o755)
 
     def print_action_plan(self):
         """Print a human-readable action plan"""
@@ -317,7 +317,7 @@ if __name__ == "__main__":
         print("   - Then JavaScript/TypeScript (use ESLint)")
         
         print("\n2. PHASE 2 - Automated Formatting:")
-        print("   - Run: python batch_fix_runner.py <fix_plan.json>")
+        print("")
         print("   - This will fix indentation and basic formatting")
         
         print("\n3. PHASE 3 - Naming Conventions (Semi-automated):")

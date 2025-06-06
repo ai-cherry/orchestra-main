@@ -310,7 +310,7 @@ class SystemMonitor:
         """Run system tests"""
         print(f"\n{YELLOW}Running system tests...{NC}")
         
-        test_script = self.project_root / "test_services.py"
+        test_script = self.project_root / ""
         if test_script.exists():
             code, out, err = self.run_command(["python3", str(test_script)])
             print(out)

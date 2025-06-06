@@ -304,7 +304,7 @@ def main():
         'core/conductor/src/services/base_orchestrator.py',  # Core component
         'mcp_server/gateway.py',  # MCP component
         'scripts/comprehensive_ai_validation.py',  # Script
-        'tests/test_orchestra_integration.py'  # Test file
+        ""  # Test file
     ]
     
     assessments = []
