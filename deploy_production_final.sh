@@ -135,12 +135,8 @@ cleanup_old_deployments() {
 start_production() {
     echo -e "${YELLOW}🚀 Starting production deployment...${NC}"
     
-    # Load environment
-    export $(cat .env.production | grep -v '^#' | xargs)
-    
-    # Build and start services
-    docker-compose -f docker-compose.production.yml build --no-cache
-    docker-compose -f docker-compose.production.yml up -d
+    # Build and start services using the correct env file
+    docker-compose -f docker-compose.production.yml --env-file .env.production up -d --build
     
     echo -e "${GREEN}✅ Production services started${NC}"
 }
@@ -221,7 +217,7 @@ show_final_status() {
     echo -e "${BLUE}🤖 AI Bridge:${NC} wss://$DOMAIN/bridge/ws"
     echo ""
     echo -e "${YELLOW}📊 Service Status:${NC}"
-    docker-compose -f docker-compose.production.yml ps
+    docker-compose -f docker-compose.production.yml --env-file .env.production ps
     echo ""
     echo -e "${YELLOW}🔑 Connect your Manus AI Coder:${NC}"
     echo -e "${BLUE}   WebSocket URL:${NC} wss://$DOMAIN/bridge/ws"
@@ -231,7 +227,7 @@ show_final_status() {
     echo "1. Point your DNS to this server's IP"
     echo "2. Get real SSL certificates: sudo certbot --nginx -d $DOMAIN -d www.$DOMAIN"
     echo "3. Connect your AI coders to the bridge"
-    echo "4. Monitor logs: docker-compose -f docker-compose.production.yml logs -f"
+    echo "4. Monitor logs: docker-compose -f docker-compose.production.yml --env-file .env.production logs -f"
     echo ""
     echo -e "${GREEN}✨ Cherry AI is now live on $DOMAIN! ✨${NC}"
 }
