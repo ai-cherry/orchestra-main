@@ -34,10 +34,6 @@ async def test_text_command(text: str) -> Dict[str, Any]:
             pass
             return {"error": str(e)}
 
-async def test_websocket():
-    """Test WebSocket connection"""
-    print("\n📡 WebSocket test (placeholder)")
-    print("WebSocket endpoint available at: ws://localhost:8000/api/nl/stream")
 
 async def main():
     """Run all tests"""
@@ -63,8 +59,6 @@ async def main():
             if result.get("suggestions"):
                 print(f"   Suggestions: {', '.join(result['suggestions'])}")
 
-    # Test WebSocket
-    await test_websocket()
 
     print("\n✅ All tests completed!")
 

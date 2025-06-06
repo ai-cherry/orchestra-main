@@ -178,11 +178,8 @@
                         ]
                     },
                     {
-                        "name": "WebSocket Server",
-                        "script": "websocket_server.py",
                         "description": "Real-time data streaming",
                         "tasks": [
-                            "Setup WebSocket server",
                             "Implement authentication",
                             "Create event handlers",
                             "Add connection management"

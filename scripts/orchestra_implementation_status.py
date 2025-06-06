@@ -81,7 +81,6 @@
             "app_tsx": "src/ui/web/react_app/src/App.tsx",
             "store_index": "src/ui/web/react_app/src/store/index.ts",
             "api_service": "src/ui/web/react_app/src/services/api.ts",
-            "websocket_service": "src/ui/web/react_app/src/services/websocket.ts",
             "home_page": "src/ui/web/react_app/src/pages/HomePage.tsx",
             "vite_config": "src/ui/web/react_app/vite.config.ts",
             "dockerfile": "src/ui/web/react_app/Dockerfile",

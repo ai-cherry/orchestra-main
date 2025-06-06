@@ -108,7 +108,6 @@ class ArchitectureBlueprint:
             layer=LayerType.PRESENTATION,
             dependencies=["api_gateway"],
             interfaces={
-                "protocols": ["HTTPS", "WebSocket"],
                 "authentication": "JWT",
                 "content_types": ["application/json", "text/html"]
             },
@@ -258,7 +257,6 @@ class ArchitectureBlueprint:
             layer=LayerType.SERVICE,
             dependencies=["orchestration_service", "security_service"],
             interfaces={
-                "protocols": ["WebSocket", "SSE"],
                 "discovery": "dynamic",
                 "registry": "consul"
             },

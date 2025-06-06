@@ -283,15 +283,9 @@ async def track_analytics_event(event_name: str, properties: Dict[str, Any]):
     }
 
 @router.ws("/ws/{device_id}")
-async def websocket_endpoint(websocket: WebSocket, device_id: str):
-    \"""WebSocket connection for real-time updates\"""
-    await websocket.accept()
     try:
         while True:
-            data = await websocket.receive_text()
             # Process incoming messages
-            await websocket.send_text(f"Echo: {data}")
-    except WebSocketDisconnect:
         pass
 """
         
@@ -503,7 +497,6 @@ class cherry_aiAISDK(private val apiKey: String, private val baseUrl: String = "
         print("- POST /mobile/v1/search - Mobile-optimized search")
         print("- POST /mobile/v1/tasks/quick - Quick task creation")
         print("- GET /mobile/v1/sync/delta - Get changes for offline sync")
-        print("- WS /mobile/v1/ws/{device_id} - WebSocket connection")
         print("\nAnalytics Dashboard:")
         print("Access at: https://cherry-ai.me/analytics/dashboard")
 

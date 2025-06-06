@@ -85,7 +85,6 @@ server {
         }
     }
     
-    # WebSocket support
     location /ws {
         proxy_pass http://localhost:8001;
         proxy_http_version 1.1;

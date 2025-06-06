@@ -62,15 +62,8 @@
 app = FastAPI(title="PostgreSQL Performance Dashboard")
 monitor = PerformanceMonitor()
 
-# WebSocket connections
 connected_clients = set()
 
-@app.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket):
-    """WebSocket endpoint for real-time metrics."""
-        print(f"WebSocket error: {e}")
-        if websocket in connected_clients:
-            connected_clients.remove(websocket)
 
 @app.get("/")
 async def dashboard():
@@ -290,8 +283,6 @@ async def dashboard():
             }
         });
         
-        // WebSocket connection
-        const ws = new WebSocket('ws://localhost:8000/ws');
         
         let metricsHistory = [];
         let lastOpsCount = 0;

@@ -43,7 +43,6 @@
                 "dependencies": ["real_time_analytics", "persona_customization"],
                 "deliverables": [
                     "React-based dashboard",
-                    "Real-time WebSocket updates",
                     "Interactive agent control panel",
                     "Analytics visualization"
                 ]
@@ -177,8 +176,6 @@
                     "estimated_hours": 40
                 },
                 {
-                    "task": "Implement WebSocket server",
-                    "script": "websocket_server.py",
                     "estimated_hours": 16
                 },
                 {

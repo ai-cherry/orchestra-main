@@ -268,7 +268,6 @@ class CherryAIAlignmentStrategy:
                     "Security framework"
                 ],
                 "isolated_components": [
-                    "Development-specific WebSocket connections",
                     "Code collaboration interfaces",
                     "Development task management",
                     "AI-to-AI communication protocols"

@@ -15,7 +15,6 @@ import time
 from datetime import datetime
 from typing import Dict, List, Optional, Any
 
-from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -245,7 +244,6 @@ async def system_status():
         "features": {
             "chat": True,
             "search": True,
-            "websocket": True,
             "personas": True
         },
         "timestamp": datetime.utcnow().isoformat()
@@ -268,21 +266,13 @@ async def system_status():
     
     return status
 
-# WebSocket for real-time features
-@app.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket):
-    """WebSocket endpoint for real-time collaboration"""
-    await websocket.accept()
     
     try:
-        await websocket.send_json({
             "type": "connected",
-            "message": "🍒 Cherry AI WebSocket connected!",
             "timestamp": datetime.utcnow().isoformat()
         })
         
         while True:
-            data = await websocket.receive_json()
             
             # Echo back with processing
             response = {
@@ -292,10 +282,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 "timestamp": datetime.utcnow().isoformat()
             }
             
-            await websocket.send_json(response)
             
-    except WebSocketDisconnect:
-        print("WebSocket disconnected")
 
 if __name__ == "__main__":
     print("🍒 Starting Cherry AI Interface...")

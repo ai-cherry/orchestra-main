@@ -183,7 +183,6 @@ self.api_key = os.getenv('ORCHESTRA_APP_API_KEY')
             if restart_services:
                 ssh_commands.extend([
                     "sudo systemctl restart cherry-ai",
-                    "sudo systemctl restart cherry-ai-bridge",
                     "sudo systemctl restart nginx"
                 ])
             

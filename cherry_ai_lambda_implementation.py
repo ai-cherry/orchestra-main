@@ -136,7 +136,6 @@ class CherryAIImplementationPlan:
                         "id": "T7",
                         "name": "Create Simple Web Interface",
                         "description": "Basic chat interface to test Cherry",
-                        "components": ["React frontend", "WebSocket connection", "Auth integration"],
                         "validation": "Can chat with Cherry via web"
                     }
                 ]

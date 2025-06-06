@@ -111,8 +111,6 @@ class SecureAPIEndpoint:
             pass
             return False, {"error": str(e)}
 
-class AIModelBridge:
-    """Bridge between AI models and Cursor operations"""
         """Handle code editing request from AI model"""
             return {"error": "Authentication failed", "details": auth_info}
         
@@ -156,7 +154,6 @@ class AIModelBridge:
 
             
             pass
-            logger.error(f"AI model bridge error: {e}")
             return {"error": "Operation failed", "details": str(e)}
     
     async def get_code_context(self, file_paths: List[str], 
@@ -188,7 +185,6 @@ class CursorIntegrationServer:
         # Initialize components
         self.cursor_client = CursorAPIClient(api_key, workspace)
         self.security = SecureAPIEndpoint(secret_key)
-        self.bridge = AIModelBridge(self.cursor_client, self.security)
         
         # Initialize Cursor session
         await self.cursor_client.initialize_session()
@@ -205,7 +201,6 @@ class CursorIntegrationServer:
         token = auth_header.split(" ")[1]
         data = await request.json()
         
-        result = await self.bridge.handle_ai_request(data, token)
         
         status = 200 if "error" not in result else 400
         return aiohttp.web.json_response(result, status=status)
@@ -223,7 +218,6 @@ class CursorIntegrationServer:
         data = await request.json()
         
         file_paths = data.get("file_paths", [])
-        result = await self.bridge.get_code_context(file_paths, token)
         
         status = 200 if "error" not in result else 400
         return aiohttp.web.json_response(result, status=status)

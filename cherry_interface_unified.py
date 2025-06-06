@@ -12,7 +12,6 @@ import time
 from datetime import datetime
 from typing import Dict, List, Optional, Any
 
-from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -227,7 +226,6 @@ async def health_check():
         "features": {
             "unified_search": True,
             "multi_persona": True,
-            "websocket": True,
             "file_upload": True,
             "multimedia": True
         },
@@ -357,27 +355,19 @@ async def generate_unified_response(persona: Dict[str, Any], message: str, searc
     
     return response
 
-# WebSocket for real-time features
-@app.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket):
-    """Enhanced WebSocket with real-time search and chat"""
-    await websocket.accept()
     
     try:
-        await websocket.send_json({
             "type": "connection",
             "data": {"status": "connected"},
             "timestamp": datetime.utcnow().isoformat()
         })
         
         while True:
-            data = await websocket.receive_json()
             message_type = data.get("type", "unknown")
             
             if message_type == "chat":
                 # Handle real-time chat
                 response = await unified_chat(data.get("data", {}))
-                await websocket.send_json({
                     "type": "chat_response",
                     "data": response,
                     "timestamp": datetime.utcnow().isoformat()
@@ -389,7 +379,6 @@ async def websocket_endpoint(websocket: WebSocket):
                 mode = data.get("data", {}).get("mode", "normal")
                 if query:
                     results = await search_engine.unified_search(query, mode)
-                    await websocket.send_json({
                         "type": "search_results",
                         "data": results,
                         "timestamp": datetime.utcnow().isoformat()
@@ -397,14 +386,11 @@ async def websocket_endpoint(websocket: WebSocket):
             
             else:
                 # Echo other messages
-                await websocket.send_json({
                     "type": "echo",
                     "data": data,
                     "timestamp": datetime.utcnow().isoformat()
                 })
             
-    except WebSocketDisconnect:
-        print("WebSocket disconnected")
 
 if __name__ == "__main__":
     print("🍒 Starting Cherry AI Unified Interface...")

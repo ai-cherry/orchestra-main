@@ -265,7 +265,6 @@ export { AICollaborationDashboard };
                 "platform": "Lambda Labs",
                 "host": "150.136.94.139",
                 "databases": ["PostgreSQL", "Redis", "Pinecone", "Weaviate"],
-                "services": ["Authentication", "API", "Frontend", "WebSocket"]
             },
             "next_steps": self._get_next_steps()
         }

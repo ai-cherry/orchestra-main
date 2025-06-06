@@ -456,9 +456,6 @@ class MCPCoordinator:
             for agent_id, agent in self.agents.items()
         }
 
-class MCPWebSocketServer:
-    """WebSocket server for real-time MCP communication"""
-        """Handle WebSocket client connections"""
                     "id": response.id,
                     "type": response.type,
                     "method": response.method,
@@ -473,11 +470,7 @@ class MCPWebSocketServer:
             pass
             pass
         finally:
-            self.clients.remove(websocket)
     
     async def broadcast(self, message: Dict[str, Any]):
         """Broadcast message to all connected clients"""
-        """Start WebSocket server"""
-        async with websockets.serve(self.handle_client, "0.0.0.0", self.port):
-            logger.info(f"MCP WebSocket server started on port {self.port}")
             await asyncio.Future()  # Run forever

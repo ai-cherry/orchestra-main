@@ -7,14 +7,9 @@ dedup_engine = DeduplicationEngine()
 dedup_resolver = DuplicateResolver()
 audit_logger = DeduplicationAuditLogger()
 
-# WebSocket connection manager
 class ConnectionManager:
     def __init__(self):
-        self.active_connections: Dict[str, WebSocket] = {}
     
-    async def connect(self, websocket: WebSocket, client_id: str):
-        await websocket.accept()
-        self.active_connections[client_id] = websocket
     
     def disconnect(self, client_id: str):
         if client_id in self.active_connections:
@@ -162,7 +157,6 @@ async def upload_files_async(
     return {
         "message": "Files queued for processing",
         "tracking_ids": tracking_ids,
-        "websocket_url": f"/api/v1/data-ingestion/v2/ws/{tracking_ids[0]['tracking_id']}"
     }
 
 # Natural Language Interface
@@ -222,11 +216,7 @@ async def upload_via_natural_language(
     
     return response
 
-# Real-time WebSocket endpoint
 
-@router.websocket("/ws/{client_id}")
-async def websocket_endpoint(
-    websocket: WebSocket,
     client_id: str,
     db: AsyncSession = Depends(get_db)
 ):
@@ -234,7 +224,6 @@ async def websocket_endpoint(
     """
             if message["type"] == "subscribe":
                 # Subscribe to upload progress
-                await websocket.send_text(json.dumps({
                     "type": "subscribed",
                     "client_id": client_id
                 }))
@@ -243,7 +232,6 @@ async def websocket_endpoint(
                 # Send current status
                 tracking_id = message.get("tracking_id")
                 status = await get_upload_status(tracking_id, db)
-                await websocket.send_text(json.dumps(status))
     
     except Exception:
 

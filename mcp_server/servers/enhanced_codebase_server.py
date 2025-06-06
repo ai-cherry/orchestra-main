@@ -36,7 +36,6 @@ class EnhancedCodebaseServer:
                 "source venv/bin/activate",
                 "pip install -r requirements.txt",
                 "sudo systemctl restart cherry-ai",
-                "sudo systemctl restart cherry-ai-bridge"
             ]
             
             ssh_command = f"ssh ubuntu@{self.production_server} '{'; '.join(ssh_commands)}'"
