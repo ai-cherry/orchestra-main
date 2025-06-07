@@ -68,7 +68,7 @@ class SophiaPayReadyDomainServer:
         # Financial data processing configuration
         self.data_batch_size = 10000
         self.max_file_size_mb = 500
-        self.supported_formats = ['csv', 'xlsx', 'json', 'parquet', 'sql', 'zip']
+        self.supported_formats = ['csv', 'xlsx', 'json', 'parquet', 'sql', 'zip', 'txt', 'wav', 'mp3', 'mp4', 'mkv', 'flac']
         self.extract_directory = "/tmp/sophia_extracts"
         
         # Create extraction directory
@@ -692,7 +692,20 @@ class SophiaPayReadyDomainServer:
             '.py': 'python',
             '.js': 'javascript',
             '.html': 'html',
-            '.zip': 'zip'
+            '.zip': 'zip',
+            # Audio formats (Gong.io call recordings)
+            '.wav': 'audio',
+            '.mp3': 'audio',
+            '.flac': 'audio',
+            '.aac': 'audio',
+            '.ogg': 'audio',
+            # Video formats (Gong.io call recordings)  
+            '.mp4': 'video',
+            '.mkv': 'video',
+            '.avi': 'video',
+            '.mov': 'video',
+            '.wmv': 'video',
+            '.webm': 'video'
         }
         return extension_map.get(file_extension, 'unknown')
     
@@ -742,12 +755,124 @@ class SophiaPayReadyDomainServer:
                 except Exception:
                     return f"Text file ({file_size} bytes)"
             
+            elif file_type == 'audio':
+                try:
+                    metadata = self._extract_audio_metadata(file_path)
+                    if metadata:
+                        duration = metadata.get('duration', 'Unknown')
+                        format_info = metadata.get('format', 'Unknown')
+                        bitrate = metadata.get('bitrate', 'Unknown')
+                        return f"Audio file ({duration}s, {format_info}, {bitrate}): Call recording ready for analysis"
+                    else:
+                        return f"Audio file ({file_size} bytes): Call recording"
+                except Exception:
+                    return f"Audio file ({file_size} bytes): Call recording"
+            
+            elif file_type == 'video':
+                try:
+                    metadata = self._extract_video_metadata(file_path)
+                    if metadata:
+                        duration = metadata.get('duration', 'Unknown')
+                        resolution = metadata.get('resolution', 'Unknown')
+                        format_info = metadata.get('format', 'Unknown')
+                        return f"Video file ({duration}s, {resolution}, {format_info}): Call recording with visual content"
+                    else:
+                        return f"Video file ({file_size} bytes): Call recording"
+                except Exception:
+                    return f"Video file ({file_size} bytes): Call recording"
+            
             else:
                 return f"{file_type.title()} file ({file_size} bytes)"
                 
         except Exception as e:
             logger.error(f"Error generating file summary: {e}")
             return f"File summary unavailable ({file_size} bytes)"
+    
+    def _extract_audio_metadata(self, file_path: str) -> Dict[str, Any]:
+        """Extract metadata from audio files (Gong.io call recordings)"""
+        try:
+            # Try using mutagen for audio metadata
+            try:
+                from mutagen import File
+                audio_file = File(file_path)
+                if audio_file is not None:
+                    duration = getattr(audio_file.info, 'length', 0)
+                    bitrate = getattr(audio_file.info, 'bitrate', 0)
+                    
+                    return {
+                        'duration': round(duration) if duration else 0,
+                        'duration_formatted': f"{int(duration//60)}:{int(duration%60):02d}" if duration else "0:00",
+                        'bitrate': f"{bitrate}kbps" if bitrate else "Unknown",
+                        'format': audio_file.mime[0] if audio_file.mime else "Unknown",
+                        'file_type': 'gong_call_recording'
+                    }
+            except ImportError:
+                logger.warning("Mutagen not available for audio metadata extraction")
+            
+            # Fallback: Basic file analysis
+            file_size = os.path.getsize(file_path)
+            file_ext = os.path.splitext(file_path)[1].lower()
+            
+            # Estimate duration based on file size (very rough for compressed audio)
+            estimated_duration = file_size // (128 * 1024 // 8) if file_ext == '.mp3' else 0
+            
+            return {
+                'duration': estimated_duration,
+                'duration_formatted': f"{estimated_duration//60}:{estimated_duration%60:02d}" if estimated_duration else "Unknown",
+                'bitrate': "Estimated 128kbps" if file_ext == '.mp3' else "Unknown",
+                'format': file_ext.upper()[1:],
+                'file_type': 'gong_call_recording'
+            }
+            
+        except Exception as e:
+            logger.error(f"Error extracting audio metadata: {e}")
+            return {}
+    
+    def _extract_video_metadata(self, file_path: str) -> Dict[str, Any]:
+        """Extract metadata from video files (Gong.io call recordings)"""
+        try:
+            # Try using ffprobe if available
+            try:
+                import subprocess
+                result = subprocess.run([
+                    'ffprobe', '-v', 'quiet', '-print_format', 'json',
+                    '-show_format', '-show_streams', file_path
+                ], capture_output=True, text=True, timeout=30)
+                
+                if result.returncode == 0:
+                    data = json.loads(result.stdout)
+                    format_info = data.get('format', {})
+                    video_stream = next((s for s in data.get('streams', []) if s.get('codec_type') == 'video'), {})
+                    
+                    duration = float(format_info.get('duration', 0))
+                    width = video_stream.get('width', 0)
+                    height = video_stream.get('height', 0)
+                    
+                    return {
+                        'duration': round(duration),
+                        'duration_formatted': f"{int(duration//60)}:{int(duration%60):02d}" if duration else "Unknown",
+                        'resolution': f"{width}x{height}" if width and height else "Unknown",
+                        'format': format_info.get('format_name', 'Unknown'),
+                        'file_type': 'gong_call_recording'
+                    }
+            except (subprocess.TimeoutExpired, subprocess.CalledProcessError, FileNotFoundError, ImportError):
+                logger.warning("ffprobe not available for video metadata extraction")
+            
+            # Fallback: Basic file analysis
+            file_size = os.path.getsize(file_path)
+            file_ext = os.path.splitext(file_path)[1].lower()
+            
+            return {
+                'duration': 0,
+                'duration_formatted': "Unknown",
+                'resolution': "Unknown",
+                'format': file_ext.upper()[1:],
+                'file_type': 'gong_call_recording'
+            }
+            
+        except Exception as e:
+            logger.error(f"Error extracting video metadata: {e}")
+            return {}
     
     async def search_zip_contents(self, search_query: str, filters: Dict[str, Any] = None) -> Dict[str, Any]:
         """Search through extracted zip file contents with advanced filtering"""
@@ -1043,6 +1168,8 @@ class SophiaPayReadyDomainServer:
             "capabilities": [
                 "Large-scale data processing",
                 "Zip file extraction and analysis",
+                "Audio/video metadata extraction (Gong.io call recordings)",
+                "Slack JSON conversation processing",
                 "Financial transaction analysis",
                 "Business intelligence reporting",
                 "Real-time compliance monitoring",
@@ -1104,7 +1231,33 @@ class SophiaPayReadyDomainServer:
             request_lower = request.lower()
             
             # Determine request type and respond with Sophia's personality
-            if any(word in request_lower for word in ["zip", "extract", "unpack", "archive", "compressed"]):
+            if any(word in request_lower for word in ["slack", "gong", "gong.io", "call recording", "conversation export"]):
+                return {
+                    "status": "success",
+                    "message": "🎯 Excellent! I'm fully prepared for Slack and Gong.io exports. I can process JSON conversation data, CSV reports, audio/video call recordings, and extract everything from zip archives. I'll analyze metadata, extract searchable content, and organize everything for business intelligence. What export data are we processing?",
+                    "suggested_actions": [
+                        "Process Slack JSON conversation exports",
+                        "Analyze Gong.io CSV data and call recordings",
+                        "Extract and catalog audio/video metadata",
+                        "Search across all conversation and call data"
+                    ],
+                    "personality": "conversation_data_specialist"
+                }
+            
+            elif any(word in request_lower for word in ["audio", "video", "call", "recording", "wav", "mp3", "mp4"]):
+                return {
+                    "status": "success", 
+                    "message": "🎵 Outstanding! Audio and video file processing is ready for your Gong.io call recordings. I can extract metadata, analyze duration and quality, and make call recordings searchable. Perfect for processing large volumes of sales calls and meetings. What media files need analysis?",
+                    "suggested_actions": [
+                        "Extract audio/video metadata",
+                        "Analyze call recording duration and quality",
+                        "Catalog media files for search",
+                        "Process Gong.io export media files"
+                    ],
+                    "personality": "media_processing_specialist"
+                }
+            
+            elif any(word in request_lower for word in ["zip", "extract", "unpack", "archive", "compressed"]):
                 return {
                     "status": "success",
                     "message": "📦 Perfect! Zip file extraction and processing is one of my core strengths. I can unpack archives, analyze contents, and make everything searchable across my enterprise databases. What zip file needs processing?",
