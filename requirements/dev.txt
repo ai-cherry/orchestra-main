@@ -27,7 +27,7 @@ types-redis==4.6.0.20240106
 types-protobuf==4.24.0.20240129
 
 # Pre-commit
-pre-commit==3.5.0
+pre-commit==4.2.0
 
 # Documentation
 sphinx==7.2.6
