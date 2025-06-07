@@ -1,170 +1,51 @@
-# Orchestra AI Project Rules for Cursor
+# Cursor IDE Quick Reference - Project Symphony
 
-## Executive Summary
-This project follows a Performance-First, Zero Junk Policy for AI-assisted development. All code must be clean, performant, and maintainable with proper lifecycle management.
+## Tool Boundaries
+- **Use Cursor for**: Quick edits, single-file operations, immediate code generation
+- **Use Roo for**: Architecture, complex workflows, multi-step tasks, research
+- **Shared standards**: Defined in .cursor/rules/ directory
 
-## AI Context Files Available
-For best results, reference these in your prompts:
-- Planning: ai_context_planner.py
-- Coding: ai_context_coder.py
-- Reviewing: ai_context_reviewer.py
-- Debugging: ai_context_debugger.py
+## Essential Coding Standards
+- **Python 3.10 only** (NOT 3.11+)
+- **Type hints mandatory** for all functions  
+- **Google-style docstrings**
+- **Black + isort formatting**
+- **subprocess.run()** not os.system()
 
-## Core Principles
-- **Performance-First Mindset**: Benchmark critical functions, optimize algorithms
-- **Zero Junk Policy**: No temporary files without lifecycle management
-- **Context-Aware Generation**: Understand existing patterns before creating new code
-- Python 3.10 (NOT 3.11+) - system constraint
-- pip/venv ONLY - NO Poetry, Docker, Pipenv
-- Simple > Complex
-- Performance > Security (within reason)
-- Existing patterns > New patterns
+## Database Constraints
+- **PostgreSQL + Weaviate only** (NO MongoDB, NO Redis for primary storage)
+- **Use shared.database.UnifiedDatabase class**
+- **EXPLAIN ANALYZE** required for new PostgreSQL queries
 
-## Database Architecture ⚠️ IMPORTANT
-- **USE ONLY**: PostgreSQL (relational) + Weaviate (vector)
-- **DO NOT USE**: MongoDB, Redis, DragonflyDB
-- **Always use**: shared.database.UnifiedDatabase class
-- **Ignore**: Old database references in legacy code
-- **EXPLAIN ANALYZE**: Required for all new PostgreSQL queries
+## Performance Requirements  
+- **Benchmark complex functions**
+- **O(n log n) or better algorithms**
+- **Memory-aware data processing**
 
-## Project Structure
-- Automation tools: scripts/
-- Config validation: scripts/config_validator.py
-- Health monitoring: scripts/health_monitor.py
-- Unified CLI: scripts/orchestra.py
-- Cleanup tools: scripts/cleanup_engine.py, scripts/comprehensive_inventory.sh
-- Automation manager: scripts/automation_manager.py
-- Requirements: requirements/base.txt
+## File Creation Rules
+- **NO standalone scripts** - integrate into existing modules
+- **NO temporary files** without @transient_file decorator  
+- **NO documentation files** unless replacing existing ones
+- **Check .cursor/rules/temp-file-prevention.mdc** for details
 
-## Coding Standards
-- subprocess.run() NOT os.system()
-- Type hints (PEP 484) for ALL functions
-- Google-style docstrings
-- Black formatting
-- Performance benchmarks for complex functions
-- Use transient_file decorator for temporary files
+## Quick Integration Paths
+- Utilities → existing utils.py files
+- Database ops → UnifiedDatabase helpers  
+- Automation → scripts/automation_manager.py
+- Reports → docs/ or reports/ directories
 
-## Before Creating New Code
-1. Check if functionality exists in scripts/ or other modules
-2. Use existing patterns and integrate into existing modules
-3. Don't add heavy dependencies
-4. Keep it simple
-5. Consider performance implications
-6. Plan file lifecycle if creating temporary files
+## Before Complex Tasks
+Ask: "Should this use a Roo mode instead?" 
+- Architecture decisions → `roo architect`
+- Debugging analysis → `roo debug`  
+- Research tasks → `roo research`
+- Multi-file workflows → `roo orchestrator`
 
-## File Management Rules
-### Temporary Files
-- Must use `transient_file` decorator or register in `.cleanup_registry.json`
-- Default lifetime: 72 hours
-- Must include expiration metadata
-- Prefer in-memory processing over file I/O
-
-### Output Files
-- Reports/docs go to `docs/` or `reports/` directories
-- Logs use centralized logging system
-- No ad-hoc output files in root or module directories
-- Update existing documents when possible
-
-### Script Creation
-- NO standalone one-off scripts by default
-- Integrate functionality into existing modules
-- If automation needed, use automation_manager.py
-- Exception: Temporary migration scripts (must self-document completion)
-
-## Integration Requirements
-- New features extend existing modules
-- Utility functions go in relevant utils.py files
-- Database operations use UnifiedDatabase helpers
-- Error handling integrates with main logging system
-- All automation scripts registered via AutomationManager
-
-## Performance Requirements
-- Benchmark loops over 1000 iterations
-- O(n log n) or better algorithms preferred
-- Database queries must include EXPLAIN ANALYZE
-- Network calls need timeouts and retries
-- Monitor memory usage for data processing
-
-## AI Behavior Guidelines
-When asked to create functionality:
-1. First ask: "Should this integrate into an existing module like [relevant_module.py]?"
-2. If creating files, ask: "What's the intended lifecycle? Should this use transient_file?"
-3. For automation, suggest: "Should this be registered as a managed automation script?"
-4. Always consider: "How does this fit into the existing project structure?"
-
-## Forbidden
-- Docker/docker-compose files
-- Poetry/Pipfile
+## Forbidden Patterns
+- Creating files in root without purpose
 - Python 3.11+ features (match/case, tomllib)
-- Complex patterns (metaclasses, multiple inheritance)
-- Heavy dependencies for simple tasks
-- Direct database connections (use UnifiedDatabase)
 - MongoDB usage
-- Standalone cleanup/utility scripts without integration
-- Temporary files without lifecycle management
-- One-off scripts for tasks that could be CLI commands
+- Docker/Poetry (use pip/venv)
+- Complex patterns without clear benefit
 
-## Permitted with Guidelines
-- **Docker / docker-compose**: Allowed for local development environment setup and service orchestration.
-    - Dockerfiles should be multi-stage where appropriate.
-    - Use official Python 3.10 base images (e.g., `python:3.10-slim`).
-    - Minimize layers and follow security best practices (e.g., non-root users).
-    - Ensure `docker-compose.yml` clearly defines all services and their configurations.
-- **Redis**: Allowed, primarily for:
-    - General-purpose caching (key-value with TTLs).
-    - Semantic caching (leveraging Redis's vector search capabilities if available, e.g., via Redis Stack or appropriate modules).
-    - Configure appropriately for performance, resource limits, and persistence needs (e.g. for warm caches).
-
-## Required Patterns
-- ✅ Integrate utilities into existing modules
-- ✅ Use central logging instead of print/file outputs
-- ✅ Implement cleanup within primary function
-- ✅ Add performance benchmarks for complex code
-- ✅ Register automation scripts properly
-- ✅ Use transient_file for temporary outputs
-- ✅ Document file purpose and lifecycle
-
-## Infrastructure & Deployment
-- Prefer Pulumi with Python for Infrastructure as Code
-- Default to Lambda Labs services unless specified otherwise
-- For Dockerfiles (if needed): multi-stage, specific versions, security best practices
-- Focus on optimization, performance, simplicity over security and cost
-
-## Example Patterns
-
-### Temporary File Creation
-```python
-from core.utils.file_management import transient_file
-
-@transient_file(lifetime_hours=24)
-def create_temp_report(data) -> Path:
-    report_path = Path(f"temp_report_{datetime.now().strftime('%Y%m%d%H%M%S')}.txt")
-    report_path.write_text(str(data))
-    return report_path
-```
-
-### Automation Script Registration
-```python
-# Instead of creating standalone script, register it:
-python scripts/automation_manager.py register "Daily Cleanup" \
-    "scripts/automation/daily_cleanup.py" "0 3 * * *" \
-    "Performs daily cleanup tasks" "devops-team"
-```
-
-### Performance Benchmarking
-```python
-import time
-from functools import wraps
-
-def benchmark(func):
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        start = time.perf_counter()
-        result = func(*args, **kwargs)
-        end = time.perf_counter()
-        print(f"{func.__name__} took {end - start:.4f} seconds")
-        return result
-    return wrapper
-```
-
-Remember: Act as a Senior Python Developer focused on long-term code hygiene, performance, and minimal repository clutter within Project Symphony.
+**Remember**: Cursor = Fast coding. Roo = Complex thinking. Choose appropriately.

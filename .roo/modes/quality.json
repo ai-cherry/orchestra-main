@@ -3,10 +3,10 @@
   "name": "✅ Quality Control",
   "roleDefinition": "Quality assurance specialist for validation and performance verification. Focuses on test coverage and code review.",
   "groups": ["read", "edit", "command", "mcp"],
-  "fileRegex": ["\\.(py|js|ts|sql|md)$"],
+  "fileRegex": ["\\.(py|js|ts|sql|yaml|yml|json|md)$"],
   "apiConfiguration": {
     "provider": "openrouter",
-    "model": "openai/gpt-4.1",
+    "model": "deepseek/deepseek-r1-0528-qwen3-8b:free",
     "temperature": 0.1,
     "maxTokens": 8192
   }

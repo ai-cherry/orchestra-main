@@ -1,152 +1,210 @@
 {
   "mcpServers": {
-    "memory": {
+    "enhanced-memory": {
       "command": "python",
       "args": [
-        "${workspaceFolder}/mcp_server/servers/memory_server.py"
+        "${workspaceFolder}/legacy/mcp_server/servers/enhanced_memory_server.py"
       ],
       "env": {
-        "REDIS_URL": "${REDIS_URL:-redis://redis:6379}",
-        "POSTGRES_URL": "postgresql://postgres:postgres@postgres:5432/cherry_ai"
+        "REDIS_URL": "${REDIS_URL:-redis://45.77.87.106:6379}",
+        "POSTGRES_URL": "postgresql://postgres@45.77.87.106:5432/cherry_ai",
+        "WEAVIATE_URL": "http://localhost:8080"
       },
       "alwaysAllow": [
-        "context_storage",
-        "vector_search",
-        "memory_management"
-      ]
-    },
-    "conductor": {
-      "command": "python",
-      "args": [
-        "${workspaceFolder}/mcp_server/servers/conductor_server.py"
-      ],
-      "env": {
-        "REDIS_URL": "${REDIS_URL:-redis://redis:6379}",
-        "API_URL": "http://api:8080"
-      },
-      "alwaysAllow": [
-        "workflow_management",
-        "task_coordination",
-        "agent_coordination"
-      ]
-    },
-    "tools": {
-      "command": "python",
-      "args": [
-        "${workspaceFolder}/mcp_server/servers/tools_server.py"
-      ],
-      "env": {
-        "REDIS_URL": "${REDIS_URL:-redis://redis:6379}"
-      },
-      "alwaysAllow": [
-        "tool_discovery",
-        "tool_execution",
-        "postgres_query",
-        "cache_operations"
+        "store_memory_batch",
+        "search_memories_cached", 
+        "optimize_memory_storage",
+        "get_memory_statistics",
+        "store_memory",
+        "search_memories"
       ]
     },
     "code-intelligence": {
       "command": "python",
       "args": [
-        "${workspaceFolder}/mcp_server/servers/code_intelligence_server.py"
+        "${workspaceFolder}/legacy/mcp_server/servers/code_intelligence_server.py"
       ],
       "env": {
-        "REDIS_URL": "${REDIS_URL:-redis://redis:6379}"
+        "REDIS_URL": "${REDIS_URL:-redis://45.77.87.106:6379}"
       },
       "alwaysAllow": [
-        "ast_analysis",
-        "function_search",
-        "complexity_analysis",
-        "code_smells"
+        "analyze_file_ast",
+        "find_function_usage",
+        "analyze_imports",
+        "code_complexity_analysis",
+        "detect_code_smells"
       ]
     },
     "git-intelligence": {
       "command": "python",
       "args": [
-        "${workspaceFolder}/mcp_server/servers/git_intelligence_server.py"
+        "${workspaceFolder}/legacy/mcp_server/servers/git_intelligence_server.py"
       ],
       "env": {
-        "REDIS_URL": "${REDIS_URL:-redis://redis:6379}"
+        "REDIS_URL": "${REDIS_URL:-redis://45.77.87.106:6379}"
       },
       "alwaysAllow": [
-        "git_history",
-        "blame_analysis",
-        "hotspot_detection",
-        "contributor_stats"
+        "git_recent_changes",
+        "git_blame_analysis",
+        "git_diff_analysis",
+        "git_file_history",
+        "git_hotspot_analysis"
+      ]
+    },
+    "infrastructure-manager": {
+      "command": "python",
+      "args": [
+        "${workspaceFolder}/legacy/mcp_server/servers/infrastructure_manager.py"
+      ],
+      "env": {
+        "LAMBDA_API_KEY": "${LAMBDA_API_KEY}",
+        "PULUMI_ACCESS_TOKEN": "${PULUMI_ACCESS_TOKEN}"
+      },
+      "alwaysAllow": [
+        "deploy_infrastructure",
+        "scale_instance", 
+        "restart_services",
+        "get_deployment_status"
+      ]
+    },
+    "prompt-management": {
+      "command": "python",
+      "args": [
+        "${workspaceFolder}/legacy/mcp_server/servers/prompt_management.py"
+      ],
+      "env": {
+        "REDIS_URL": "${REDIS_URL:-redis://45.77.87.106:6379}"
+      },
+      "alwaysAllow": [
+        "get_prompt",
+        "list_prompts",
+        "create_prompt",
+        "optimize_prompt"
+      ]
+    },
+    "weaviate-direct": {
+      "command": "python",
+      "args": [
+        "${workspaceFolder}/legacy/mcp_server/servers/weaviate_direct_mcp_server.py"
+      ],
+      "env": {
+        "WEAVIATE_URL": "http://localhost:8080",
+        "WEAVIATE_HOST": "localhost",
+        "WEAVIATE_PORT": "8080"
+      },
+      "alwaysAllow": [
+        "get_schema",
+        "add_object",
+        "get_object",
+        "delete_object",
+        "hybrid_search",
+        "raw_graphql_query"
+      ]
+    },
+    "web-scraping": {
+      "command": "python",
+      "args": [
+        "${workspaceFolder}/legacy/mcp_server/servers/web_scraping_mcp_server.py"
+      ],
+      "env": {
+        "ZENROWS_API_KEY": "${ZENROWS_API_KEY}",
+        "APIFY_API_KEY": "${APIFY_API_KEY}",
+        "OPENAI_API_KEY": "${OPENAI_API_KEY}",
+        "REDIS_HOST": "45.77.87.106"
+      },
+      "alwaysAllow": [
+        "web_search",
+        "scrape_website",
+        "analyze_content",
+        "bulk_scrape"
+      ]
+    },
+    "cherry-domain": {
+      "command": "python",
+      "args": [
+        "${workspaceFolder}/legacy/mcp_server/servers/enhanced_cherry_domain_server.py"
+      ],
+      "env": {
+        "POSTGRES_HOST": "45.77.87.106",
+        "REDIS_HOST": "45.77.87.106",
+        "WEAVIATE_URL": "http://localhost:8080",
+        "PINECONE_API_KEY": "${PINECONE_API_KEY}"
+      },
+      "alwaysAllow": [
+        "handle_personal_task",
+        "handle_ranch_operation",
+        "search_personal_data",
+        "process_natural_language_request"
       ]
     }
   },
   "servers": [
     {
-      "name": "memory",
-      "port": 8003,
-      "capabilities": [
-        "context_storage",
-        "vector_search",
-        "memory_management"
-      ],
-      "description": "Memory and context management with PostgreSQL + Weaviate",
-      "priority": 1,
-      "health_endpoint": "/health"
+      "name": "enhanced-memory",
+      "port": 8001,
+      "capabilities": ["memory_management", "context_storage", "vector_search", "intelligent_caching"],
+      "description": "Enhanced memory with PostgreSQL + Weaviate + Redis caching",
+      "priority": 1
     },
     {
-      "name": "conductor",
-      "port": 8002,
-      "capabilities": [
-        "workflow_management",
-        "task_coordination",
-        "agent_coordination"
-      ],
-      "description": "Agent coordination and workflow management",
-      "priority": 1,
-      "health_endpoint": "/health"
-    },
-    {
-      "name": "tools",
-      "port": 8006,
-      "capabilities": [
-        "tool_discovery",
-        "tool_execution",
-        "postgres_query",
-        "cache_operations"
-      ],
-      "description": "Tool registry and execution with PostgreSQL/Redis/Weaviate tools",
-      "priority": 2,
-      "health_endpoint": "/health"
-    },
-    {
-      "name": "code-intelligence",
+      "name": "code-intelligence", 
       "port": 8007,
-      "capabilities": [
-        "ast_analysis",
-        "function_search",
-        "complexity_analysis",
-        "code_smells"
-      ],
+      "capabilities": ["ast_analysis", "complexity_analysis", "code_smells", "function_search"],
       "description": "Advanced code analysis and intelligence",
-      "priority": 2,
-      "health_endpoint": "/health"
+      "priority": 1
     },
     {
       "name": "git-intelligence",
-      "port": 8008,
-      "capabilities": [
-        "git_history",
-        "blame_analysis",
-        "hotspot_detection",
-        "contributor_stats"
-      ],
+      "port": 8008, 
+      "capabilities": ["git_history", "blame_analysis", "hotspot_detection"],
       "description": "Git history and change analysis",
-      "priority": 3,
-      "health_endpoint": "/health"
+      "priority": 2
+    },
+    {
+      "name": "infrastructure-manager",
+      "port": 8009,
+      "capabilities": ["deployment", "scaling", "monitoring", "lambda_labs"],
+      "description": "Lambda Labs infrastructure management", 
+      "priority": 2
+    },
+    {
+      "name": "prompt-management",
+      "port": 8010,
+      "capabilities": ["prompt_optimization", "template_management"],
+      "description": "AI prompt templates and optimization",
+      "priority": 3
+    },
+    {
+      "name": "weaviate-direct",
+      "port": 8011,
+      "capabilities": ["vector_operations", "semantic_search", "schema_management"],
+      "description": "Direct Weaviate operations",
+      "priority": 2
+    },
+    {
+      "name": "web-scraping", 
+      "port": 8012,
+      "capabilities": ["web_search", "content_scraping", "content_analysis"],
+      "description": "Intelligent web scraping and research",
+      "priority": 3
+    },
+    {
+      "name": "cherry-domain",
+      "port": 8013,
+      "capabilities": ["personal_assistant", "ranch_management", "wellness_tracking"],
+      "description": "Cherry personal assistant domain",
+      "priority": 2
     }
   ],
   "routing": {
-    "code_analysis": "code-intelligence",
+    "memory_operations": "enhanced-memory",
+    "code_analysis": "code-intelligence", 
     "git_operations": "git-intelligence",
-    "context_retrieval": "memory",
-    "tool_execution": "tools",
-    "workflow_management": "conductor"
+    "infrastructure": "infrastructure-manager",
+    "prompts": "prompt-management",
+    "vector_search": "weaviate-direct",
+    "web_research": "web-scraping",
+    "personal_assistant": "cherry-domain"
   },
   "cache": {
     "ttl": 3600,
