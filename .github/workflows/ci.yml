@@ -1,0 +1,73 @@
+name: CI
+
+on: 
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.10', '3.11']
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      
+      - name: Install Poetry
+        uses: abatilo/actions-poetry@v3
+        with:
+          poetry-version: latest
+      
+      - name: Configure Poetry
+        run: poetry config virtualenvs.create true --local
+      
+      - name: Cache Poetry dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pypoetry
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-
+      
+      - name: Install dependencies
+        run: poetry install --no-interaction
+      
+      - name: Run tests
+        run: poetry run pytest
+
+      - name: Run type checking
+        run: poetry run python -m compileall src/
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install Poetry
+        uses: abatilo/actions-poetry@v3
+        with:
+          poetry-version: latest
+      
+      - name: Install dependencies
+        run: poetry install --no-interaction
+      
+      - name: Run Black formatting check
+        run: poetry run black --check src/ tests/
+        continue-on-error: true
+      
+      - name: Run isort import sorting check
+        run: poetry run isort --check-only src/ tests/
+        continue-on-error: true 

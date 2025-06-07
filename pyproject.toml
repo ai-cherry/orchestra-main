@@ -3,12 +3,14 @@ name = "orchestra-main"
 version = "0.1.0"
 description = "AI Orchestrator and Modular Agent Framework for GCP"
 authors = ["Your Name <your@email.com>"]
+packages = [{include = "orchestra_core", from = "src"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 pre-commit = "^4.2.0"
+pytest = "^8.4.0"
 
 [tool.black]
 line-length = 120
@@ -17,7 +19,7 @@ target-version = ["py310"]
 [tool.isort]
 profile = "black"
 line_length = 120
-known_first_party = ["agent", "core", "mcp_server", "orchestra", "services"]
+known_first_party = ["orchestra_core"]
 combine_as_imports = true
 include_trailing_comma = true
 multi_line_output = 3

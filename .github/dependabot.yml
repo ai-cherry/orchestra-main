@@ -1,74 +1,23 @@
 version: 2
 updates:
-  # Python dependencies
-  - package-ecosystem: "pip"
-    directory: "/"
-    schedule:
-      interval: "daily"
-      time: "09:00"
-    open-pull-requests-limit: 5
-    reviewers:
-      - "scoobyjava"
-    assignees:
-      - "scoobyjava"
-    commit-message:
-      prefix: "deps"
-      include: "scope"
-    # Auto-merge low-risk updates
-    allow:
-      - dependency-type: "direct"
-        update-type: "version-update:semver-patch"
-      - dependency-type: "indirect"
-        update-type: "version-update:semver-patch"
-    
-  # Python requirements in subdirectories
-  - package-ecosystem: "pip"
-    directory: "/requirements"
-    schedule:
-      interval: "daily"
-      time: "09:30"
-    open-pull-requests-limit: 3
-    reviewers:
-      - "scoobyjava"
-    assignees:
-      - "scoobyjava"
-    commit-message:
-      prefix: "deps(requirements)"
-      include: "scope"
-    
-  # Node.js dependencies (admin-interface)
-  - package-ecosystem: "npm"
-    directory: "/admin-interface"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "10:00"
-    open-pull-requests-limit: 3
-    reviewers:
-      - "scoobyjava"
-    assignees:
-      - "scoobyjava"
-    commit-message:
-      prefix: "deps(admin-interface)"
-      include: "scope"
-    # Auto-merge patch updates for admin-interface
-    allow:
-      - dependency-type: "direct"
-        update-type: "version-update:semver-patch"
-      - dependency-type: "indirect"
-        update-type: "version-update:semver-patch"
-        
-  # GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
-      day: "sunday"
-    open-pull-requests-limit: 2
+    commit-message:
+      prefix: "ci"
+      include: "scope"
+
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+    open-pull-requests-limit: 10
     reviewers:
       - "scoobyjava"
     assignees:
       - "scoobyjava"
-    commit-message:
-      prefix: "deps(actions)"
 
