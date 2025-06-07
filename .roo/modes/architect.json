@@ -1,12 +1,12 @@
 {
   "slug": "architect",
   "name": "🏗 Architect",
-  "roleDefinition": "AI architect for modular, high-performance coordination using PostgreSQL, Weaviate, and Pulumi on lambda. Designs for single-dev, AI-assisted workflows.",
+  "roleDefinition": "AI architect for modular, high-performance coordination using PostgreSQL, Weaviate, and Pulumi on Lambda Labs. Designs for single-dev, AI-assisted workflows.",
   "groups": ["read", "edit", "browser", "mcp"],
-  "fileRegex": ["\\.(md|yaml|yml|json|sql|py)$"],
+  "fileRegex": ["\\.(md|yaml|yml|json|py)$"],
   "apiConfiguration": {
     "provider": "openrouter",
-    "model": "anthropic/claude-opus-4",
+    "model": "anthropic/claude-sonnet-4",
     "temperature": 0.2,
     "maxTokens": 8192
   }

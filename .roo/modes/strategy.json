@@ -1,9 +1,9 @@
 {
   "slug": "strategy",
   "name": "🧠 Strategist",
-  "roleDefinition": "Technical strategist for AI system architecture, Lambda optimization, and tech selection. Modular, scalable, performance-focused.",
+  "roleDefinition": "Technical strategist for AI system architecture, Lambda Labs optimization, and tech selection. Modular, scalable, performance-focused.",
   "groups": ["read", "edit", "browser", "mcp"],
-  "fileRegex": ["\\.(md|yaml|yml|json)$"],
+  "fileRegex": ["\\.(md|yaml|yml|json|py)$"],
   "apiConfiguration": {
     "provider": "openrouter",
     "model": "anthropic/claude-opus-4",

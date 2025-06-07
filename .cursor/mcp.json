@@ -1,39 +1,46 @@
 {
   "mcpServers": {
-    "cherry-ai-enhanced": {
+    "enhanced-memory": {
       "command": "python",
-      "args": ["/home/ubuntu/orchestra-main-repo/mcp_server/servers/enhanced_codebase_server.py"],
+      "args": ["/home/ubuntu/orchestra-main/legacy/mcp_server/servers/enhanced_memory_server.py"],
       "env": {
-        "PRODUCTION_SERVER": "150.136.94.139",
-        "DATABASE_URL": "postgresql://cherry_ai:CherryAI2024!@150.136.94.139/cherry_ai_production",
-        "REDIS_URL": "redis://150.136.94.139:6379",
-        "WEAVIATE_URL": "http://150.136.94.139:8080",
-        "ENVIRONMENT": "lambda-production"
+        "POSTGRES_HOST": "45.77.87.106",
+        "POSTGRES_USER": "postgres", 
+        "POSTGRES_DB": "cherry_ai",
+        "REDIS_HOST": "45.77.87.106",
+        "WEAVIATE_URL": "http://localhost:8080"
       }
     },
-    "lambda-infrastructure": {
+    "code-intelligence": {
       "command": "python",
-      "args": ["/home/ubuntu/orchestra-main-repo/lambda_infrastructure_mcp_server.py"],
+      "args": ["/home/ubuntu/orchestra-main/legacy/mcp_server/servers/code_intelligence_server.py"],
       "env": {
-        "LAMBDA_API_KEY": "secret_manus_5305c377b1e94aaa8352f2efc72f5ae3.cA4GcSKfAAhTtT2XsNDmC3CpRPvvupIk",
-        "PRODUCTION_IP": "150.136.94.139"
+        "REDIS_HOST": "45.77.87.106"
       }
     },
-    "cherry-ai-codex": {
-      "command": "python",
-      "args": ["/home/ubuntu/orchestra-main-repo/mcp_server/codex_integration.py"],
+    "git-intelligence": {
+      "command": "python", 
+      "args": ["/home/ubuntu/orchestra-main/legacy/mcp_server/servers/git_intelligence_server.py"],
       "env": {
-        "OPENAI_API_KEY": "${OPENAI_API_KEY}",
-        "PRODUCTION_SERVER": "150.136.94.139"
+        "REDIS_HOST": "45.77.87.106"
       }
     },
-    "database-manager": {
+    "infrastructure-manager": {
       "command": "python",
-      "args": ["/home/ubuntu/orchestra-main-repo/mcp_server/database_manager.py"],
+      "args": ["/home/ubuntu/orchestra-main/legacy/mcp_server/servers/infrastructure_manager.py"],
       "env": {
-        "DATABASE_URL": "postgresql://cherry_ai:CherryAI2024!@150.136.94.139/cherry_ai_production",
-        "REDIS_URL": "redis://150.136.94.139:6379",
-        "WEAVIATE_URL": "http://150.136.94.139:8080"
+        "LAMBDA_API_KEY": "${LAMBDA_API_KEY}",
+        "PULUMI_ACCESS_TOKEN": "${PULUMI_ACCESS_TOKEN}"
+      }
+    },
+    "cherry-domain": {
+      "command": "python",
+      "args": ["/home/ubuntu/orchestra-main/legacy/mcp_server/servers/enhanced_cherry_domain_server.py"],
+      "env": {
+        "POSTGRES_HOST": "45.77.87.106",
+        "REDIS_HOST": "45.77.87.106",
+        "WEAVIATE_URL": "http://localhost:8080",
+        "PINECONE_API_KEY": "${PINECONE_API_KEY}"
       }
     }
   }

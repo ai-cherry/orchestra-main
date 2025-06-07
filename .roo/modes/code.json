@@ -6,7 +6,7 @@
   "fileRegex": ["\\.(py|js|ts|sql|yaml|yml|json|md)$"],
   "apiConfiguration": {
     "provider": "openrouter",
-    "model": "google/gemini-2.5-flash-preview-05-20",
+    "model": "deepseek/deepseek-r1-0528-qwen3-8b:free",
     "temperature": 0.1,
     "maxTokens": 8192
   }

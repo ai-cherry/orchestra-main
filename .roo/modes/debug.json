@@ -3,10 +3,10 @@
   "name": "🪲 Debugger",
   "roleDefinition": "Systematic debugger for coordination, Postgres, Weaviate, and MCP. Provides actionable, AI-friendly error analysis.",
   "groups": ["read", "edit", "browser", "command", "mcp"],
-  "fileRegex": ["\\.(py|sql|log|md|json)$"],
+  "fileRegex": ["\\.(py|js|ts|sql|log|md)$"],
   "apiConfiguration": {
     "provider": "openrouter",
-    "model": "openai/gpt-4.1",
+    "model": "deepseek/deepseek-r1-0528-qwen3-8b:free",
     "temperature": 0.05,
     "maxTokens": 8192
   }
