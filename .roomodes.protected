@@ -1,6 +1,6 @@
 modes:
   architect:
-    model: anthropic/claude-opus-4
+    model: anthropic/claude-sonnet-4
     temperature: 0.2
     tools:
       - read
@@ -11,7 +11,7 @@ modes:
       Weaviate, and Pulumi on Lambda Labs. Designs for single-dev, AI-assisted
       workflows.
   code:
-    model: google/gemini-2.5-flash-preview-05-20
+    model: deepseek/deepseek-r1-0528-qwen3-8b:free
     temperature: 0.1
     tools:
       - read
@@ -21,7 +21,7 @@ modes:
     role: Expert Python/TypeScript developer for orchestration, Postgres, Weaviate,
       and Pulumi. Focuses on modular, AI-friendly, high-performance code.
   debug:
-    model: openai/gpt-4.1
+    model: deepseek/deepseek-r1-0528-qwen3-8b:free
     temperature: 0.05
     tools:
       - read
@@ -53,7 +53,7 @@ modes:
     role: Technical strategist for AI system architecture, Lambda Labs optimization, and
       tech selection. Modular, scalable, performance-focused.
   research:
-    model: anthropic/claude-sonnet-4
+    model: google/gemini-2.5-pro-preview-06-05
     temperature: 0.2
     tools:
       - read
@@ -63,7 +63,7 @@ modes:
     role: AI research assistant for best practices, benchmarking, and solution
       exploration. Synthesizes technical findings for coding agents.
   analytics:
-    model: google/gemini-2.5-flash-preview-05-20
+    model: deepseek/deepseek-r1-0528-qwen3-8b:free
     temperature: 0.1
     tools:
       - read
@@ -72,7 +72,7 @@ modes:
     role: Data analysis expert for metrics, performance monitoring, and reporting.
       Integrates with Postgres and Weaviate for insight generation.
   implementation:
-    model: google/gemini-2.5-flash-preview-05-20
+    model: deepseek/deepseek-r1-0528-qwen3-8b:free
     temperature: 0.1
     tools:
       - read
@@ -82,7 +82,7 @@ modes:
     role: Operations implementation expert for deployment, process execution, and
       Pulumi IaC. Ensures rapid, reliable setup on Lambda Labs.
   quality:
-    model: openai/gpt-4.1
+    model: deepseek/deepseek-r1-0528-qwen3-8b:free
     temperature: 0.1
     tools:
       - read
@@ -92,7 +92,7 @@ modes:
     role: Quality assurance specialist for validation and performance verification.
       Focuses on test coverage and code review.
   documentation:
-    model: anthropic/claude-sonnet-4
+    model: google/gemini-2.0-flash
     temperature: 0.15
     tools:
       - read
@@ -138,13 +138,13 @@ customModes:
       - edit
       - browser
       - mcp
-    model: anthropic/claude-opus-4
+    model: anthropic/claude-sonnet-4
   - slug: code
     name: 💻 Developer
     roleDefinition: Expert Python/TypeScript developer for orchestration, Postgres,
       Weaviate, and Pulumi. Focuses on modular, AI-friendly, high-performance
       code.
-    customInstructions: Always use Python 3.10+ features and syntax. Type hints are
+    customInstructions: Always use Python 3.10 features and syntax (NOT 3.11+). Type hints are
       mandatory for all functions and methods. Use PEP 484 type annotations.
       Follow Google-style docstrings. Use Black for formatting, isort for
       imports. Implement proper error handling with specific exceptions.
@@ -153,7 +153,7 @@ customModes:
       - edit
       - command
       - mcp
-    model: google/gemini-2.5-flash-preview-05-20
+    model: deepseek/deepseek-r1-0528-qwen3-8b:free
   - slug: debug
     name: 🪲 Debugger
     roleDefinition: Systematic debugger for orchestration, Postgres, Weaviate, and
@@ -168,7 +168,7 @@ customModes:
       - browser
       - command
       - mcp
-    model: openai/gpt-4.1
+    model: deepseek/deepseek-r1-0528-qwen3-8b:free
   - slug: orchestrator
     name: 🪃 Orchestrator
     roleDefinition: AI workflow orchestrator for task decomposition, agent
@@ -209,7 +209,7 @@ customModes:
       - edit
       - browser
       - mcp
-    model: anthropic/claude-sonnet-4
+    model: google/gemini-2.5-pro-preview-06-05
   - slug: analytics
     name: 📊 Analytics
     roleDefinition: Data analysis expert for metrics, performance monitoring, and
@@ -221,7 +221,7 @@ customModes:
       - read
       - edit
       - mcp
-    model: google/gemini-2.5-flash-preview-05-20
+    model: deepseek/deepseek-r1-0528-qwen3-8b:free
   - slug: implementation
     name: ⚙️ Implementation
     roleDefinition: Operations implementation expert for deployment, process
@@ -234,7 +234,7 @@ customModes:
       - edit
       - command
       - mcp
-    model: google/gemini-2.5-flash-preview-05-20
+    model: deepseek/deepseek-r1-0528-qwen3-8b:free
   - slug: quality
     name: ✅ Quality Control
     roleDefinition: Quality assurance specialist for validation and performance
@@ -247,7 +247,7 @@ customModes:
       - edit
       - command
       - mcp
-    model: openai/gpt-4.1
+    model: deepseek/deepseek-r1-0528-qwen3-8b:free
   - slug: documentation
     name: 📝 Documentation
     roleDefinition: Knowledge management specialist for process documentation and
@@ -259,4 +259,4 @@ customModes:
       - read
       - edit
       - mcp
-    model: anthropic/claude-sonnet-4
+    model: google/gemini-2.0-flash
