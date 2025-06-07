@@ -43,7 +43,7 @@ config:
     description: Redis port
     default: 6379
   
-  # Monitoring Configuration
+  # Monitoring Configuration (Optimized for Single Developer)
   monitoring:enabled:
     description: Enable monitoring stack
     default: true
@@ -51,8 +51,18 @@ config:
   
   monitoring:retention_days:
     description: Metrics retention in days
-    default: 30
+    default: 7
     type: integer
+  
+  # Performance Optimization
+  performance:mode:
+    description: Performance optimization mode
+    default: single_developer
+  
+  performance:resource_limits:
+    description: Enable resource limits for cost control
+    default: true
+    type: boolean
 
 # Stack configuration
 stacks:
@@ -61,14 +71,18 @@ stacks:
       lambda:instance_type: gpu_1x_a10
       lambda:region: us-west-1
       monitoring:enabled: true
-      monitoring:retention_days: 30
+      monitoring:retention_days: 7
+      performance:mode: single_developer
+      performance:resource_limits: true
   
   staging:
     config:
       lambda:instance_type: gpu_1x_a10
       lambda:region: us-west-1
       monitoring:enabled: true
-      monitoring:retention_days: 7
+      monitoring:retention_days: 3
+      performance:mode: single_developer
+      performance:resource_limits: true
   
   development:
     config:
@@ -76,3 +90,5 @@ stacks:
       lambda:region: us-west-1
       monitoring:enabled: false
       monitoring:retention_days: 1
+      performance:mode: single_developer
+      performance:resource_limits: false

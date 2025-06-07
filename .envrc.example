@@ -1,11 +1,43 @@
-# Example .envrc for Orchestra MCP System
+# Unified Environment Configuration for Orchestra AI
+# Optimized for single-developer performance
 
-# Example: Database and service URIs
-export DRAGONFLY_URL=redis://localhost:6379
-export MONGODB_URI=mongodb://localhost:27017
+# === INFRASTRUCTURE HOSTS ===
+export PRODUCTION_HOST=45.32.69.157
+export DATABASE_HOST=45.77.87.106
+export STAGING_HOST=207.246.108.201
+export LOAD_BALANCER_HOST=45.63.58.63
+
+# === DATABASE CONNECTIONS (Performance Optimized) ===
+export DATABASE_URL=postgresql://orchestra:${DB_PASSWORD}@45.77.87.106:5432/orchestra_main
+export REDIS_URL=redis://45.77.87.106:6379
 export WEAVIATE_URL=http://localhost:8080
+export POSTGRES_HOST=45.77.87.106
+export POSTGRES_PORT=5432
+export REDIS_HOST=45.77.87.106
+export REDIS_PORT=6379
 
-# Example: API keys and secrets (managed by Pulumi secrets)
-# export API_KEY_EXAMPLE=...
+# === MCP SERVER OPTIMIZATION ===
+export MCP_MODE=single_developer
+export MCP_ESSENTIAL_ONLY=true
+export MCP_PERFORMANCE_PRIORITY=true
+export PYTHONPATH=${PWD}
 
-# Add other required environment variables here
+# === LAMBDA LABS INFRASTRUCTURE ===
+export LAMBDA_API_KEY=${LAMBDA_API_KEY}
+export PULUMI_ACCESS_TOKEN=${PULUMI_ACCESS_TOKEN}
+
+# === DEVELOPMENT OPTIMIZATION ===
+export NODE_ENV=development
+export DEBUG=false
+export LOG_LEVEL=info
+export PERFORMANCE_MODE=true
+
+# === AI SERVICES (Optional) ===
+# export OPENAI_API_KEY=...
+# export ANTHROPIC_API_KEY=...
+# export PINECONE_API_KEY=...
+
+# === MONITORING (Lightweight) ===
+export MONITORING_ENABLED=true
+export MONITORING_LIGHTWEIGHT=true
+export METRICS_RETENTION_DAYS=7
