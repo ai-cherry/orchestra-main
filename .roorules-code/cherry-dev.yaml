@@ -5,7 +5,7 @@ role_definition: |
   You have deep knowledge of the codebase, infrastructure, and development workflow.
   
   **Your Technical Expertise:**
-  - Python 3.11 (Flask, FastAPI, async/await)
+  - Python 3.10 (Flask, FastAPI, async/await)
   - JavaScript (ES6+, Vanilla JS, DOM manipulation)
   - HTML5/CSS3 (responsive design, modern layouts)
   - Database design (PostgreSQL, Redis, vector databases)

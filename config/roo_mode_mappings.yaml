@@ -5,7 +5,7 @@ roo_modes:
   code:
     agent_id: roo_code_agent
     display_name: "💻 Developer"
-    model: anthropic/claude-opus-4
+    model: deepseek/deepseek-r1-0528-qwen3-8b:free
     role: "Expert Python/TypeScript developer for coordination, Postgres, Weaviate, and Pulumi"
     capabilities:
       - code_generation
@@ -20,12 +20,12 @@ roo_modes:
       - "*.tsx"
       - "*.jsx"
     max_tokens: 4096
-    temperature: 0.7
+    temperature: 0.1
     
   architect:
     agent_id: roo_architect_agent
     display_name: "🏗 Architect"
-    model: anthropic/claude-opus-4
+    model: anthropic/claude-sonnet-4
     role: "AI architect for modular, high-performance coordination using PostgreSQL, Weaviate, and Pulumi on Lambda"
     capabilities:
       - system_design
@@ -35,12 +35,12 @@ roo_modes:
     file_patterns:
       - "*.md"
     max_tokens: 4096
-    temperature: 0.7
+    temperature: 0.2
     
   ask:
     agent_id: roo_ask_agent
     display_name: "❓ Ask"
-    model: anthropic/claude-3.5-sonnet
+    model: google/gemini-2.5-flash-preview-05-20
     role: "Knowledgeable technical assistant focused on answering questions and providing information"
     capabilities:
       - question_answering
@@ -52,7 +52,7 @@ roo_modes:
   debug:
     agent_id: roo_debug_agent
     display_name: "🪲 Debugger"
-    model: anthropic/claude-opus-4
+    model: deepseek/deepseek-r1-0528-qwen3-8b:free
     role: "Systematic debugger for coordination, Postgres, Weaviate, and MCP"
     capabilities:
       - error_analysis
@@ -60,12 +60,12 @@ roo_modes:
       - fix_suggestion
       - testing
     max_tokens: 4096
-    temperature: 0.3
+    temperature: 0.05
     
   conductor:
     agent_id: roo_conductor_agent
     display_name: "🪃 conductor"
-    model: anthropic/claude-opus-4
+    model: anthropic/claude-sonnet-4
     role: "AI workflow conductor for task decomposition, agent coordination, and context management"
     capabilities:
       - task_decomposition
@@ -73,7 +73,7 @@ roo_modes:
       - context_management
       - workflow_optimization
     max_tokens: 4096
-    temperature: 0.7
+    temperature: 0.2
     
   strategy:
     agent_id: roo_strategy_agent
@@ -86,12 +86,12 @@ roo_modes:
       - risk_assessment
       - roadmap_creation
     max_tokens: 4096
-    temperature: 0.8
+    temperature: 0.3
     
   research:
     agent_id: roo_research_agent
     display_name: "🔍 Researcher"
-    model: anthropic/claude-3.5-sonnet
+    model: google/gemini-2.5-pro-preview-06-05
     role: "AI research assistant for best practices, benchmarking, and solution exploration"
     capabilities:
       - best_practices_research
@@ -99,12 +99,12 @@ roo_modes:
       - solution_exploration
       - documentation_analysis
     max_tokens: 4096
-    temperature: 0.6
+    temperature: 0.2
     
   analytics:
     agent_id: roo_analytics_agent
     display_name: "📊 Analytics"
-    model: anthropic/claude-3.5-sonnet
+    model: deepseek/deepseek-r1-0528-qwen3-8b:free
     role: "Data analysis expert for metrics, performance monitoring, and reporting"
     capabilities:
       - metrics_analysis
@@ -112,12 +112,12 @@ roo_modes:
       - reporting
       - visualization
     max_tokens: 4096
-    temperature: 0.4
+    temperature: 0.1
     
   implementation:
     agent_id: roo_implementation_agent
     display_name: "⚙️ Implementation"
-    model: anthropic/claude-opus-4
+    model: deepseek/deepseek-r1-0528-qwen3-8b:free
     role: "Operations implementation expert for deployment, process execution, and Pulumi IaC"
     capabilities:
       - deployment
@@ -125,12 +125,12 @@ roo_modes:
       - infrastructure_as_code
       - automation
     max_tokens: 4096
-    temperature: 0.5
+    temperature: 0.1
     
   quality:
     agent_id: roo_quality_agent
     display_name: "✅ Quality Control"
-    model: anthropic/claude-3.5-sonnet
+    model: deepseek/deepseek-r1-0528-qwen3-8b:free
     role: "Quality assurance specialist for validation and performance verification"
     capabilities:
       - validation
@@ -138,12 +138,12 @@ roo_modes:
       - compliance_checking
       - test_automation
     max_tokens: 4096
-    temperature: 0.3
+    temperature: 0.1
     
   documentation:
     agent_id: roo_documentation_agent
     display_name: "📝 Documentation"
-    model: anthropic/claude-3.5-sonnet
+    model: google/gemini-2.0-flash
     role: "Knowledge management specialist for process documentation and standard maintenance"
     capabilities:
       - documentation_generation
@@ -151,7 +151,7 @@ roo_modes:
       - standard_maintenance
       - knowledge_organization
     max_tokens: 4096
-    temperature: 0.5
+    temperature: 0.15
 
 # Transition rules for automatic mode switching
 transition_rules:
