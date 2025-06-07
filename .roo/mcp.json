@@ -140,7 +140,7 @@
     "sophia-payready": {
       "command": "python",
       "args": [
-        "${workspaceFolder}/legacy/mcp_server/servers/sophia_payready_domain_server.py"
+        "${workspaceFolder}/legacy/mcp_server/servers/sophia_pay_ready_server.py"
       ],
       "env": {
         "POSTGRES_HOST": "45.77.87.106",
