@@ -87,7 +87,7 @@ mypy==1.13.0
 mcp==1.9.2
 
 # Additional Utilities
-tenacity==8.2.3
+tenacity==9.1.2
 backoff==1.11.1
 decorator==5.1.1
 croniter==5.0.1 
