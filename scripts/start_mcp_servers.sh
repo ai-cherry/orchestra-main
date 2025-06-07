@@ -34,6 +34,7 @@ declare -A MCP_SERVERS=(
     ["git-intelligence"]="${SERVER_DIR}/git_intelligence_server.py"
     ["infrastructure-manager"]="${SERVER_DIR}/infrastructure_manager.py"
     ["cherry-domain"]="${SERVER_DIR}/enhanced_cherry_domain_server.py"
+    ["sophia-payready"]="${SERVER_DIR}/sophia_payready_domain_server.py"
     ["karen-paragonrx"]="${SERVER_DIR}/karen_paragonrx_domain_server.py"
     ["weaviate-direct"]="${SERVER_DIR}/weaviate_direct_mcp_server.py"
     ["web-scraping"]="${SERVER_DIR}/web_scraping_mcp_server.py"

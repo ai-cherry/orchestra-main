@@ -42,6 +42,16 @@
         "WEAVIATE_URL": "http://localhost:8080",
         "PINECONE_API_KEY": "${PINECONE_API_KEY}"
       }
+    },
+    "sophia-payready": {
+      "command": "python",
+      "args": ["/home/ubuntu/orchestra-main/legacy/mcp_server/servers/sophia_payready_domain_server.py"],
+      "env": {
+        "POSTGRES_HOST": "45.77.87.106",
+        "REDIS_HOST": "45.77.87.106",
+        "WEAVIATE_URL": "http://localhost:8080",
+        "PINECONE_API_KEY": "${PINECONE_API_KEY}"
+      }
     }
   }
 }
