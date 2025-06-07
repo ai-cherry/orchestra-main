@@ -20,7 +20,7 @@ jobs:
         uses: actions/checkout@v4
         
       - name: Sync to Lambda Server
-        uses: appleboy/ssh-action@v0.1.5
+        uses: appleboy/ssh-action@v1.2.2
         with:
           host: 45.32.69.157
           username: root
@@ -63,7 +63,7 @@ jobs:
             make service-status
             
       - name: Health Check
-        uses: appleboy/ssh-action@v0.1.5
+        uses: appleboy/ssh-action@v1.2.2
         with:
           host: 45.32.69.157
           username: root
