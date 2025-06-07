@@ -136,6 +136,25 @@
         "search_personal_data",
         "process_natural_language_request"
       ]
+    },
+    "sophia-payready": {
+      "command": "python",
+      "args": [
+        "${workspaceFolder}/legacy/mcp_server/servers/sophia_payready_domain_server.py"
+      ],
+      "env": {
+        "POSTGRES_HOST": "45.77.87.106",
+        "REDIS_HOST": "45.77.87.106",
+        "WEAVIATE_URL": "http://localhost:8080",
+        "PINECONE_API_KEY": "${PINECONE_API_KEY}"
+      },
+      "alwaysAllow": [
+        "handle_large_data_download",
+        "process_financial_transaction_batch",
+        "generate_business_intelligence_report",
+        "search_financial_data",
+        "process_natural_language_request"
+      ]
     }
   },
   "servers": [
@@ -194,6 +213,13 @@
       "capabilities": ["personal_assistant", "ranch_management", "wellness_tracking"],
       "description": "Cherry personal assistant domain",
       "priority": 2
+    },
+    {
+      "name": "sophia-payready",
+      "port": 8014,
+      "capabilities": ["financial_analysis", "data_processing", "business_intelligence", "pay_ready_operations"],
+      "description": "Sophia Pay Ready financial operations and large data processing",
+      "priority": 1
     }
   ],
   "routing": {
@@ -204,7 +230,10 @@
     "prompts": "prompt-management",
     "vector_search": "weaviate-direct",
     "web_research": "web-scraping",
-    "personal_assistant": "cherry-domain"
+    "personal_assistant": "cherry-domain",
+    "financial_operations": "sophia-payready",
+    "data_processing": "sophia-payready",
+    "business_intelligence": "sophia-payready"
   },
   "cache": {
     "ttl": 3600,
