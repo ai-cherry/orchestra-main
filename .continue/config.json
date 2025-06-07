@@ -1,0 +1,157 @@
+{
+  "models": [
+    {
+      "title": "UI-GPT-4o (Experimental)",
+      "provider": "openai",
+      "model": "gpt-4o-2024-11-20",
+      "apiKey": "${OPENAI_API_KEY}",
+      "contextLength": 128000,
+      "description": "Experimental UI-focused GPT-4o model optimized for React/TypeScript component generation, UI/UX design, and advanced frontend development",
+      "systemMessage": "You are an expert UI/UX developer specializing in React, TypeScript, Tailwind CSS, and modern frontend architecture. Focus on creating sophisticated, accessible, and responsive user interfaces for AI-powered applications.",
+      "completionOptions": {
+        "temperature": 0.7,
+        "top_p": 0.9,
+        "presence_penalty": 0.1,
+        "frequency_penalty": 0.1
+      }
+    },
+    {
+      "title": "GPT-4o (Standard)",
+      "provider": "openai", 
+      "model": "gpt-4o",
+      "apiKey": "${OPENAI_API_KEY}",
+      "contextLength": 128000,
+      "description": "Standard GPT-4o model for general coding, architecture, and backend development",
+      "systemMessage": "You are an expert software engineer specializing in Python, FastAPI, multi-agent systems, and AI orchestration. Focus on clean, maintainable, and scalable code architecture.",
+      "completionOptions": {
+        "temperature": 0.3,
+        "top_p": 0.8
+      }
+    },
+    {
+      "title": "GPT-4o (Persona Development)",
+      "provider": "openai",
+      "model": "gpt-4o",
+      "apiKey": "${OPENAI_API_KEY}",
+      "contextLength": 128000,
+      "description": "Specialized for Cherry, Sophia, and Karen AI persona development and orchestration",
+      "systemMessage": "You are developing AI personas for the Orchestra ecosystem: Cherry (life companion), Sophia (business intelligence), and Karen (healthcare). Focus on personality-driven interactions, multi-agent coordination, and persona-specific capabilities.",
+      "completionOptions": {
+        "temperature": 0.6,
+        "top_p": 0.9,
+        "presence_penalty": 0.2
+      }
+    }
+  ],
+  "customCommands": [
+    {
+      "name": "generate-ui-component",
+      "prompt": "Generate a React TypeScript component with the following requirements:\\n- Modern, accessible design using Tailwind CSS\\n- Dark theme support with persona-specific accent colors\\n- Responsive layout for desktop and mobile\\n- Proper TypeScript interfaces and props\\n- Include error handling and loading states\\n\\nComponent specification: {{{ input }}}",
+      "description": "Generate sophisticated React components optimized for the Orchestra admin interface"
+    },
+    {
+      "name": "create-persona-interface",
+      "prompt": "Create a persona-specific interface component for the Orchestra AI ecosystem:\\n- Persona: {{{ input }}}\\n- Include personality-driven design elements\\n- Implement persona-specific color schemes (Cherry: red, Sophia: blue, Karen: green)\\n- Add appropriate icons and visual metaphors\\n- Ensure accessibility and responsive design\\n- Include interaction patterns that match the persona's characteristics",
+      "description": "Generate persona-specific UI components for Cherry, Sophia, and Karen"
+    },
+    {
+      "name": "optimize-mcp-integration",
+      "prompt": "Optimize this code for MCP (Model Context Protocol) integration:\\n- Ensure proper context management\\n- Add intelligent caching strategies\\n- Implement efficient data flow patterns\\n- Include error handling and fallback mechanisms\\n- Optimize for multi-agent coordination\\n\\nCode to optimize: {{{ input }}}",
+      "description": "Optimize code for MCP server integration and multi-agent systems"
+    },
+    {
+      "name": "review-orchestra-code",
+      "prompt": "Review this Orchestra ecosystem code for:\\n- Architecture consistency with multi-agent patterns\\n- Persona-specific implementation correctness\\n- Performance optimization opportunities\\n- Security best practices\\n- Code maintainability and scalability\\n\\nCode to review: {{{ input }}}",
+      "description": "Comprehensive code review for Orchestra AI ecosystem"
+    }
+  ],
+  "contextProviders": [
+    {
+      "name": "code",
+      "params": {
+        "maxChars": 100000,
+        "includeComments": true
+      }
+    },
+    {
+      "name": "diff",
+      "params": {}
+    },
+    {
+      "name": "terminal",
+      "params": {}
+    },
+    {
+      "name": "problems",
+      "params": {}
+    },
+    {
+      "name": "folder",
+      "params": {
+        "folders": [
+          "admin-interface",
+          "src",
+          "core",
+          "production-api"
+        ]
+      }
+    },
+    {
+      "name": "codebase",
+      "params": {
+        "nRetrieve": 25,
+        "nFinal": 10,
+        "useReranking": true
+      }
+    }
+  ],
+  "slashCommands": [
+    {
+      "name": "ui",
+      "description": "Generate UI components with UI-GPT-4o",
+      "prompt": "Using the UI-GPT-4o model, generate a sophisticated React TypeScript component: {{{ input }}}"
+    },
+    {
+      "name": "persona",
+      "description": "Create persona-specific features",
+      "prompt": "Create a feature for the Orchestra AI persona system: {{{ input }}}"
+    },
+    {
+      "name": "mcp",
+      "description": "Optimize for MCP integration",
+      "prompt": "Optimize this code for MCP server integration and multi-agent coordination: {{{ input }}}"
+    },
+    {
+      "name": "review",
+      "description": "Comprehensive Orchestra code review",
+      "prompt": "Perform a comprehensive review of this Orchestra ecosystem code: {{{ input }}}"
+    }
+  ],
+  "allowAnonymousTelemetry": false,
+  "embeddingsProvider": {
+    "provider": "openai",
+    "model": "text-embedding-3-small",
+    "apiKey": "${OPENAI_API_KEY}"
+  },
+  "reranker": {
+    "name": "cohere",
+    "params": {
+      "model": "rerank-english-v3.0",
+      "apiKey": "${COHERE_API_KEY}"
+    }
+  },
+  "tabAutocompleteModel": {
+    "title": "GPT-4o Autocomplete",
+    "provider": "openai",
+    "model": "gpt-4o",
+    "apiKey": "${OPENAI_API_KEY}"
+  },
+  "experimental": {
+    "modelRoles": {
+      "inlineEdit": "UI-GPT-4o (Experimental)",
+      "applyCodeBlock": "GPT-4o (Standard)",
+      "summarize": "GPT-4o (Standard)"
+    }
+  }
+}
+
