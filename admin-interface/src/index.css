@@ -1,0 +1,79 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: #000000;
+    color: #ffffff;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+/* Custom scrollbar styles */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgb(31 41 55);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgb(75 85 99);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(107 114 128);
+}
+
+/* Custom animations */
+@keyframes shimmer {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s linear infinite;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  background-size: 200px 100%;
+}
+
+/* Persona-specific accent colors */
+.persona-cherry {
+  --accent-color: rgb(239 68 68);
+  --accent-color-hover: rgb(220 38 38);
+}
+
+.persona-sophia {
+  --accent-color: rgb(59 130 246);
+  --accent-color-hover: rgb(37 99 235);
+}
+
+.persona-karen {
+  --accent-color: rgb(16 185 129);
+  --accent-color-hover: rgb(5 150 105);
+}
+
+.persona-master {
+  --accent-color: rgb(234 179 8);
+  --accent-color-hover: rgb(202 138 4);
+}
+
+/* Glass morphism effect */
+.glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-dark {
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}

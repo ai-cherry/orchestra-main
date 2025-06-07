@@ -1,6 +1,78 @@
+name: ai-orchestration
+runtime:
+  name: python
+  options:
+    virtualenv: venv
+description: AI Orchestration Infrastructure on Lambda Labs
 config:
-  Lambda:region: ewr
-  cherry_ai:environment: ${PULUMI_STACK}
-description: Cherry AI infrastructure on Lambda
-name: cherry_ai-ai
-runtime: python
+  pulumi:tags:
+    value:
+      pulumi:template: ai-orchestration
+      project: orchestra
+      environment: production
+      infrastructure: lambda-labs
+  
+  # Lambda Labs Configuration
+  lambda:instance_type:
+    description: Lambda Labs GPU instance type
+    default: gpu_1x_a10
+  
+  lambda:region:
+    description: Lambda Labs deployment region
+    default: us-west-1
+  
+  # Database Configuration
+  database:host:
+    description: PostgreSQL host
+    default: localhost
+  
+  database:port:
+    description: PostgreSQL port
+    default: 5432
+  
+  database:name:
+    description: PostgreSQL database name
+    default: orchestra_db
+  
+  # Redis Configuration
+  redis:host:
+    description: Redis host
+    default: localhost
+  
+  redis:port:
+    description: Redis port
+    default: 6379
+  
+  # Monitoring Configuration
+  monitoring:enabled:
+    description: Enable monitoring stack
+    default: true
+    type: boolean
+  
+  monitoring:retention_days:
+    description: Metrics retention in days
+    default: 30
+    type: integer
+
+# Stack configuration
+stacks:
+  production:
+    config:
+      lambda:instance_type: gpu_1x_a10
+      lambda:region: us-west-1
+      monitoring:enabled: true
+      monitoring:retention_days: 30
+  
+  staging:
+    config:
+      lambda:instance_type: gpu_1x_a10
+      lambda:region: us-west-1
+      monitoring:enabled: true
+      monitoring:retention_days: 7
+  
+  development:
+    config:
+      lambda:instance_type: cpu_1x_a10
+      lambda:region: us-west-1
+      monitoring:enabled: false
+      monitoring:retention_days: 1

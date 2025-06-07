@@ -1074,3 +1074,36 @@ async def main():
 if __name__ == "__main__":
     asyncio.run(main())
 
+
+
+class MemoryLayer:
+    """Memory layer for agent context management"""
+    
+    def __init__(self, vector_store=None):
+        self.vector_store = vector_store
+        self.short_term_memory = []
+        self.long_term_memory = []
+        
+    async def store(self, data: dict):
+        """Store data in memory"""
+        self.short_term_memory.append(data)
+        if len(self.short_term_memory) > 100:
+            # Move to long-term memory
+            self.long_term_memory.extend(self.short_term_memory[:50])
+            self.short_term_memory = self.short_term_memory[50:]
+            
+    async def retrieve(self, query: str, limit: int = 10):
+        """Retrieve relevant memories"""
+        # Simple implementation - in production would use vector similarity
+        relevant = []
+        for memory in self.short_term_memory + self.long_term_memory[-100:]:
+            if query.lower() in str(memory).lower():
+                relevant.append(memory)
+                if len(relevant) >= limit:
+                    break
+        return relevant
+        
+    async def clear(self):
+        """Clear all memories"""
+        self.short_term_memory = []
+        self.long_term_memory = []
