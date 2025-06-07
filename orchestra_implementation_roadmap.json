@@ -1,0 +1,307 @@
+{
+  "roadmap_metadata": {
+    "generated_at": "2025-06-06T16:04:35.265312",
+    "total_tasks": 10,
+    "estimated_duration_weeks": 16,
+    "team_size_recommendation": 4
+  },
+  "phases": [
+    {
+      "phase": 1,
+      "name": "Critical Integration",
+      "duration_weeks": 4,
+      "focus": "Frontend-backend integration and error handling",
+      "tasks": [
+        "INT-001",
+        "INT-002",
+        "INT-003"
+      ]
+    },
+    {
+      "phase": 2,
+      "name": "Core Functionality",
+      "duration_weeks": 4,
+      "focus": "Real implementations and LLM integration",
+      "tasks": [
+        "FUNC-001",
+        "FUNC-002",
+        "FUNC-003"
+      ]
+    },
+    {
+      "phase": 3,
+      "name": "Performance & Security",
+      "duration_weeks": 4,
+      "focus": "Optimization and security hardening",
+      "tasks": [
+        "PERF-001",
+        "SEC-001"
+      ]
+    },
+    {
+      "phase": 4,
+      "name": "Innovation Features",
+      "duration_weeks": 4,
+      "focus": "Advanced features and user experience",
+      "tasks": [
+        "INNO-001",
+        "INNO-002"
+      ]
+    }
+  ],
+  "tasks": {
+    "INT-001": {
+      "id": "INT-001",
+      "title": "Complete API Client Integration",
+      "description": "Connect admin interface to real backend APIs",
+      "priority": "critical",
+      "estimated_hours": 16,
+      "dependencies": [],
+      "assigned_to": null,
+      "status": "not_started",
+      "code_changes": [
+        {
+          "file": "admin-interface/src/app/business-tools/page.tsx",
+          "changes": "\n// Replace mock data loading with real API calls\nconst loadBusinessTools = async () => {\n  try {\n    setLoading(true);\n    \n    // Real API calls\n    const [workflowsRes, agentsRes, serversRes] = await Promise.all([\n      apiClient.getWorkflows(),\n      apiClient.getAgents(currentPersona.id),\n      apiClient.getMCPServers()\n    ]);\n    \n    setWorkflows(workflowsRes);\n    setAgents(agentsRes);\n    setMcpServers(serversRes);\n  } catch (error) {\n    console.error('Failed to load business tools:', error);\n    showErrorNotification('Failed to load tools');\n  } finally {\n    setLoading(false);\n  }\n};"
+        }
+      ]
+    },
+    "INT-002": {
+      "id": "INT-002",
+      "title": "Implement WebSocket Connection",
+      "description": "Add real-time updates for workflows and agent status",
+      "priority": "high",
+      "estimated_hours": 24,
+      "dependencies": [
+        "INT-001"
+      ],
+      "assigned_to": null,
+      "status": "not_started",
+      "code_changes": [
+        {
+          "file": "admin-interface/src/hooks/useWebSocket.js",
+          "changes": "\nimport { useEffect, useRef, useCallback } from 'react';\nimport { io, Socket } from 'socket.io-client';\n\nexport const useWebSocket = (url: string) => {\n  const socketRef = useRef<Socket | null>(null);\n  \n  useEffect(() => {\n    socketRef.current = io(url, {\n      transports: ['websocket'],\n      reconnection: true,\n      reconnectionAttempts: 5\n    });\n    \n    return () => {\n      socketRef.current?.disconnect();\n    };\n  }, [url]);\n  \n  const emit = useCallback((event: string, data: any) => {\n    socketRef.current?.emit(event, data);\n  }, []);\n  \n  const on = useCallback((event: string, handler: Function) => {\n    socketRef.current?.on(event, handler);\n  }, []);\n  \n  return { emit, on, socket: socketRef.current };\n};"
+        }
+      ]
+    },
+    "INT-003": {
+      "id": "INT-003",
+      "title": "Add Error Boundaries",
+      "description": "Implement comprehensive error handling in React",
+      "priority": "high",
+      "estimated_hours": 8,
+      "dependencies": [],
+      "assigned_to": null,
+      "status": "not_started",
+      "code_changes": [
+        {
+          "file": "admin-interface/src/components/ErrorBoundary.tsx",
+          "changes": "\nimport React, { Component, ErrorInfo, ReactNode } from 'react';\n\ninterface Props {\n  children: ReactNode;\n  fallback?: ReactNode;\n}\n\ninterface State {\n  hasError: boolean;\n  error: Error | null;\n}\n\nexport class ErrorBoundary extends Component<Props, State> {\n  public state: State = {\n    hasError: false,\n    error: null\n  };\n\n  public static getDerivedStateFromError(error: Error): State {\n    return { hasError: true, error };\n  }\n\n  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {\n    console.error('Uncaught error:', error, errorInfo);\n    // Send to error tracking service\n  }\n\n  public render() {\n    if (this.state.hasError) {\n      return this.props.fallback || <ErrorFallback error={this.state.error} />;\n    }\n\n    return this.props.children;\n  }\n}"
+        }
+      ]
+    },
+    "FUNC-001": {
+      "id": "FUNC-001",
+      "title": "Implement Real MCP Server Tools",
+      "description": "Replace mock implementations with actual functionality",
+      "priority": "critical",
+      "estimated_hours": 40,
+      "dependencies": [],
+      "assigned_to": null,
+      "status": "not_started",
+      "code_changes": [
+        {
+          "file": "mcp_server/servers/conductor_server.py",
+          "changes": "\n# Add real agent orchestration\nasync def run_agent_task(agent_id: str, task: str, parameters: Dict[str, Any] = None) -> Dict[str, Any]:\n    # Connect to agent registry\n    agent_registry = AgentRegistry()\n    agent = await agent_registry.get_agent(agent_id)\n    \n    if not agent:\n        raise ValueError(f\"Agent {agent_id} not found\")\n    \n    # Create task execution context\n    context = TaskContext(\n        task_id=str(uuid.uuid4()),\n        agent_id=agent_id,\n        task=task,\n        parameters=parameters,\n        created_at=datetime.now()\n    )\n    \n    # Execute task with monitoring\n    try:\n        result = await agent.execute_task(context)\n        await self._record_task_metrics(context, result)\n        return result\n    except Exception as e:\n        await self._handle_task_failure(context, e)\n        raise"
+        }
+      ]
+    },
+    "FUNC-002": {
+      "id": "FUNC-002",
+      "title": "Add LLM Integration",
+      "description": "Integrate OpenAI/Anthropic for conversation engine",
+      "priority": "high",
+      "estimated_hours": 32,
+      "dependencies": [],
+      "assigned_to": null,
+      "status": "not_started",
+      "code_changes": [
+        {
+          "file": "api/conversation_engine.py",
+          "changes": "\n# Add LLM client integration\nfrom openai import AsyncOpenAI\nfrom anthropic import AsyncAnthropic\n\nclass LLMClient:\n    def __init__(self, config: AIConfig):\n        self.openai = AsyncOpenAI(api_key=config.openai_api_key)\n        self.anthropic = AsyncAnthropic(api_key=config.anthropic_api_key)\n        self.default_model = config.default_model\n        \n    async def generate_response(self, \n                              messages: List[Dict[str, str]], \n                              model: Optional[str] = None,\n                              temperature: float = 0.7) -> str:\n        model = model or self.default_model\n        \n        if model.startswith('gpt'):\n            response = await self.openai.chat.completions.create(\n                model=model,\n                messages=messages,\n                temperature=temperature\n            )\n            return response.choices[0].message.content\n        elif model.startswith('claude'):\n            response = await self.anthropic.messages.create(\n                model=model,\n                messages=messages,\n                temperature=temperature\n            )\n            return response.content[0].text"
+        }
+      ]
+    },
+    "FUNC-003": {
+      "id": "FUNC-003",
+      "title": "Implement Database Migrations",
+      "description": "Add Alembic for database version control",
+      "priority": "high",
+      "estimated_hours": 16,
+      "dependencies": [],
+      "assigned_to": null,
+      "status": "not_started",
+      "code_changes": [
+        {
+          "file": "alembic.ini",
+          "changes": "\n[alembic]\nscript_location = migrations\nprepend_sys_path = .\nversion_path_separator = os\nsqlalchemy.url = postgresql://%(DB_USER)s:%(DB_PASS)s@%(DB_HOST)s/%(DB_NAME)s\n\n[loggers]\nkeys = root,sqlalchemy,alembic\n\n[handlers]\nkeys = console\n\n[formatters]\nkeys = generic"
+        }
+      ]
+    },
+    "PERF-001": {
+      "id": "PERF-001",
+      "title": "Implement Response Caching",
+      "description": "Add Redis-based response caching for API",
+      "priority": "medium",
+      "estimated_hours": 16,
+      "dependencies": [
+        "INT-001"
+      ],
+      "assigned_to": null,
+      "status": "not_started",
+      "code_changes": [
+        {
+          "file": "api/middleware/cache.py",
+          "changes": "\nfrom functools import wraps\nimport hashlib\nimport json\nfrom typing import Callable\nimport redis.asyncio as redis\n\nclass CacheMiddleware:\n    def __init__(self, redis_url: str, default_ttl: int = 300):\n        self.redis = redis.from_url(redis_url)\n        self.default_ttl = default_ttl\n    \n    def cache_response(self, ttl: Optional[int] = None):\n        def decorator(func: Callable):\n            @wraps(func)\n            async def wrapper(*args, **kwargs):\n                # Generate cache key\n                cache_key = self._generate_cache_key(func.__name__, args, kwargs)\n                \n                # Try to get from cache\n                cached = await self.redis.get(cache_key)\n                if cached:\n                    return json.loads(cached)\n                \n                # Execute function\n                result = await func(*args, **kwargs)\n                \n                # Cache result\n                await self.redis.setex(\n                    cache_key, \n                    ttl or self.default_ttl,\n                    json.dumps(result)\n                )\n                \n                return result\n            return wrapper\n        return decorator"
+        }
+      ]
+    },
+    "SEC-001": {
+      "id": "SEC-001",
+      "title": "Implement Secrets Management",
+      "description": "Integrate with AWS Secrets Manager",
+      "priority": "high",
+      "estimated_hours": 24,
+      "dependencies": [],
+      "assigned_to": null,
+      "status": "not_started",
+      "code_changes": [
+        {
+          "file": "config/secrets_manager.py",
+          "changes": "\nimport boto3\nfrom botocore.exceptions import ClientError\nimport json\nfrom typing import Dict, Any, Optional\n\nclass SecretsManager:\n    def __init__(self, region_name: str = \"us-east-1\"):\n        self.client = boto3.client('secretsmanager', region_name=region_name)\n        self._cache: Dict[str, Any] = {}\n    \n    async def get_secret(self, secret_name: str) -> Dict[str, Any]:\n        # Check cache first\n        if secret_name in self._cache:\n            return self._cache[secret_name]\n        \n        try:\n            response = self.client.get_secret_value(SecretId=secret_name)\n            secret = json.loads(response['SecretString'])\n            self._cache[secret_name] = secret\n            return secret\n        except ClientError as e:\n            logger.error(f\"Failed to retrieve secret {secret_name}: {e}\")\n            raise\n    \n    async def rotate_secret(self, secret_name: str) -> bool:\n        try:\n            self.client.rotate_secret(\n                SecretId=secret_name,\n                RotationRules={'AutomaticallyAfterDays': 30}\n            )\n            # Clear cache\n            self._cache.pop(secret_name, None)\n            return True\n        except ClientError as e:\n            logger.error(f\"Failed to rotate secret {secret_name}: {e}\")\n            return False"
+        }
+      ]
+    },
+    "INNO-001": {
+      "id": "INNO-001",
+      "title": "Visual Workflow Builder",
+      "description": "Implement drag-and-drop workflow creation",
+      "priority": "medium",
+      "estimated_hours": 80,
+      "dependencies": [
+        "FUNC-001",
+        "INT-002"
+      ],
+      "assigned_to": null,
+      "status": "not_started",
+      "code_changes": [
+        {
+          "file": "admin-interface/src/components/WorkflowBuilder.tsx",
+          "changes": "\nimport React, { useCallback } from 'react';\nimport ReactFlow, {\n  Node,\n  Edge,\n  addEdge,\n  Background,\n  Controls,\n  MiniMap,\n  useNodesState,\n  useEdgesState,\n} from 'reactflow';\nimport 'reactflow/dist/style.css';\n\nexport const WorkflowBuilder: React.FC = () => {\n  const [nodes, setNodes, onNodesChange] = useNodesState([]);\n  const [edges, setEdges, onEdgesChange] = useEdgesState([]);\n\n  const onConnect = useCallback(\n    (params) => setEdges((eds) => addEdge(params, eds)),\n    [setEdges]\n  );\n\n  const onDrop = useCallback(\n    (event) => {\n      event.preventDefault();\n      const type = event.dataTransfer.getData('nodeType');\n      const position = { x: event.clientX, y: event.clientY };\n      \n      const newNode: Node = {\n        id: `${type}-${Date.now()}`,\n        type,\n        position,\n        data: { label: type }\n      };\n      \n      setNodes((nds) => nds.concat(newNode));\n    },\n    [setNodes]\n  );\n\n  return (\n    <div style={{ height: '100%' }}>\n      <ReactFlow\n        nodes={nodes}\n        edges={edges}\n        onNodesChange={onNodesChange}\n        onEdgesChange={onEdgesChange}\n        onConnect={onConnect}\n        onDrop={onDrop}\n        onDragOver={(e) => e.preventDefault()}\n      >\n        <Background />\n        <Controls />\n        <MiniMap />\n      </ReactFlow>\n    </div>\n  );\n};"
+        }
+      ]
+    },
+    "INNO-002": {
+      "id": "INNO-002",
+      "title": "Analytics Dashboard",
+      "description": "Real-time conversation analytics",
+      "priority": "medium",
+      "estimated_hours": 60,
+      "dependencies": [
+        "INT-002"
+      ],
+      "assigned_to": null,
+      "status": "not_started",
+      "code_changes": [
+        {
+          "file": "admin-interface/src/components/AnalyticsDashboard.tsx",
+          "changes": "\nimport React, { useEffect, useState } from 'react';\nimport { Line, Bar, Doughnut } from 'react-chartjs-2';\nimport { useWebSocket } from '../hooks/useWebSocket';\n\nexport const AnalyticsDashboard: React.FC = () => {\n  const [metrics, setMetrics] = useState({\n    conversationQuality: [],\n    responseTime: [],\n    userSatisfaction: [],\n    personaPerformance: {}\n  });\n  \n  const { on } = useWebSocket(process.env.REACT_APP_WS_URL);\n  \n  useEffect(() => {\n    on('metrics:update', (data) => {\n      setMetrics(prev => ({\n        ...prev,\n        ...data\n      }));\n    });\n  }, [on]);\n  \n  return (\n    <div className=\"grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6\">\n      <MetricCard title=\"Conversation Quality\">\n        <Line data={formatLineData(metrics.conversationQuality)} />\n      </MetricCard>\n      <MetricCard title=\"Response Time\">\n        <Bar data={formatBarData(metrics.responseTime)} />\n      </MetricCard>\n      <MetricCard title=\"Persona Performance\">\n        <Doughnut data={formatDoughnutData(metrics.personaPerformance)} />\n      </MetricCard>\n    </div>\n  );\n};"
+        }
+      ]
+    }
+  },
+  "sprint_plan": [
+    {
+      "sprint": 1,
+      "start_date": "2025-06-06T16:04:35.265303",
+      "end_date": "2025-06-20T16:04:35.265303",
+      "goals": [
+        "Complete API integration",
+        "Add WebSocket support"
+      ],
+      "tasks": [
+        "INT-001",
+        "INT-002"
+      ]
+    },
+    {
+      "sprint": 2,
+      "start_date": "2025-06-20T16:04:35.265303",
+      "end_date": "2025-07-04T16:04:35.265303",
+      "goals": [
+        "Error handling",
+        "Start MCP implementation"
+      ],
+      "tasks": [
+        "INT-003",
+        "FUNC-001"
+      ]
+    }
+  ],
+  "implementation_guide": {
+    "setup_instructions": {
+      "development_environment": [
+        "Install Node.js 18+ and Python 3.11+",
+        "Set up PostgreSQL, Redis, and Weaviate locally",
+        "Configure environment variables from .env.example",
+        "Install dependencies: npm install && pip install -r requirements.txt"
+      ],
+      "testing_strategy": [
+        "Unit tests for all new functions",
+        "Integration tests for API endpoints",
+        "E2E tests for critical user flows",
+        "Performance benchmarks for key operations"
+      ]
+    },
+    "best_practices": {
+      "code_standards": [
+        "Use TypeScript for all new frontend code",
+        "Follow PEP 8 for Python code",
+        "Implement proper error handling",
+        "Add comprehensive logging"
+      ],
+      "review_process": [
+        "All PRs require 2 approvals",
+        "Run automated tests before merge",
+        "Update documentation with changes",
+        "Deploy to staging before production"
+      ]
+    }
+  },
+  "quick_wins": [
+    {
+      "task": "Add loading states",
+      "effort_hours": 4,
+      "impact": "Improves user experience immediately",
+      "implementation": "Add loading skeletons to all data-fetching components"
+    },
+    {
+      "task": "Fix TypeScript errors",
+      "effort_hours": 8,
+      "impact": "Improves code quality and prevents bugs",
+      "implementation": "Fix all existing TypeScript errors in admin interface"
+    },
+    {
+      "task": "Add basic monitoring",
+      "effort_hours": 8,
+      "impact": "Enables production debugging",
+      "implementation": "Set up Sentry for error tracking"
+    },
+    {
+      "task": "Implement health checks",
+      "effort_hours": 6,
+      "impact": "Improves system reliability",
+      "implementation": "Add /health endpoints to all services"
+    }
+  ]
+}

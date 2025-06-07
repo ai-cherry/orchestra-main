@@ -7,7 +7,7 @@ endif
 
 .PHONY: dev-start validate service-status start-services stop-services \
     health-check health-monitor wait-for-mcp ai-review-changes \
-    before-ai-coding after-ai-coding restart-services format lint clean-code
+    before-ai-coding after-ai-coding restart-services format lint clean-code dev-up dev-down
 
 dev-start:
 	bash start_orchestra.sh
@@ -66,3 +66,9 @@ lint:
 
 clean-code: format lint
 	@echo "✨ Code is clean and formatted!"
+
+dev-up:
+	cd infra/dev && pulumi up --yes | cat
+
+dev-down:
+	cd infra/dev && pulumi destroy --yes | cat

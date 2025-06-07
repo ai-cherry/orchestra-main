@@ -1,5 +1,9 @@
 """
+Memory subsystem for the orchestration platform
 """
+
+__all__ = [
+    # Interfaces
     "IMemoryStorage",
     "IMemoryManager",
     "IMemoryOptimizer",
