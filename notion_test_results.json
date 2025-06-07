@@ -1,0 +1,62 @@
+{
+  "total_tests": 7,
+  "passed": 4,
+  "failed": 3,
+  "success_rate": "57.1%",
+  "results": {
+    "API Connection": {
+      "status": "PASS",
+      "details": {
+        "success": true,
+        "user_id": "67f4b449-389d-4454-9735-a240a504e7be",
+        "user_name": "LLM Brainstorm",
+        "user_type": "bot"
+      }
+    },
+    "Token Validation": {
+      "status": "PASS",
+      "details": {
+        "success": true,
+        "token_format": "valid",
+        "permissions": "confirmed"
+      }
+    },
+    "Database Creation": {
+      "status": "FAIL",
+      "details": {
+        "success": false,
+        "error": "400 Client Error: Bad Request for url: https://api.notion.com/v1/databases"
+      }
+    },
+    "Page Creation": {
+      "status": "FAIL",
+      "details": {
+        "success": false,
+        "error": "400 Client Error: Bad Request for url: https://api.notion.com/v1/databases"
+      }
+    },
+    "Property Updates": {
+      "status": "FAIL",
+      "details": {
+        "success": false,
+        "error": "400 Client Error: Bad Request for url: https://api.notion.com/v1/databases"
+      }
+    },
+    "Search Functionality": {
+      "status": "PASS",
+      "details": {
+        "success": true,
+        "results_count": 0,
+        "has_more": false
+      }
+    },
+    "Workspace Setup": {
+      "status": "PASS",
+      "details": {
+        "success": true,
+        "schemas_validated": 8,
+        "ready_for_setup": true
+      }
+    }
+  }
+}

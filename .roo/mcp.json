@@ -1,5 +1,21 @@
 {
   "mcpServers": {
+    "orchestra-unified": {
+      "command": "python",
+      "args": [
+        "${workspaceFolder}/mcp_unified_server.py"
+      ],
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}"
+      },
+      "alwaysAllow": [
+        "register_tool",
+        "update_context",
+        "get_shared_context",
+        "route_task",
+        "sync_project_state"
+      ]
+    },
     "enhanced-memory": {
       "command": "python",
       "args": [
@@ -161,6 +177,13 @@
   },
   "servers": [
     {
+      "name": "orchestra-unified",
+      "port": 8000,
+      "capabilities": ["context_sharing", "task_routing", "tool_coordination", "project_sync"],
+      "description": "Unified context and task routing for Cursor, Roo, and Continue",
+      "priority": 1
+    },
+    {
       "name": "enhanced-memory",
       "port": 8001,
       "capabilities": ["memory_management", "context_storage", "vector_search", "intelligent_caching"],
@@ -225,6 +248,9 @@
     }
   ],
   "routing": {
+    "tool_coordination": "orchestra-unified",
+    "context_sharing": "orchestra-unified",
+    "task_routing": "orchestra-unified",
     "memory_operations": "enhanced-memory",
     "code_analysis": "code-intelligence", 
     "git_operations": "git-intelligence",
@@ -239,9 +265,18 @@
   },
   "cache": {
     "ttl": 3600,
-    "strategy": "lru"
+    "strategy": "lru",
+    "intelligent_condensing": true,
+    "context_preservation": true
   },
   "rate_limits": {
-    "requests_per_minute": 120
+    "requests_per_minute": 120,
+    "burst_limit": 20
+  },
+  "optimization": {
+    "openrouter_integration": true,
+    "cost_optimization": true,
+    "fallback_models": true,
+    "context_condensing": true
   }
 }

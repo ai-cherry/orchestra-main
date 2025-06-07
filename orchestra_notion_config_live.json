@@ -1,0 +1,28 @@
+{
+  "setup_date": "2025-06-07T17:55:48.686685",
+  "setup_version": "2.0 - Live Execution",
+  "root_page_id": "20bdba04940280ca9ba7f9bce721f547",
+  "root_page_url": "https://www.notion.so/Orchestra-AI-Workspace-20bdba04940280ca9ba7f9bce721f547",
+  "api_token": "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",
+  "databases": {
+    "\ud83c\udfaf Epic & Feature Tracking": "20bdba04-9402-8114-b57b-df7f1d4b2712",
+    "\ud83d\udccb Task Management": "20bdba04-9402-81a2-99f3-e69dc37b73d6",
+    "\ud83d\udcbb Development Log": "20bdba04-9402-81fd-9558-d66c07d9576c",
+    "\ud83c\udf52 Cherry Features": "20bdba04-9402-8162-9e3c-fa8c8e41fd16",
+    "\ud83d\udc69\u200d\ud83d\udcbc Sophia Features": "20bdba04-9402-811d-83b4-cdc1a2505623",
+    "\ud83d\udc69\u200d\u2695\ufe0f Karen Features": "20bdba04-9402-819c-b2ca-d3d3828691e6",
+    "\ud83d\udcd6 Patrick Instructions": "20bdba04-9402-81b4-9890-e663db2b50a3",
+    "\ud83d\udcda Knowledge Base": "20bdba04-9402-81a4-bc27-e06d160e3378"
+  },
+  "databases_created": 8,
+  "database_urls": {
+    "\ud83c\udfaf Epic & Feature Tracking": "https://notion.so/20bdba0494028114b57bdf7f1d4b2712",
+    "\ud83d\udccb Task Management": "https://notion.so/20bdba04940281a299f3e69dc37b73d6",
+    "\ud83d\udcbb Development Log": "https://notion.so/20bdba04940281fd9558d66c07d9576c",
+    "\ud83c\udf52 Cherry Features": "https://notion.so/20bdba04940281629e3cfa8c8e41fd16",
+    "\ud83d\udc69\u200d\ud83d\udcbc Sophia Features": "https://notion.so/20bdba049402811d83b4cdc1a2505623",
+    "\ud83d\udc69\u200d\u2695\ufe0f Karen Features": "https://notion.so/20bdba049402819cb2cad3d3828691e6",
+    "\ud83d\udcd6 Patrick Instructions": "https://notion.so/20bdba04940281b49890e663db2b50a3",
+    "\ud83d\udcda Knowledge Base": "https://notion.so/20bdba04940281a4bc27e06d160e3378"
+  }
+}
