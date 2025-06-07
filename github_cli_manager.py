@@ -21,7 +21,7 @@ class GitHubCLIManager:
                 shell=True,
                 capture_output=True,
                 text=True,
-                cwd="/tmp/orchestra-main"
+                cwd="/home/ubuntu/orchestra-main"
             )
             if result.returncode == 0:
                 return {"success": True, "output": result.stdout.strip()}
@@ -75,10 +75,10 @@ class GitHubCLIManager:
         except json.JSONDecodeError:
             return {"success": False, "error": "Failed to parse PR list"}
         
-        # Filter dependabot PRs
+        # Filter dependabot PRs (check both possible formats)
         dependabot_prs = [
             pr for pr in prs 
-            if pr["author"]["login"] == "dependabot[bot]"
+            if pr["author"]["login"] in ["dependabot[bot]", "app/dependabot"]
         ]
         
         print(f"📊 Found {len(dependabot_prs)} dependabot PRs")
@@ -162,11 +162,11 @@ done
         }
         
         for filename, content in scripts.items():
-            with open(f"/tmp/orchestra-main/scripts/{filename}", "w") as f:
+            with open(f"/home/ubuntu/orchestra-main/scripts/{filename}", "w") as f:
                 f.write(content)
-            subprocess.run(f"chmod +x /tmp/orchestra-main/scripts/{filename}", shell=True)
+            subprocess.run(f"chmod +x /home/ubuntu/orchestra-main/scripts/{filename}", shell=True)
         
-        print("✅ Generated automation scripts in /tmp/orchestra-main/scripts/")
+        print("✅ Generated automation scripts in /home/ubuntu/orchestra-main/scripts/")
         return scripts
 
 def main():

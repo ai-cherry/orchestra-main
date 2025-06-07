@@ -277,6 +277,16 @@
     "openrouter_integration": true,
     "cost_optimization": true,
     "fallback_models": true,
-    "context_condensing": true
+    "context_condensing": true,
+    "single_developer_mode": true,
+    "performance_priority": true,
+    "reduced_server_count": true
+  },
+  "single_developer_config": {
+    "essential_servers": ["orchestra-unified", "enhanced-memory", "infrastructure-manager"],
+    "optional_servers": ["code-intelligence", "weaviate-direct"],
+    "disabled_servers": ["web-scraping", "prompt-management", "git-intelligence", "cherry-domain", "sophia-payready"],
+    "resource_optimization": true,
+    "startup_delay_reduction": true
   }
 }

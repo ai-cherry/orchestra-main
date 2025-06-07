@@ -1,6 +1,6 @@
 """
 Cherry AI Orchestrator - Infrastructure as Code
-Pulumi configuration for automated infrastructure management
+Pulumi configuration optimized for single-developer performance
 """
 
 import pulumi
@@ -8,18 +8,24 @@ import pulumi_lambda as Lambda
 import pulumi_random as random
 from pulumi import Config, Output
 
-# Configuration
+# Configuration (Performance Optimized)
 config = Config()
 LAMBDA_API_KEY = config.require_secret("LAMBDA_API_KEY")
 
+# Performance mode detection
+performance_mode = config.get("performance:mode") or "standard"
+resource_limits = config.get_bool("performance:resource_limits") or False
+
+print(f"🚀 Deploying in {performance_mode} mode with resource_limits={resource_limits}")
+
 # Create SSH key for server access
-ssh_key = lambda.SshKey("cherry-ai-ssh-key",
+ssh_key = Lambda.SshKey("cherry-ai-ssh-key",
     name="cherry-ai-orchestrator",
     ssh_key=config.require("ssh_public_key")
 )
 
 # Production server
-production_server = lambda.Instance("cherry-ai-production",
+production_server = Lambda.Instance("cherry-ai-production",
     plan="vc2-16c-64gb",  # 16 vCPUs, 64GB RAM
     region="lax",  # Los Angeles
     os_id=1743,  # Ubuntu 24.04 LTS
@@ -59,7 +65,7 @@ echo "✅ Server initialization completed"
 )
 
 # Database server
-database_server = lambda.Instance("cherry-ai-database",
+database_server = Lambda.Instance("cherry-ai-database",
     plan="vc2-8c-32gb",  # 8 vCPUs, 32GB RAM
     region="lax",  # Los Angeles
     os_id=1743,  # Ubuntu 24.04 LTS
@@ -91,7 +97,7 @@ echo "✅ Database server setup completed"
 )
 
 # Staging server
-staging_server = lambda.Instance("cherry-ai-staging",
+staging_server = Lambda.Instance("cherry-ai-staging",
     plan="vc2-4c-8gb",  # 4 vCPUs, 8GB RAM
     region="lax",  # Los Angeles
     os_id=1743,  # Ubuntu 24.04 LTS
