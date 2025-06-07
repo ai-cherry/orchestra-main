@@ -51,7 +51,7 @@ typer==0.12.3
 
 # Data Processing & Science
 numpy==1.26.4
-pandas==2.2.0
+pandas==2.3.0
 joblib==1.5.1
 scikit-learn==1.6.1
 
