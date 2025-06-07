@@ -205,7 +205,7 @@ pytest-asyncio==0.26.0
 pytest-cov==6.1.1
 python-dateutil==2.9.0.post0
 python-dotenv==1.1.0
-python-multipart==0.0.9
+python-multipart==0.0.20
 pytz==2025.2
 redis==5.0.1
 referencing==0.36.2
