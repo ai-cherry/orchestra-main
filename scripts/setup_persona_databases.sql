@@ -158,6 +158,24 @@ CREATE TABLE IF NOT EXISTS sophia.customer_financial_profiles (
     profile_data JSONB
 );
 
+-- Zip file contents table for searchable extraction tracking
+CREATE TABLE IF NOT EXISTS sophia.zip_file_contents (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    zip_job_id UUID REFERENCES sophia.data_processing_jobs(id),
+    file_name VARCHAR(500) NOT NULL,
+    file_path TEXT NOT NULL,
+    file_size_bytes BIGINT,
+    file_type VARCHAR(50),
+    extraction_status VARCHAR(20) DEFAULT 'extracted',
+    processing_status VARCHAR(20) DEFAULT 'pending',
+    content_summary TEXT,
+    records_count INTEGER,
+    extracted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    processed_at TIMESTAMP,
+    metadata JSONB,
+    search_content TEXT -- For full-text search
+);
+
 -- ========================================
 -- KAREN SCHEMA - Healthcare & ParagonRX Operations
 -- ========================================
@@ -312,6 +330,9 @@ CREATE INDEX IF NOT EXISTS idx_sophia_transactions_customer ON sophia.financial_
 CREATE INDEX IF NOT EXISTS idx_sophia_metrics_name_period ON sophia.business_metrics(metric_name, time_period);
 CREATE INDEX IF NOT EXISTS idx_sophia_jobs_status ON sophia.data_processing_jobs(status);
 CREATE INDEX IF NOT EXISTS idx_sophia_customers_risk ON sophia.customer_financial_profiles(risk_rating);
+CREATE INDEX IF NOT EXISTS idx_sophia_zip_contents_job ON sophia.zip_file_contents(zip_job_id);
+CREATE INDEX IF NOT EXISTS idx_sophia_zip_contents_type ON sophia.zip_file_contents(file_type);
+CREATE INDEX IF NOT EXISTS idx_sophia_zip_search_content ON sophia.zip_file_contents USING gin(to_tsvector('english', search_content));
 
 -- Karen indexes
 CREATE INDEX IF NOT EXISTS idx_karen_compliance_status ON karen.healthcare_compliance(status);

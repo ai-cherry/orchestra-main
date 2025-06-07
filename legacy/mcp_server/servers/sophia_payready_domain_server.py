@@ -68,7 +68,11 @@ class SophiaPayReadyDomainServer:
         # Financial data processing configuration
         self.data_batch_size = 10000
         self.max_file_size_mb = 500
-        self.supported_formats = ['csv', 'xlsx', 'json', 'parquet', 'sql']
+        self.supported_formats = ['csv', 'xlsx', 'json', 'parquet', 'sql', 'zip']
+        self.extract_directory = "/tmp/sophia_extracts"
+        
+        # Create extraction directory
+        os.makedirs(self.extract_directory, exist_ok=True)
         
     def _initialize_pinecone(self):
         """Initialize Pinecone vector database with Sophia namespace"""
@@ -217,12 +221,35 @@ class SophiaPayReadyDomainServer:
                 )
             """)
             
+            # Zip file contents table for searchable extraction tracking
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS sophia.zip_file_contents (
+                    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                    zip_job_id UUID REFERENCES sophia.data_processing_jobs(id),
+                    file_name VARCHAR(500) NOT NULL,
+                    file_path TEXT NOT NULL,
+                    file_size_bytes BIGINT,
+                    file_type VARCHAR(50),
+                    extraction_status VARCHAR(20) DEFAULT 'extracted',
+                    processing_status VARCHAR(20) DEFAULT 'pending',
+                    content_summary TEXT,
+                    records_count INTEGER,
+                    extracted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    processed_at TIMESTAMP,
+                    metadata JSONB,
+                    search_content TEXT -- For full-text search
+                )
+            """)
+            
             # Create indexes for performance
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_sophia_transactions_date ON sophia.financial_transactions(created_at)")
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_sophia_transactions_status ON sophia.financial_transactions(status)")
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_sophia_transactions_merchant ON sophia.financial_transactions(merchant_id)")
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_sophia_metrics_name_period ON sophia.business_metrics(metric_name, time_period)")
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_sophia_jobs_status ON sophia.data_processing_jobs(status)")
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_sophia_zip_contents_job ON sophia.zip_file_contents(zip_job_id)")
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_sophia_zip_contents_type ON sophia.zip_file_contents(file_type)")
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_sophia_zip_search_content ON sophia.zip_file_contents USING gin(to_tsvector('english', search_content))")
             
             self.pg_conn.commit()
             logger.info("✅ Sophia database schemas created successfully")
@@ -460,6 +487,378 @@ class SophiaPayReadyDomainServer:
         # Ensure risk score is between 0 and 1
         return min(1.0, max(0.0, risk_score))
     
+    async def handle_zip_file_extraction(self, zip_config: Dict[str, Any]) -> Dict[str, Any]:
+        """Handle zip file extraction and process contents in a searchable way"""
+        try:
+            import zipfile
+            import tempfile
+            import shutil
+            
+            zip_file_path = zip_config.get("file_path", "")
+            job_name = zip_config.get("job_name", f"Zip_Extract_{datetime.now().strftime('%Y%m%d_%H%M%S')}")
+            
+            if not zip_file_path or not os.path.exists(zip_file_path):
+                return {
+                    "status": "error",
+                    "message": "Zip file path not provided or file doesn't exist"
+                }
+            
+            # Create processing job
+            job_id = f"zip_{datetime.now().timestamp()}"
+            db_job_id = None
+            
+            if self.pg_conn:
+                cursor = self.pg_conn.cursor()
+                cursor.execute("""
+                    INSERT INTO sophia.data_processing_jobs 
+                    (job_name, job_type, status, file_path, file_size_mb, processing_config)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                    RETURNING id
+                """, (
+                    job_name,
+                    "zip_file_extraction",
+                    "processing",
+                    zip_file_path,
+                    round(os.path.getsize(zip_file_path) / (1024*1024), 2),
+                    json.dumps(zip_config)
+                ))
+                db_job_id = cursor.fetchone()[0]
+                self.pg_conn.commit()
+            
+            # Extract zip file
+            extract_path = os.path.join(self.extract_directory, job_id)
+            os.makedirs(extract_path, exist_ok=True)
+            
+            extracted_files = []
+            total_files = 0
+            total_size = 0
+            
+            with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
+                # Get list of files first
+                file_list = zip_ref.namelist()
+                total_files = len(file_list)
+                
+                logger.info(f"💼 Extracting {total_files} files from zip archive...")
+                
+                for file_info in zip_ref.infolist():
+                    if not file_info.is_dir():
+                        # Extract file
+                        extracted_file_path = zip_ref.extract(file_info, extract_path)
+                        file_size = file_info.file_size
+                        total_size += file_size
+                        
+                        # Determine file type
+                        file_extension = os.path.splitext(file_info.filename)[1].lower()
+                        file_type = self._determine_file_type(file_extension)
+                        
+                        # Generate content summary
+                        content_summary = await self._generate_file_summary(extracted_file_path, file_type)
+                        
+                        # Store in database
+                        if self.pg_conn and db_job_id:
+                            cursor.execute("""
+                                INSERT INTO sophia.zip_file_contents 
+                                (zip_job_id, file_name, file_path, file_size_bytes, file_type, 
+                                 content_summary, search_content, metadata)
+                                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                                RETURNING id
+                            """, (
+                                db_job_id,
+                                file_info.filename,
+                                extracted_file_path,
+                                file_size,
+                                file_type,
+                                content_summary,
+                                f"{file_info.filename} {content_summary}",  # Searchable content
+                                json.dumps({
+                                    "original_path": file_info.filename,
+                                    "compression_type": zip_config.get("compression", "unknown"),
+                                    "extraction_time": datetime.now().isoformat()
+                                })
+                            ))
+                            file_db_id = cursor.fetchone()[0]
+                            
+                            extracted_files.append({
+                                "id": str(file_db_id),
+                                "name": file_info.filename,
+                                "path": extracted_file_path,
+                                "size": file_size,
+                                "type": file_type,
+                                "summary": content_summary
+                            })
+            
+            # Update job status
+            if self.pg_conn and db_job_id:
+                cursor.execute("""
+                    UPDATE sophia.data_processing_jobs 
+                    SET status = %s, records_total = %s, records_processed = %s, 
+                        completed_at = CURRENT_TIMESTAMP,
+                        results_summary = %s
+                    WHERE id = %s
+                """, (
+                    "completed",
+                    total_files,
+                    len(extracted_files),
+                    json.dumps({
+                        "total_files": total_files,
+                        "extracted_files": len(extracted_files),
+                        "total_size_bytes": total_size,
+                        "extraction_path": extract_path
+                    }),
+                    db_job_id
+                ))
+                self.pg_conn.commit()
+            
+            # Cache results in Redis
+            if self.redis_client:
+                cache_data = {
+                    "job_id": job_id,
+                    "status": "completed",
+                    "total_files": total_files,
+                    "extracted_files": len(extracted_files),
+                    "total_size_mb": round(total_size / (1024*1024), 2),
+                    "extraction_path": extract_path,
+                    "completed_at": datetime.now().isoformat()
+                }
+                self.redis_client.setex(f"sophia:zip:{job_id}", 3600, json.dumps(cache_data))
+            
+            # Store in Pinecone for semantic search
+            if self.vector_store:
+                doc = VectorDocument(
+                    id=f"sophia_zip_{job_id}",
+                    content=f"Zip file extraction: {job_name} - {total_files} files extracted including {', '.join([f['name'] for f in extracted_files[:5]])}{'...' if len(extracted_files) > 5 else ''}",
+                    metadata={
+                        "type": "zip_extraction",
+                        "total_files": total_files,
+                        "extracted_files": len(extracted_files),
+                        "total_size_mb": round(total_size / (1024*1024), 2),
+                        "file_types": list(set([f['type'] for f in extracted_files])),
+                        "created_at": datetime.now().isoformat()
+                    },
+                    domain="sophia"
+                )
+                self.pinecone_manager.upsert_documents([doc], "sophia")
+            
+            return {
+                "status": "success",
+                "message": f"📦 Zip file '{job_name}' extracted successfully! {len(extracted_files)} files are now searchable and ready for processing.",
+                "job_id": job_id,
+                "db_job_id": str(db_job_id) if db_job_id else None,
+                "total_files": total_files,
+                "extracted_files": len(extracted_files),
+                "total_size_mb": round(total_size / (1024*1024), 2),
+                "extraction_path": extract_path,
+                "files": extracted_files,
+                "search_capabilities": [
+                    "Full-text search across all file contents",
+                    "File type filtering",
+                    "Size-based filtering", 
+                    "Date-based search",
+                    "Semantic similarity search"
+                ]
+            }
+            
+        except Exception as e:
+            logger.error(f"Error extracting zip file: {e}")
+            # Update job status to failed
+            if self.pg_conn and 'db_job_id' in locals() and db_job_id:
+                cursor = self.pg_conn.cursor()
+                cursor.execute("""
+                    UPDATE sophia.data_processing_jobs 
+                    SET status = %s, error_message = %s, completed_at = CURRENT_TIMESTAMP
+                    WHERE id = %s
+                """, ("failed", str(e), db_job_id))
+                self.pg_conn.commit()
+            
+            return {
+                "status": "error",
+                "message": f"Zip extraction failed: {e}"
+            }
+    
+    def _determine_file_type(self, file_extension: str) -> str:
+        """Determine file type from extension"""
+        extension_map = {
+            '.csv': 'csv',
+            '.xlsx': 'excel',
+            '.xls': 'excel', 
+            '.json': 'json',
+            '.xml': 'xml',
+            '.txt': 'text',
+            '.pdf': 'pdf',
+            '.sql': 'sql',
+            '.parquet': 'parquet',
+            '.log': 'log',
+            '.md': 'markdown',
+            '.py': 'python',
+            '.js': 'javascript',
+            '.html': 'html',
+            '.zip': 'zip'
+        }
+        return extension_map.get(file_extension, 'unknown')
+    
+    async def _generate_file_summary(self, file_path: str, file_type: str) -> str:
+        """Generate intelligent summary of file contents"""
+        try:
+            if not os.path.exists(file_path):
+                return "File not found"
+            
+            file_size = os.path.getsize(file_path)
+            
+            if file_type == 'csv':
+                try:
+                    import pandas as pd
+                    df = pd.read_csv(file_path, nrows=5)  # Read just first 5 rows for summary
+                    return f"CSV file with {len(df.columns)} columns: {', '.join(df.columns.tolist()[:10])}"
+                except Exception:
+                    return f"CSV file ({file_size} bytes)"
+            
+            elif file_type == 'excel':
+                try:
+                    import pandas as pd
+                    df = pd.read_excel(file_path, nrows=5)
+                    return f"Excel file with {len(df.columns)} columns: {', '.join(df.columns.tolist()[:10])}"
+                except Exception:
+                    return f"Excel file ({file_size} bytes)"
+            
+            elif file_type == 'json':
+                try:
+                    with open(file_path, 'r', encoding='utf-8') as f:
+                        data = json.load(f)
+                    if isinstance(data, dict):
+                        return f"JSON object with keys: {', '.join(list(data.keys())[:10])}"
+                    elif isinstance(data, list):
+                        return f"JSON array with {len(data)} items"
+                    else:
+                        return f"JSON file ({file_size} bytes)"
+                except Exception:
+                    return f"JSON file ({file_size} bytes)"
+            
+            elif file_type == 'text':
+                try:
+                    with open(file_path, 'r', encoding='utf-8') as f:
+                        lines = f.readlines()[:10]  # First 10 lines
+                    content_preview = ' '.join([line.strip() for line in lines])[:200]
+                    return f"Text file ({len(lines)} lines sampled): {content_preview}..."
+                except Exception:
+                    return f"Text file ({file_size} bytes)"
+            
+            else:
+                return f"{file_type.title()} file ({file_size} bytes)"
+                
+        except Exception as e:
+            logger.error(f"Error generating file summary: {e}")
+            return f"File summary unavailable ({file_size} bytes)"
+    
+    async def search_zip_contents(self, search_query: str, filters: Dict[str, Any] = None) -> Dict[str, Any]:
+        """Search through extracted zip file contents with advanced filtering"""
+        try:
+            if not self.pg_conn:
+                return {"status": "error", "message": "Database connection not available"}
+            
+            cursor = self.pg_conn.cursor()
+            
+            # Build search query
+            where_conditions = ["1=1"]
+            params = []
+            
+            # Full-text search
+            if search_query:
+                where_conditions.append("to_tsvector('english', search_content) @@ plainto_tsquery('english', %s)")
+                params.append(search_query)
+            
+            # File type filter
+            if filters and filters.get("file_type"):
+                where_conditions.append("file_type = %s")
+                params.append(filters["file_type"])
+            
+            # Size filter (in MB)
+            if filters and filters.get("min_size_mb"):
+                where_conditions.append("file_size_bytes >= %s")
+                params.append(filters["min_size_mb"] * 1024 * 1024)
+                
+            if filters and filters.get("max_size_mb"):
+                where_conditions.append("file_size_bytes <= %s")
+                params.append(filters["max_size_mb"] * 1024 * 1024)
+            
+            # Date filter
+            if filters and filters.get("extracted_after"):
+                where_conditions.append("extracted_at >= %s")
+                params.append(filters["extracted_after"])
+            
+            query = f"""
+                SELECT zfc.id, zfc.file_name, zfc.file_path, zfc.file_size_bytes, 
+                       zfc.file_type, zfc.content_summary, zfc.extracted_at,
+                       dpj.job_name, dpj.job_type
+                FROM sophia.zip_file_contents zfc
+                JOIN sophia.data_processing_jobs dpj ON zfc.zip_job_id = dpj.id
+                WHERE {' AND '.join(where_conditions)}
+                ORDER BY zfc.extracted_at DESC
+                LIMIT 50
+            """
+            
+            cursor.execute(query, params)
+            results = cursor.fetchall()
+            
+            # Format results
+            search_results = []
+            for row in results:
+                search_results.append({
+                    "id": str(row[0]),
+                    "file_name": row[1],
+                    "file_path": row[2],
+                    "file_size_mb": round(row[3] / (1024*1024), 2),
+                    "file_type": row[4],
+                    "content_summary": row[5],
+                    "extracted_at": row[6].isoformat() if row[6] else None,
+                    "job_name": row[7],
+                    "job_type": row[8]
+                })
+            
+            # Get aggregated statistics
+            cursor.execute("""
+                SELECT 
+                    COUNT(*) as total_files,
+                    COUNT(DISTINCT file_type) as unique_types,
+                    SUM(file_size_bytes) as total_size_bytes,
+                    MIN(extracted_at) as earliest_extraction,
+                    MAX(extracted_at) as latest_extraction
+                FROM sophia.zip_file_contents zfc
+                WHERE %s
+            """ % ' AND '.join(where_conditions), params)
+            
+            stats = cursor.fetchone()
+            
+            return {
+                "status": "success",
+                "message": f"🔍 Found {len(search_results)} files matching your search criteria across zip extractions",
+                "query": search_query,
+                "filters": filters,
+                "results": search_results,
+                "statistics": {
+                    "total_matching_files": stats[0] if stats else 0,
+                    "unique_file_types": stats[1] if stats else 0,
+                    "total_size_mb": round(stats[2] / (1024*1024), 2) if stats and stats[2] else 0,
+                    "date_range": {
+                        "earliest": stats[3].isoformat() if stats and stats[3] else None,
+                        "latest": stats[4].isoformat() if stats and stats[4] else None
+                    }
+                },
+                "search_capabilities": [
+                    "Full-text search across file contents",
+                    "File type filtering (csv, excel, json, text, etc.)",
+                    "File size filtering",
+                    "Date range filtering",
+                    "Advanced PostgreSQL text search"
+                ]
+            }
+            
+        except Exception as e:
+            logger.error(f"Error searching zip contents: {e}")
+            return {
+                "status": "error",
+                "message": f"Search failed: {e}"
+            }
+    
     async def generate_business_intelligence_report(self, report_config: Dict[str, Any]) -> Dict[str, Any]:
         """Generate comprehensive business intelligence reports from financial data"""
         try:
@@ -643,10 +1042,12 @@ class SophiaPayReadyDomainServer:
             "statistics": {},
             "capabilities": [
                 "Large-scale data processing",
+                "Zip file extraction and analysis",
                 "Financial transaction analysis",
                 "Business intelligence reporting",
                 "Real-time compliance monitoring",
-                "Risk assessment automation"
+                "Risk assessment automation",
+                "Advanced file content search"
             ]
         }
         
@@ -703,7 +1104,20 @@ class SophiaPayReadyDomainServer:
             request_lower = request.lower()
             
             # Determine request type and respond with Sophia's personality
-            if any(word in request_lower for word in ["download", "data", "large", "process", "import"]):
+            if any(word in request_lower for word in ["zip", "extract", "unpack", "archive", "compressed"]):
+                return {
+                    "status": "success",
+                    "message": "📦 Perfect! Zip file extraction and processing is one of my core strengths. I can unpack archives, analyze contents, and make everything searchable across my enterprise databases. What zip file needs processing?",
+                    "suggested_actions": [
+                        "Extract and analyze zip file",
+                        "Search through zip contents",
+                        "Process individual files from archive",
+                        "Generate comprehensive file inventory"
+                    ],
+                    "personality": "archive_processing_specialist"
+                }
+            
+            elif any(word in request_lower for word in ["download", "data", "large", "process", "import"]):
                 return {
                     "status": "success",
                     "message": "💼 Excellent! Large-scale data operations are my specialty. I'll handle this with enterprise-grade efficiency and deliver actionable insights. What data source are we working with?",
@@ -711,7 +1125,7 @@ class SophiaPayReadyDomainServer:
                         "Configure large data download",
                         "Set up batch processing pipeline",
                         "Define data validation rules",
-                        "Schedule automated processing"
+                        "Extract and process zip archives"
                     ],
                     "personality": "efficient_data_specialist"
                 }

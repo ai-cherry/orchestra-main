@@ -150,6 +150,8 @@
       },
       "alwaysAllow": [
         "handle_large_data_download",
+        "handle_zip_file_extraction",
+        "search_zip_contents",
         "process_financial_transaction_batch",
         "generate_business_intelligence_report",
         "search_financial_data",
