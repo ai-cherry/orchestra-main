@@ -7,7 +7,8 @@ endif
 
 .PHONY: dev-start validate service-status start-services stop-services \
     health-check health-monitor wait-for-mcp ai-review-changes \
-    before-ai-coding after-ai-coding restart-services format lint clean-code dev-up dev-down
+    before-ai-coding after-ai-coding restart-services format lint clean-code dev-up dev-down \
+    lambda-setup lambda-status lambda-ssh lambda-destroy lambda-provision
 
 dev-start:
 	bash start_orchestra.sh
@@ -72,3 +73,40 @@ dev-up:
 
 dev-down:
 	cd infra/dev && pulumi destroy --yes | cat
+
+# Lambda Labs targets
+lambda-setup:
+	@echo "🚀 Running Lambda Labs setup..."
+	@./lambda_quick_setup.sh
+
+lambda-status:
+	@echo "📊 Checking Lambda Labs instances..."
+	@if [ -z "$$LAMBDA_TOKEN" ]; then \
+		echo "Error: LAMBDA_TOKEN environment variable not set"; \
+		exit 1; \
+	fi; \
+	curl -s -X GET -H "Authorization: Bearer $$LAMBDA_TOKEN" https://cloud.lambdalabs.com/api/v1/instances | jq '.data[] | {name, id, ip, status}'
+
+lambda-ssh:
+	@echo "🔗 Connecting to Lambda Labs VPS..."
+	@ssh orchestra-dev
+
+lambda-destroy:
+	@echo "🔻 Destroying Lambda Labs VPS..."
+	@if [ -f lambda_instance_info.json ]; then \
+		./lambda_destroy.sh; \
+	else \
+		echo "No instance info found. Run 'make lambda-status' to check existing instances."; \
+	fi
+
+lambda-provision:
+	@echo "🏗️ Provisioning Lambda Labs infrastructure with Pulumi..."
+	@if [ -z "$$LAMBDA_TOKEN" ] || [ -z "$$GITHUB_PAT" ] || [ -z "$$SSH_KEY_ID" ]; then \
+		echo "Error: Required environment variables not set (LAMBDA_TOKEN, GITHUB_PAT, SSH_KEY_ID)"; \
+		exit 1; \
+	fi; \
+	pulumi stack select orchestra-dev || pulumi stack init orchestra-dev; \
+	pulumi config set lambda:api_key "$$LAMBDA_TOKEN" --secret; \
+	pulumi config set lambda:ssh_key_id "$$SSH_KEY_ID"; \
+	pulumi config set github:token "$$GITHUB_PAT" --secret; \
+	pulumi up --yes

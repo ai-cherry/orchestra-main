@@ -1,0 +1,36 @@
+#!/bin/bash
+# Direct Lambda Labs API Commands
+# Copy and paste these commands as needed
+
+# Environment variables (set these before running)
+# export LAMBDA_TOKEN="your-lambda-api-token"
+# export SSH_KEY_NAME="manus-ai-deployment"
+# export SSH_PUBLIC_KEY="your-ssh-public-key"
+# export SSH_KEY_ID="your-ssh-key-id"
+
+echo "Lambda Labs API Commands"
+echo "======================="
+echo ""
+echo "1. List existing SSH keys:"
+echo "curl -s -X GET -H \"Authorization: Bearer \$LAMBDA_TOKEN\" https://cloud.lambdalabs.com/api/v1/ssh-keys | jq ."
+echo ""
+echo "2. Upload SSH key (if needed):"
+echo "curl -s -X POST -H \"Authorization: Bearer \$LAMBDA_TOKEN\" -H \"Content-Type: application/json\" -d '{\"name\":\"'\$SSH_KEY_NAME'\",\"public_key\":\"'\$SSH_PUBLIC_KEY'\"}' https://cloud.lambdalabs.com/api/v1/ssh-keys | jq ."
+echo ""
+echo "3. List available instance types:"
+echo "curl -s -X GET -H \"Authorization: Bearer \$LAMBDA_TOKEN\" https://cloud.lambdalabs.com/api/v1/instance-types | jq '.data[] | select(.regions_with_capacity | length > 0)'"
+echo ""
+echo "4. Create instance (replace SSH_KEY_ID with your actual ID):"
+echo "curl -s -X POST -H \"Authorization: Bearer \$LAMBDA_TOKEN\" -H \"Content-Type: application/json\" -d '{\"instance_type\":\"gpu_1x_a10\",\"region\":\"us-west-1\",\"ssh_key_ids\":[\$SSH_KEY_ID],\"quantity\":1,\"name\":\"orchestra-dev\"}' https://cloud.lambdalabs.com/api/v1/instances | jq ."
+echo ""
+echo "5. List all instances:"
+echo "curl -s -X GET -H \"Authorization: Bearer \$LAMBDA_TOKEN\" https://cloud.lambdalabs.com/api/v1/instances | jq ."
+echo ""
+echo "6. Get specific instance status (replace INSTANCE_ID):"
+echo "curl -s -X GET -H \"Authorization: Bearer \$LAMBDA_TOKEN\" https://cloud.lambdalabs.com/api/v1/instances/INSTANCE_ID | jq ."
+echo ""
+echo "7. Terminate instance (replace INSTANCE_ID):"
+echo "curl -s -X POST -H \"Authorization: Bearer \$LAMBDA_TOKEN\" -H \"Content-Type: application/json\" -d '{\"instance_ids\":[\"INSTANCE_ID\"]}' https://cloud.lambdalabs.com/api/v1/instances/terminate | jq ."
+echo ""
+echo "======================="
+echo "Run any command above by copying and pasting it"

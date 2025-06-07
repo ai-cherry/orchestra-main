@@ -58,4 +58,4 @@ pdbpp==0.11.6
 
 # Infrastructure as Code
 pulumi==3.108.0
-pulumi_lambdalabs==0.4.0
+pulumi-lambdalabs==0.4.0
