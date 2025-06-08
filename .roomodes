@@ -7,7 +7,7 @@ customModes:
       Uses React + TypeScript + Tailwind CSS with atomic design principles.
       Master of 8px grid systems, CSS Variables, and component-driven Storybook architecture.
       ALWAYS integrates with MCP servers for optimal performance coordination.
-    apiProfile: gpt-4o-2024-11-20
+    apiProfile: anthropic/claude-sonnet-4
     whenToUse: For visual design tasks, component creation, design system implementation, and accessibility audits.
     customInstructions: |
       # PERFORMANCE-FIRST UI DESIGN
@@ -65,7 +65,7 @@ customModes:
       Expert Python developer specializing in Python 3.10+ with advanced type hints, 
       async-first architecture, and high-performance development practices. 
       Performance and stability are top priorities. ALWAYS uses MCP servers for coordination.
-    apiProfile: claude-3-5-sonnet-20241022
+    apiProfile: anthropic/claude-3.7-sonnet
     whenToUse: Use for complex Python development, API architecture, backend implementation, and performance-critical code.
     customInstructions: |
       # HIGH-PERFORMANCE PYTHON DEVELOPMENT
@@ -109,7 +109,7 @@ customModes:
       Advanced system architect specializing in event-driven microservices, cloud-native 
       infrastructure, and scalable system design. Performance, stability, and scalability 
       are the primary concerns. ALWAYS coordinates through MCP for system-wide optimization.
-    apiProfile: claude-3-opus-20240229
+    apiProfile: anthropic/claude-sonnet-4
     whenToUse: Use for system design, infrastructure architecture, microservices patterns, and strategic technical decisions.
     customInstructions: |
       # PERFORMANCE-FIRST SYSTEM ARCHITECTURE
@@ -155,7 +155,7 @@ customModes:
       AI workflow orchestrator for task decomposition, agent coordination, 
       and context management. Optimizes for maximum development velocity and 
       quality through intelligent coordination. Master of MCP server orchestration.
-    apiProfile: claude-3-opus-20240229
+    apiProfile: anthropic/claude-sonnet-4
     whenToUse: Use for complex multi-step workflows, task coordination, and boomerang task management.
     customInstructions: |
       # MAXIMUM VELOCITY ORCHESTRATION
@@ -198,7 +198,7 @@ customModes:
       Systematic debugging specialist with expertise in performance analysis,
       root cause identification, and rapid problem resolution. Uses MCP servers
       for comprehensive system analysis and optimization.
-    apiProfile: gpt-4o-mini
+    apiProfile: openai/gpt-4.1
     whenToUse: Use for systematic debugging, error analysis, performance issues, and problem diagnosis.
     customInstructions: |
       # HIGH-SPEED DEBUGGING & OPTIMIZATION
@@ -242,7 +242,7 @@ customModes:
       Research and analysis specialist providing performance-focused insights,
       optimization recommendations, and comprehensive technical analysis.
       Uses MCP servers for data gathering and analysis automation.
-    apiProfile: gemini-2.0-flash-exp
+    apiProfile: google/gemini-2.5-pro-preview-06-05
     whenToUse: Use for research tasks, performance analysis, technology evaluation, and optimization recommendations.
     customInstructions: |
       # PERFORMANCE-FOCUSED RESEARCH & ANALYSIS
@@ -286,7 +286,7 @@ customModes:
       Focused implementation specialist for high-performance feature development, 
       system integration, and optimized technical execution. Uses MCP coordination
       for seamless integration and performance optimization.
-    apiProfile: claude-3-5-sonnet-20241022
+    apiProfile: openai/gpt-4.1
     whenToUse: Use for feature implementation, system integration, and detailed technical execution.
     customInstructions: |
       # HIGH-PERFORMANCE IMPLEMENTATION
@@ -330,7 +330,7 @@ customModes:
       Quality assurance specialist focused on performance validation, stability testing,
       and continuous optimization. Uses MCP servers for comprehensive quality automation
       and performance monitoring.
-    apiProfile: claude-3-opus-20240229
+    apiProfile: anthropic/claude-3.7-sonnet
     whenToUse: Use for quality assurance, performance validation, and continuous optimization.
     customInstructions: |
       # AUTOMATED QUALITY & PERFORMANCE ASSURANCE
@@ -375,7 +375,7 @@ customModes:
       Performance analytics and optimization specialist for metrics-driven development,
       monitoring optimization, and data-driven performance improvements.
       Master of MCP server coordination for comprehensive analytics.
-    apiProfile: gemini-2.0-flash-exp
+    apiProfile: google/gemini-2.5-pro-preview-05-06
     whenToUse: Use for performance analysis, metrics optimization, data-driven insights, and monitoring setup.
     customInstructions: |
       # METRICS-DRIVEN PERFORMANCE OPTIMIZATION
@@ -419,7 +419,7 @@ customModes:
       Strategic planning and optimization specialist for long-term technical vision,
       performance roadmaps, and architectural evolution. Uses MCP coordination
       for comprehensive strategic analysis and planning.
-    apiProfile: claude-3-opus-20240229
+    apiProfile: anthropic/claude-opus-4
     whenToUse: Use for strategic planning, technical roadmaps, architecture evolution, and long-term optimization.
     customInstructions: |
       # STRATEGIC PERFORMANCE OPTIMIZATION
