@@ -1,0 +1,136 @@
+{
+  "api_keys": {
+    "openai": {
+      "status": "\u2705 Valid",
+      "models_available": 26,
+      "key_prefix": "sk-svcacct-zQTWLUH06...",
+      "gpt4o_models": [
+        "gpt-4o-audio-preview-2025-06-03",
+        "gpt-4o-realtime-preview-2025-06-03",
+        "gpt-4o"
+      ]
+    },
+    "openrouter": {
+      "status": "\u2705 Valid",
+      "key_prefix": "sk-or-v1-03b1045b0cf...",
+      "deepseek_available": 24,
+      "claude_available": 25,
+      "deepseek_models": [
+        "deepseek/deepseek-r1-distill-qwen-7b",
+        "deepseek/deepseek-r1-0528-qwen3-8b:free"
+      ],
+      "claude_models": [
+        "anthropic/claude-opus-4",
+        "anthropic/claude-sonnet-4"
+      ]
+    }
+  },
+  "configurations": {
+    "cursor_rules": {
+      "status": "\u2705 Exists",
+      "size_kb": 1.8,
+      "path": ".cursorrules"
+    },
+    "continue_config": {
+      "status": "\u2705 Exists",
+      "size_kb": 7.1,
+      "path": ".continue/config.json"
+    },
+    "roo_main_config": {
+      "status": "\u2705 Exists",
+      "size_kb": 2.0,
+      "path": ".roo/config.json"
+    },
+    "roo_mcp_config": {
+      "status": "\u2705 Exists",
+      "size_kb": 8.6,
+      "path": ".roo/mcp.json"
+    },
+    "patrick_instructions": {
+      "status": "\u2705 Exists",
+      "size_kb": 11.5,
+      "path": "PATRICK_INSTRUCTIONS.md"
+    },
+    "ai_coding_instructions": {
+      "status": "\u2705 Exists",
+      "size_kb": 18.5,
+      "path": "AI_CODING_INSTRUCTIONS.md"
+    },
+    "notion_ai_notes": {
+      "status": "\u2705 Exists",
+      "size_kb": 13.2,
+      "path": "NOTION_AI_NOTES.md"
+    },
+    "roo_modes": {
+      "status": "\u2705 Configured",
+      "total_modes": 10,
+      "detailed_modes": 5,
+      "modes": [
+        "implementation",
+        "architect",
+        "debug",
+        "documentation",
+        "analytics",
+        "research",
+        "orchestrator",
+        "quality",
+        "strategy",
+        "code"
+      ]
+    }
+  },
+  "integrations": {
+    "continue": {
+      "status": "\u2705 Configured",
+      "total_models": 3,
+      "ui_models": 2,
+      "custom_commands": [
+        "ui",
+        "prototype",
+        "persona",
+        "mcp",
+        "review",
+        "admin"
+      ],
+      "context_providers": [
+        "diff",
+        "folder",
+        "codebase",
+        "git",
+        "mcp"
+      ],
+      "ui_gpt4o_ready": true
+    }
+  },
+  "tools": {
+    "roo": {
+      "status": "\u274c Not Installed",
+      "note": "Roo binary not found in PATH"
+    },
+    "mcp_start_mcp_minimal": {
+      "status": "\u2705 Ready",
+      "executable": true
+    },
+    "mcp_start_mcp_servers_working": {
+      "status": "\u2705 Ready",
+      "executable": true
+    },
+    "mcp_check_mcp_status": {
+      "status": "\u2705 Ready",
+      "executable": true
+    },
+    "mcp_stop_mcp_servers": {
+      "status": "\u2705 Ready",
+      "executable": true
+    },
+    "server_mcp_unified_server": {
+      "status": "\u2705 Available",
+      "size_kb": 23.9
+    },
+    "server_mcp_simple_server": {
+      "status": "\u2705 Available",
+      "size_kb": 7.3
+    }
+  },
+  "overall_status": "\ud83d\udfe2 FULLY OPERATIONAL"
+}
