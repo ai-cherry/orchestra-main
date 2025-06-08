@@ -1,0 +1,38 @@
+# Performance optimization for large monorepo
+node_modules/
+dist/
+build/
+.git/
+*.log
+coverage/
+.next/
+.nuxt/
+vendor/
+*.cache
+tmp/
+.env*
+
+# Project-specific large files
+data/
+uploads/
+storage/
+
+# Cloud/Infrastructure artifacts
+terraform.tfstate*
+pulumi.*.yaml
+.pulumi/
+
+# IDE artifacts
+.vscode/
+.idea/
+
+# Language-specific
+__pycache__/
+*.pyc
+target/
+pkg/
+
+# Cleanup artifacts
+.roo/
+.roomodes*
+roo_integration.db
