@@ -14,8 +14,9 @@ from pathlib import Path
 import requests
 from datetime import datetime
 
-# MCP imports (assuming MCP SDK is available)
-from mcp import Server, types
+# MCP imports
+from mcp.server import Server
+from mcp import types
 from mcp.server.models import InitializationOptions
 from mcp.server.stdio import stdio_server
 

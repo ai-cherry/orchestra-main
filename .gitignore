@@ -102,3 +102,5 @@ yarn-debug.log*
 yarn-error.log*
 .npm
 .yarn-integrity
+.env
+# API Keys and secrets

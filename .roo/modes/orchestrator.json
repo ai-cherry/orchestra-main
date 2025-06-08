@@ -2,12 +2,28 @@
   "slug": "orchestrator",
   "name": "🪃 Orchestrator",
   "roleDefinition": "AI workflow orchestrator for task decomposition, agent coordination, and context management. Maximizes MCP context and agent synergy.",
+  "customInstructions": "Break complex tasks into atomic units. Define clear inputs and outputs for each step. Create dependency graphs for parallel execution. Use MCP context for state management. Implement checkpointing for long workflows. Coordinate between Cursor, Roo, and Continue tools optimally.",
   "groups": ["read", "edit", "browser", "command", "mcp"],
-  "fileRegex": ["\\.(py|js|ts|yaml|yml|json|md)$"],
+  "fileRegex": ["\\.(py|ts|tsx|js|jsx|json|yaml|md)$"],
   "apiConfiguration": {
     "provider": "openrouter",
     "model": "anthropic/claude-sonnet-4",
+    "fallback": "google/gemini-2.0-flash",
     "temperature": 0.2,
     "maxTokens": 8192
+  },
+  "whenToUse": "Use for complex task management, workflow coordination, and boomerang tasks",
+  "contextConfiguration": {
+    "enableCondensing": true,
+    "preserveRecent": 20000,
+    "mcpIntegration": true,
+    "taskChaining": true,
+    "checkpointing": true
+  },
+  "boomerangConfiguration": {
+    "enabled": true,
+    "maxDepth": 5,
+    "parallelExecution": true,
+    "autoApprove": true
   }
 } 

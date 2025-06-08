@@ -1,20 +1,31 @@
-# Enhanced Continue Configuration for Orchestra AI Ecosystem
-# Optimized for cross-tool integration with Roo and Cursor
-
 {
   "models": [
     {
-      "title": "UI-GPT-4o (Experimental)",
+      "title": "UI-GPT-4O-Latest",
       "provider": "openai",
       "model": "gpt-4o-2024-11-20",
       "apiKey": "${OPENAI_API_KEY}",
-      "systemMessage": "You are an expert UI/UX developer specializing in React, TypeScript, and Tailwind CSS for the Orchestra AI ecosystem. Focus on creating sophisticated, accessible components for Cherry (life companion), Sophia (business intelligence), and Karen (healthcare) personas.",
+      "systemMessage": "You are an expert UI/UX developer specializing in React, TypeScript, Tailwind CSS, and modern web development for the Orchestra AI ecosystem. Focus on creating clean, accessible, responsive components with excellent user experience. Prioritize: Cherry (red accents), Sophia (blue accents), Karen (green accents) persona-specific design patterns.",
       "contextLength": 128000,
       "completionOptions": {
         "temperature": 0.1,
         "topP": 0.95,
         "presencePenalty": 0.1,
-        "frequencyPenalty": 0.1
+        "frequencyPenalty": 0.1,
+        "maxTokens": 4000
+      }
+    },
+    {
+      "title": "UI-GPT-4O-Fast",
+      "provider": "openai",
+      "model": "gpt-4o-mini",
+      "apiKey": "${OPENAI_API_KEY}",
+      "systemMessage": "You are a rapid UI prototyping assistant for Orchestra AI. Create quick, functional React components with TypeScript and Tailwind CSS. Focus on speed and functionality for rapid iteration.",
+      "contextLength": 128000,
+      "completionOptions": {
+        "temperature": 0.2,
+        "topP": 0.9,
+        "maxTokens": 2000
       }
     },
     {
@@ -26,42 +37,41 @@
       "contextLength": 128000,
       "completionOptions": {
         "temperature": 0.2,
-        "topP": 0.9
-      }
-    },
-    {
-      "title": "GPT-4o Mini (Fast)",
-      "provider": "openai",
-      "model": "gpt-4o-mini",
-      "apiKey": "${OPENAI_API_KEY}",
-      "systemMessage": "You are a fast coding assistant for quick iterations and simple tasks in the Orchestra AI ecosystem.",
-      "contextLength": 128000,
-      "completionOptions": {
-        "temperature": 0.3,
-        "topP": 0.9
+        "topP": 0.9,
+        "maxTokens": 4000
       }
     }
   ],
   "customCommands": [
     {
       "name": "ui",
-      "prompt": "Generate a sophisticated React/TypeScript component for the Orchestra AI ecosystem. Use Tailwind CSS for styling, implement proper TypeScript interfaces, ensure accessibility, and follow the design system for {Cherry: red accents, Sophia: blue accents, Karen: green accents}. Include proper error handling and loading states.",
-      "description": "Generate UI components with UI-GPT-4o"
+      "prompt": "Generate a sophisticated React/TypeScript component for the Orchestra AI ecosystem using gpt-4o-2024-11-20. Use Tailwind CSS for styling, implement proper TypeScript interfaces, ensure accessibility (ARIA labels, keyboard navigation), and follow the design system: Cherry (red-500 accents), Sophia (blue-500 accents), Karen (green-500 accents). Include proper error handling, loading states, and responsive design (mobile-first). Use shadcn/ui components when appropriate.",
+      "description": "Generate UI components with UI-GPT-4O Latest"
+    },
+    {
+      "name": "prototype",
+      "prompt": "Create a rapid prototype React component using gpt-4o-mini for quick iteration. Focus on functional MVP with basic Tailwind styling. Include TypeScript interfaces and basic error handling. Optimize for development speed.",
+      "description": "Rapid prototyping with UI-GPT-4O Fast"
     },
     {
       "name": "persona",
-      "prompt": "Develop features specific to the Orchestra AI personas: Cherry (life companion - personal, wellness, ranch management), Sophia (business intelligence - financial analysis, data processing), or Karen (healthcare - clinical research, medical operations). Consider persona-specific requirements and user experience patterns.",
+      "prompt": "Develop features specific to the Orchestra AI personas using gpt-4o-2024-11-20: Cherry (life companion - personal, wellness, ranch management, warm red theme), Sophia (business intelligence - financial analysis, data processing, professional blue theme), or Karen (healthcare - clinical research, medical operations, clinical green theme). Consider persona-specific UI patterns, data visualization needs, and user experience requirements.",
       "description": "Create persona-specific features and interfaces"
     },
     {
       "name": "mcp",
-      "prompt": "Optimize this code for MCP (Model Context Protocol) integration. Ensure proper async/await patterns, error handling, and integration with the Orchestra MCP servers: enhanced-memory, code-intelligence, git-intelligence, infrastructure-manager, weaviate-direct, web-scraping, cherry-domain, sophia-payready.",
+      "prompt": "Optimize this code for MCP (Model Context Protocol) integration with Orchestra AI servers. Ensure proper async/await patterns, error handling, and integration with: enhanced-memory, code-intelligence, git-intelligence, infrastructure-manager, weaviate-direct, web-scraping, cherry-domain, sophia-payready. Include proper TypeScript types for MCP responses.",
       "description": "Optimize code for MCP server integration"
     },
     {
       "name": "review",
-      "prompt": "Review this code for Orchestra AI ecosystem best practices: Python 3.10 compatibility, type hints, Google-style docstrings, AI-agent friendliness, performance optimization, MCP integration, and persona-specific considerations. Provide specific improvement suggestions.",
+      "prompt": "Review this code for Orchestra AI ecosystem best practices: Python 3.10 compatibility, type hints, Google-style docstrings, AI-agent friendliness, performance optimization, MCP integration, accessibility (WCAG 2.1 AA), responsive design, and persona-specific considerations. Provide specific improvement suggestions with code examples.",
       "description": "Comprehensive code review for Orchestra standards"
+    },
+    {
+      "name": "admin",
+      "prompt": "Generate or improve admin interface components for Orchestra AI using gpt-4o-2024-11-20. Focus on data tables, forms, dashboards, and management interfaces. Include proper TypeScript types, error handling, loading states, and admin-specific UX patterns. Use professional, efficient design.",
+      "description": "Admin interface development"
     }
   ],
   "contextProviders": [
@@ -73,9 +83,10 @@
       "name": "folder",
       "params": {
         "folders": [
+          "admin-interface",
+          "production-api", 
+          "src",
           "core",
-          "admin-interface", 
-          "production-api",
           "docs",
           ".roo",
           ".continue"
@@ -85,8 +96,8 @@
     {
       "name": "codebase",
       "params": {
-        "nRetrieve": 25,
-        "nFinal": 10,
+        "nRetrieve": 30,
+        "nFinal": 15,
         "useReranking": true
       }
     },
@@ -95,10 +106,10 @@
       "params": {}
     },
     {
-      "name": "orchestra-unified",
+      "name": "mcp",
       "params": {
         "serverName": "orchestra-unified",
-        "capabilities": ["context_sharing", "task_routing"]
+        "capabilities": ["context_sharing", "task_routing", "ui_optimization"]
       }
     }
   ],
@@ -118,6 +129,10 @@
     {
       "name": "route",
       "description": "Route task to optimal tool (Cursor/Roo/Continue)"
+    },
+    {
+      "name": "optimize",
+      "description": "Optimize code for performance and UI/UX"
     }
   ],
   "embeddingsProvider": {
@@ -131,13 +146,13 @@
     "name": "cohere",
     "params": {
       "model": "rerank-english-v2.0",
-      "apiKey": "your-cohere-api-key-here"
+      "apiKey": "${COHERE_API_KEY}"
     }
   },
   "tabAutocompleteModel": {
-    "title": "GPT-4o Autocomplete",
+    "title": "UI-Autocomplete",
     "provider": "openai",
-    "model": "gpt-4o",
+    "model": "gpt-4o-mini",
     "apiKey": "${OPENAI_API_KEY}",
     "contextLength": 8192,
     "completionOptions": {
@@ -147,22 +162,37 @@
   },
   "experimental": {
     "modelRoles": {
-      "inlineEdit": "UI-GPT-4o (Experimental)",
-      "applyCodeBlock": "GPT-4o Standard", 
-      "summarize": "GPT-4o Mini (Fast)"
+      "inlineEdit": "UI-GPT-4O-Latest",
+      "applyCodeBlock": "UI-GPT-4O-Latest", 
+      "summarize": "UI-GPT-4O-Fast"
     },
     "contextLength": 200000,
     "useChunking": true,
-    "useTools": true
+    "useTools": true,
+    "enableUIOptimization": true
   },
   "ui": {
     "fontSize": 14,
     "displayRawMarkdown": false,
-    "showChatScrollbar": true
+    "showChatScrollbar": true,
+    "theme": "orchestra"
   },
   "analytics": {
     "enabled": false,
     "url": ""
+  },
+  "apiKeyConfiguration": {
+    "openai": {
+      "required": true,
+      "envVar": "OPENAI_API_KEY",
+      "models": ["gpt-4o-2024-11-20", "gpt-4o", "gpt-4o-mini"],
+      "description": "Required for UI-GPT-4O and all AI development features"
+    },
+    "cohere": {
+      "required": false,
+      "envVar": "COHERE_API_KEY", 
+      "description": "Optional: Improves search result ranking"
+    }
   }
 }
 
