@@ -2,7 +2,7 @@
 name = "orchestra-main"
 version = "0.1.0"
 description = "AI Orchestrator and Modular Agent Framework for GCP"
-authors = ["Your Name <your@email.com>"]
+authors = ["AI Cherry Team <security@ai-cherry.com>"]
 packages = [{include = "orchestra_core", from = "src"}]
 
 [tool.poetry.dependencies]
