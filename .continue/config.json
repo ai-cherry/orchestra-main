@@ -124,7 +124,7 @@
     },
     {
       "name": "share",
-      "description": "Share context with Roo and Cursor via unified MCP"
+      "description": "Share context with Roo and Cursor via unified MCP (100% integrated)"
     },
     {
       "name": "route",
