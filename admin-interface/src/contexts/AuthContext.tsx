@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { ServiceManager } from '../services/ServiceManager';
+import CryptoJS from 'crypto-js';
 
 interface AuthUser {
   id: string;
@@ -19,6 +20,17 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const ENCRYPTION_KEY = process.env.VITE_ENCRYPTION_KEY || 'default-dev-key';
+
+function encrypt(text: string): string {
+  return CryptoJS.AES.encrypt(text, ENCRYPTION_KEY).toString();
+}
+
+function decrypt(cipher: string): string {
+  const bytes = CryptoJS.AES.decrypt(cipher, ENCRYPTION_KEY);
+  return bytes.toString(CryptoJS.enc.Utf8);
+}
+
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
@@ -37,7 +49,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Check for existing session
     const checkAuth = async () => {
       try {
-        const token = localStorage.getItem('auth_token');
+        const token = (() => {
+          const enc = localStorage.getItem('auth_token');
+          return enc ? decrypt(enc) : null;
+        })();
         if (token) {
           // Validate token and get user info
           const userData = await validateToken(token);
@@ -60,7 +75,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       id: 'default-user',
       email: 'admin@cherry-ai.me',
       name: 'Orchestra AI Admin',
-      preferences: JSON.parse(localStorage.getItem('user_preferences') || '{}')
+      preferences: (() => {
+        const enc = localStorage.getItem('user_preferences');
+        return enc ? JSON.parse(decrypt(enc)) : {};
+      })()
     };
   };
 
@@ -70,7 +88,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // For single-user deployment, simple validation
       if (email === 'admin@cherry-ai.me' && password === 'OrchestraAI2024!') {
         const token = 'single-user-token';
-        localStorage.setItem('auth_token', token);
+        localStorage.setItem('auth_token', encrypt(token));
         
         const userData = await validateToken(token);
         setUser(userData);
@@ -96,7 +114,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const updatedUser = { ...user, preferences };
     setUser(updatedUser);
-    localStorage.setItem('user_preferences', JSON.stringify(preferences));
+    localStorage.setItem('user_preferences', encrypt(JSON.stringify(preferences)));
   }, [user]);
 
   const value: AuthContextType = {

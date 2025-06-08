@@ -7,6 +7,10 @@ interface RetryOptions {
   backoffFactor: number;
 }
 
+// Robust API client with retry and rate limiting.
+// NOTE: For single-user, in-memory rate limiter is sufficient. For multi-user or distributed deployments, use a distributed rate limiter (e.g., Redis, Memcached).
+// To upgrade, replace rateLimiter.execute with a distributed implementation.
+
 class APIClient {
   private static instance: APIClient;
   private baseURL: string;

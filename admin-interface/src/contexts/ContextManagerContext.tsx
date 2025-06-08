@@ -1,13 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import ServiceManager from '../services/ServiceManager';
-
-interface ContextData {
-  id: string;
-  content: string;
-  type: 'conversation' | 'search' | 'task' | 'document';
-  timestamp: string;
-  metadata: Record<string, any>;
-}
+import ContextDB, { ContextData } from '../utils/ContextDB';
 
 interface ContextManagerType {
   contexts: ContextData[];
@@ -52,7 +45,7 @@ export const ContextManagerProvider: React.FC<ContextManagerProviderProps> = ({ 
     return () => clearTimeout(timeoutId);
   }, [contexts]);
 
-  const addContext = (content: string, type: ContextData['type'], metadata: Record<string, any> = {}) => {
+  const addContext = async (content: string, type: ContextData['type'], metadata: Record<string, any> = {}) => {
     const newContext: ContextData = {
       id: `context_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       content,
@@ -65,12 +58,9 @@ export const ContextManagerProvider: React.FC<ContextManagerProviderProps> = ({ 
       }
     };
 
-    setContexts(prev => {
-      // Keep only the last 100 contexts to prevent memory issues
-      const updated = [newContext, ...prev].slice(0, 100);
-      return updated;
-    });
-
+    await ContextDB.addContext(newContext);
+    const recent = await ContextDB.getRecentContexts(100);
+    setContexts(recent);
     setCurrentContext(newContext);
   };
 
@@ -122,38 +112,23 @@ export const ContextManagerProvider: React.FC<ContextManagerProviderProps> = ({ 
     return typeSimilarity + contentSimilarity;
   };
 
-  const clearContexts = () => {
+  const clearContexts = async () => {
+    await ContextDB.clearContexts();
     setContexts([]);
     setCurrentContext(null);
-    localStorage.removeItem('orchestra_contexts');
   };
 
-  const persistContext = () => {
-    try {
-      const contextData = {
-        contexts: contexts.slice(0, 50), // Only persist last 50 contexts
-        currentContextId: currentContext?.id || null,
-        timestamp: new Date().toISOString()
-      };
-      localStorage.setItem('orchestra_contexts', JSON.stringify(contextData));
-    } catch (error) {
-      console.error('Failed to persist contexts:', error);
-    }
+  const persistContext = async () => {
+    // No-op: Dexie handles persistence
+    // Optionally, could trigger a backup or sync here
   };
 
-  const loadPersistedContext = () => {
+  const loadPersistedContext = async () => {
     try {
-      const stored = localStorage.getItem('orchestra_contexts');
-      if (stored) {
-        const contextData = JSON.parse(stored);
-        setContexts(contextData.contexts || []);
-        
-        if (contextData.currentContextId) {
-          const current = contextData.contexts.find((c: ContextData) => c.id === contextData.currentContextId);
-          if (current) {
-            setCurrentContext(current);
-          }
-        }
+      const recent = await ContextDB.getRecentContexts(100);
+      setContexts(recent);
+      if (recent.length > 0) {
+        setCurrentContext(recent[0]);
       }
     } catch (error) {
       console.error('Failed to load persisted contexts:', error);
