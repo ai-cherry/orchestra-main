@@ -1,6 +1,24 @@
 #!/usr/bin/env python3
 """
+Weaviate Direct MCP Server
+Provides direct access to Weaviate operations through MCP protocol.
 """
+
+import os
+import logging
+from typing import Optional, List, Dict, Any
+from fastapi import FastAPI, HTTPException, Depends
+from pydantic import BaseModel, Field
+import weaviate
+import weaviate.classes.config as wvc
+import uvicorn
+
+# Import configuration functions
+from legacy.core.config.database_config import (
+    validate_weaviate_config,
+    get_weaviate_client_params
+)
+
 logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO").upper())
 logger = logging.getLogger(__name__)
 
@@ -59,10 +77,7 @@ class HybridSearchRequest(BaseModel):
     limit: int = Field(10, description="Maximum number of results to return.")
     filters: Optional[Dict[str, Any]] = Field(
         None,
-        description="Simple key-value filters for properties (
-            e.g.,
-            {'property': 'value'}
-        ). More complex filters need GraphQL.",
+        description="Simple key-value filters for properties (e.g., {'property': 'value'}). More complex filters need GraphQL.",
     )
     properties_to_return: Optional[List[str]] = Field(
         None, description="Specific properties to return for each object."

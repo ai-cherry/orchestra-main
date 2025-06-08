@@ -544,10 +544,10 @@ async def main():
             InitializationOptions(
                 server_name="orchestra-unified",
                 server_version="2.0.0",
-                capabilities=server_instance.server.get_capabilities(
-                    notification_options=None,
-                    experimental_capabilities={}
-                )
+                            capabilities=server_instance.server.get_capabilities(
+                notification_options=types.NotificationParams(),
+                experimental_capabilities={}
+            )
             )
         )
 
