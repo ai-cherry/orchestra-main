@@ -7,13 +7,7 @@ import { Avatar, AvatarFallback } from '../ui/avatar';
 import { Badge } from '../ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 import { usePersona } from '../../contexts/PersonaContext';
-import PortkeyService from '../../services/portkeyService';
-import SearchService from '../../services/searchService';
-import SlideSpeakService from '../../services/slideSpeakService';
-import ElevenLabsService from '../../services/elevenLabsService';
-import AILearningService from '../../services/aiLearningService';
-import AirbyteCloudService from '../../services/airbyteService';
-import NotionWorkflowService from '../../services/notionWorkflowService';
+import ServiceManager from '../../services/ServiceManager';
 
 interface Message {
   id: string;
@@ -47,14 +41,15 @@ const EnhancedChatInterface: React.FC = () => {
   const inputRef = useRef<HTMLInputElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
 
-  // Services
-  const portkeyService = new PortkeyService();
-  const searchService = new SearchService();
-  const slideSpeakService = new SlideSpeakService();
-  const elevenLabsService = new ElevenLabsService();
-  const aiLearningService = new AILearningService();
-  const airbyteService = new AirbyteCloudService();
-  const notionWorkflowService = new NotionWorkflowService();
+  // Get services from ServiceManager singleton
+  const serviceManager = ServiceManager.getInstance();
+  const portkeyService = serviceManager.getPortkeyService();
+  const searchService = serviceManager.getSearchService();
+  const slideSpeakService = serviceManager.getSlideSpeakService();
+  const elevenLabsService = serviceManager.getElevenLabsService();
+  const aiLearningService = serviceManager.getAILearningService();
+  const airbyteService = serviceManager.getAirbyteService();
+  const notionWorkflowService = serviceManager.getNotionWorkflowService();
 
   useEffect(() => {
     scrollToBottom();

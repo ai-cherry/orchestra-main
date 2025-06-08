@@ -1,28 +1,28 @@
+import APIConfigService from '../config/apiConfig';
+
 class PortkeyService {
-  private apiKey = 'hPxFZGd8AN269n4bznDf2/Onbi8I';
-  private configId = 'pc-portke-b43e56';
-  private baseUrl = 'https://api.portkey.ai/v1/chat/completions';
+  private config = APIConfigService.getInstance().getPortkeyConfig();
 
   async sendMessage(
     message: string,
     persona: 'sophia' | 'karen' | 'cherry',
     context?: any[]
   ): Promise<any> {
-    const config = this.getPersonaConfig(persona);
+    const personaConfig = this.getPersonaConfig(persona);
     
     try {
-      const response = await fetch(this.baseUrl, {
+      const response = await fetch(`${this.config.baseUrl}/chat/completions`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
+          'Authorization': `Bearer ${this.config.apiKey}`,
           'Content-Type': 'application/json',
-          'x-portkey-config': this.configId
+          'x-portkey-config': this.config.configId
         },
         body: JSON.stringify({
-          model: config.model,
-          messages: this.buildMessageHistory(message, context, config.systemPrompt),
-          temperature: config.temperature,
-          max_tokens: config.maxTokens,
+          model: personaConfig.model,
+          messages: this.buildMessageHistory(message, context, personaConfig.systemPrompt),
+          temperature: personaConfig.temperature,
+          max_tokens: personaConfig.maxTokens,
           stream: false
         })
       });
@@ -104,21 +104,21 @@ class PortkeyService {
     context?: any[],
     onChunk?: (chunk: string) => void
   ): Promise<string> {
-    const config = this.getPersonaConfig(persona);
+    const personaConfig = this.getPersonaConfig(persona);
     
     try {
-      const response = await fetch(this.baseUrl, {
+      const response = await fetch(`${this.config.baseUrl}/chat/completions`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
+          'Authorization': `Bearer ${this.config.apiKey}`,
           'Content-Type': 'application/json',
-          'x-portkey-config': this.configId
+          'x-portkey-config': this.config.configId
         },
         body: JSON.stringify({
-          model: config.model,
-          messages: this.buildMessageHistory(message, context, config.systemPrompt),
-          temperature: config.temperature,
-          max_tokens: config.maxTokens,
+          model: personaConfig.model,
+          messages: this.buildMessageHistory(message, context, personaConfig.systemPrompt),
+          temperature: personaConfig.temperature,
+          max_tokens: personaConfig.maxTokens,
           stream: true
         })
       });
