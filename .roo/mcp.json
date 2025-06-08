@@ -1,0 +1,28 @@
+{
+  "servers": {
+    "orchestra-main": {
+      "command": "python",
+      "args": ["mcp_roo_server.py"],
+      "env": {
+        "PYTHONPATH": ".",
+        "MCP_SERVER_PORT": "8000"
+      }
+    },
+    "infrastructure": {
+      "command": "python", 
+      "args": ["mcp_infrastructure_server.py"],
+      "env": {
+        "PYTHONPATH": ".",
+        "MCP_SERVER_PORT": "8001"
+      }
+    },
+    "weaviate": {
+      "command": "python",
+      "args": ["mcp_weaviate_server.py"], 
+      "env": {
+        "PYTHONPATH": ".",
+        "MCP_SERVER_PORT": "8002"
+      }
+    }
+  }
+} 

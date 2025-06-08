@@ -1,0 +1,75 @@
+{
+  "version": "1.0",
+  "projectName": "Orchestra AI - Symphony Project",
+  "description": "Advanced AI orchestration platform with multi-modal capabilities",
+  "defaultMode": "orchestrator",
+  "modes": [
+    "orchestrator",
+    "developer", 
+    "architect",
+    "debugger",
+    "researcher",
+    "implementation",
+    "quality",
+    "analytics",
+    "strategy"
+  ],
+  "mcpServers": [
+    {
+      "name": "orchestra-main",
+      "url": "http://localhost:8000",
+      "description": "Main Orchestra MCP server for project coordination",
+      "capabilities": ["project_context", "workflow_management", "agent_coordination"]
+    },
+    {
+      "name": "infrastructure",
+      "url": "http://localhost:8001", 
+      "description": "Infrastructure management and Lambda Labs deployment",
+      "capabilities": ["deployment", "monitoring", "scaling"]
+    },
+    {
+      "name": "weaviate",
+      "url": "http://localhost:8002",
+      "description": "Vector database and knowledge management",
+      "capabilities": ["vector_search", "knowledge_retrieval", "semantic_analysis"]
+    }
+  ],
+  "apiConfiguration": {
+    "defaultProvider": "openrouter",
+    "providers": {
+      "openrouter": {
+        "baseUrl": "https://openrouter.ai/api/v1",
+        "models": {
+          "claude-sonnet-4": "anthropic/claude-sonnet-4",
+          "deepseek-r1": "deepseek/deepseek-r1", 
+          "gemini-2.5-pro": "google/gemini-2.5-pro",
+          "gemini-2.0-flash": "google/gemini-2.0-flash"
+        }
+      },
+      "anthropic": {
+        "baseUrl": "https://api.anthropic.com/v1",
+        "models": {
+          "claude-sonnet-4": "claude-3-5-sonnet-20241022"
+        }
+      }
+    }
+  },
+  "costOptimization": {
+    "enabled": true,
+    "preferOpenRouter": true,
+    "costSavingsTarget": "60-80%",
+    "smartModelSelection": true
+  },
+  "orchestration": {
+    "boomerangTasks": true,
+    "contextCondensing": true,
+    "workflowManagement": true,
+    "multiStepPlanning": true
+  },
+  "features": {
+    "codeIntelligence": true,
+    "performanceOptimization": true,
+    "qualityAssurance": true,
+    "documentationGeneration": true
+  }
+} 

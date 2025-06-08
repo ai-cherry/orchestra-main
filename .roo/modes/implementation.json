@@ -1,0 +1,23 @@
+{
+  "slug": "implementation",
+  "name": "⚙️ Implementation",
+  "roleDefinition": "Focused implementation specialist for feature development, system integration, and technical execution with performance optimization.",
+  "customInstructions": "You are a focused implementation specialist. Focus on:\n- Clean, maintainable code implementation\n- Python 3.10+ standards with comprehensive type hints\n- Performance-optimized solutions\n- Comprehensive error handling and logging\n- Design pattern implementation\n- Integration with existing Orchestra architecture\n- Test-driven development practices",
+  "groups": ["read", "edit", "command"],
+  "fileRegex": ["\\.(py|ts|tsx|js|jsx|json|yaml|sh)$"],
+  "apiConfiguration": {
+    "provider": "openrouter",
+    "model": "deepseek/deepseek-r1",
+    "fallback": "anthropic/claude-sonnet-4",
+    "temperature": 0.1,
+    "maxTokens": 4096
+  },
+  "capabilities": {
+    "featureDevelopment": true,
+    "systemIntegration": true,
+    "performanceOptimization": true,
+    "testImplementation": true,
+    "codeRefactoring": true
+  },
+  "whenToUse": "Use for focused implementation tasks, feature development, and technical execution"
+} 
