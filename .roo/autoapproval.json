@@ -1,104 +1,117 @@
 {
-  "version": "1.0.0",
-  "description": "Auto-approval rules for multi-modal development workflows",
+  "version": "2.0.0",
+  "description": "Ultra-fast auto-approval for uninterrupted development flow - Performance/Quality priority",
   "globalSettings": {
     "enableAutoApproval": true,
     "requireExplicitApproval": false,
-    "logAllDecisions": true
+    "defaultApprove": true,
+    "logAllDecisions": true,
+    "performancePriority": true,
+    "allowBacktracking": true
   },
+  "philosophy": "Fast, powerful, accurate AI coding with human oversight via review, not interruption",
   "rules": [
     {
-      "id": "python_development",
-      "condition": "mode == '💻 Developer - Python 3.10+' && fileExt in ['.py', '.pyi', '.toml']",
-      "approve": ["edit", "command"],
-      "description": "Auto-approve Python development tasks",
+      "id": "universal_development",
+      "condition": "mode in ['💻 Developer - Python 3.10+', '🎨 UI Designer', '⚙️ Implementation', '🪲 Debugger']",
+      "approve": ["edit", "command", "browser", "mcp"],
+      "description": "Auto-approve all development activities - optimize for speed and quality",
       "constraints": {
-        "maxFileSize": "10KB",
-        "excludePatterns": ["production/*", "*.env*", "*secret*"]
+        "noOneOffScripts": true,
+        "integrateWithExisting": true,
+        "maintainPerformance": true
       }
     },
     {
-      "id": "ui_design",
-      "condition": "mode == '🎨 UI Designer' && fileExt in ['.jsx', '.tsx', '.css', '.scss']",
-      "approve": ["edit", "browser"],
-      "description": "Auto-approve UI/UX design tasks",
-      "constraints": {
-        "maxFileSize": "15KB",
-        "requireTests": false
-      }
-    },
-    {
-      "id": "architecture_review",
+      "id": "architecture_flow",
       "condition": "mode == '🏗 Architect'",
-      "approve": ["read", "mcp"],
-      "requireApproval": ["edit"],
-      "description": "Architecture requires manual approval for edits",
-      "reason": "Critical infrastructure changes need human oversight"
-    },
-    {
-      "id": "test_files",
-      "condition": "fileName contains 'test' || fileName contains 'spec'",
-      "approve": ["edit", "command"],
-      "description": "Auto-approve test file modifications",
+      "approve": ["read", "edit", "mcp", "command"],
+      "description": "Auto-approve architecture changes - human can review afterward",
       "constraints": {
-        "requireCoverage": true
+        "optimizeForPerformance": true,
+        "designForScale": true,
+        "prioritizeStability": true
       }
     },
     {
-      "id": "documentation",
-      "condition": "fileExt in ['.md', '.rst', '.txt'] && !fileName.contains('README')",
-      "approve": ["edit"],
-      "description": "Auto-approve documentation updates except README files"
-    },
-    {
-      "id": "refactoring_safety",
-      "condition": "taskContains('refactor') || taskContains('rename')",
-      "requireApproval": ["edit"],
-      "description": "Refactoring requires manual approval for safety",
-      "reason": "Large-scale changes need human review"
-    },
-    {
-      "id": "production_protection",
-      "condition": "filePath contains 'production' || filePath contains 'prod'",
-      "requireApproval": ["edit", "command"],
-      "description": "Production files require manual approval",
-      "reason": "Production safety critical"
-    },
-    {
-      "id": "security_sensitive",
-      "condition": "fileName contains 'auth' || fileName contains 'security' || fileName contains 'key'",
-      "requireApproval": ["edit"],
-      "description": "Security-related files require manual approval",
-      "reason": "Security implications require human oversight"
-    },
-    {
-      "id": "quality_control",
-      "condition": "mode == '✅ Quality Control'",
-      "approve": ["read", "command"],
-      "requireApproval": ["edit"],
-      "description": "Quality control edits require approval",
-      "reason": "QC changes affect entire codebase"
-    },
-    {
-      "id": "orchestrator_coordination",
+      "id": "orchestrator_autonomy",
       "condition": "mode == '🪃 Orchestrator'",
-      "approve": ["read", "mcp", "browser"],
-      "description": "Auto-approve orchestrator coordination tasks"
+      "approve": ["read", "edit", "command", "browser", "mcp"],
+      "description": "Full autonomy for workflow orchestration - maximum coordination power"
+    },
+    {
+      "id": "quality_automation",
+      "condition": "mode == '✅ Quality Control'",
+      "approve": ["read", "edit", "command", "mcp"],
+      "description": "Auto-approve quality improvements - continuous enhancement focus"
+    },
+    {
+      "id": "research_freedom",
+      "condition": "mode in ['🔍 Researcher', '📊 Analytics', '🧠 Strategist']",
+      "approve": ["read", "edit", "browser", "mcp"],
+      "description": "Full research and analysis capabilities"
+    },
+    {
+      "id": "all_file_types",
+      "condition": "fileExt in ['.py', '.ts', '.tsx', '.js', '.jsx', '.css', '.scss', '.json', '.yaml', '.yml', '.md', '.sql', '.toml']",
+      "approve": ["edit", "command"],
+      "description": "Auto-approve all standard development file types"
+    },
+    {
+      "id": "test_and_docs",
+      "condition": "fileName contains 'test' || fileName contains 'spec' || fileExt in ['.md', '.rst', '.txt']",
+      "approve": ["edit", "command"],
+      "description": "Auto-approve tests and meaningful documentation",
+      "constraints": {
+        "focusOnAICoders": true,
+        "noTrivialDocs": true
+      }
+    },
+    {
+      "id": "mcp_integration_always",
+      "condition": "taskContains('mcp') || taskContains('server') || taskContains('integration')",
+      "approve": ["edit", "command", "mcp"],
+      "description": "Always approve MCP integration work - essential for AI coordination"
+    },
+    {
+      "id": "performance_optimization",
+      "condition": "taskContains('performance') || taskContains('optimize') || taskContains('speed')",
+      "approve": ["edit", "command", "mcp"],
+      "description": "Auto-approve all performance optimization work",
+      "priority": "highest"
     }
   ],
-  "budgetControls": {
-    "enableBudgetLimits": true,
-    "dailyBudget": 50.0,
-    "taskBudget": 5.0,
-    "costAlerts": {
-      "warningThreshold": 0.8,
-      "stopThreshold": 0.95
+  "restrictions": {
+    "preventOneOffScripts": {
+      "enabled": true,
+      "blockPatterns": ["temp_*.py", "quick_*.py", "test_*.py", "script_*.py"],
+      "requireIntegration": true,
+      "suggestAlternatives": true
+    },
+    "documentationStandards": {
+      "aiCoderFocused": true,
+      "blockTrivialDocs": ["README.md", "CHANGELOG.md", "TODO.md"],
+      "requireMeaningful": true,
+      "updateOngoing": true
+    },
+    "mcpRequirement": {
+      "enforceUsage": true,
+      "autoUpdate": true,
+      "integrateInModes": true
     }
   },
+  "performanceSettings": {
+    "prioritizeSpeed": true,
+    "optimizeForQuality": true,
+    "maintainStability": true,
+    "budgetSecondary": true,
+    "securityReasonable": true
+  },
   "auditSettings": {
-    "logPath": ".roo/logs/autoapproval.log",
-    "includeTokenCounts": true,
-    "includeTimestamps": true,
-    "retentionDays": 30
+    "logPath": ".roo/logs/flow.log",
+    "enableBacktracking": true,
+    "summaryAfterAction": true,
+    "humanReviewCapable": true,
+    "retentionDays": 7
   }
 } 

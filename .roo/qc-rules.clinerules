@@ -1,187 +1,277 @@
-# Multi-Model Quality Gate Configuration
-# Implementation of intelligent model selection and validation
+# Performance-First Quality Control Configuration
+# Optimized for speed, quality, and stability - human review via summaries, not interruption
 
 import json
 from typing import Dict, Any, Optional
 from dataclasses import dataclass
 
 @dataclass
-class ModelValidator:
+class ModelPerformanceConfig:
     primary: str
     fallback: Optional[str] = None
-    budget: float = 0.15
-    max_tokens: int = 4096
+    max_tokens: int = 8192
     temperature: float = 0.1
+    priority: str = "performance"
 
-def calculate_task_complexity(task: Dict[str, Any]) -> float:
-    """Calculate task complexity score from 0.0 to 1.0"""
-    complexity_factors = {
-        'file_count': min(task.get('file_count', 1) / 10, 0.3),
-        'line_count': min(task.get('line_count', 100) / 1000, 0.3), 
-        'dependencies': min(len(task.get('dependencies', [])) / 5, 0.2),
-        'security_impact': 0.2 if task.get('involves_security', False) else 0.0,
-        'architecture_change': 0.2 if task.get('changes_architecture', False) else 0.0
-    }
-    return min(sum(complexity_factors.values()), 1.0)
-
-def quality_check(task: Dict[str, Any]) -> ModelValidator:
-    """Select optimal model configuration based on task characteristics"""
+def calculate_performance_profile(task: Dict[str, Any]) -> str:
+    """Determine performance requirements - all optimized for speed and quality"""
     
+    # High-performance modes get premium models
+    if task.get('mode') in ['🎨 UI Designer', '🏗 Architect', '🪃 Orchestrator']:
+        return "premium"
+    
+    # Development modes get balanced high-performance
+    elif task.get('mode') in ['💻 Developer - Python 3.10+', '⚙️ Implementation', '✅ Quality Control']:
+        return "balanced_high"
+    
+    # Research and analysis modes get specialized models
+    elif task.get('mode') in ['🔍 Researcher', '📊 Analytics', '🧠 Strategist']:
+        return "specialized"
+    
+    # Debug mode gets fast, focused models
+    elif task.get('mode') == '🪲 Debugger':
+        return "fast_focused"
+    
+    return "balanced_high"
+
+def get_optimal_model_config(task: Dict[str, Any]) -> ModelPerformanceConfig:
+    """Select optimal model configuration for maximum performance"""
+    
+    performance_profile = calculate_performance_profile(task)
     mode = task.get('mode', '')
-    complexity = calculate_task_complexity(task)
-    budget_preference = task.get('budget_preference', 'medium')
     
-    # UI Designer Mode - High visual understanding required
-    if mode == '🎨 UI Designer':
-        return ModelValidator(
-            primary="gpt4o-ui",
-            fallback="gpt4-turbo",
-            budget=0.20,
-            temperature=0.3
-        )
-    
-    # High complexity tasks - Use most capable models
-    elif complexity > 0.7:
-        return ModelValidator(
-            primary="claude-sonnet", 
-            fallback="deepseek-r1",
-            budget=0.25,
-            temperature=0.1
-        )
-    
-    # Architecture mode - Strategic thinking required
-    elif mode == '🏗 Architect':
-        return ModelValidator(
-            primary="claude-sonnet",
-            fallback="gpt4-turbo", 
-            budget=0.20,
-            temperature=0.7
-        )
-    
-    # Python development - Code generation optimized
-    elif mode == '💻 Developer - Python 3.10+':
-        if complexity > 0.5:
-            return ModelValidator(
-                primary="deepseek-r1",
-                fallback="claude-sonnet",
-                budget=0.15,
-                temperature=0.1
+    # Premium performance configurations
+    if performance_profile == "premium":
+        if mode == '🎨 UI Designer':
+            return ModelPerformanceConfig(
+                primary="gpt41-ui-premium",
+                fallback="claude-opus4", 
+                temperature=0.3,
+                priority="visual_reasoning"
             )
-        else:
-            return ModelValidator(
-                primary="deepseek-r1",
-                fallback="claude-haiku",
-                budget=0.08,
-                temperature=0.1
+        elif mode == '🏗 Architect':
+            return ModelPerformanceConfig(
+                primary="claude-opus4",
+                fallback="claude-sonnet4",
+                temperature=0.1,
+                priority="system_design"
+            )
+        elif mode == '🪃 Orchestrator':
+            return ModelPerformanceConfig(
+                primary="claude-opus4-openrouter",
+                fallback="claude-opus4",
+                temperature=0.2,
+                priority="coordination"
             )
     
-    # Quality Control - Balanced analysis
-    elif mode == '✅ Quality Control':
-        return ModelValidator(
-            primary="claude-sonnet",
-            fallback="gpt4-turbo",
-            budget=0.12,
-            temperature=0.2
+    # Balanced high-performance configurations
+    elif performance_profile == "balanced_high":
+        if mode == '💻 Developer - Python 3.10+':
+            return ModelPerformanceConfig(
+                primary="claude-sonnet4",
+                fallback="gpt41-mini",
+                temperature=0.1,
+                priority="code_generation"
+            )
+        elif mode == '✅ Quality Control':
+            return ModelPerformanceConfig(
+                primary="claude-opus4",
+                fallback="claude-sonnet4",
+                temperature=0.1,
+                priority="quality_analysis"
+            )
+    
+    # Specialized configurations
+    elif performance_profile == "specialized":
+        return ModelPerformanceConfig(
+            primary="gemini-25-pro",
+            fallback="claude-opus4",
+            temperature=0.2,
+            priority="multimodal_analysis"
         )
     
-    # Debug mode - Fast, cost-effective
-    elif mode == '🪲 Debugger':
-        return ModelValidator(
-            primary="claude-haiku",
-            fallback="deepseek-r1", 
-            budget=0.05,
-            temperature=0.1
+    # Fast focused configurations
+    elif performance_profile == "fast_focused":
+        return ModelPerformanceConfig(
+            primary="gpt41-mini",
+            fallback="claude-sonnet4",
+            temperature=0.1,
+            priority="debugging"
         )
     
-    # Default fallback for other modes
-    else:
-        budget_map = {
-            'low': 0.05,
-            'medium': 0.15, 
-            'high': 0.25
-        }
-        
-        return ModelValidator(
-            primary="deepseek-r1",
-            fallback="claude-haiku",
-            budget=budget_map.get(budget_preference, 0.15),
-            temperature=0.2
-        )
+    # Default high-performance
+    return ModelPerformanceConfig(
+        primary="claude-sonnet4",
+        fallback="gpt41-mini",
+        temperature=0.2,
+        priority="general_performance"
+    )
 
-# Quality Gates Configuration
-QUALITY_GATES = {
+# Performance-First Quality Gates - No Approval Requirements
+PERFORMANCE_QUALITY_GATES = {
     'ui_designer': {
-        'required_checks': [
-            'accessibility_compliance',
-            'responsive_design_validation',
-            'component_story_coverage',
-            'design_token_consistency'
+        'auto_checks': [
+            'performance_budget_check',
+            'accessibility_scan',
+            'design_token_validation',
+            'component_optimization'
         ],
-        'performance_thresholds': {
-            'lighthouse_score': 90,
+        'performance_targets': {
+            'bundle_size_limit': '250KB',
+            'lighthouse_performance': 90,
             'accessibility_score': 95,
-            'bundle_size_limit': '250KB'
-        }
+            'core_web_vitals': 'good'
+        },
+        'approval_required': False,
+        'auto_optimize': True
     },
     'python_developer': {
-        'required_checks': [
-            'type_hint_coverage',
-            'test_coverage',
-            'security_scan',
-            'performance_benchmark'
+        'auto_checks': [
+            'performance_profiling',
+            'memory_optimization',
+            'async_pattern_validation',
+            'type_safety_check'
         ],
-        'performance_thresholds': {
-            'test_coverage': 90,
+        'performance_targets': {
+            'execution_time': 'baseline_x2_max',
+            'memory_usage': 'baseline_x1.5_max',
             'type_coverage': 95,
-            'complexity_score': 10
-        }
+            'async_compatibility': True
+        },
+        'approval_required': False,
+        'auto_optimize': True
     },
     'architect': {
-        'required_checks': [
-            'architecture_review',
-            'security_assessment',
-            'scalability_analysis',
-            'cost_impact_review'
+        'auto_checks': [
+            'scalability_assessment',
+            'performance_architecture_review',
+            'stability_analysis',
+            'integration_validation'
         ],
-        'approval_required': True
+        'performance_targets': {
+            'scalability_score': 90,
+            'stability_rating': 'high',
+            'integration_complexity': 'manageable'
+        },
+        'approval_required': False,
+        'continuous_improvement': True
     },
     'quality_control': {
-        'required_checks': [
-            'integration_test_coverage',
-            'e2e_test_coverage', 
-            'security_audit',
-            'performance_regression_test'
+        'auto_checks': [
+            'performance_regression_test',
+            'stability_validation',
+            'integration_health_check',
+            'optimization_opportunities'
         ],
-        'performance_thresholds': {
-            'integration_coverage': 85,
-            'e2e_coverage': 70
-        }
+        'performance_targets': {
+            'regression_tolerance': 5,
+            'stability_uptime': 99.9,
+            'integration_success_rate': 95
+        },
+        'approval_required': False,
+        'auto_remediate': True
     }
 }
 
-# Cost Optimization Rules
-COST_OPTIMIZATION = {
-    'token_efficiency': {
-        'max_context_reuse': 0.7,
-        'compression_threshold': 50000,
-        'smart_truncation': True
+# MCP Integration Requirements - Always Used and Updated
+MCP_INTEGRATION = {
+    'enforcement': {
+        'always_use_mcp': True,
+        'auto_update_servers': True,
+        'integrate_in_all_modes': True,
+        'performance_monitor': True
     },
-    'model_cascading': {
+    'server_priorities': [
+        'orchestra_unified_mcp',
+        'infrastructure_mcp', 
+        'weaviate_mcp',
+        'analytics_mcp'
+    ],
+    'auto_coordination': {
+        'context_sharing': True,
+        'state_synchronization': True,
+        'workflow_optimization': True,
+        'performance_tracking': True
+    }
+}
+
+# Documentation Standards - AI Coder Focused Only
+DOCUMENTATION_STANDARDS = {
+    'ai_coder_focus': {
+        'meaningful_only': True,
+        'block_trivial_docs': True,
+        'update_ongoing': True,
+        'integration_focused': True
+    },
+    'blocked_patterns': [
+        'README.md',
+        'CHANGELOG.md', 
+        'TODO.md',
+        'NOTES.md',
+        'temp_*.md',
+        'quick_*.md'
+    ],
+    'required_patterns': [
+        'architecture_decisions.md',
+        'performance_benchmarks.md',
+        'mcp_integration_guide.md',
+        'ai_coding_patterns.md'
+    ]
+}
+
+# Anti-Pattern Prevention
+ANTI_PATTERNS = {
+    'prevent_one_off_scripts': {
         'enabled': True,
-        'cost_threshold_multiplier': 1.5,
-        'fallback_delay': 2.0
+        'blocked_patterns': [
+            'temp_*.py',
+            'quick_*.py', 
+            'test_script_*.py',
+            'one_time_*.py',
+            'fix_*.py'
+        ],
+        'require_integration': True,
+        'suggest_proper_location': True
     },
-    'budget_alerts': {
-        'daily_limit': 50.0,
-        'task_limit': 5.0,
-        'warning_threshold': 0.8
+    'performance_degradation': {
+        'monitor_continuously': True,
+        'auto_optimize': True,
+        'prevent_regression': True,
+        'alert_on_slowdown': True
+    }
+}
+
+# Performance Optimization Rules
+PERFORMANCE_OPTIMIZATION = {
+    'priority_order': [
+        'performance',
+        'quality', 
+        'stability',
+        'maintainability',
+        'security',
+        'cost'
+    ],
+    'auto_optimization': {
+        'enabled': True,
+        'continuous_monitoring': True,
+        'proactive_improvements': True,
+        'performance_budgets': True
+    },
+    'model_efficiency': {
+        'context_optimization': True,
+        'smart_caching': True,
+        'parallel_processing': True,
+        'load_balancing': True
     }
 }
 
 # Export configuration for roo consumption
-def get_roo_config():
+def get_performance_config():
     return {
-        'quality_check': quality_check,
-        'quality_gates': QUALITY_GATES,
-        'cost_optimization': COST_OPTIMIZATION
+        'model_config': get_optimal_model_config,
+        'quality_gates': PERFORMANCE_QUALITY_GATES,
+        'mcp_integration': MCP_INTEGRATION,
+        'documentation_standards': DOCUMENTATION_STANDARDS,
+        'anti_patterns': ANTI_PATTERNS,
+        'performance_optimization': PERFORMANCE_OPTIMIZATION
     } 
