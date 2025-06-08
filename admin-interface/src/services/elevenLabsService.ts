@@ -1,4 +1,5 @@
 import { ElevenLabsClient } from 'elevenlabs';
+import APIConfigService from '../config/apiConfig';
 
 interface VoiceConfig {
   voiceId: string;
@@ -16,11 +17,11 @@ interface AudioTag {
 
 class ElevenLabsService {
   private client: ElevenLabsClient;
-  private apiKey = 'sk_c6b8e5b5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5'; // User's API key
+  private config = APIConfigService.getInstance().getVoiceConfig().elevenLabs;
 
   constructor() {
     this.client = new ElevenLabsClient({
-      apiKey: this.apiKey
+      apiKey: this.config.apiKey
     });
   }
 

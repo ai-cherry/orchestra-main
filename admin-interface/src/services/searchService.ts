@@ -1,3 +1,5 @@
+import APIConfigService from '../config/apiConfig';
+
 interface SearchResult {
   title: string;
   url: string;
@@ -7,37 +9,8 @@ interface SearchResult {
   timestamp?: string;
 }
 
-interface SearchConfig {
-  brave: { apiKey: string; endpoint: string; };
-  perplexity: { apiKey: string; endpoint: string; };
-  exa: { apiKey: string; endpoint: string; };
-  tavily: { apiKey: string; endpoint: string; };
-  apollo: { apiKey: string; endpoint: string; };
-}
-
 class SearchService {
-  private config: SearchConfig = {
-    brave: {
-      apiKey: 'BSApz0194z7SG6DplmVozl7ttFOi0Eo',
-      endpoint: 'https://api.search.brave.com/res/v1/web/search'
-    },
-    perplexity: {
-      apiKey: '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',
-      endpoint: 'https://api.perplexity.ai/chat/completions'
-    },
-    exa: {
-      apiKey: 'fdf07f38-34ad-44a9-ab6f-74ca2ca90fd4',
-      endpoint: 'https://api.exa.ai/search'
-    },
-    tavily: {
-      apiKey: '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',
-      endpoint: 'https://api.tavily.com/search'
-    },
-    apollo: {
-      apiKey: 'n-I9eHckqmnURzE1Zk82xg',
-      endpoint: 'https://api.apollo.io/v1/mixed_people/search'
-    }
-  };
+  private config = APIConfigService.getInstance().getSearchConfig();
 
   async search(
     query: string,

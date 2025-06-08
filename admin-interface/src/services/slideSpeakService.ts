@@ -1,3 +1,5 @@
+import APIConfigService from '../config/apiConfig';
+
 interface PresentationResult {
   id: string;
   title: string;
@@ -8,8 +10,8 @@ interface PresentationResult {
 }
 
 class SlideSpeakService {
-  private apiKey = 'ed5bef2c-99c4-4509-a835-ef05f71601d5';
-  private endpoint = 'https://api.slidespeak.co/v1/presentations';
+  private config = APIConfigService.getInstance().getPresentationConfig().slideSpeak;
+  private endpoint = `${this.config.baseUrl}/presentations`;
 
   async createPresentation(
     topic: string,
@@ -24,7 +26,7 @@ class SlideSpeakService {
       const response = await fetch(this.endpoint, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
+          'Authorization': `Bearer ${this.config.apiKey}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
@@ -186,7 +188,7 @@ ${this.getPersonaConclusion(persona, topic)}
     try {
       const response = await fetch(`${this.endpoint}/${presentationId}`, {
         headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
+          'Authorization': `Bearer ${this.config.apiKey}`,
           'Content-Type': 'application/json'
         }
       });
@@ -215,7 +217,7 @@ ${this.getPersonaConclusion(persona, topic)}
     try {
       const response = await fetch(this.endpoint, {
         headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
+          'Authorization': `Bearer ${this.config.apiKey}`,
           'Content-Type': 'application/json'
         }
       });
