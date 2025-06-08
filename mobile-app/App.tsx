@@ -1,72 +1,103 @@
 import React from 'react';
+import { StatusBar } from 'expo-status-bar';
+import { SafeAreaView, StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
-// Screens
-import ChatScreen from './src/screens/ChatScreen';
-import DashboardScreen from './src/screens/DashboardScreen';
-import SearchScreen from './src/screens/SearchScreen';
+// Import screens
+import EnhancedDashboardScreen from './src/screens/EnhancedDashboardScreen';
+import EnhancedChatScreen from './src/screens/EnhancedChatScreen';
+import LinearIntegrationScreen from './src/screens/LinearIntegrationScreen';
+import VoiceCommandScreen from './src/screens/VoiceCommandScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
-import PersonaScreen from './src/screens/PersonaScreen';
 
-// Contexts
-import { PersonaProvider } from './src/contexts/PersonaContext';
-import { WebSocketProvider } from './src/contexts/WebSocketContext';
-import { ContextManagerProvider } from './src/contexts/ContextManagerContext';
-
-const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
+const Tab = createBottomTabNavigator();
 
-const MainTabs = () => {
+function TabNavigator() {
   return (
     <Tab.Navigator
-      screenOptions={({ route }) => ({
-        tabBarIcon: ({ focused, color, size }) => {
-          let iconName;
-
-          if (route.name === 'Chat') {
-            iconName = 'chat';
-          } else if (route.name === 'Dashboard') {
-            iconName = 'dashboard';
-          } else if (route.name === 'Search') {
-            iconName = 'search';
-          } else if (route.name === 'Settings') {
-            iconName = 'settings';
-          }
-
-          return <Icon name={iconName} size={size} color={color} />;
+      screenOptions={{
+        tabBarStyle: {
+          backgroundColor: '#1C1C1E',
+          borderTopColor: '#2C2C2E',
+          borderTopWidth: 1,
         },
-        tabBarActiveTintColor: '#3B82F6',
-        tabBarInactiveTintColor: 'gray',
-        headerShown: false,
-      })}
+        tabBarActiveTintColor: '#007AFF',
+        tabBarInactiveTintColor: '#8E8E93',
+        headerStyle: {
+          backgroundColor: '#1C1C1E',
+        },
+        headerTintColor: '#FFFFFF',
+        headerTitleStyle: {
+          fontWeight: 'bold',
+        },
+      }}
     >
-      <Tab.Screen name="Chat" component={ChatScreen} />
-      <Tab.Screen name="Dashboard" component={DashboardScreen} />
-      <Tab.Screen name="Search" component={SearchScreen} />
-      <Tab.Screen name="Settings" component={SettingsScreen} />
+      <Tab.Screen 
+        name="Dashboard" 
+        component={EnhancedDashboardScreen}
+        options={{
+          title: 'Orchestra AI',
+          tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20 }}>🏠</Text>,
+          headerShown: false,
+        }}
+      />
+      <Tab.Screen 
+        name="Chat" 
+        component={EnhancedChatScreen}
+        options={{
+          title: 'AI Chat',
+          tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20 }}>💬</Text>,
+        }}
+      />
+      <Tab.Screen 
+        name="Linear" 
+        component={LinearIntegrationScreen}
+        options={{
+          title: 'Linear',
+          tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20 }}>📋</Text>,
+          headerShown: false,
+        }}
+      />
+      <Tab.Screen 
+        name="Voice" 
+        component={VoiceCommandScreen}
+        options={{
+          title: 'Voice',
+          tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20 }}>🎤</Text>,
+        }}
+      />
+      <Tab.Screen 
+        name="Settings" 
+        component={SettingsScreen}
+        options={{
+          title: 'Settings',
+          tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20 }}>⚙️</Text>,
+        }}
+      />
     </Tab.Navigator>
   );
-};
+}
 
-const App = () => {
+export default function App() {
   return (
-    <PersonaProvider>
-      <WebSocketProvider>
-        <ContextManagerProvider>
-          <NavigationContainer>
-            <Stack.Navigator screenOptions={{ headerShown: false }}>
-              <Stack.Screen name="Main" component={MainTabs} />
-              <Stack.Screen name="Persona" component={PersonaScreen} />
-            </Stack.Navigator>
-          </NavigationContainer>
-        </ContextManagerProvider>
-      </WebSocketProvider>
-    </PersonaProvider>
+    <SafeAreaView style={styles.container}>
+      <NavigationContainer>
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="Main" component={TabNavigator} />
+        </Stack.Navigator>
+      </NavigationContainer>
+      <StatusBar style="light" backgroundColor="#000000" />
+    </SafeAreaView>
   );
-};
+}
 
-export default App;
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#000000',
+  },
+});
 
