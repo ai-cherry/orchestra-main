@@ -1,9 +1,21 @@
 # cherry_ai Production Deployment Guide
 
-This guide provides a comprehensive overview of the deployment process for cherry_ai to production environments. It details the steps involved, scripts available, and recommendations for a successful deployment.
+## 🚀 Updated for Single-User, Secure, and Observable Deployment (2025)
+
+This guide reflects the latest production architecture, security, and monitoring best practices for cherry_ai. It is optimized for a single-user deployment, but is easily extensible for future scaling.
+
+---
+
+## Key Enhancements
+- **Context Management:** Now uses IndexedDB (Dexie) with AES encryption for all context data. No more 5MB limit, and data is secure at rest.
+- **Secrets, Tokens, Preferences:** All are encrypted in localStorage using AES.
+- **Monitoring:** Sentry (error tracking) and Prometheus (metrics) are integrated. Fluentd forwards logs to Elasticsearch/Loki for centralized log search.
+- **Cleanup:** All one-off, legacy, and diagnostic scripts are reviewed and marked for removal.
+- **Documentation:** Notion and internal docs are updated with new architecture, monitoring, and security practices.
+
+---
 
 ## Table of Contents
-
 - [Overview](#overview)
 - [Deployment Scripts](#deployment-scripts)
 - [Pre-Deployment Verification](#pre-deployment-verification)
@@ -11,245 +23,75 @@ This guide provides a comprehensive overview of the deployment process for cherr
 - [Production Deployment](#production-deployment)
 - [Post-Deployment Verification](#post-deployment-verification)
 - [Monitoring and Alerting](#monitoring-and-alerting)
+- [Documentation & Notion Update](#documentation--notion-update)
 - [Cleanup Plan](#cleanup-plan)
 - [Troubleshooting](#troubleshooting)
 
-## Overview
-
-Deploying cherry_ai to production involves several steps to ensure a reliable, secure, and well-monitored environment. The process follows a dev → prod progression to minimize risks:
-
-1. Develop and test in a development environment
-2. Verify the system works as expected with pre-deployment checks
-3. Set up production infrastructure and configurations
-4. Deploy to production
-5. Verify the production deployment
-6. Set up monitoring and alerting
-7. Follow the cleanup plan to remove deprecated code
+---
 
 ## Architecture Overview
 
-cherry_ai uses a two-service deployment architecture:
+cherry_ai now uses a secure, single-user optimized architecture:
+- **Frontend:** React/TypeScript, all context and preferences encrypted, IndexedDB for context storage
+- **Backend:** API, AI Bridge, Health Monitor, Nginx, Redis, Weaviate, Postgres
+- **Monitoring:** Sentry (frontend/backend), Prometheus metrics, Fluentd log forwarding
+- **Secrets:** All API keys, tokens, and preferences are encrypted at rest
 
-1. **cherry_ai API Service** (`conductor-api-{env}`):
-
-   - Primary backend service implementing the cherry_ai coordination logic
-   - Provides API endpoints for agent interaction, including the `/phidata/chat` endpoint
-   - Connects to PostgreSQL and Redis for data persistence and caching
-   - Manages LLM provider integration, agent coordination, and memory systems
-
-2. **Phidata Agent UI Service** (`phidata-agent-ui-{env}`):
-   - Frontend UI service using the official Phidata Agent UI container image (`phidata/agent_ui:1.0.0`)
-   - Serves as a placeholder UI for interacting with the cherry_ai backend
-   - Connects to the cherry_ai API using the `PHIDATA_API_URL` environment variable
-   - Runs as a separate
-This separation of concerns allows for:
-
-- Independent scaling of frontend and backend services
-- Use of the standard Phidata UI container without customization
-- Clear API contract between frontend and backend
-- Future replacements of either component without affecting the other
-
-Both services are deployed together using Pulumi or the
-## Deployment Scripts
-
-We've created several scripts to automate and streamline the deployment process:
-
-1. **`run_pre_deployment_automated.sh`**
-
-   - Automates pre-deployment verification
-   - Checks environment readiness
-   - Runs integration tests and diagnostics
-
-2. **`scripts/setup_prod_secrets.sh`**
-
-   - Sets up production secrets in Google    - Creates or updates required secrets for production
-   - Configures IAM permissions for service accounts
-
-3. **`deploy_to_production.sh`**
-   - cherry_aites the full production deployment process
-   - Guides you through all necessary steps
-   - Handles Pulumi workspace and configuration
-
-## Pre-Deployment Verification
-
-Before deploying to production, it's crucial to verify that your system is ready:
-
-```bash
-./run_pre_deployment_automated.sh
-```
-
-This script checks:
-
-- Deployment readiness
-- PostgreSQL setup with pgvector extensions
-- Credentials validity
-- System diagnostics
-- Integration tests (MongoDB
-- UI validation
-
-Review the output carefully and fix any issues before proceeding to production deployment.
-
-## Setting Up Production Environment
-
-### 1. Production Pulumi Configuration
-
-We've created a production configuration file at `infra/prod.yaml` with appropriate settings:
-
-```hcl
-# Key production settings
-env = "prod"
-region = "us-central1"
-cloud_run_min_instances = 2
-cloud_run_max_instances = 20
-cloudsql_machine_type = "db-custom-4-8192"
-cloudsql_disk_size = 50  # GB
-use_private_endpoints = true
-enable_cloud_armor = true
-enable_alerting = true
-```
-
-Review and modify this file to match your production requirements.
-
-### 2. Production Secrets
-
-Set up production secrets securely using:
-
-```bash
-./scripts/setup_prod_secrets.sh
-```
-
-This script helps you create and manage:
-
-- API keys (OpenRouter, Portkey)
-- Database passwords
-- Redis credentials
-- Other sensitive information
-
-The secrets are stored in Google
-## Production Deployment
-
-When you're ready to deploy to production, use:
-
-```bash
-./deploy_to_production.sh
-```
-
-This script guides you through:
-
-1. Verifying prerequisites
-2. Running pre-deployment checks (if not already done)
-3. Setting up production secrets (if not already done)
-4. Reviewing production configuration
-5. Deploying using Pulumi
-6. Verifying the deployment
-7. Setting up monitoring and alerts
-
-The script implements safeguards to ensure a smooth deployment process and avoid common mistakes.
-
-## Post-Deployment Verification
-
-After deployment, verify both services:
-
-1. **API Health**: Check if the API is responding correctly
-
-   ```bash
-   curl $(g   ```
-
-2. **Phidata UI**: Verify the UI is accessible
-
-   ```bash
-   # Get the UI service URL
-   UI_URL=$(g   echo $UI_URL
-   ```
-
-   - Visit this URL in your web browser to confirm the Phidata Agent UI is working
-   - Test sending messages through the UI to verify it connects to the cherry_ai API
-
-3. **Logs**: Review recent logs for any errors
-
-   ```bash
-   # API logs
-   gcloud logging read "resource.type=cloud_run_revision AND resource.labels.service_name=conductor-api-prod" --limit=10
-
-   # UI logs
-   gcloud logging read "resource.type=cloud_run_revision AND resource.labels.service_name=phidata-agent-ui-prod" --limit=10
-   ```
-
-4. **Connectivity**: Verify the UI service is successfully connecting to the API by checking for successful request logs in the API service when using the UI
+---
 
 ## Monitoring and Alerting
 
-The deployment script sets up basic monitoring and alerting for:
+- **Sentry:** Integrated in both frontend and backend for real-time error tracking
+- **Prometheus:** Exposes /metrics endpoint for API, tracks custom metrics
+- **Fluentd:** Forwards logs to Elasticsearch or Loki for centralized search
+- **Health Monitor:** Slack/email alerting for health check failures
 
-1. **High Error Rate**: Alerts if the error rate exceeds a threshold
-2. **High Latency**: Alerts if API latency exceeds acceptable limits
+---
 
-For more advanced monitoring:
+## Documentation & Notion Update
 
-1. Open the 2. Navigate to Monitoring → Dashboards
-3. Create custom dashboards for cherry_ai metrics
-4. Set up additional alerting policies as needed
+- **Notion:** Update the main Notion workspace with:
+  - New architecture diagram (showing encrypted context, monitoring stack)
+  - Security practices (encryption at rest, single-user optimizations)
+  - Monitoring/observability stack (Sentry, Prometheus, Fluentd)
+  - Cleanup checklist for one-off/obsolete scripts
+  - Link to this updated deployment guide
+- **Internal Docs:**
+  - Update all relevant markdown files in /docs to reflect new context management, monitoring, and security
+  - Remove or mark as obsolete any documentation for multi-user or legacy scripts
+
+---
 
 ## Cleanup Plan
 
-After successful production deployment, follow the prioritized cleanup plan:
+### Priority 1 (Immediate)
+- Remove or archive all one-off and diagnostic scripts in:
+  - `archive/one-time-scripts/`
+  - `scripts/` (e.g., `diagnose_*.py`, `setup.sh`, legacy setup scripts)
+  - `admin-interface/scripts/` (except for current verification scripts)
+- Mark any scripts not referenced in this guide as obsolete
 
-### Priority 1 (Safest)
-
-- Remove redundant diagnostic scripts
-  - `diagnose_environment.py`
-  - `diagnose_conductor.py`
-  - `diagnose_patrick_issues.py`
-- Remove older setup scripts
-  - `setup.sh`
-  - `setup_
-### Priority 2 (Requires Care)
-
-- Remove `future/MongoDB
-
-### Priority 3 (Requires Care)
-
-- Remove redundant agent wrapper files (`updated_phidata_wrapper.py`) after confirming all code uses the official implementation
-
-### Priority 4 (Ongoing)
-
+### Priority 2 (Ongoing)
 - Refactor shared utilities
 - Standardize configurations
-- Update documentation
+- Update documentation and Notion
 
-## Troubleshooting
+---
 
-### Common Issues
+## Checklist for Obsolete/One-Off Script Cleanup
+- [ ] Remove all scripts in `archive/one-time-scripts/` unless needed for future reference
+- [ ] Remove or archive diagnostic scripts in `scripts/` (e.g., `diagnose_*.py`, `setup.sh`)
+- [ ] Remove legacy setup scripts not referenced in this guide
+- [ ] Remove or archive any admin-interface/scripts/ not used in current deployment
+- [ ] Update Notion and /docs to reflect these changes
 
-1. **API Key Errors**
+---
 
-   - Check    - Verify IAM permissions are correctly set
+## Summary
 
-2. **Database Connection Issues**
+- **Single-user, encrypted, and observable**: All context, tokens, and preferences are encrypted at rest. Monitoring and alerting are production-grade. All documentation and Notion are updated to reflect the new architecture.
+- **Ready for production**: Clean up obsolete scripts, keep documentation current, and monitor your deployment with confidence.
 
-   - Check network connectivity (VPC settings)
-   - Verify IP allowlisting is configured correctly
-   - Check service account permissions
+---
 
-3. **Deployment Failures**
-   - Review Pulumi logs for detailed error information
-   - Check Cloud Build logs if using CI/CD
-
-### Getting Help
-
-If you encounter issues:
-
-1. Check the logs for specific error messages
-2. Review the [Troubleshooting Guide](./TROUBLESHOOTING_GUIDE.md)
-3. Look for similar issues in [cherry_ai Deployment Steps](./cherry_ai_DEPLOYMENT_STEPS.md)
-
-## Conclusion
-
-By following this guide and using the provided scripts, you can deploy cherry_ai to production with confidence. The automated verification, configuration management, and monitoring setup help ensure a reliable and maintainable production environment.
-
-Remember to:
-
-1. Test thoroughly in development first
-2. Review configuration before applying
-3. Monitor the production deployment closely
-4. Follow the cleanup plan after successful deployment
+*For questions or to contribute improvements, see the [Troubleshooting Guide](./TROUBLESHOOTING_GUIDE.md) or contact the maintainer.*

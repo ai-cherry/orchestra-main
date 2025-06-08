@@ -342,5 +342,9 @@ class EnhancedLinearService {
   }
 }
 
+// NOTE: For single-user, in-memory cache is sufficient. For multi-user or distributed deployments, replace CacheService with a Redis or distributed cache implementation.
+// TODO: Implement distributed cache (e.g., Redis) for multi-user or serverless scaling scenarios.
+// To swap, replace all cache.get/set/clear calls with async Redis equivalents.
+
 export default EnhancedLinearService;
 

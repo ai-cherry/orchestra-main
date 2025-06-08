@@ -9,6 +9,32 @@ import LinearService from './linearService';
 import GitHubProjectsService from './githubProjectsService';
 import AsanaService from './asanaService';
 import MLService from './mlService';
+import CryptoJS from 'crypto-js';
+
+const ENCRYPTION_KEY = process.env.VITE_ENCRYPTION_KEY || 'default-dev-key';
+
+function encrypt(text: string): string {
+  return CryptoJS.AES.encrypt(text, ENCRYPTION_KEY).toString();
+}
+
+function decrypt(cipher: string): string {
+  const bytes = CryptoJS.AES.decrypt(cipher, ENCRYPTION_KEY);
+  return bytes.toString(CryptoJS.enc.Utf8);
+}
+
+function getUserProjectConfig(): { linearProjectId?: string; asanaProjectId?: string } {
+  const enc = localStorage.getItem('orchestra_project_config');
+  if (!enc) return {};
+  try {
+    return JSON.parse(decrypt(enc));
+  } catch {
+    return {};
+  }
+}
+
+function setUserProjectConfig(config: { linearProjectId?: string; asanaProjectId?: string }) {
+  localStorage.setItem('orchestra_project_config', encrypt(JSON.stringify(config)));
+}
 
 class ServiceManager {
   private static instance: ServiceManager;
@@ -133,14 +159,16 @@ class ServiceManager {
     const asanaService = this.getAsanaService();
 
     try {
-      // Get default project IDs (these would be configured per user)
-      const defaultLinearProjectId = 'default-linear-project';
-      const defaultAsanaProjectId = 'default-asana-project';
+      // Get default project IDs from user config
+      const { linearProjectId, asanaProjectId } = getUserProjectConfig();
+      if (!linearProjectId || !asanaProjectId) {
+        throw new Error('Default project IDs not configured. Please set up your project config.');
+      }
 
       const [linearTask, githubIssue, asanaTask] = await Promise.allSettled([
-        linearService.createIssue(defaultLinearProjectId, title, description),
+        linearService.createIssue(linearProjectId, title, description),
         githubService.createIssue('ai-cherry', 'orchestra-main', title, description),
-        asanaService.createTask(defaultAsanaProjectId, title, description)
+        asanaService.createTask(asanaProjectId, title, description)
       ]);
 
       return {
