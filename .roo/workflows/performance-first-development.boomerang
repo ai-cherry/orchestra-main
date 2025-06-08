@@ -1,0 +1,306 @@
+# Performance-First Development Workflow
+# Ultra-fast, no-friction AI development with MCP coordination
+
+version: "2.0"
+name: "performance_first_development"
+description: "High-velocity development workflow optimized for performance, quality, and stability"
+
+philosophy: |
+  Fast, powerful, accurate AI coding with human oversight via review, not interruption.
+  Performance and quality above all else. MCP coordination mandatory.
+
+# Global Settings - Maximum Performance
+settings:
+  auto_approval: true
+  performance_priority: highest
+  mcp_coordination: mandatory
+  friction_elimination: true
+  continuous_optimization: true
+  human_oversight: summary_only
+
+# Performance-Optimized Task Decomposition
+task_decomposition:
+  orchestrator:
+    mode: "🪃 Orchestrator"
+    model: "claude-opus4-openrouter"
+    responsibility: "Break complex tasks into optimal parallel units"
+    mcp_servers: ["context_mcp", "performance_mcp", "workflow_mcp"]
+    performance_target: "maximum_coordination"
+    
+  analyzer:
+    mode: "📊 Analytics"
+    model: "gemini-25-pro"
+    responsibility: "Performance impact analysis and optimization opportunities"
+    mcp_servers: ["analytics_mcp", "performance_mcp", "monitoring_mcp"]
+    performance_target: "actionable_insights"
+
+# Development Pipeline - Parallel Execution
+development_pipeline:
+  ui_design:
+    mode: "🎨 UI Designer"
+    model: "gpt41-ui-premium"
+    parallel_execution: true
+    performance_requirements:
+      bundle_size: "< 250KB"
+      core_web_vitals: "all_green"
+      accessibility_score: "> 95%"
+    mcp_coordination:
+      - design_mcp: "component_optimization"
+      - performance_mcp: "bundle_analysis"
+      - analytics_mcp: "ux_metrics"
+    auto_optimizations:
+      - responsive_variants
+      - accessibility_attributes
+      - performance_optimizations
+      - design_system_integration
+
+  backend_development:
+    mode: "💻 Developer - Python 3.10+"
+    model: "claude-sonnet4"
+    parallel_execution: true
+    performance_requirements:
+      response_time: "< 100ms"
+      memory_efficiency: "< 10MB increase"
+      async_patterns: "mandatory"
+    mcp_coordination:
+      - code_intelligence_mcp: "ast_analysis"
+      - performance_mcp: "profiling"
+      - database_mcp: "query_optimization"
+    auto_optimizations:
+      - async_conversion
+      - type_hint_generation
+      - performance_monitoring
+      - error_handling_patterns
+
+  architecture_design:
+    mode: "🏗 Architect"
+    model: "claude-opus4"
+    parallel_execution: true
+    performance_requirements:
+      scalability: "10x_current_load"
+      availability: "> 99.9%"
+      response_time: "< 50ms"
+    mcp_coordination:
+      - infrastructure_mcp: "scaling_strategies"
+      - analytics_mcp: "performance_monitoring"
+      - database_mcp: "data_architecture"
+    auto_optimizations:
+      - horizontal_scaling_design
+      - caching_strategies
+      - database_optimization
+      - monitoring_integration
+
+# Quality Assurance - Automated & Continuous
+quality_assurance:
+  performance_validation:
+    mode: "✅ Quality Control"
+    model: "claude-opus4"
+    continuous_execution: true
+    mcp_coordination:
+      - testing_mcp: "automated_test_generation"
+      - performance_mcp: "regression_detection"
+      - monitoring_mcp: "quality_metrics"
+    automated_checks:
+      - performance_regression: "< 5% degradation"
+      - memory_leaks: "zero_tolerance"
+      - type_coverage: "> 95%"
+      - test_coverage: "> 90%"
+      - accessibility: "> 95%"
+    auto_fixes:
+      - performance_optimizations
+      - type_hint_completion
+      - accessibility_improvements
+      - test_generation
+
+  debugging_optimization:
+    mode: "🪲 Debugger"
+    model: "gpt41-mini"
+    trigger: "on_issue_detection"
+    mcp_coordination:
+      - monitoring_mcp: "real_time_data"
+      - log_analysis_mcp: "pattern_detection"
+      - performance_mcp: "bottleneck_identification"
+    performance_focus:
+      - memory_leak_detection
+      - query_performance_analysis
+      - api_response_optimization
+      - cpu_usage_profiling
+    auto_remediation:
+      - performance_fixes
+      - monitoring_improvements
+      - optimization_implementation
+
+# Research & Strategy - Continuous Improvement
+research_strategy:
+  performance_research:
+    mode: "🔍 Researcher"
+    model: "gemini-25-pro"
+    continuous_execution: true
+    mcp_coordination:
+      - analytics_mcp: "performance_data"
+      - web_research_mcp: "optimization_techniques"
+      - benchmark_mcp: "comparative_analysis"
+    focus_areas:
+      - performance_optimization_techniques
+      - technology_stack_improvements
+      - scalability_patterns
+      - industry_performance_trends
+    output: "ai_coder_focused_documentation"
+
+  strategic_planning:
+    mode: "🧠 Strategist"
+    model: "claude-opus4-openrouter"
+    execution: "milestone_based"
+    mcp_coordination:
+      - planning_mcp: "strategic_analysis"
+      - forecast_mcp: "performance_projection"
+      - architecture_mcp: "technical_alignment"
+    performance_focus:
+      - long_term_scalability
+      - technology_evolution
+      - performance_driven_architecture
+      - development_velocity_optimization
+
+# Implementation Coordination - Maximum Velocity
+implementation:
+  feature_development:
+    mode: "⚙️ Implementation"
+    model: "claude-sonnet4"
+    parallel_execution: true
+    mcp_coordination:
+      - code_mcp: "implementation_patterns"
+      - testing_mcp: "automated_test_generation"
+      - performance_mcp: "optimization_during_development"
+    performance_requirements:
+      - optimize_every_line
+      - async_patterns_mandatory
+      - memory_efficient_structures
+      - performance_monitoring_integration
+    auto_implementation:
+      - performance_best_practices
+      - comprehensive_error_handling
+      - automated_test_generation
+      - monitoring_integration
+
+# Anti-Pattern Prevention - Automated Enforcement
+anti_pattern_prevention:
+  script_prevention:
+    trigger: "file_creation_attempt"
+    blocked_patterns:
+      - "temp_*.py"
+      - "quick_*.js"
+      - "test_script_*.py"
+      - "one_time_*.py"
+      - "fix_*.py"
+    action: "redirect_to_proper_integration"
+    alternative_suggestions:
+      - "integrate_into_existing_module"
+      - "create_proper_cli_command"
+      - "add_to_service_class"
+      - "use_mcp_coordination"
+
+  documentation_standards:
+    trigger: "documentation_creation"
+    blocked_patterns:
+      - "README.md"
+      - "CHANGELOG.md"
+      - "TODO.md"
+      - "NOTES.md"
+    required_patterns:
+      - "architecture_decisions.md"
+      - "performance_benchmarks.md"
+      - "mcp_integration_guide.md"
+      - "ai_coding_patterns.md"
+    enforcement: "automatic_redirect"
+
+# Performance Monitoring - Real-Time Optimization
+monitoring:
+  real_time_metrics:
+    mcp_servers: ["monitoring_mcp", "performance_mcp", "analytics_mcp"]
+    metrics:
+      - api_response_times
+      - memory_usage_patterns
+      - database_query_performance
+      - ui_bundle_sizes
+      - core_web_vitals
+      - error_rates
+    alerting:
+      performance_degradation: "auto_optimize"
+      memory_leaks: "auto_fix"
+      slow_queries: "auto_optimize"
+      bundle_size_increase: "auto_optimize"
+
+  continuous_optimization:
+    trigger: "performance_threshold_breach"
+    auto_actions:
+      - rollback_to_baseline
+      - implement_optimization_fixes
+      - update_performance_targets
+      - enhance_monitoring
+    mcp_coordination: "comprehensive_analysis"
+
+# Success Metrics - Performance First
+success_metrics:
+  development_velocity:
+    commits_per_hour: "maximize"
+    feature_completion_time: "minimize"
+    bug_resolution_time: "< 30_minutes"
+    performance_optimization_rate: "continuous"
+
+  quality_performance:
+    performance_regression_rate: "< 1%"
+    system_availability: "> 99.9%"
+    response_time_consistency: "< 5% variance"
+    memory_leak_incidents: "zero"
+
+  ai_coordination:
+    mcp_server_uptime: "> 99.9%"
+    cross_agent_coordination: "> 95% success"
+    context_sharing_efficiency: "optimal"
+    automated_optimization_rate: "maximum"
+
+# Workflow Execution - Ultra-Fast Coordination
+execution_strategy:
+  parallel_processing: "maximum"
+  dependency_optimization: "intelligent"
+  context_sharing: "efficient"
+  mcp_coordination: "seamless"
+  human_interaction: "summary_only"
+  approval_elimination: "complete"
+  performance_priority: "absolute"
+
+# Emergency Response - Automated Recovery
+emergency_protocols:
+  performance_degradation:
+    detection: "real_time_monitoring"
+    response: "auto_rollback_and_optimize"
+    coordination: "mcp_emergency_protocol"
+    human_notification: "summary_after_resolution"
+
+  mcp_server_failure:
+    detection: "health_check_monitoring"
+    response: "auto_restart_and_failover"
+    degraded_operation: "essential_mcp_only"
+    recovery: "automatic_full_restoration"
+
+# Continuous Learning - Performance Evolution
+learning_loop:
+  pattern_recognition:
+    performance_patterns: "auto_identify"
+    optimization_opportunities: "continuous_discovery"
+    efficiency_improvements: "proactive_implementation"
+    
+  knowledge_integration:
+    patrick_patterns: "always_reference"
+    notion_sync: "automatic"
+    ai_coding_evolution: "continuous_update"
+    performance_benchmarks: "ongoing_improvement"
+
+# Final Configuration
+final_state:
+  result: "maximum_velocity_development"
+  human_experience: "oversight_via_summaries"
+  ai_coordination: "seamless_mcp_integration"
+  performance: "industry_leading"
+  quality: "production_ready"
+  satisfaction: "developer_joy_maximized" 
