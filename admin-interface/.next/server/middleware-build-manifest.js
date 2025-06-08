@@ -3,33 +3,34 @@ globalThis.__BUILD_MANIFEST = {
     "static/chunks/polyfills.js"
   ],
   "devFiles": [
-    "static/chunks/fallback/react-refresh.js"
+    "static/chunks/react-refresh.js"
   ],
-  "ampDevFiles": [
-    "static/chunks/fallback/webpack.js",
-    "static/chunks/fallback/amp.js"
-  ],
+  "ampDevFiles": [],
   "lowPriorityFiles": [],
   "rootMainFiles": [
-    "static/chunks/fallback/webpack.js",
-    "static/chunks/fallback/main-app.js"
+    "static/chunks/webpack.js",
+    "static/chunks/main-app.js"
   ],
   "rootMainFilesTree": {},
   "pages": {
     "/_app": [
-      "static/chunks/fallback/webpack.js",
-      "static/chunks/fallback/main.js",
-      "static/chunks/fallback/pages/_app.js"
+      "static/chunks/webpack.js",
+      "static/chunks/main.js",
+      "static/chunks/pages/_app.js"
     ],
     "/_error": [
-      "static/chunks/fallback/webpack.js",
-      "static/chunks/fallback/main.js",
-      "static/chunks/fallback/pages/_error.js"
+      "static/chunks/webpack.js",
+      "static/chunks/main.js",
+      "static/chunks/pages/_error.js"
     ]
   },
   "ampFirstPages": []
 };
 globalThis.__BUILD_MANIFEST.lowPriorityFiles = [
+"/static/" + process.env.__NEXT_BUILD_ID + "/_buildManifest.js",
+,"/static/" + process.env.__NEXT_BUILD_ID + "/_ssgManifest.js",
+
+];ANIFEST.lowPriorityFiles = [
 "/static/" + process.env.__NEXT_BUILD_ID + "/_buildManifest.js",
 ,"/static/" + process.env.__NEXT_BUILD_ID + "/_ssgManifest.js",
 
