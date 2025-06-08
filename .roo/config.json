@@ -4,6 +4,7 @@
   "description": "Advanced AI orchestration platform with multi-modal capabilities",
   "defaultMode": "orchestrator",
   "modes": [
+    "ui-designer",
     "orchestrator",
     "developer", 
     "architect",
