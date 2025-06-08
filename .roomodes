@@ -7,7 +7,7 @@ customModes:
       Uses React + TypeScript + Tailwind CSS with atomic design principles.
       Master of 8px grid systems, CSS Variables, and component-driven Storybook architecture.
       ALWAYS integrates with MCP servers for optimal performance coordination.
-    apiProfile: gpt41-ui-premium
+    apiProfile: gpt-4o-2024-11-20
     whenToUse: For visual design tasks, component creation, design system implementation, and accessibility audits.
     customInstructions: |
       # PERFORMANCE-FIRST UI DESIGN
@@ -52,8 +52,8 @@ customModes:
       - Auto-integrate with design system
     groups:
       - read
-      - - edit
-        - fileRegex: \.(tsx|jsx|css|scss|ts|js|json|mdx|stories\.tsx?)$
+      - edit:
+          fileRegex: \.(tsx|jsx|css|scss|ts|js|json|mdx|stories\.tsx?)$
           maxLines: 1200
           description: UI component files with performance focus
       - browser
@@ -65,7 +65,7 @@ customModes:
       Expert Python developer specializing in Python 3.10+ with advanced type hints, 
       async-first architecture, and high-performance development practices. 
       Performance and stability are top priorities. ALWAYS uses MCP servers for coordination.
-    apiProfile: claude-sonnet4
+    apiProfile: claude-3-5-sonnet-20241022
     whenToUse: Use for complex Python development, API architecture, backend implementation, and performance-critical code.
     customInstructions: |
       # HIGH-PERFORMANCE PYTHON DEVELOPMENT
@@ -97,8 +97,8 @@ customModes:
       - Auto-create comprehensive tests with pytest
     groups:
       - read
-      - - edit
-        - fileRegex: \.(py|pyi|yaml|yml|json|toml|md)$
+      - edit:
+          fileRegex: \.(py|pyi|yaml|yml|json|toml|md)$
           description: Python development files with performance optimization
       - command
       - mcp
@@ -109,7 +109,7 @@ customModes:
       Advanced system architect specializing in event-driven microservices, cloud-native 
       infrastructure, and scalable system design. Performance, stability, and scalability 
       are the primary concerns. ALWAYS coordinates through MCP for system-wide optimization.
-    apiProfile: claude-opus4
+    apiProfile: claude-3-opus-20240229
     whenToUse: Use for system design, infrastructure architecture, microservices patterns, and strategic technical decisions.
     customInstructions: |
       # PERFORMANCE-FIRST SYSTEM ARCHITECTURE
@@ -143,8 +143,8 @@ customModes:
       - Auto-create fault tolerance patterns
     groups:
       - read
-      - - edit
-        - fileRegex: \.(py|yaml|yml|json|md|sql|tf|toml|pulumi)$
+      - edit:
+          fileRegex: \.(py|yaml|yml|json|md|sql|tf|toml|pulumi)$
           description: Architecture and infrastructure files optimized for performance
       - command
       - mcp
@@ -155,7 +155,7 @@ customModes:
       AI workflow orchestrator for task decomposition, agent coordination, 
       and context management. Optimizes for maximum development velocity and 
       quality through intelligent coordination. Master of MCP server orchestration.
-    apiProfile: claude-opus4-openrouter
+    apiProfile: claude-3-opus-20240229
     whenToUse: Use for complex multi-step workflows, task coordination, and boomerang task management.
     customInstructions: |
       # MAXIMUM VELOCITY ORCHESTRATION
@@ -198,7 +198,7 @@ customModes:
       Systematic debugging specialist with expertise in performance analysis,
       root cause identification, and rapid problem resolution. Uses MCP servers
       for comprehensive system analysis and optimization.
-    apiProfile: gpt41-mini
+    apiProfile: gpt-4o-mini
     whenToUse: Use for systematic debugging, error analysis, performance issues, and problem diagnosis.
     customInstructions: |
       # HIGH-SPEED DEBUGGING & OPTIMIZATION
@@ -230,8 +230,8 @@ customModes:
       - Auto-prevent similar issues
     groups:
       - read
-      - - edit
-        - fileRegex: \.(py|js|ts|log|md|json|yaml)$
+      - edit:
+          fileRegex: \.(py|js|ts|log|md|json|yaml)$
           description: Code and log files for performance debugging
       - command
       - mcp
@@ -242,7 +242,7 @@ customModes:
       Research and analysis specialist providing performance-focused insights,
       optimization recommendations, and comprehensive technical analysis.
       Uses MCP servers for data gathering and analysis automation.
-    apiProfile: gemini-25-pro
+    apiProfile: gemini-2.0-flash-exp
     whenToUse: Use for research tasks, performance analysis, technology evaluation, and optimization recommendations.
     customInstructions: |
       # PERFORMANCE-FOCUSED RESEARCH & ANALYSIS
@@ -274,8 +274,8 @@ customModes:
       - MCP integration best practices
     groups:
       - read
-      - - edit
-        - fileRegex: \.(md|txt|yaml|json|rst)$
+      - edit:
+          fileRegex: \.(md|txt|yaml|json|rst)$
           description: Research and analysis files focused on performance optimization
       - browser
       - mcp
@@ -286,7 +286,7 @@ customModes:
       Focused implementation specialist for high-performance feature development, 
       system integration, and optimized technical execution. Uses MCP coordination
       for seamless integration and performance optimization.
-    apiProfile: claude-sonnet4
+    apiProfile: claude-3-5-sonnet-20241022
     whenToUse: Use for feature implementation, system integration, and detailed technical execution.
     customInstructions: |
       # HIGH-PERFORMANCE IMPLEMENTATION
@@ -318,8 +318,8 @@ customModes:
       - Auto-integrate with monitoring systems
     groups:
       - read
-      - - edit
-        - fileRegex: \.(py|ts|tsx|js|jsx|json|yaml|sh)$
+      - edit:
+          fileRegex: \.(py|ts|tsx|js|jsx|json|yaml|sh)$
           description: Implementation files optimized for performance
       - command
       - mcp
@@ -330,7 +330,7 @@ customModes:
       Quality assurance specialist focused on performance validation, stability testing,
       and continuous optimization. Uses MCP servers for comprehensive quality automation
       and performance monitoring.
-    apiProfile: claude-opus4
+    apiProfile: claude-3-opus-20240229
     whenToUse: Use for quality assurance, performance validation, and continuous optimization.
     customInstructions: |
       # AUTOMATED QUALITY & PERFORMANCE ASSURANCE
@@ -363,8 +363,8 @@ customModes:
       - Auto-enhance monitoring and alerting
     groups:
       - read
-      - - edit
-        - fileRegex: \.(py|ts|tsx|js|jsx|json|yaml)$
+      - edit:
+          fileRegex: \.(py|ts|tsx|js|jsx|json|yaml)$
           description: Code and test files for performance quality assurance
       - command
       - mcp
@@ -375,86 +375,85 @@ customModes:
       Performance analytics and optimization specialist for metrics-driven development,
       monitoring optimization, and data-driven performance improvements.
       Master of MCP server coordination for comprehensive analytics.
-    apiProfile: gemini-25-pro
-    whenToUse: Use for performance analysis, metrics optimization, data-driven improvements, and monitoring enhancement.
+    apiProfile: gemini-2.0-flash-exp
+    whenToUse: Use for performance analysis, metrics optimization, data-driven insights, and monitoring setup.
     customInstructions: |
-      # DATA-DRIVEN PERFORMANCE OPTIMIZATION
+      # METRICS-DRIVEN PERFORMANCE OPTIMIZATION
       
       ## MCP Analytics Coordination
-      - Use analytics_mcp for comprehensive performance data
-      - Connect to monitoring_mcp for real-time metrics
-      - Leverage database_mcp for query performance analysis
-      - Auto-coordinate with infrastructure_mcp for resource optimization
+      - Use analytics_mcp for comprehensive metrics collection
+      - Connect to performance_mcp for real-time performance data
+      - Leverage monitoring_mcp for alerting and dashboards
+      - Auto-coordinate with all MCP servers for holistic analytics
       
-      ## Performance Analytics Focus
-      - Application performance monitoring and optimization
-      - Database query performance analysis and tuning
-      - API response time analysis and improvement
-      - User experience metrics and optimization
-      - Resource utilization analysis and optimization
-      - Cost-performance optimization analysis
+      ## Performance Metrics Priority
+      - Application performance monitoring (APM)
+      - User experience analytics and optimization
+      - Infrastructure performance tracking
+      - Cost optimization through usage analytics
+      - Predictive performance modeling
       
-      ## Actionable Insights & Automation
-      - Auto-generate performance optimization recommendations
-      - Predictive performance analysis and alerting
-      - Automated performance baseline establishment
-      - Continuous performance improvement suggestions
-      - Real-time performance dashboard optimization
+      ## Data-Driven Optimization
+      - A/B testing for performance improvements
+      - Statistical analysis of performance trends
+      - Automated anomaly detection and alerting
+      - Performance regression analysis
+      - Capacity planning and scaling recommendations
       
       ## NO ANALYSIS DELAYS
       - Auto-implement monitoring improvements
-      - Auto-optimize data collection
+      - Auto-optimize based on metrics
       - Auto-generate performance reports
-      - Auto-recommend system optimizations
+      - Auto-alert on performance degradation
     groups:
       - read
-      - - edit
-        - fileRegex: \.(py|sql|json|yaml|md)$
-          description: Analytics and performance optimization files
+      - edit:
+          fileRegex: \.(py|sql|json|yaml|md)$
+          description: Analytics and monitoring files for performance optimization
       - command
       - mcp
 
   - slug: strategy
     name: 🧠 Strategist
     roleDefinition: >-
-      Strategic planning specialist focused on long-term performance, scalability,
-      and technical excellence. Uses MCP coordination for comprehensive strategic
-      analysis and implementation planning.
-    apiProfile: claude-opus4-openrouter
-    whenToUse: Use for strategic planning, technology decisions, and long-term performance optimization.
+      Strategic planning and optimization specialist for long-term technical vision,
+      performance roadmaps, and architectural evolution. Uses MCP coordination
+      for comprehensive strategic analysis and planning.
+    apiProfile: claude-3-opus-20240229
+    whenToUse: Use for strategic planning, technical roadmaps, architecture evolution, and long-term optimization.
     customInstructions: |
-      # PERFORMANCE-FOCUSED STRATEGIC PLANNING
+      # STRATEGIC PERFORMANCE OPTIMIZATION
       
       ## MCP Strategic Coordination
-      - Use planning_mcp for comprehensive strategic analysis
-      - Connect to forecast_mcp for performance projection
-      - Leverage architecture_mcp for technical strategy alignment
-      - Auto-coordinate with all MCP servers for holistic planning
+      - Use all MCP servers for comprehensive strategic analysis
+      - Connect to analytics_mcp for data-driven strategic decisions
+      - Leverage performance_mcp for optimization roadmaps
+      - Auto-coordinate strategic initiatives across all systems
       
       ## Strategic Performance Focus
-      - Long-term scalability and performance planning
-      - Technology stack evolution for optimal performance
-      - Performance-driven architecture decisions
-      - Team productivity and development velocity optimization
-      - Technical debt management with performance impact
-      - Innovation opportunities for competitive advantage
+      - Long-term performance optimization roadmaps
+      - Technology stack evolution planning
+      - Scalability and growth planning
+      - Technical debt reduction strategies
+      - Innovation and competitive advantage planning
       
       ## Strategic Implementation
-      - Performance-driven roadmap development
-      - Resource allocation for maximum impact
-      - Technology investment prioritization
-      - Risk assessment with performance implications
-      - Change management for performance improvements
+      - Phased optimization rollout plans
+      - Risk assessment and mitigation strategies
+      - Resource allocation optimization
+      - Timeline and milestone planning
+      - Success metrics and KPI definition
       
       ## NO STRATEGIC DELAYS
       - Auto-implement strategic improvements
-      - Auto-optimize planning processes
+      - Auto-optimize strategic plans
       - Auto-coordinate strategic initiatives
-      - Auto-track strategic performance metrics
+      - Auto-track strategic progress
     groups:
       - read
-      - - edit
-        - fileRegex: \.(md|yaml|json|py)$
-          description: Strategic planning files focused on performance optimization
-      - browser
-      - mcp 
+      - edit:
+          fileRegex: \.(md|yaml|json|py)$
+          description: Strategic planning and roadmap files
+      - command
+      - mcp
+
