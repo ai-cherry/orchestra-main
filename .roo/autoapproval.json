@@ -1,0 +1,104 @@
+{
+  "version": "1.0.0",
+  "description": "Auto-approval rules for multi-modal development workflows",
+  "globalSettings": {
+    "enableAutoApproval": true,
+    "requireExplicitApproval": false,
+    "logAllDecisions": true
+  },
+  "rules": [
+    {
+      "id": "python_development",
+      "condition": "mode == '💻 Developer - Python 3.10+' && fileExt in ['.py', '.pyi', '.toml']",
+      "approve": ["edit", "command"],
+      "description": "Auto-approve Python development tasks",
+      "constraints": {
+        "maxFileSize": "10KB",
+        "excludePatterns": ["production/*", "*.env*", "*secret*"]
+      }
+    },
+    {
+      "id": "ui_design",
+      "condition": "mode == '🎨 UI Designer' && fileExt in ['.jsx', '.tsx', '.css', '.scss']",
+      "approve": ["edit", "browser"],
+      "description": "Auto-approve UI/UX design tasks",
+      "constraints": {
+        "maxFileSize": "15KB",
+        "requireTests": false
+      }
+    },
+    {
+      "id": "architecture_review",
+      "condition": "mode == '🏗 Architect'",
+      "approve": ["read", "mcp"],
+      "requireApproval": ["edit"],
+      "description": "Architecture requires manual approval for edits",
+      "reason": "Critical infrastructure changes need human oversight"
+    },
+    {
+      "id": "test_files",
+      "condition": "fileName contains 'test' || fileName contains 'spec'",
+      "approve": ["edit", "command"],
+      "description": "Auto-approve test file modifications",
+      "constraints": {
+        "requireCoverage": true
+      }
+    },
+    {
+      "id": "documentation",
+      "condition": "fileExt in ['.md', '.rst', '.txt'] && !fileName.contains('README')",
+      "approve": ["edit"],
+      "description": "Auto-approve documentation updates except README files"
+    },
+    {
+      "id": "refactoring_safety",
+      "condition": "taskContains('refactor') || taskContains('rename')",
+      "requireApproval": ["edit"],
+      "description": "Refactoring requires manual approval for safety",
+      "reason": "Large-scale changes need human review"
+    },
+    {
+      "id": "production_protection",
+      "condition": "filePath contains 'production' || filePath contains 'prod'",
+      "requireApproval": ["edit", "command"],
+      "description": "Production files require manual approval",
+      "reason": "Production safety critical"
+    },
+    {
+      "id": "security_sensitive",
+      "condition": "fileName contains 'auth' || fileName contains 'security' || fileName contains 'key'",
+      "requireApproval": ["edit"],
+      "description": "Security-related files require manual approval",
+      "reason": "Security implications require human oversight"
+    },
+    {
+      "id": "quality_control",
+      "condition": "mode == '✅ Quality Control'",
+      "approve": ["read", "command"],
+      "requireApproval": ["edit"],
+      "description": "Quality control edits require approval",
+      "reason": "QC changes affect entire codebase"
+    },
+    {
+      "id": "orchestrator_coordination",
+      "condition": "mode == '🪃 Orchestrator'",
+      "approve": ["read", "mcp", "browser"],
+      "description": "Auto-approve orchestrator coordination tasks"
+    }
+  ],
+  "budgetControls": {
+    "enableBudgetLimits": true,
+    "dailyBudget": 50.0,
+    "taskBudget": 5.0,
+    "costAlerts": {
+      "warningThreshold": 0.8,
+      "stopThreshold": 0.95
+    }
+  },
+  "auditSettings": {
+    "logPath": ".roo/logs/autoapproval.log",
+    "includeTokenCounts": true,
+    "includeTimestamps": true,
+    "retentionDays": 30
+  }
+} 

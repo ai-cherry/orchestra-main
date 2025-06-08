@@ -1,0 +1,136 @@
+{
+  "profiles": [
+    {
+      "name": "gpt41-ui-premium",
+      "provider": "openai",
+      "apiKey": "${OPENAI_API_KEY}",
+      "model": "gpt-4.1",
+      "contextWindow": 128000,
+      "temperature": 0.3,
+      "maxTokens": 4096,
+      "description": "GPT-4.1 for premium UI/UX design with advanced visual reasoning"
+    },
+    {
+      "name": "gpt41-mini",
+      "provider": "openai",
+      "apiKey": "${OPENAI_API_KEY}",
+      "model": "gpt-4.1-mini",
+      "contextWindow": 128000,
+      "temperature": 0.2,
+      "maxTokens": 4096,
+      "description": "GPT-4.1 Mini for cost-effective premium tasks"
+    },
+    {
+      "name": "claude-opus4",
+      "provider": "anthropic",
+      "apiKey": "${ANTHROPIC_API_KEY}",
+      "model": "claude-4-opus",
+      "temperature": 0.1,
+      "maxTokens": 4096,
+      "description": "Claude Opus 4 for most advanced reasoning and complex tasks"
+    },
+    {
+      "name": "claude-sonnet4",
+      "provider": "anthropic",
+      "apiKey": "${ANTHROPIC_API_KEY}",
+      "model": "claude-4-sonnet",
+      "temperature": 0.2,
+      "maxTokens": 4096,
+      "description": "Claude Sonnet 4 for advanced architecture and strategic planning"
+    },
+    {
+      "name": "gemini-25-pro",
+      "provider": "openai-compatible",
+      "baseUrl": "https://generativelanguage.googleapis.com/v1beta",
+      "apiKey": "${GOOGLE_API_KEY}",
+      "model": "gemini-2.5-pro-preview-05-06",
+      "temperature": 0.2,
+      "maxTokens": 4096,
+      "description": "Google Gemini 2.5 Pro for multimodal tasks and analysis"
+    },
+    {
+      "name": "gpt41-openrouter",
+      "provider": "openai-compatible",
+      "baseUrl": "https://openrouter.ai/api/v1",
+      "apiKey": "${OPENROUTER_API_KEY}",
+      "model": "openai/gpt-4.1",
+      "contextWindow": 128000,
+      "temperature": 0.3,
+      "maxTokens": 4096,
+      "description": "GPT-4.1 via OpenRouter for premium UI design tasks"
+    },
+    {
+      "name": "claude-opus4-openrouter",
+      "provider": "openai-compatible",
+      "baseUrl": "https://openrouter.ai/api/v1",
+      "apiKey": "${OPENROUTER_API_KEY}",
+      "model": "anthropic/claude-4-opus",
+      "temperature": 0.1,
+      "maxTokens": 4096,
+      "description": "Claude Opus 4 via OpenRouter for most complex reasoning"
+    },
+    {
+      "name": "claude-sonnet4-openrouter",
+      "provider": "openai-compatible",
+      "baseUrl": "https://openrouter.ai/api/v1",
+      "apiKey": "${OPENROUTER_API_KEY}",
+      "model": "anthropic/claude-4-sonnet",
+      "temperature": 0.2,
+      "maxTokens": 4096,
+      "description": "Claude Sonnet 4 via OpenRouter for advanced tasks"
+    }
+  ],
+  "modelRouting": {
+    "ui-design": {
+      "priority": ["gpt41-ui-premium", "claude-opus4", "gemini-25-pro"],
+      "costLimit": 0.25,
+      "tokenLimit": 4096
+    },
+    "architecture": {
+      "priority": ["claude-opus4", "claude-sonnet4", "gpt41-ui-premium"],
+      "costLimit": 0.30,
+      "tokenLimit": 4096
+    },
+    "implementation": {
+      "priority": ["claude-sonnet4", "gpt41-mini", "gemini-25-pro"],
+      "costLimit": 0.15,
+      "tokenLimit": 4096
+    },
+    "research": {
+      "priority": ["gemini-25-pro", "claude-opus4", "gpt41-ui-premium"],
+      "costLimit": 0.20,
+      "tokenLimit": 4096
+    }
+  },
+  "rateLimits": {
+    "gpt41-ui-premium": {
+      "rpm": 150,
+      "tpm": 60000
+    },
+    "claude-opus4": {
+      "rpm": 100,
+      "tpm": 40000
+    },
+    "claude-sonnet4": {
+      "rpm": 200,
+      "tpm": 50000
+    },
+    "gemini-25-pro": {
+      "rpm": 180,
+      "tpm": 45000
+    }
+  },
+  "costOptimization": {
+    "enableCascading": true,
+    "budgetThresholds": {
+      "low": 0.10,
+      "medium": 0.20,
+      "high": 0.30
+    },
+    "fallbackChain": {
+      "premium": ["claude-opus4", "gpt41-ui-premium", "gemini-25-pro"],
+      "balanced": ["claude-sonnet4", "gpt41-mini"],
+      "economy": ["gpt41-mini"]
+    }
+  }
+}

@@ -1,0 +1,187 @@
+# Multi-Model Quality Gate Configuration
+# Implementation of intelligent model selection and validation
+
+import json
+from typing import Dict, Any, Optional
+from dataclasses import dataclass
+
+@dataclass
+class ModelValidator:
+    primary: str
+    fallback: Optional[str] = None
+    budget: float = 0.15
+    max_tokens: int = 4096
+    temperature: float = 0.1
+
+def calculate_task_complexity(task: Dict[str, Any]) -> float:
+    """Calculate task complexity score from 0.0 to 1.0"""
+    complexity_factors = {
+        'file_count': min(task.get('file_count', 1) / 10, 0.3),
+        'line_count': min(task.get('line_count', 100) / 1000, 0.3), 
+        'dependencies': min(len(task.get('dependencies', [])) / 5, 0.2),
+        'security_impact': 0.2 if task.get('involves_security', False) else 0.0,
+        'architecture_change': 0.2 if task.get('changes_architecture', False) else 0.0
+    }
+    return min(sum(complexity_factors.values()), 1.0)
+
+def quality_check(task: Dict[str, Any]) -> ModelValidator:
+    """Select optimal model configuration based on task characteristics"""
+    
+    mode = task.get('mode', '')
+    complexity = calculate_task_complexity(task)
+    budget_preference = task.get('budget_preference', 'medium')
+    
+    # UI Designer Mode - High visual understanding required
+    if mode == '🎨 UI Designer':
+        return ModelValidator(
+            primary="gpt4o-ui",
+            fallback="gpt4-turbo",
+            budget=0.20,
+            temperature=0.3
+        )
+    
+    # High complexity tasks - Use most capable models
+    elif complexity > 0.7:
+        return ModelValidator(
+            primary="claude-sonnet", 
+            fallback="deepseek-r1",
+            budget=0.25,
+            temperature=0.1
+        )
+    
+    # Architecture mode - Strategic thinking required
+    elif mode == '🏗 Architect':
+        return ModelValidator(
+            primary="claude-sonnet",
+            fallback="gpt4-turbo", 
+            budget=0.20,
+            temperature=0.7
+        )
+    
+    # Python development - Code generation optimized
+    elif mode == '💻 Developer - Python 3.10+':
+        if complexity > 0.5:
+            return ModelValidator(
+                primary="deepseek-r1",
+                fallback="claude-sonnet",
+                budget=0.15,
+                temperature=0.1
+            )
+        else:
+            return ModelValidator(
+                primary="deepseek-r1",
+                fallback="claude-haiku",
+                budget=0.08,
+                temperature=0.1
+            )
+    
+    # Quality Control - Balanced analysis
+    elif mode == '✅ Quality Control':
+        return ModelValidator(
+            primary="claude-sonnet",
+            fallback="gpt4-turbo",
+            budget=0.12,
+            temperature=0.2
+        )
+    
+    # Debug mode - Fast, cost-effective
+    elif mode == '🪲 Debugger':
+        return ModelValidator(
+            primary="claude-haiku",
+            fallback="deepseek-r1", 
+            budget=0.05,
+            temperature=0.1
+        )
+    
+    # Default fallback for other modes
+    else:
+        budget_map = {
+            'low': 0.05,
+            'medium': 0.15, 
+            'high': 0.25
+        }
+        
+        return ModelValidator(
+            primary="deepseek-r1",
+            fallback="claude-haiku",
+            budget=budget_map.get(budget_preference, 0.15),
+            temperature=0.2
+        )
+
+# Quality Gates Configuration
+QUALITY_GATES = {
+    'ui_designer': {
+        'required_checks': [
+            'accessibility_compliance',
+            'responsive_design_validation',
+            'component_story_coverage',
+            'design_token_consistency'
+        ],
+        'performance_thresholds': {
+            'lighthouse_score': 90,
+            'accessibility_score': 95,
+            'bundle_size_limit': '250KB'
+        }
+    },
+    'python_developer': {
+        'required_checks': [
+            'type_hint_coverage',
+            'test_coverage',
+            'security_scan',
+            'performance_benchmark'
+        ],
+        'performance_thresholds': {
+            'test_coverage': 90,
+            'type_coverage': 95,
+            'complexity_score': 10
+        }
+    },
+    'architect': {
+        'required_checks': [
+            'architecture_review',
+            'security_assessment',
+            'scalability_analysis',
+            'cost_impact_review'
+        ],
+        'approval_required': True
+    },
+    'quality_control': {
+        'required_checks': [
+            'integration_test_coverage',
+            'e2e_test_coverage', 
+            'security_audit',
+            'performance_regression_test'
+        ],
+        'performance_thresholds': {
+            'integration_coverage': 85,
+            'e2e_coverage': 70
+        }
+    }
+}
+
+# Cost Optimization Rules
+COST_OPTIMIZATION = {
+    'token_efficiency': {
+        'max_context_reuse': 0.7,
+        'compression_threshold': 50000,
+        'smart_truncation': True
+    },
+    'model_cascading': {
+        'enabled': True,
+        'cost_threshold_multiplier': 1.5,
+        'fallback_delay': 2.0
+    },
+    'budget_alerts': {
+        'daily_limit': 50.0,
+        'task_limit': 5.0,
+        'warning_threshold': 0.8
+    }
+}
+
+# Export configuration for roo consumption
+def get_roo_config():
+    return {
+        'quality_check': quality_check,
+        'quality_gates': QUALITY_GATES,
+        'cost_optimization': COST_OPTIMIZATION
+    } 
