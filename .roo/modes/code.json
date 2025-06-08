@@ -1,13 +1,21 @@
 {
   "slug": "code",
   "name": "💻 Developer",
-  "roleDefinition": "Expert Python/TypeScript developer for coordination, Postgres, Weaviate, and Pulumi. Focuses on modular, AI-friendly, high-performance code.",
+  "roleDefinition": "Expert Python/TypeScript developer for orchestration, Postgres, Weaviate, and Pulumi. Focuses on modular, AI-friendly, high-performance code.",
+  "customInstructions": "Always use Python 3.10 features and syntax (NOT 3.11+). Type hints are mandatory for all functions and methods. Use PEP 484 type annotations. Follow Google-style docstrings. Use Black for formatting, isort for imports. Implement proper error handling with specific exceptions. All code must be MCP-compatible and AI-agent friendly.",
   "groups": ["read", "edit", "command", "mcp"],
-  "fileRegex": ["\\.(py|js|ts|sql|yaml|yml|json|md)$"],
+  "fileRegex": ["\\.(py|ts|tsx|js|jsx|vue|svelte)$", "^(?!.*test).*\\.(py|ts)$", "^src/.*", "^core/.*"],
   "apiConfiguration": {
     "provider": "openrouter",
     "model": "deepseek/deepseek-r1-0528-qwen3-8b:free",
+    "fallback": "anthropic/claude-sonnet-4",
     "temperature": 0.1,
     "maxTokens": 8192
+  },
+  "whenToUse": "Use for implementation, coding, and technical development",
+  "contextConfiguration": {
+    "enableCondensing": true,
+    "preserveRecent": 20000,
+    "mcpIntegration": true
   }
 } 
