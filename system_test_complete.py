@@ -168,28 +168,56 @@ class OrchestralSystemTest:
         """Test Roo installation and availability"""
         print("🤖 Testing Roo Installation...")
         
-        # Check if roo command exists
+        # Check if roo command exists (CLI - not expected)
         try:
             result = subprocess.run(["which", "roo"], capture_output=True, text=True)
             if result.returncode == 0:
                 self.results["tools"]["roo"] = {
-                    "status": "✅ Installed",
-                    "path": result.stdout.strip()
+                    "status": "✅ CLI Installed",
+                    "path": result.stdout.strip(),
+                    "note": "Unexpected CLI installation found"
                 }
             else:
-                self.results["tools"]["roo"] = {"status": "❌ Not Installed", "note": "Roo binary not found in PATH"}
+                self.results["tools"]["roo"] = {
+                    "status": "📋 VS Code Extension Required", 
+                    "note": "Roo Code is a VS Code extension, not a CLI tool",
+                    "installation": "Search 'Roo Code' in VS Code Extensions",
+                    "publisher": "RooCode Inc.",
+                    "configurations_ready": True
+                }
         except Exception as e:
-            self.results["tools"]["roo"] = {"status": "❌ Error", "error": str(e)}
+            self.results["tools"]["roo"] = {
+                "status": "📋 VS Code Extension Required",
+                "note": "Roo Code is a VS Code extension, not a CLI tool",
+                "installation": "Search 'Roo Code' in VS Code Extensions",
+                "publisher": "RooCode Inc.",
+                "configurations_ready": True
+            }
         
-        # Check if it's a VS Code extension or different installation method
-        if self.results["tools"]["roo"]["status"].startswith("❌"):
-            # Check for VS Code extensions directory
-            vscode_extensions = Path.home() / ".vscode" / "extensions"
-            if vscode_extensions.exists():
-                roo_extensions = list(vscode_extensions.glob("*roo*"))
-                if roo_extensions:
-                    self.results["tools"]["roo"]["vscode_extension"] = [str(ext.name) for ext in roo_extensions]
-                    self.results["tools"]["roo"]["note"] = "Might be VS Code extension"
+        # Check if VS Code extensions directory exists (informational)
+        vscode_extensions = Path.home() / ".vscode" / "extensions"
+        if vscode_extensions.exists():
+            roo_extensions = list(vscode_extensions.glob("*roo*"))
+            if roo_extensions:
+                self.results["tools"]["roo"]["vscode_extension_found"] = [str(ext.name) for ext in roo_extensions]
+                self.results["tools"]["roo"]["status"] = "✅ VS Code Extension Installed"
+            else:
+                self.results["tools"]["roo"]["vscode_extension_found"] = False
+        
+        # Check configurations are ready
+        roo_config_files = [
+            ".roo/config.json",
+            ".roo/mcp.json", 
+            ".roo/modes"
+        ]
+        
+        configs_ready = 0
+        for config_file in roo_config_files:
+            if Path(config_file).exists():
+                configs_ready += 1
+        
+        self.results["tools"]["roo"]["configurations_ready"] = configs_ready == len(roo_config_files)
+        self.results["tools"]["roo"]["config_files_found"] = f"{configs_ready}/{len(roo_config_files)}"
         
         return self.results["tools"]["roo"]
     
@@ -312,10 +340,12 @@ class OrchestralSystemTest:
         else:
             print("   2. ⚠️ Configure Continue.dev")
             
-        if self.results["tools"]["roo"]["status"].startswith("❌"):
-            print("   3. ⚠️ Install Roo (may be VS Code extension)")
+        if "VS Code Extension Required" in self.results["tools"]["roo"]["status"]:
+            print("   3. 📋 Install Roo Code VS Code extension (search 'Roo Code' in VS Code)")
+        elif self.results["tools"]["roo"]["status"].startswith("✅"):
+            print("   3. ✅ Roo Code installed - Test specialized modes")
         else:
-            print("   3. ✅ Test Roo modes")
+            print("   3. ⚠️ Check Roo Code installation")
             
         mcp_ready = any("✅" in r["status"] for k, r in self.results["tools"].items() if "server" in k)
         if mcp_ready:
