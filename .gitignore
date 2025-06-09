@@ -73,6 +73,7 @@ nohup.out
 !README.md
 *.md
 !README.md
+!docs/HIGH_LEVEL_ARCHITECTURE.md
 !.roo/**/*.md
 
 # Environment variables
