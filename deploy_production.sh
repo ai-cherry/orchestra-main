@@ -3,14 +3,23 @@
 echo "🚀 DEPLOYING ORCHESTRA AI TO CHERRY-AI.ME"
 echo "=========================================="
 
-# Set environment variables
+# Check for required environment variables
+if [ -z "$PULUMI_CONFIG_PASSPHRASE" ] || \
+   [ -z "$DATABASE_PASSWORD" ] || \
+   [ -z "$REDIS_AUTH_TOKEN" ] || \
+   [ -z "$PINECONE_API_KEY" ] || \
+   [ -z "$WEAVIATE_API_KEY" ]; then
+    echo "❌ Error: Required environment variables are not set."
+    echo "Please set PULUMI_CONFIG_PASSPHRASE, DATABASE_PASSWORD, REDIS_AUTH_TOKEN, PINECONE_API_KEY, and WEAVIATE_API_KEY."
+    exit 1
+fi
+
 export PATH=$PATH:$HOME/.pulumi/bin
-export PULUMI_CONFIG_PASSPHRASE="OrchestraAI2024!"
 
 # Navigate to project root
 cd /tmp/orchestra-main
 
-echo "📋 Step 1: Configuring Pulumi secrets..."
+echo "📋 Step 1: Configuring Pulumi secrets from environment variables..."
 
 # Configure AWS region
 pulumi config set aws:region us-east-1
@@ -19,19 +28,15 @@ pulumi config set aws:region us-east-1
 pulumi config set domain:name cherry-ai.me
 pulumi config set domain:subdomain app
 
-# Configure database secrets
-pulumi config set --secret database:password "OrchestraAI2024!"
-pulumi config set --secret redis:auth_token "RedisAuth2024!"
-
-# Configure API keys as secrets
-pulumi config set --secret redis:user_api_key "S666q3cr9wmzpetc6iud02iqv26774azveodh2pfadrd7pgq8l7"
-pulumi config set --secret redis:account_key "A4mmxx43yms087hucu51sxbau5mi9hmnz6u33k43mpauhof6rz2"
-pulumi config set --secret pinecone:api_key "pcsk_7PHV2G_Mj1rRCwiHZ7YsuuzJcqKch9akzNKXv6mfwDX65DenD8Q72w3Qjh4AmuataTnEDW"
-pulumi config set --secret weaviate:api_key "VMKjGMQUnXQIDiFOciZZOhr7amBfCHMh7hNf"
+# Configure secrets from environment variables
+pulumi config set --secret database:password "$DATABASE_PASSWORD"
+pulumi config set --secret redis:auth_token "$REDIS_AUTH_TOKEN"
+pulumi config set --secret pinecone:api_key "$PINECONE_API_KEY"
+pulumi config set --secret weaviate:api_key "$WEAVIATE_API_KEY"
 
 # Configure Weaviate endpoints
-pulumi config set weaviate:rest_endpoint "w6bigpoxsrwvq7wlgmmdva.c0.us-west3.gcp.weaviate.cloud"
-pulumi config set weaviate:grpc_endpoint "grpc-w6bigpoxsrwvq7wlgmmdva.c0.us-west3.gcp.weaviate.cloud"
+pulumi config set weaviate:rest_endpoint "${WEAVIATE_REST_ENDPOINT:-w6bigpoxsrwvq7wlgmmdva.c0.us-west3.gcp.weaviate.cloud}"
+pulumi config set weaviate:grpc_endpoint "${WEAVIATE_GRPC_ENDPOINT:-grpc-w6bigpoxsrwvq7wlgmmdva.c0.us-west3.gcp.weaviate.cloud}"
 
 echo "✅ Pulumi configuration complete!"
 

@@ -81,6 +81,7 @@ nohup.out
 api_keys.txt
 config/secrets.json
 !.env.example
+!.env.prod.example
 
 # Auto-generated scripts
 auto_setup.sh

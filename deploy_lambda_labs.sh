@@ -70,25 +70,19 @@ git clone https://github.com/ai-cherry/orchestra-main.git
 cd orchestra-main
 
 # Create production environment file
-cat > admin-interface/.env.local << 'ENVEOF'
+cat > admin-interface/.env.local << EOF
 NODE_ENV=production
-DATABASE_URL=postgresql://orchestraadmin:${DB_PASSWORD}@localhost:5432/orchestraai
-REDIS_URL=redis://:${REDIS_PASSWORD}@localhost:6379
+DATABASE_URL=postgresql://orchestraadmin:\${DB_PASSWORD}@localhost:5432/orchestraai
+REDIS_URL=redis://:\${REDIS_PASSWORD}@localhost:6379
 
-# API Keys
-REDIS_USER_API_KEY=S666q3cr9wmzpetc6iud02iqv26774azveodh2pfadrd7pgq8l7
-REDIS_ACCOUNT_KEY=A4mmxx43yms087hucu51sxbau5mi9hmnz6u33k43mpauhof6rz2
-PINECONE_API_KEY=pcsk_7PHV2G_Mj1rRCwiHZ7YsuuzJcqKch9akzNKXv6mfwDX65DenD8Q72w3Qjh4AmuataTnEDW
-WEAVIATE_REST_ENDPOINT=w6bigpoxsrwvq7wlgmmdva.c0.us-west3.gcp.weaviate.cloud
-WEAVIATE_GRPC_ENDPOINT=grpc-w6bigpoxsrwvq7wlgmmdva.c0.us-west3.gcp.weaviate.cloud
-WEAVIATE_API_KEY=VMKjGMQUnXQIDiFOciZZOhr7amBfCHMh7hNf
-
-# GitHub and other service keys (add your actual keys)
-GITHUB_TOKEN=your_github_token_here
-LINEAR_API_KEY=your_linear_key_here
-ASANA_API_KEY=your_asana_key_here
-NOTION_API_KEY=your_notion_key_here
-ENVEOF
+# API Keys from environment variables
+PINECONE_API_KEY=\${PINECONE_API_KEY}
+WEAVIATE_API_KEY=\${WEAVIATE_API_KEY}
+GITHUB_TOKEN=\${GITHUB_TOKEN}
+LINEAR_API_KEY=\${LINEAR_API_KEY}
+ASANA_API_KEY=\${ASANA_API_KEY}
+NOTION_API_KEY=\${NOTION_API_KEY}
+EOF
 
 # Create Docker Compose file
 cat > docker-compose.prod.yml << 'DOCKEREOF'
