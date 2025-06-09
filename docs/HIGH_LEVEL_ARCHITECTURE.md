@@ -48,7 +48,6 @@
 - Session handling and security
 
 ### Deployment Architecture
-- AWS-based production environment
 - Containerized services with Docker
 - Load balancing and auto-scaling
 - Monitoring and logging infrastructure
@@ -205,3 +204,5 @@
 - Multi-modal interaction capabilities
 - Customizable personas for specific domains
 - Enterprise integration options
+
+# All compute is now Lambda Labs, frontend is Vercel, and object storage is MinIO/Backblaze B2.

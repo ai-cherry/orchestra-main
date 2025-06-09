@@ -81,8 +81,8 @@ class PineconeManager:
                         dimension=config["dimension"],
                         metric=config["metric"],
                         spec=ServerlessSpec(
-                            cloud="aws",
-                            region="us-east-1"
+                            cloud="gcp",
+                            region="us-west1"
                         )
                     )
                 else:

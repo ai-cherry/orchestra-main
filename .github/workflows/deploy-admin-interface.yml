@@ -105,8 +105,10 @@ jobs:
     
     - name: Deploy to production
       run: |
-        # Add your deployment commands here
-        # Example: Deploy to Vercel, Netlify, AWS, etc.
+        # Use Vercel CLI or GitHub App for deployment
+        # Example:
+        # - name: Deploy to Vercel
+        #   run: npx vercel --prod --token ${{ secrets.VERCEL_TOKEN }}
         echo "Deploying to production..."
         
         # Example for Vercel:
