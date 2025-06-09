@@ -1,38 +1,21 @@
-# Python virtual environments
+# === TIER 1: CRITICAL EXCLUSIONS (Performance Impact) ===
+# Python virtual environments and dependencies
 venv/
 .venv/
+node_modules/
+.yarn/
+.npm/
 
-# Python cache files
+# Python cache and build artifacts
 __pycache__/
 *.pyc
 *.pyo
-
-# Python build artifacts
 build/
 dist/
 *.egg-info/
 *.egg
 
-# Test reports and caches
-htmlcov/
-.pytest_cache/
-.coverage
-nosetests.xml
-coverage.xml
-
-# IDE/editor specific configurations (general ones)
-# .vscode/ # Keep if used for shared project settings (e.g., launch.json, extensions.json for the project)
-           # Add specific files/folders inside .vscode/ if some are workspace-specific and others user-specific
-.idea/
-
-# OS-specific files
-.DS_Store
-Thumbs.db
-
-# Large data files, model checkpoints, media files
-# Be more specific if you have known locations for these
-data/large_files/
-models/checkpoints/
+# Large binary files and media (> 10MB impact)
 *.bin
 *.pt
 *.pth
@@ -52,11 +35,43 @@ models/checkpoints/
 *.gz
 *.rar
 *.7z
-*.ipynb_checkpoints/
+*.whl
 
-# Log files
-*.log
-logs/
+# === TIER 2: DEVELOPMENT ARTIFACTS ===
+# Test reports and caches
+htmlcov/
+.pytest_cache/
+.coverage
+nosetests.xml
+coverage.xml
+*.test.js
+*.spec.js
+test-results/
+playwright-report/
+
+# IDE/editor specific (keep shared configs)
+.idea/
+*.swp
+*.swo
+*~
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+.directory
+
+# === TIER 3: CLOUD AND INFRASTRUCTURE ===
+# Cloud provider artifacts
+.pulumi/
+.terraform/
+terraform.tfstate*
+.aws/
+.gcp/
+
+# Docker and container artifacts
+.docker/
+*.dockerfile
+docker-compose.override.yml
 
 # Secrets files (if accidentally committed outside .env or designated secret management)
 # Add specific credential file names if you know them and they shouldn't be indexed

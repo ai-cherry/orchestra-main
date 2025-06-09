@@ -1,1 +1,0 @@
-"""API endpoints module for Cherry AI."""

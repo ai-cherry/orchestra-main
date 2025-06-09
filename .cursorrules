@@ -1,9 +1,11 @@
 # Cursor IDE Quick Reference - Project Symphony
 
-## Tool Boundaries
+## Tool Boundaries & Context Intelligence
 - **Use Cursor for**: Quick edits, single-file operations, immediate code generation
 - **Use Roo for**: Architecture, complex workflows, multi-step tasks, research
-- **Shared standards**: Defined in .cursor/rules/ directory
+- **Hierarchical rules**: Auto-activated based on file context (.cursor/rules/)
+- **MCP integration**: Pulumi, Sequential Thinking, GitHub, Filesystem servers active
+- **Templates**: Use .cursor/templates.md for context-aware prompting
 
 ## Essential Coding Standards
 - **Python 3.10 only** (NOT 3.11+)

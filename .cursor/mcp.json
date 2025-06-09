@@ -5,35 +5,61 @@
       "command": "npx",
       "args": ["@pulumi/mcp-server"],
       "priority": "critical",
-      "description": "Infrastructure as Code acceleration"
+      "description": "Infrastructure as Code acceleration",
+      "timeout": 30000
     },
     "sequential_thinking": {
       "type": "stdio",
       "command": "npx",
       "args": ["@modelcontextprotocol/server-sequential-thinking"],
-      "priority": "high",
-      "description": "Complex task breakdown and workflow management"
+      "priority": "critical",
+      "description": "Complex task breakdown and workflow management",
+      "timeout": 30000
     },
     "github": {
       "type": "stdio",
       "command": "npx",
       "args": ["@modelcontextprotocol/server-github"],
       "priority": "high",
-      "description": "CI/CD integration and repository management"
+      "description": "CI/CD integration and repository management",
+      "timeout": 20000
     },
     "filesystem": {
       "type": "stdio",
       "command": "npx",
       "args": ["@modelcontextprotocol/server-filesystem"],
+      "priority": "high",
+      "description": "Advanced file operations for monorepo navigation",
+      "timeout": 15000
+    },
+    "brave_search": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["@modelcontextprotocol/server-brave-search"],
       "priority": "medium",
-      "description": "Advanced file operations"
+      "description": "Real-time documentation and research",
+      "timeout": 10000
     },
     "puppeteer": {
       "type": "stdio",
       "command": "npx",
       "args": ["@modelcontextprotocol/server-puppeteer"],
       "priority": "medium",
-      "description": "Browser automation and testing"
+      "description": "Browser automation and testing",
+      "timeout": 25000
+    },
+    "memory": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["@modelcontextprotocol/server-memory"],
+      "priority": "medium",
+      "description": "Persistent context and session management",
+      "timeout": 10000
     }
+  },
+  "globalSettings": {
+    "maxConcurrentServers": 5,
+    "retryAttempts": 3,
+    "healthCheckInterval": 60000
   }
 }

@@ -90,5 +90,8 @@
       "@tailwindcss/oxide",
       "esbuild"
     ]
+  },
+  "engines": {
+    "node": "18.x"
   }
 }
