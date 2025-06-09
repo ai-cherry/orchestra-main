@@ -10,10 +10,10 @@ The Reliability Droid specializes in deployment, monitoring, and infrastructure 
 - **Incident Response**: Provides runbooks and automated remediation
 - **Capacity Planning**: Analyzes and predicts resource needs
 
-## Integration with Roo
+## Integration with 
 - Maps to: `deployment_server.py`
 - Context sharing: Infrastructure state, deployment history, metrics
-- Fallback: Roo's deployment tools handle requests if Factory AI is unavailable
+- Fallback: 's deployment tools handle requests if Factory AI is unavailable
 
 ## Request Format
 ```json

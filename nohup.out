@@ -71,19 +71,14 @@ system_prompt
   Field required [type=missing, input_value={'name': 'Cherry', 'descr...e, 'style': 'creative'}}, input_type=dict]
     For further information visit https://errors.pydantic.dev/2.11/v/missing
 Traceback (most recent call last):
-  File "/root/orchestra-main/core/orchestrator/src/main.py", line 96, in lifespan
     persona_configs = load_persona_configs()
                       ^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/core/orchestrator/src/config/loader.py", line 62, in wrapper
     return cached_func(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/core/orchestrator/src/config/loader.py", line 143, in load_persona_configs
     return create_default_persona_configs()
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/core/orchestrator/src/config/loader.py", line 200, in create_default_persona_configs
     persona_configs["cherry"] = PersonaConfig(**cherry_config)
                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/pydantic/main.py", line 253, in __init__
     validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 pydantic_core._pydantic_core.ValidationError: 3 validation errors for PersonaConfig
@@ -114,11 +109,8 @@ system_prompt
 2025-06-02 10:00:19 - core.orchestrator.src.agents.simplified_agent_registry - INFO - Registered agent type: llm_agent
 2025-06-02 10:00:19 - core.orchestrator.src.main - ERROR - Failed to register default agents: 'PersonaAwareAgent' object has no attribute 'agent_type'
 Traceback (most recent call last):
-  File "/root/orchestra-main/core/orchestrator/src/main.py", line 132, in lifespan
     register_default_agents()
-  File "/root/orchestra-main/core/orchestrator/src/agents/simplified_agent_registry.py", line 255, in register_default_agents
     registry.register_agent(persona_agent)
-  File "/root/orchestra-main/core/orchestrator/src/agents/simplified_agent_registry.py", line 56, in register_agent
     agent_type = agent.agent_type
                  ^^^^^^^^^^^^^^^^
 AttributeError: 'PersonaAwareAgent' object has no attribute 'agent_type'
@@ -127,119 +119,75 @@ INFO:     Application startup complete.
 INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
 2025-06-02 10:00:21 - core.orchestrator.src.utils.error_handling - ERROR - DependencyError: Memory manager components are not available | Context: function=get_memory_manager
 Traceback (most recent call last):
-  File "/root/orchestra-main/core/orchestrator/src/utils/error_handling.py", line 177, in async_wrapper
     return await func(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/core/orchestrator/src/api/dependencies/memory.py", line 180, in get_memory_manager
     raise DependencyError("Memory manager components are not available")
 core.orchestrator.src.exceptions.DependencyError: Memory manager components are not available
 2025-06-02 10:00:21 - core.orchestrator.src.utils.error_handling - WARNING - Failed to log error to monitoring: No module named 'opentelemetry.exporter.cloud_trace'
 INFO:     127.0.0.1:60220 - "GET /api/health HTTP/1.1" 500 Internal Server Error
 ERROR:    Exception in ASGI application
 Traceback (most recent call last):
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/uvicorn/protocols/http/httptools_impl.py", line 411, in run_asgi
     result = await app(  # type: ignore[func-returns-value]
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/uvicorn/middleware/proxy_headers.py", line 69, in __call__
     return await self.app(scope, receive, send)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/fastapi/applications.py", line 1054, in __call__
     await super().__call__(scope, receive, send)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/applications.py", line 112, in __call__
     await self.middleware_stack(scope, receive, send)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 187, in __call__
     raise exc
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 165, in __call__
     await self.app(scope, receive, _send)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 85, in __call__
     await self.app(scope, receive, send)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
     raise exc
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
     await app(scope, receive, sender)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/routing.py", line 714, in __call__
     await self.middleware_stack(scope, receive, send)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/routing.py", line 734, in app
     await route.handle(scope, receive, send)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/routing.py", line 288, in handle
     await self.app(scope, receive, send)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/routing.py", line 76, in app
     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
     raise exc
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
     await app(scope, receive, sender)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/routing.py", line 73, in app
     response = await f(request)
                ^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/fastapi/routing.py", line 291, in app
     solved_result = await solve_dependencies(
                     ^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/fastapi/dependencies/utils.py", line 638, in solve_dependencies
     solved = await call(**solved_result.values)
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/core/orchestrator/src/api/dependencies/cache.py", line 94, in get_redis_cache
     _redis_cache = create_redis_cache(settings)
                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 TypeError: unhashable type: 'Settings'
 2025-06-02 10:01:20 - core.orchestrator.src.utils.error_handling - ERROR - DependencyError: Memory manager components are not available | Context: function=get_memory_manager
 Traceback (most recent call last):
-  File "/root/orchestra-main/core/orchestrator/src/utils/error_handling.py", line 177, in async_wrapper
     return await func(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/core/orchestrator/src/api/dependencies/memory.py", line 180, in get_memory_manager
     raise DependencyError("Memory manager components are not available")
 core.orchestrator.src.exceptions.DependencyError: Memory manager components are not available
 2025-06-02 10:01:20 - core.orchestrator.src.utils.error_handling - WARNING - Failed to log error to monitoring: No module named 'opentelemetry.exporter.cloud_trace'
 INFO:     127.0.0.1:34054 - "GET /api/health HTTP/1.1" 500 Internal Server Error
 ERROR:    Exception in ASGI application
 Traceback (most recent call last):
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/uvicorn/protocols/http/httptools_impl.py", line 411, in run_asgi
     result = await app(  # type: ignore[func-returns-value]
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/uvicorn/middleware/proxy_headers.py", line 69, in __call__
     return await self.app(scope, receive, send)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/fastapi/applications.py", line 1054, in __call__
     await super().__call__(scope, receive, send)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/applications.py", line 112, in __call__
     await self.middleware_stack(scope, receive, send)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 187, in __call__
     raise exc
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 165, in __call__
     await self.app(scope, receive, _send)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 85, in __call__
     await self.app(scope, receive, send)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
     raise exc
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
     await app(scope, receive, sender)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/routing.py", line 714, in __call__
     await self.middleware_stack(scope, receive, send)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/routing.py", line 734, in app
     await route.handle(scope, receive, send)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/routing.py", line 288, in handle
     await self.app(scope, receive, send)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/routing.py", line 76, in app
     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
     raise exc
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
     await app(scope, receive, sender)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/routing.py", line 73, in app
     response = await f(request)
                ^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/fastapi/routing.py", line 291, in app
     solved_result = await solve_dependencies(
                     ^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/fastapi/dependencies/utils.py", line 638, in solve_dependencies
     solved = await call(**solved_result.values)
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/core/orchestrator/src/api/dependencies/cache.py", line 94, in get_redis_cache
     _redis_cache = create_redis_cache(settings)
                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 TypeError: unhashable type: 'Settings'
@@ -248,60 +196,38 @@ INFO:     127.0.0.1:56680 - "GET /health HTTP/1.1" 404 Not Found
 INFO:     127.0.0.1:60024 - "GET /health HTTP/1.1" 404 Not Found
 2025-06-02 10:06:42 - core.orchestrator.src.utils.error_handling - ERROR - DependencyError: Memory manager components are not available | Context: function=get_memory_manager
 Traceback (most recent call last):
-  File "/root/orchestra-main/core/orchestrator/src/utils/error_handling.py", line 177, in async_wrapper
     return await func(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/core/orchestrator/src/api/dependencies/memory.py", line 180, in get_memory_manager
     raise DependencyError("Memory manager components are not available")
 core.orchestrator.src.exceptions.DependencyError: Memory manager components are not available
 2025-06-02 10:06:42 - core.orchestrator.src.utils.error_handling - WARNING - Failed to log error to monitoring: No module named 'opentelemetry.exporter.cloud_trace'
 INFO:     127.0.0.1:40336 - "GET /api/health HTTP/1.1" 500 Internal Server Error
 ERROR:    Exception in ASGI application
 Traceback (most recent call last):
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/uvicorn/protocols/http/httptools_impl.py", line 411, in run_asgi
     result = await app(  # type: ignore[func-returns-value]
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/uvicorn/middleware/proxy_headers.py", line 69, in __call__
     return await self.app(scope, receive, send)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/fastapi/applications.py", line 1054, in __call__
     await super().__call__(scope, receive, send)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/applications.py", line 112, in __call__
     await self.middleware_stack(scope, receive, send)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 187, in __call__
     raise exc
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 165, in __call__
     await self.app(scope, receive, _send)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 85, in __call__
     await self.app(scope, receive, send)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
     raise exc
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
     await app(scope, receive, sender)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/routing.py", line 714, in __call__
     await self.middleware_stack(scope, receive, send)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/routing.py", line 734, in app
     await route.handle(scope, receive, send)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/routing.py", line 288, in handle
     await self.app(scope, receive, send)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/routing.py", line 76, in app
     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
     raise exc
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
     await app(scope, receive, sender)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/routing.py", line 73, in app
     response = await f(request)
                ^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/fastapi/routing.py", line 291, in app
     solved_result = await solve_dependencies(
                     ^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/fastapi/dependencies/utils.py", line 638, in solve_dependencies
     solved = await call(**solved_result.values)
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/core/orchestrator/src/api/dependencies/cache.py", line 94, in get_redis_cache
     _redis_cache = create_redis_cache(settings)
                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 TypeError: unhashable type: 'Settings'
@@ -385,19 +311,14 @@ system_prompt
   Field required [type=missing, input_value={'name': 'Cherry', 'descr...e, 'style': 'creative'}}, input_type=dict]
     For further information visit https://errors.pydantic.dev/2.11/v/missing
 Traceback (most recent call last):
-  File "/root/orchestra-main/core/orchestrator/src/main.py", line 96, in lifespan
     persona_configs = load_persona_configs()
                       ^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/core/orchestrator/src/config/loader.py", line 62, in wrapper
     return cached_func(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/core/orchestrator/src/config/loader.py", line 143, in load_persona_configs
     return create_default_persona_configs()
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/core/orchestrator/src/config/loader.py", line 200, in create_default_persona_configs
     persona_configs["cherry"] = PersonaConfig(**cherry_config)
                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/pydantic/main.py", line 253, in __init__
     validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 pydantic_core._pydantic_core.ValidationError: 3 validation errors for PersonaConfig
@@ -428,11 +349,8 @@ system_prompt
 2025-06-02 10:07:39 - core.orchestrator.src.agents.simplified_agent_registry - INFO - Registered agent type: llm_agent
 2025-06-02 10:07:39 - core.orchestrator.src.main - ERROR - Failed to register default agents: 'PersonaAwareAgent' object has no attribute 'agent_type'
 Traceback (most recent call last):
-  File "/root/orchestra-main/core/orchestrator/src/main.py", line 132, in lifespan
     register_default_agents()
-  File "/root/orchestra-main/core/orchestrator/src/agents/simplified_agent_registry.py", line 255, in register_default_agents
     registry.register_agent(persona_agent)
-  File "/root/orchestra-main/core/orchestrator/src/agents/simplified_agent_registry.py", line 56, in register_agent
     agent_type = agent.agent_type
                  ^^^^^^^^^^^^^^^^
 AttributeError: 'PersonaAwareAgent' object has no attribute 'agent_type'
@@ -441,63 +359,40 @@ INFO:     Application startup complete.
 INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
 2025-06-02 10:07:48 - core.orchestrator.src.utils.error_handling - ERROR - DependencyError: Memory manager components are not available | Context: function=get_memory_manager
 Traceback (most recent call last):
-  File "/root/orchestra-main/core/orchestrator/src/utils/error_handling.py", line 177, in async_wrapper
     return await func(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/core/orchestrator/src/api/dependencies/memory.py", line 180, in get_memory_manager
     raise DependencyError("Memory manager components are not available")
 core.orchestrator.src.exceptions.DependencyError: Memory manager components are not available
 2025-06-02 10:07:48 - core.orchestrator.src.utils.error_handling - WARNING - Failed to log error to monitoring: No module named 'opentelemetry.exporter.cloud_trace'
 INFO:     127.0.0.1:50974 - "GET /api/health HTTP/1.1" 500 Internal Server Error
 ERROR:    Exception in ASGI application
 Traceback (most recent call last):
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/uvicorn/protocols/http/httptools_impl.py", line 411, in run_asgi
     result = await app(  # type: ignore[func-returns-value]
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/uvicorn/middleware/proxy_headers.py", line 69, in __call__
     return await self.app(scope, receive, send)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/fastapi/applications.py", line 1054, in __call__
     await super().__call__(scope, receive, send)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/applications.py", line 112, in __call__
     await self.middleware_stack(scope, receive, send)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 187, in __call__
     raise exc
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 165, in __call__
     await self.app(scope, receive, _send)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 85, in __call__
     await self.app(scope, receive, send)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
     raise exc
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
     await app(scope, receive, sender)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/routing.py", line 714, in __call__
     await self.middleware_stack(scope, receive, send)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/routing.py", line 734, in app
     await route.handle(scope, receive, send)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/routing.py", line 288, in handle
     await self.app(scope, receive, send)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/routing.py", line 76, in app
     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
     raise exc
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
     await app(scope, receive, sender)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/routing.py", line 73, in app
     response = await f(request)
                ^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/fastapi/routing.py", line 301, in app
     raw_response = await run_endpoint_function(
                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/fastapi/routing.py", line 212, in run_endpoint_function
     return await dependant.call(**values)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/core/orchestrator/src/api/endpoints/health.py", line 87, in check_health
     if settings.get_gcp_project_id():
        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/pydantic/main.py", line 989, in __getattr__
     raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
 AttributeError: 'Settings' object has no attribute 'get_gcp_project_id'
 INFO:     Shutting down
@@ -580,19 +475,14 @@ system_prompt
   Field required [type=missing, input_value={'name': 'Cherry', 'descr...e, 'style': 'creative'}}, input_type=dict]
     For further information visit https://errors.pydantic.dev/2.11/v/missing
 Traceback (most recent call last):
-  File "/root/orchestra-main/core/orchestrator/src/main.py", line 96, in lifespan
     persona_configs = load_persona_configs()
                       ^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/core/orchestrator/src/config/loader.py", line 62, in wrapper
     return cached_func(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/core/orchestrator/src/config/loader.py", line 143, in load_persona_configs
     return create_default_persona_configs()
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/core/orchestrator/src/config/loader.py", line 200, in create_default_persona_configs
     persona_configs["cherry"] = PersonaConfig(**cherry_config)
                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/pydantic/main.py", line 253, in __init__
     validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 pydantic_core._pydantic_core.ValidationError: 3 validation errors for PersonaConfig
@@ -625,9 +515,7 @@ system_prompt
 2025-06-02 10:08:36 - core.orchestrator.src.agents.llm_agent - INFO - LLMAgent initialized with provider: openrouter
 2025-06-02 10:08:36 - core.orchestrator.src.main - ERROR - Failed to register default agents: property 'capabilities' of 'LLMAgent' object has no setter
 Traceback (most recent call last):
-  File "/root/orchestra-main/core/orchestrator/src/main.py", line 132, in lifespan
     register_default_agents()
-  File "/root/orchestra-main/core/orchestrator/src/agents/simplified_agent_registry.py", line 260, in register_default_agents
     llm_agent.capabilities = [
     ^^^^^^^^^^^^^^^^^^^^^^
 AttributeError: property 'capabilities' of 'LLMAgent' object has no setter
@@ -636,63 +524,40 @@ INFO:     Application startup complete.
 INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
 2025-06-02 10:08:36 - core.orchestrator.src.utils.error_handling - ERROR - DependencyError: Memory manager components are not available | Context: function=get_memory_manager
 Traceback (most recent call last):
-  File "/root/orchestra-main/core/orchestrator/src/utils/error_handling.py", line 177, in async_wrapper
     return await func(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/core/orchestrator/src/api/dependencies/memory.py", line 180, in get_memory_manager
     raise DependencyError("Memory manager components are not available")
 core.orchestrator.src.exceptions.DependencyError: Memory manager components are not available
 2025-06-02 10:08:36 - core.orchestrator.src.utils.error_handling - WARNING - Failed to log error to monitoring: No module named 'opentelemetry.exporter.cloud_trace'
 INFO:     127.0.0.1:38154 - "GET /api/health HTTP/1.1" 500 Internal Server Error
 ERROR:    Exception in ASGI application
 Traceback (most recent call last):
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/uvicorn/protocols/http/httptools_impl.py", line 411, in run_asgi
     result = await app(  # type: ignore[func-returns-value]
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/uvicorn/middleware/proxy_headers.py", line 69, in __call__
     return await self.app(scope, receive, send)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/fastapi/applications.py", line 1054, in __call__
     await super().__call__(scope, receive, send)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/applications.py", line 112, in __call__
     await self.middleware_stack(scope, receive, send)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 187, in __call__
     raise exc
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 165, in __call__
     await self.app(scope, receive, _send)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 85, in __call__
     await self.app(scope, receive, send)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
     raise exc
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
     await app(scope, receive, sender)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/routing.py", line 714, in __call__
     await self.middleware_stack(scope, receive, send)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/routing.py", line 734, in app
     await route.handle(scope, receive, send)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/routing.py", line 288, in handle
     await self.app(scope, receive, send)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/routing.py", line 76, in app
     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
     raise exc
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
     await app(scope, receive, sender)
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/routing.py", line 73, in app
     response = await f(request)
                ^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/fastapi/routing.py", line 301, in app
     raw_response = await run_endpoint_function(
                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/fastapi/routing.py", line 212, in run_endpoint_function
     return await dependant.call(**values)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/core/orchestrator/src/api/endpoints/health.py", line 87, in check_health
     if settings.get_gcp_project_id():
        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/pydantic/main.py", line 989, in __getattr__
     raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
 AttributeError: 'Settings' object has no attribute 'get_gcp_project_id'
 INFO:     127.0.0.1:51016 - "GET /health HTTP/1.1" 404 Not Found
@@ -777,19 +642,14 @@ system_prompt
   Field required [type=missing, input_value={'name': 'Cherry', 'descr...e, 'style': 'creative'}}, input_type=dict]
     For further information visit https://errors.pydantic.dev/2.11/v/missing
 Traceback (most recent call last):
-  File "/root/orchestra-main/core/orchestrator/src/main.py", line 96, in lifespan
     persona_configs = load_persona_configs()
                       ^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/core/orchestrator/src/config/loader.py", line 62, in wrapper
     return cached_func(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/core/orchestrator/src/config/loader.py", line 143, in load_persona_configs
     return create_default_persona_configs()
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/core/orchestrator/src/config/loader.py", line 200, in create_default_persona_configs
     persona_configs["cherry"] = PersonaConfig(**cherry_config)
                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/pydantic/main.py", line 253, in __init__
     validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 pydantic_core._pydantic_core.ValidationError: 3 validation errors for PersonaConfig
@@ -822,9 +682,7 @@ system_prompt
 2025-06-02 10:10:44 - core.orchestrator.src.agents.llm_agent - INFO - LLMAgent initialized with provider: openrouter
 2025-06-02 10:10:44 - core.orchestrator.src.main - ERROR - Failed to register default agents: property 'capabilities' of 'LLMAgent' object has no setter
 Traceback (most recent call last):
-  File "/root/orchestra-main/core/orchestrator/src/main.py", line 132, in lifespan
     register_default_agents()
-  File "/root/orchestra-main/core/orchestrator/src/agents/simplified_agent_registry.py", line 260, in register_default_agents
     llm_agent.capabilities = [
     ^^^^^^^^^^^^^^^^^^^^^^
 AttributeError: property 'capabilities' of 'LLMAgent' object has no setter
@@ -833,10 +691,8 @@ INFO:     Application startup complete.
 INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
 2025-06-02 10:10:54 - core.orchestrator.src.utils.error_handling - ERROR - DependencyError: Memory manager components are not available | Context: function=get_memory_manager
 Traceback (most recent call last):
-  File "/root/orchestra-main/core/orchestrator/src/utils/error_handling.py", line 177, in async_wrapper
     return await func(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/core/orchestrator/src/api/dependencies/memory.py", line 180, in get_memory_manager
     raise DependencyError("Memory manager components are not available")
 core.orchestrator.src.exceptions.DependencyError: Memory manager components are not available
 2025-06-02 10:10:54 - core.orchestrator.src.utils.error_handling - WARNING - Failed to log error to monitoring: No module named 'opentelemetry.exporter.cloud_trace'
@@ -928,19 +784,14 @@ system_prompt
   Field required [type=missing, input_value={'name': 'Cherry', 'descr...e, 'style': 'creative'}}, input_type=dict]
     For further information visit https://errors.pydantic.dev/2.11/v/missing
 Traceback (most recent call last):
-  File "/root/orchestra-main/core/orchestrator/src/main.py", line 96, in lifespan
     persona_configs = load_persona_configs()
                       ^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/core/orchestrator/src/config/loader.py", line 62, in wrapper
     return cached_func(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/core/orchestrator/src/config/loader.py", line 143, in load_persona_configs
     return create_default_persona_configs()
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/core/orchestrator/src/config/loader.py", line 200, in create_default_persona_configs
     persona_configs["cherry"] = PersonaConfig(**cherry_config)
                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/pydantic/main.py", line 253, in __init__
     validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 pydantic_core._pydantic_core.ValidationError: 3 validation errors for PersonaConfig
@@ -973,9 +824,7 @@ system_prompt
 2025-06-02 10:15:43 - core.orchestrator.src.agents.llm_agent - INFO - LLMAgent initialized with provider: openrouter
 2025-06-02 10:15:43 - core.orchestrator.src.main - ERROR - Failed to register default agents: property 'capabilities' of 'LLMAgent' object has no setter
 Traceback (most recent call last):
-  File "/root/orchestra-main/core/orchestrator/src/main.py", line 132, in lifespan
     register_default_agents()
-  File "/root/orchestra-main/core/orchestrator/src/agents/simplified_agent_registry.py", line 260, in register_default_agents
     llm_agent.capabilities = [
     ^^^^^^^^^^^^^^^^^^^^^^
 AttributeError: property 'capabilities' of 'LLMAgent' object has no setter
@@ -1067,19 +916,14 @@ system_prompt
   Field required [type=missing, input_value={'name': 'Cherry', 'descr...e, 'style': 'creative'}}, input_type=dict]
     For further information visit https://errors.pydantic.dev/2.11/v/missing
 Traceback (most recent call last):
-  File "/root/orchestra-main/core/orchestrator/src/main.py", line 95, in lifespan
     persona_configs = load_persona_configs()
                       ^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/core/orchestrator/src/config/loader.py", line 61, in wrapper
     return cached_func(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/core/orchestrator/src/config/loader.py", line 141, in load_persona_configs
     return create_default_persona_configs()
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/core/orchestrator/src/config/loader.py", line 197, in create_default_persona_configs
     persona_configs["cherry"] = PersonaConfig(**cherry_config)
                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/venv/lib/python3.12/site-packages/pydantic/main.py", line 253, in __init__
     validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 pydantic_core._pydantic_core.ValidationError: 3 validation errors for PersonaConfig
@@ -1112,9 +956,7 @@ system_prompt
 2025-06-02 10:19:09 - core.orchestrator.src.agents.llm_agent - INFO - LLMAgent initialized with provider: openrouter
 2025-06-02 10:19:09 - core.orchestrator.src.main - ERROR - Failed to register default agents: property 'capabilities' of 'LLMAgent' object has no setter
 Traceback (most recent call last):
-  File "/root/orchestra-main/core/orchestrator/src/main.py", line 131, in lifespan
     register_default_agents()
-  File "/root/orchestra-main/core/orchestrator/src/agents/simplified_agent_registry.py", line 255, in register_default_agents
     llm_agent.capabilities = [
     ^^^^^^^^^^^^^^^^^^^^^^
 AttributeError: property 'capabilities' of 'LLMAgent' object has no setter
@@ -1308,10 +1150,8 @@ INFO:     127.0.0.1:33188 - "GET /health HTTP/1.1" 404 Not Found
 INFO:     127.0.0.1:51664 - "GET /health HTTP/1.1" 404 Not Found
 2025-06-02 16:15:49 - core.orchestrator.src.utils.error_handling - ERROR - DependencyError: Memory manager components are not available | Context: function=get_memory_manager
 Traceback (most recent call last):
-  File "/root/orchestra-main/core/orchestrator/src/utils/error_handling.py", line 174, in async_wrapper
     return await func(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/core/orchestrator/src/api/dependencies/memory.py", line 176, in get_memory_manager
     raise DependencyError("Memory manager components are not available")
 core.orchestrator.src.exceptions.DependencyError: Memory manager components are not available
 2025-06-02 16:15:49 - core.orchestrator.src.utils.error_handling - WARNING - Failed to log error to monitoring: No module named 'opentelemetry.exporter.cloud_trace'
@@ -1327,10 +1167,8 @@ INFO:     172.56.209.174:0 - "GET /api/agents HTTP/1.1" 404 Not Found
 INFO:     172.203.71.249:0 - "GET /api/healthz HTTP/1.1" 404 Not Found
 2025-06-02 16:24:04 - core.orchestrator.src.utils.error_handling - ERROR - DependencyError: Memory manager components are not available | Context: function=get_memory_manager
 Traceback (most recent call last):
-  File "/root/orchestra-main/core/orchestrator/src/utils/error_handling.py", line 174, in async_wrapper
     return await func(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/core/orchestrator/src/api/dependencies/memory.py", line 176, in get_memory_manager
     raise DependencyError("Memory manager components are not available")
 core.orchestrator.src.exceptions.DependencyError: Memory manager components are not available
 2025-06-02 16:24:04 - core.orchestrator.src.utils.error_handling - WARNING - Failed to log error to monitoring: No module named 'opentelemetry.exporter.cloud_trace'
@@ -1340,10 +1178,8 @@ INFO:     127.0.0.1:37426 - "GET /health HTTP/1.1" 404 Not Found
 INFO:     127.0.0.1:51052 - "GET /health HTTP/1.1" 404 Not Found
 2025-06-02 16:29:45 - core.orchestrator.src.utils.error_handling - ERROR - DependencyError: Memory manager components are not available | Context: function=get_memory_manager
 Traceback (most recent call last):
-  File "/root/orchestra-main/core/orchestrator/src/utils/error_handling.py", line 174, in async_wrapper
     return await func(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/core/orchestrator/src/api/dependencies/memory.py", line 176, in get_memory_manager
 core.orchestrator.src.exceptions.DependencyError: Memory manager components are not available
 2025-06-02 16:29:45 - core.orchestrator.src.utils.error_handling - WARNING - Failed to log error to monitoring: No module named 'opentelemetry.exporter.cloud_trace'
 INFO:     45.32.69.157:0 - "GET /api/health HTTP/1.1" 200 OK
@@ -1385,10 +1221,8 @@ INFO:     127.0.0.1:54796 - "GET /health HTTP/1.1" 404 Not Found
 INFO:     52.170.195.61:0 - "GET /api/healthz HTTP/1.1" 404 Not Found
 2025-06-02 17:37:13 - core.orchestrator.src.utils.error_handling - ERROR - DependencyError: Memory manager components are not available | Context: function=get_memory_manager
 Traceback (most recent call last):
-  File "/root/orchestra-main/core/orchestrator/src/utils/error_handling.py", line 174, in async_wrapper
     return await func(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/orchestra-main/core/orchestrator/src/api/dependencies/memory.py", line 176, in get_memory_manager
 core.orchestrator.src.exceptions.DependencyError: Memory manager components are not available
 2025-06-02 17:37:13 - core.orchestrator.src.utils.error_handling - WARNING - Failed to log error to monitoring: No module named 'opentelemetry.exporter.cloud_trace'
 INFO:     45.32.69.157:0 - "GET /api/health HTTP/1.1" 200 OK

@@ -63,8 +63,6 @@ DELETE_DIRS = [
 ]
 
 class InfrastructurePurger:
-    def __init__(self, root_dir: Path):
-        self.root_dir = root_dir
         self.changes_made = 0
         self.files_deleted = 0
         self.dirs_deleted = 0
@@ -105,16 +103,13 @@ class InfrastructurePurger:
     def _delete_directories(self):
         """Delete directories related to unwanted infrastructure."""
             if "*" in dir_path:
-                parent = self.root_dir / Path(dir_path).parent
                 pattern = Path(dir_path).name
                 if parent.exists():
                     for path in parent.glob(pattern):
                         if path.is_dir():
-                            print(f"🗑️  Deleting directory: {path.relative_to(self.root_dir)}")
                             shutil.rmtree(path)
                             self.dirs_deleted += 1
             else:
-                full_path = self.root_dir / dir_path
                 if full_path.exists() and full_path.is_dir():
                     print(f"🗑️  Deleting directory: {dir_path}")
                     shutil.rmtree(full_path)
@@ -124,7 +119,6 @@ class InfrastructurePurger:
         """Clean Python files by removing unwanted infrastructure code."""
         print("\n🐍 Cleaning Python files...")
 
-        for py_file in self.root_dir.rglob("*.py"):
             # Skip virtual environments
             if "venv" in py_file.parts or "__pycache__" in py_file.parts:
                 continue
@@ -135,14 +129,12 @@ class InfrastructurePurger:
         """Clean shell scripts by removing unwanted infrastructure references."""
         print("\n🐚 Cleaning shell scripts...")
 
-        for sh_file in self.root_dir.rglob("*.sh"):
             self._clean_file(sh_file, self._clean_shell_content)
 
     def _clean_documentation(self):
         """Clean documentation files."""
         print("\n📚 Cleaning documentation...")
 
-        for md_file in self.root_dir.rglob("*.md"):
             self._clean_file(md_file, self._clean_doc_content)
 
     def _clean_config_files(self):
@@ -150,14 +142,11 @@ class InfrastructurePurger:
         print("\n⚙️  Cleaning configuration files...")
 
         # Clean YAML files
-        for yaml_file in self.root_dir.rglob("*.yaml"):
             self._clean_file(yaml_file, self._clean_yaml_content)
 
-        for yml_file in self.root_dir.rglob("*.yml"):
             self._clean_file(yml_file, self._clean_yaml_content)
 
         # Clean .env files
-        for env_file in self.root_dir.rglob(".env*"):
             if env_file.is_file():
                 self._clean_file(env_file, self._clean_env_content)
 
@@ -168,7 +157,6 @@ class InfrastructurePurger:
 
             if content != cleaned_content:
                 file_path.write_text(cleaned_content, encoding="utf-8")
-                print(f"   ✓ Cleaned: {file_path.relative_to(self.root_dir)}")
                 self.changes_made += 1
         except Exception:
 
@@ -263,7 +251,6 @@ class InfrastructurePurger:
 
 def main():
     """Main entry point."""
-    print(f"🎯 Target directory: {root_dir}")
     print("⚠️  This will permanently modify your codebase!")
     response = input("Continue? (yes/no): ")
 
@@ -279,7 +266,6 @@ subprocess.run([f"tar -czf {backup_name} . --exclude=venv --exclude=__pycache__ 
     print(f"✅ Backup created: {backup_name}")
 
     # Run the purge
-    purger = InfrastructurePurger(root_dir)
     purger.purge_all()
 
     print("\n🎉 Infrastructure purge complete!")

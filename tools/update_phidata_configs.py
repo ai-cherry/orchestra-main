@@ -106,7 +106,6 @@ def process_directory(directory: str, dry_run: bool = False) -> Tuple[int, int]:
     """
     """
             if file.endswith((".yaml", ".yml")):
-                file_path = os.path.join(root, file)
                 files_processed += 1
 
                 if process_yaml_file(file_path, dry_run):

@@ -26,7 +26,6 @@
             }
         }
         
-        self.base_dir = Path("/root/cherry_ai-main")
         self.config_dir = self.base_dir / "config" / "domains"
         self.scripts_dir = self.base_dir / "scripts" / "domain_setup"
         

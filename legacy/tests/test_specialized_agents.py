@@ -97,8 +97,6 @@ class TestPayReadyAgent:
             "id": "apt123",
             "address": "123 Tech St, San Francisco, CA",
             "price": 3000,
-            "bedrooms": 2,
-            "bathrooms": 2,
             "sqft": 1200,
             "amenities": ["gym", "pool", "parking"],
             "smart_home_features": ["smart_locks", "fiber_internet"]
@@ -120,7 +118,6 @@ class TestPayReadyAgent:
         """Test technology amenity scoring"""
             "fiber internet available",
             "smart locks installed",
-            "usb outlets in all rooms",
             "ev charging station"
         ]
         
@@ -156,7 +153,6 @@ class TestPayReadyAgent:
         
         result = await agent.market_analysis(
             "San Francisco",
-            {"bedrooms": 2, "max_price": 3500}
         )
         
         assert result["location"] == "San Francisco"

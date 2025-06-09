@@ -239,7 +239,6 @@
             'core/shared', 'core/business', 'core/business/personas',
             'shared', 'shared/database', 'shared/memory',
             'tools', '.factory', '.factory/bridge',
-            '.roo', '.roo/scripts'
         ]
         
         created_count = 0

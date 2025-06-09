@@ -2,7 +2,6 @@
 """
 """
     """Checks and reports on Cherry AI implementation status"""
-        self.base_dir = Path("/root/cherry_ai-main")
         self.status_report = {
             "timestamp": datetime.now().isoformat(),
             "components": {},

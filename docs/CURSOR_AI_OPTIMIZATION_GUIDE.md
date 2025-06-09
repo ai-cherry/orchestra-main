@@ -21,7 +21,6 @@ This guide provides specific prompts, workflows, and best practices for leveragi
 First, ensure Cursor understands your project structure:
 
 ```bash
-# Create a .cursorrules file in your project root
 cat > .cursorrules << 'EOF'
 # AI cherry_ai Project Rules for Cursor
 
@@ -308,7 +307,6 @@ Follow cherry_ai_api/routers/ patterns
 
 Solution:
 ```
-1. Ensure .cursorrules is in project root
 2. Re-index the project (Cmd+Shift+P -> "Reload Window")
 3. Use explicit file references with @file
 4. Start prompts with context reminders

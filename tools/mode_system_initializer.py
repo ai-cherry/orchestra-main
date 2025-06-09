@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
 """
-CONFIG_DIR = PROJECT_ROOT / "config"
-CORE_DIR = PROJECT_ROOT / "core"
-TOOLS_DIR = PROJECT_ROOT / "tools"
-DOCS_DIR = PROJECT_ROOT / "docs"
+CONFIG_DIR = PROJECT_T / "config"
+CORE_DIR = PROJECT_T / "core"
+TOOLS_DIR = PROJECT_T / "tools"
+DOCS_DIR = PROJECT_T / "docs"
 
 MODE_DEFINITIONS_PATH = CONFIG_DIR / "mode_definitions.yaml"
 MODE_MANAGER_PATH = CORE_DIR / "mode_manager.py"
@@ -20,20 +20,20 @@ def print_header():
 def check_file_exists(path: Path) -> bool:
     """Check if a file exists and print its status."""
     status = f"{Fore.GREEN}✓ Found" if exists else f"{Fore.RED}✗ Missing"
-    print(f"{status}{Style.RESET_ALL} {path.relative_to(PROJECT_ROOT)}")
+    print(f"{status}{Style.RESET_ALL} {path.relative_to(PROJECT_T)}")
     return exists
 
 def create_directory(path: Path) -> bool:
     """Create a directory if it doesn't exist."""
-            print(f"{Fore.GREEN}✓ Created directory{Style.RESET_ALL} {path.relative_to(PROJECT_ROOT)}")
+            print(f"{Fore.GREEN}✓ Created directory{Style.RESET_ALL} {path.relative_to(PROJECT_T)}")
             return True
         except Exception:
 
             pass
-            print(f"{Fore.RED}✗ Failed to create directory{Style.RESET_ALL} {path.relative_to(PROJECT_ROOT)}: {str(e)}")
+            print(f"{Fore.RED}✗ Failed to create directory{Style.RESET_ALL} {path.relative_to(PROJECT_T)}: {str(e)}")
             return False
     else:
-        print(f"{Fore.GREEN}✓ Directory exists{Style.RESET_ALL} {path.relative_to(PROJECT_ROOT)}")
+        print(f"{Fore.GREEN}✓ Directory exists{Style.RESET_ALL} {path.relative_to(PROJECT_T)}")
         return True
 
 def validate_project_structure() -> bool:
@@ -93,16 +93,16 @@ def initialize_mode_system() -> bool:
         print(f"\n{Fore.YELLOW}Please run the following commands to create missing files:{Style.RESET_ALL}")
 
         if not MODE_DEFINITIONS_PATH.exists():
-            print(f"- Create {MODE_DEFINITIONS_PATH.relative_to(PROJECT_ROOT)} with mode definitions")
+            print(f"- Create {MODE_DEFINITIONS_PATH.relative_to(PROJECT_T)} with mode definitions")
 
         if not MODE_MANAGER_PATH.exists():
-            print(f"- Create {MODE_MANAGER_PATH.relative_to(PROJECT_ROOT)} to implement mode management logic")
+            print(f"- Create {MODE_MANAGER_PATH.relative_to(PROJECT_T)} to implement mode management logic")
 
         if not MODE_SWITCHER_PATH.exists():
-            print(f"- Create {MODE_SWITCHER_PATH.relative_to(PROJECT_ROOT)} for the CLI interface")
+            print(f"- Create {MODE_SWITCHER_PATH.relative_to(PROJECT_T)} for the CLI interface")
 
         if not DOCS_PATH.exists():
-            print(f"- Create {DOCS_PATH.relative_to(PROJECT_ROOT)} for documentation")
+            print(f"- Create {DOCS_PATH.relative_to(PROJECT_T)} for documentation")
 
         return False
 
@@ -161,7 +161,7 @@ def verify_model_assignments():
             print(f"\n{Fore.GREEN}All model assignments are correctly configured.{Style.RESET_ALL}")
         else:
             print(f"\n{Fore.YELLOW}Some model assignments need to be updated.{Style.RESET_ALL}")
-            print(f"Please edit {MODE_DEFINITIONS_PATH.relative_to(PROJECT_ROOT)} to correct the assignments.")
+            print(f"Please edit {MODE_DEFINITIONS_PATH.relative_to(PROJECT_T)} to correct the assignments.")
 
     except Exception:
 

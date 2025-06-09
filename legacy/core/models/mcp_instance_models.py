@@ -29,7 +29,7 @@ class UserDefinedMCPServerInstanceConfig(BaseModel):
     name: str = Field(..., min_length=3, max_length=100, description="User-friendly name for the MCP server instance")
     description: Optional[str] = Field(default=None, max_length=500)
 
-    target_ai_coders: List[Literal["RooCoder", "CursorAI", "Claude", "OpenAI_GPT4", "OpenAI_GPT3_5", "Gemini", "Copilot", "Generic"]] = Field(
+    target_ai_coders: List[Literal["Coder", "CursorAI", "Claude", "OpenAI_GPT4", "OpenAI_GPT3_5", "Gemini", "Copilot", "Generic"]] = Field(
         ...,
         description="Primary AI Coder(s) this server instance is intended to support or emulate."
     )

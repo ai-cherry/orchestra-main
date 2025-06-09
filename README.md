@@ -81,7 +81,6 @@ python3 notion_integration_api.py
 
 ### **🤖 MCP (Model Context Protocol)**
 **Server**: `mcp_unified_server.py` - Unified tool integration
-**Config**: `.roo/mcp.json` - Server and connection definitions
 **Features**: File system, Notion API, context management
 
 ## 🎯 **AI Persona System**
@@ -145,11 +144,10 @@ python3 notion_integration_api.py
 - `admin-interface/` - LEGACY (superseded by MVP)
 
 ### **📁 File Organization**
-- **Root Level**: Production scripts and core files only
+- **t Level**: Production scripts and core files only
 - **`/scripts/`**: Production automation scripts (cleaned)
 - **`/archive/`**: One-time scripts and legacy files
 - **`/orchestra-admin-mvp/`**: Current admin interface
-- **`/.roo/`**: Roo Coder configuration and MCP settings
 
 ## 🔄 **Continuous Improvement**
 
@@ -170,7 +168,6 @@ python3 notion_integration_api.py
 ### **🔧 Common Issues**
 1. **Notion API Errors**: Check `orchestra_notion_config_live.json` credentials
 2. **Admin Interface Issues**: Verify React dependencies in `package.json`
-3. **MCP Connection Problems**: Review `.roo/mcp.json` configuration
 4. **Database Access**: Confirm Notion workspace permissions
 
 ### **📞 Support Resources**

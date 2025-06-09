@@ -3,7 +3,6 @@
     "aiToolMetrics": {
       "responseTimeThresholds": {
         "cursor": 500,
-        "roo": 2000,
         "continue": 1000,
         "claude": 1500
       },

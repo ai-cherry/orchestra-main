@@ -8,8 +8,6 @@ if [ ! -d ".venv" ]; then
 fi
 source .venv/bin/activate || echo "Failed to activate virtual environment. Proceeding without it."
 
-# Set PYTHONPATH to include the project root directory
-echo "Setting PYTHONPATH to include the project root..."
 export PYTHONPATH=$(pwd):$PYTHONPATH
 
 echo "Installing pytest-cov if needed..."

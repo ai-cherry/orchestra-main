@@ -36,9 +36,9 @@
 ./dragonfly_config.py:39:22: F821 undefined name 'secretmanager'
 ./execute_strategy_workflow.py:43:19: F821 undefined name 'SubtaskManager'
 ./infra/do_superagi_stack.py:211:150: E999 SyntaxError: unterminated string literal (detected at line 211)
-./mcp_cli.py:142:43: F821 undefined name 'ROO_MODES'
-./mcp_cli.py:144:45: F821 undefined name 'ROO_MODES'
-./mcp_cli.py:292:35: F821 undefined name 'ROO_MODES'
+./mcp_cli.py:142:43: F821 undefined name '_MODES'
+./mcp_cli.py:144:45: F821 undefined name '_MODES'
+./mcp_cli.py:292:35: F821 undefined name '_MODES'
 ./mcp_server/memory/langchain_memory.py:90:28: F821 undefined name 'FirestoreEpisodicMemory'
 ./mcp_server/scripts/deploy_monitoring.py:110:14: F821 undefined name 'monitoring_v3'
 ./mcp_server/scripts/deploy_monitoring.py:114:22: F821 undefined name 'monitoring_v3'

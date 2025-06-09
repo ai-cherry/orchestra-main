@@ -15,7 +15,6 @@ orchestra-main/
 ├── github_cli_manager.py          # Enhanced automation script
 ├── .github/workflows/
 │   └── deploy-optimized.yml       # 🚀 NEW: Performance-optimized CI/CD
-├── .roo/mcp.json                  # 🔧 OPTIMIZED: Single-developer MCP config
 ├── Pulumi.yaml                    # 🔧 OPTIMIZED: Performance configuration
 ├── .envrc.example                 # 🔧 OPTIMIZED: Unified environment setup
 ├── scripts/

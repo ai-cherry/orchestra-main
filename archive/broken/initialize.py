@@ -8,7 +8,7 @@ logger = logging.getLogger("ai-memory-init")
 
 # Directory where this script is located (should be .ai-memory/)
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
+PROJECT_T = os.path.dirname(SCRIPT_DIR)
 
 # Performance-first priorities
 PRIORITIES = {
@@ -50,7 +50,7 @@ PRIORITIES = {
 
 def initialize_memory_system():
     """Initialize the AI memory system with performance-first directives."""
-        priorities_md_path = os.path.join(PROJECT_ROOT, "PROJECT_PRIORITIES.md")
+        priorities_md_path = os.path.join(PROJECT_T, "PROJECT_PRIORITIES.md")
         symlink_path = os.path.join(SCRIPT_DIR, "PROJECT_PRIORITIES.md")
 
         # Create symbolic link if the file exists

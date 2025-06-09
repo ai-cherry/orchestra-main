@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils"
 function Popover({
   ...props
 }) {
-  return <PopoverPrimitive.Root data-slot="popover" {...props} />;
+  return <PopoverPrimitive.t data-slot="popover" {...props} />;
 }
 
 function PopoverTrigger({

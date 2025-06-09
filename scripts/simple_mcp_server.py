@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Simple MCP-compatible server for Roo integration"""
+"""Simple MCP-compatible server for  integration"""
         """Handle GET requests"""
         if self.path == "/health":
             self.send_response(200)

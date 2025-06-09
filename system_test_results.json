@@ -36,15 +36,11 @@
       "size_kb": 7.1,
       "path": ".continue/config.json"
     },
-    "roo_main_config": {
       "status": "\u2705 Exists",
       "size_kb": 2.0,
-      "path": ".roo/config.json"
     },
-    "roo_mcp_config": {
       "status": "\u2705 Exists",
       "size_kb": 8.6,
-      "path": ".roo/mcp.json"
     },
     "patrick_instructions": {
       "status": "\u2705 Exists",
@@ -61,7 +57,6 @@
       "size_kb": 13.2,
       "path": "NOTION_AI_NOTES.md"
     },
-    "roo_modes": {
       "status": "\u2705 Configured",
       "total_modes": 10,
       "detailed_modes": 5,
@@ -103,11 +98,10 @@
     }
   },
   "tools": {
-    "roo": {
       "status": "\ud83d\udccb VS Code Extension Required",
-      "note": "Roo Code is a VS Code extension, not a CLI tool",
-      "installation": "Search 'Roo Code' in VS Code Extensions",
-      "publisher": "RooCode Inc.",
+      "note": " Code is a VS Code extension, not a CLI tool",
+      "installation": "Search ' Code' in VS Code Extensions",
+      "publisher": "Code Inc.",
       "configurations_ready": true,
       "config_files_found": "3/3"
     },

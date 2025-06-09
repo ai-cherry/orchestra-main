@@ -101,21 +101,19 @@ orchestra-main/
 
 ---
 
-## 🦘 Step 3: Roo Coder Setup
+## 🦘 Step 3:  Coder Setup
 
-### 3.1 Verify Roo Configuration
+### 3.1 Verify  Configuration
 
-**Check existing Roo setup:**
+**Check existing  setup:**
 ```bash
 # In Cursor terminal
-ls -la .roo/
-cat .roo/README.md
 ```
 
-### 3.2 Test Roo Modes
+### 3.2 Test  Modes
 
-**In Roo Coder:**
-1. Open Roo interface
+**In  Coder:**
+1. Open  interface
 2. Try switching modes:
    - `switch to architect mode`
    - `switch to developer mode`
@@ -129,7 +127,7 @@ cat .roo/README.md
 echo $OPENROUTER_API_KEY
 ```
 
-**✅ Verification:** Roo modes switch successfully and show different personalities
+**✅ Verification:**  modes switch successfully and show different personalities
 
 ---
 
@@ -140,7 +138,6 @@ echo $OPENROUTER_API_KEY
 **From your Mac:**
 ```bash
 # SSH to production server
-ssh root@45.32.69.157
 
 # Navigate to project directory
 cd ~/orchestra-main
@@ -339,7 +336,7 @@ cat .ai-tools/apis/unified_config.json
 
 **Test each AI tool:**
 
-1. **Roo Coder:**
+1. ** Coder:**
    ```
    switch to architect mode
    optimize for performance
@@ -385,13 +382,12 @@ cd orchestra-main
 cursor .
 
 # SSH to server (in Cursor terminal)
-ssh root@45.32.69.157
 cd ~/orchestra-main
 ```
 
 **2. Use AI Tools for Coding:**
 
-**Roo Coder:**
+** Coder:**
 - `switch to developer mode` - For implementation
 - `optimize for performance` - For performance improvements
 - `ensure stability` - For error handling and resilience
@@ -427,7 +423,7 @@ ai_assistant.analyze_performance({'directory': 'src/', 'include_database': True}
 
 **2. Apply Optimizations:**
 - Use performance prompts from dashboard
-- Apply Roo Coder performance mode
+- Apply  Coder performance mode
 - Execute Codex optimization tasks
 
 **3. Verify Improvements:**
@@ -444,16 +440,14 @@ ai_assistant.analyze_performance({'directory': 'src/', 'include_database': True}
 **1. Cursor IDE not connecting to servers:**
 ```bash
 # Check SSH configuration
-ssh -v root@45.32.69.157
 
 # Verify SSH keys
 ls -la ~/.ssh/
 ```
 
-**2. Roo Coder modes not working:**
+**2.  Coder modes not working:**
 - Ensure OpenRouter API key is set
-- Check .roo/README.md for configuration
-- Restart Roo Coder after configuration changes
+- Restart  Coder after configuration changes
 
 **3. MCP servers not responding:**
 ```bash

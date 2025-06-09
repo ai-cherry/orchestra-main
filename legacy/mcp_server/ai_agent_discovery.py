@@ -36,7 +36,6 @@ class MCPServerInfo:
 class AIAgentConfig:
     """Configuration for an AI agent."""
     name: str
-    type: str  # "roo", "factory", "claude", "openai", "cursor"
     mcp_servers: List[str]  # Which MCP servers this agent should use
     routing_rules: Dict[str, str]  # Request type -> MCP server mapping
     cache_settings: Dict[str, Any]
@@ -48,7 +47,6 @@ class AIAgentDiscoverySystem:
     """Central system for AI agent discovery and MCP server integration."""
 
     def __init__(self):
-        self.project_root = Path.cwd()
         self.redis_client = None
         self.mcp_servers: Dict[str, MCPServerInfo] = {}
         self.ai_agents: Dict[str, AIAgentConfig] = {}
@@ -146,9 +144,6 @@ class AIAgentDiscoverySystem:
     def _load_ai_agents(self):
         """Load and configure AI agent settings."""
         self.ai_agents = {
-            "roo": AIAgentConfig(
-                name="roo",
-                type="roo",
                 mcp_servers=["memory", "conductor", "tools", "code-intelligence", "git-intelligence"],
                 routing_rules={
                     "code_analysis": "code-intelligence",
@@ -243,8 +238,7 @@ class AIAgentDiscoverySystem:
         """Generate configuration files for all AI agents."""
         print("🔧 Generating AI agent configurations...")
         
-        # Update Roo configuration
-        await self._update_roo_config()
+        # Update  configuration
         
         # Update Factory AI configuration  
         await self._update_factory_config()
@@ -261,19 +255,12 @@ class AIAgentDiscoverySystem:
         # Create unified discovery endpoint
         await self._create_discovery_endpoint()
 
-    async def _update_roo_config(self):
-        """Update Roo MCP configuration with enhanced servers."""
-        roo_config = {
+        """Update  MCP configuration with enhanced servers."""
             "mcpServers": {},
             "servers": [],
-            "routing": self.ai_agents["roo"].routing_rules,
-            "cache": self.ai_agents["roo"].cache_settings,
-            "rate_limits": self.ai_agents["roo"].rate_limits
         }
         
-        for server_name in self.ai_agents["roo"].mcp_servers:
             server = self.mcp_servers[server_name]
-            roo_config["mcpServers"][server_name] = {
                 "command": "python",
                 "args": [f"${{workspaceFolder}}/mcp_server/servers/{server_name.replace('-', '_')}_server.py"],
                 "env": {
@@ -283,7 +270,6 @@ class AIAgentDiscoverySystem:
                 "alwaysAllow": [f"{capability}" for capability in server.capabilities]
             }
             
-            roo_config["servers"].append({
                 "name": server_name,
                 "port": server.port,
                 "capabilities": server.capabilities,
@@ -293,15 +279,12 @@ class AIAgentDiscoverySystem:
             })
         
         # Write updated config
-        config_path = self.project_root / ".roo" / "mcp.json"
         with open(config_path, 'w') as f:
-            json.dump(roo_config, f, indent=2)
         
-        print("✅ Updated Roo MCP configuration")
+        print("✅ Updated  MCP configuration")
 
     async def _update_factory_config(self):
         """Update Factory AI configuration with MCP server mappings."""
-        config_path = self.project_root / ".factory" / "config.yaml"
         
         # Load existing config
         with open(config_path, 'r') as f:
@@ -349,7 +332,6 @@ class AIAgentDiscoverySystem:
             }
         
         # Write to Cursor config
-        config_path = self.project_root / ".cursor" / "mcp.json"
         with open(config_path, 'w') as f:
             json.dump(cursor_config, f, indent=2)
         
@@ -374,7 +356,6 @@ class AIAgentDiscoverySystem:
             }
         
         # Write Claude config
-        config_path = self.project_root / "claude_mcp_config.json"
         with open(config_path, 'w') as f:
             json.dump(claude_config, f, indent=2)
         
@@ -400,7 +381,6 @@ class AIAgentDiscoverySystem:
             }
         
         # Write OpenAI config  
-        config_path = self.project_root / "openai_mcp_config.json"
         with open(config_path, 'w') as f:
             json.dump(openai_config, f, indent=2)
         
@@ -433,7 +413,6 @@ class AIAgentDiscoverySystem:
                 print(f"⚠️  Redis cache failed: {e}")
         
         # Write to file as backup
-        discovery_path = self.project_root / "mcp_discovery.json"
         with open(discovery_path, 'w') as f:
             json.dump(discovery_data, f, indent=2)
         
@@ -496,7 +475,6 @@ if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8010)
 '''
         
-        router_path = self.project_root / "mcp_smart_router.py"
         with open(router_path, 'w') as f:
             f.write(routing_script)
         
@@ -527,7 +505,6 @@ echo "✅ All MCP servers started"
 echo "🔗 Discovery endpoint: http://localhost:8010/discover"
 '''
         
-        script_path = self.project_root / "start_mcp_agents.sh"
         with open(script_path, 'w') as f:
             f.write(start_script)
         script_path.chmod(0o755)
@@ -576,7 +553,6 @@ if __name__ == "__main__":
     asyncio.run(validate_mcp_integration())
 '''
         
-        validation_path = self.project_root / "scripts" / "validate_ai_agents.py"
         with open(validation_path, 'w') as f:
             f.write(validation_script)
         
@@ -605,7 +581,7 @@ if __name__ == "__main__":
         print("🎉 AI Agent Integration Complete!")
         print("="*50)
         print("📋 What's been configured:")
-        print("   ✅ Roo AI: Enhanced MCP access")
+        print("   ✅  AI: Enhanced MCP access")
         print("   ✅ Factory AI Droids: Intelligent routing")
         print("   ✅ Cursor: Advanced coding context")
         print("   ✅ Claude: Comprehensive tool access")

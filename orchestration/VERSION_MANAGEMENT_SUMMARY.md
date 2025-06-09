@@ -93,7 +93,6 @@ Python implementation providing:
 ### 1. Initialize Version Management
 ```bash
 # Install the version management tool
-cd /root/cherry_ai-main
 chmod +x coordination/version_management_implementation.py
 
 # Initialize version tracking

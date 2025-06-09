@@ -2,7 +2,6 @@
 """
 """
     """Specifies UI components and integration approach"""
-        self.base_dir = Path("/root/cherry_ai-main")
         self.ui_spec = {
             "framework": "React 18 + TypeScript",
             "styling": "Tailwind CSS",

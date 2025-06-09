@@ -11,7 +11,7 @@ import {
 } from '@/services/mcpApiService'; // Adjust path as needed
 
 // Define literals for form options (should match those in mcpApiService.ts)
-const TARGET_AI_CODERS = ["RooCoder", "CursorAI", "Claude", "OpenAI_GPT4", "OpenAI_GPT3_5", "Gemini", "Copilot", "Generic"] as const;
+const TARGET_AI_CODERS = ["Coder", "CursorAI", "Claude", "OpenAI_GPT4", "OpenAI_GPT3_5", "Gemini", "Copilot", "Generic"] as const;
 const ENABLED_INTERNAL_TOOLS = ["copilot", "gemini"] as const;
 const DESIRED_STATUS_OPTIONS = ["running", "stopped"] as const;
 const AI_PROVIDER_NAMES = ["openai", "claude", "gemini", "copilot", "custom"] as const;

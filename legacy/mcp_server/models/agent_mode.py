@@ -116,7 +116,6 @@ Your task is to analyze code, error messages, and logs to diagnose and fix issue
             "Fix the null reference exception in this JavaScript code",
         ],
         constraints=[
-            "Identify the root cause of the issue",
             "Suggest minimal changes to fix the problem",
             "Explain why the error occurred",
         ],

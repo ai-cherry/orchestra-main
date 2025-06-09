@@ -149,8 +149,6 @@
                         "id": "apt123",
                         "address": "123 Test St",
                         "price": 2500,
-                        "bedrooms": 2,
-                        "bathrooms": 2,
                         "sqft": 1200,
                         "amenities": ["gym", "pool"],
                         "smart_home_features": ["smart_locks"]

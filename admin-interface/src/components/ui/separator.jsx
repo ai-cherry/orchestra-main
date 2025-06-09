@@ -12,8 +12,7 @@ function Separator({
   ...props
 }) {
   return (
-    <SeparatorPrimitive.Root
-      data-slot="separator-root"
+    <SeparatorPrimitive.t
       decorative={decorative}
       orientation={orientation}
       className={cn(

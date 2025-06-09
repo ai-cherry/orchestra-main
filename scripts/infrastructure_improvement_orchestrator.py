@@ -2,7 +2,6 @@
 """
 """
     """cherry_aites infrastructure improvements across multiple modes"""
-        self.base_dir = Path("/root/cherry_ai-main")
         self.workflow_state = {
             "started_at": datetime.now().isoformat(),
             "phases": {},

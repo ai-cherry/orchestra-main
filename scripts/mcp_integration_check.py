@@ -34,7 +34,6 @@ class MCPIntegrationChecker:
         ]
 
         for filename in context_files:
-            filepath = self.root_dir / filename
             if not filepath.exists():
                 self.issues.append(f"Missing AI context file: {filename}")
                 continue
@@ -63,7 +62,6 @@ class MCPIntegrationChecker:
         print("\n🔧 Checking MCP Configuration...")
 
         # Check .mcp.json
-        mcp_config_path = self.root_dir / ".mcp.json"
         if not mcp_config_path.exists():
             self.issues.append("Missing .mcp.json configuration file")
             return
@@ -80,7 +78,6 @@ class MCPIntegrationChecker:
                 self.successes.append(f"MCP server '{server}' is configured")
 
                 # Check if server file exists
-                server_file = self.root_dir / "mcp_server" / "servers" / f"{server}_server.py"
                 if server_file.exists():
                     self.successes.append(f"MCP server file exists: {server_file.name}")
                 else:
@@ -89,11 +86,10 @@ class MCPIntegrationChecker:
                 self.issues.append(f"MCP server '{server}' not configured")
 
     def check_integration_files(self) -> None:
-        """Check Cursor and Roo integration files."""
+        """Check Cursor and  integration files."""
         print("\n📋 Checking Integration Files...")
 
         # Check .cursorrules
-        cursorrules_path = self.root_dir / ".cursorrules"
         if cursorrules_path.exists():
             with open(cursorrules_path, "r") as f:
                 content = f.read()
@@ -110,12 +106,7 @@ class MCPIntegrationChecker:
         else:
             self.issues.append("Missing .cursorrules file")
 
-        # Check .roomodes
-        roomodes_path = self.root_dir / ".roomodes"
-        if roomodes_path.exists():
-            self.successes.append(".roomodes file exists for Roo integration")
         else:
-            self.warnings.append("Missing .roomodes file (optional)")
 
     def check_mcp_servers_running(self) -> None:
         """Check if MCP servers are running."""
@@ -157,7 +148,6 @@ class MCPIntegrationChecker:
         ]
 
         for script in launch_scripts:
-            script_path = self.root_dir / script
             if script_path.exists():
                 self.successes.append(f"Launch script exists: {script}")
                 if os.access(script_path, os.X_OK):

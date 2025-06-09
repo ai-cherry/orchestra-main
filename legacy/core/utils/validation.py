@@ -86,7 +86,6 @@ class EnhancedValidator:
             )
         
         # Check for reserved names
-        reserved_names = {'admin', 'api', 'system', 'root', 'default', 'test'}
         if name.lower() in reserved_names:
             result.add_warning(f"'{name}' is a reserved name and may cause conflicts")
         

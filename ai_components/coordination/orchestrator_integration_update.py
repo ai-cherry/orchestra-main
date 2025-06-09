@@ -120,7 +120,6 @@ async def test_integrated_workflow():
             name="Deep Project Analysis",
             agent_role=AgentRole.ANALYZER,
             inputs={
-                "codebase_path": "/root/cherry_ai-main",
                 "deep_analysis": True,
                 "focus_areas": ["architecture", "performance", "security"],
                 "options": {

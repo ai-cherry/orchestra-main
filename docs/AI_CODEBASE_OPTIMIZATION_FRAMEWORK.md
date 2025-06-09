@@ -48,9 +48,8 @@ These principles must be ingrained in all AI-assisted development workflows and 
 
 These configurations and guidelines should be implemented in the respective AI assistant tools and project rule files.
 
-### 1. Roo AI System
+### 1.  AI System
 
-**File: `.roo/config/performance_rules.json` (or equivalent master config)**
 ```json
 {
   "globalSettings": {
@@ -112,7 +111,6 @@ These configurations and guidelines should be implemented in the respective AI a
         "performance-profiling-for-bottlenecks"
       ],
       "instructions": [
-        "Identify root causes and suggest fixes adhering to project standards.",
         "Do not add temporary debug files; use integrated logging."
       ]
     }
@@ -126,15 +124,12 @@ These configurations and guidelines should be implemented in the respective AI a
     "autoPurgeSuggestionPatterns": ["tmp_*", "temp_*", "ai_generated_debug_*", "test_output_*", "draft_v*_*.md", "*.bak", "*.tmp"]
   },
   "projectSpecificRules": [
-    ".roo/rules-architect/01-core-principles.md",
-    ".roo/rules-code/01-coding-standards.md"
   ]
 }
 ```
 
-**File: `.roo/rules-architect/01-core-principles.md**
 ```markdown
-## Architecture Principles for Roo AI (Project Symphony)
+## Architecture Principles for  AI (Project Symphony)
 - **Integration First:** Prioritize extending existing modules (`scripts/`, `core/`, `services/`, `shared/`) over creating new standalone components or scripts.
 - **Database:** Use only PostgreSQL (via `shared.database.UnifiedDatabase`) for relational data and Weaviate for vector data.
 - **Performance:** Design for performance. All database operations must be analyzed (`EXPLAIN ANALYZE`). CPU/memory intensive operations should be flagged.
@@ -148,9 +143,8 @@ These configurations and guidelines should be implemented in the respective AI a
 - **Automation:** New automation tasks should be integrated into `scripts/cherry_ai.py` or existing scheduled jobs, not as new standalone cron entries without registration.
 ```
 
-**File: `.roo/rules-code/01-coding-standards.md**
 ```markdown
-## Code Generation Standards for Roo AI (Project Symphony)
+## Code Generation Standards for  AI (Project Symphony)
 - **Python Version:** Python 3.10. No Python 3.11+ specific features (e.g., `match/case`, `tomllib`).
 - **Dependencies:** Use `pip/venv` only. Check `requirements/base.txt`. Avoid adding heavy dependencies for simple tasks.
 - **Formatting:** Adhere to Black. Use isort for imports.
@@ -195,7 +189,6 @@ These configurations and guidelines should be implemented in the respective AI a
 - **Register Generated Files:** If a file needs to persist beyond immediate execution, it should ideally be registered with the cleanup system (`.cleanup_registry.json`) or have a clear expiration mechanism.
 - **Prefer Streaming/In-Memory:** For data processing, prefer streaming or in-memory operations over intermediate file-based steps.
 - **Log Management:** All logging output must go through the project\'s established logging framework. Do not create separate log files. Rotating handlers are configured centrally.
-- **Output Destination:** Ask for clarification if an output destination is unclear. Default to integrating into existing structures or standard output locations (`docs/`, `reports/`). Avoid littering the root or module directories with loose output files.
 
 ### Integration Requirements
 - **Module Extension:** New functionality should extend existing modules where appropriate.
@@ -271,7 +264,6 @@ This plan outlines a multi-phase approach to identify, remove, and manage obsole
 ### Phase 1: Intelligent Inventory System
 
 **Script: `scripts/comprehensive_inventory.sh`**
-(This script is designed to be run from the project root.)
 ```bash
 #!/bin/bash
 # comprehensive_inventory.sh - Smart file discovery and analysis for Project Symphony
@@ -279,12 +271,10 @@ This plan outlines a multi-phase approach to identify, remove, and manage obsole
 set -euo pipefail # Exit on error, undefined variable, or pipe failure
 
 INVENTORY_FILE="cleanup_inventory.json"
-PROJECT_ROOT="${1:-.}" # Allow specifying project root, default to current dir
 
-echo "🔍 Starting comprehensive codebase inventory in \'$PROJECT_ROOT\'..."
+echo "🔍 Starting comprehensive codebase inventory in \'$PROJECT_T\'..."
 
-# Ensure project root is an absolute path
-PROJECT_ROOT_ABS="$(cd "$PROJECT_ROOT" && pwd)"
+PROJECT_T_ABS="$(cd "$PROJECT_T" && pwd)"
 
 # Function to analyze file purpose and lifecycle
 analyze_file() {
@@ -320,7 +310,7 @@ analyze_file() {
     # Search for filename without path to catch more references
     local filename_only
     filename_only=$(basename "$file_abs_path")
-    references_count=$(git grep -lw "$filename_only" -- "$PROJECT_ROOT_ABS" | wc -l)
+    references_count=$(git grep -lw "$filename_only" -- "$PROJECT_T_ABS" | wc -l)
     
     # Extract metadata if present (example: "Expires: YYYY-MM-DD")
     if head -n 5 "$file_abs_path" | grep -q -i "expires:"; then
@@ -328,10 +318,10 @@ analyze_file() {
     fi
 
     # Check Git status
-    if git -C "$PROJECT_ROOT_ABS" ls-files --error-unmatch "$file_abs_path" >/dev/null 2>&1; then
+    if git -C "$PROJECT_T_ABS" ls-files --error-unmatch "$file_abs_path" >/dev/null 2>&1; then
         git_tracked_status="true"
         # Get last committer (can be slow per file, consider batching or alternative approach if too slow)
-        # owner_info=$(git -C "$PROJECT_ROOT_ABS" log -1 --pretty=format:\'%an\' -- "$file_abs_path")
+        # owner_info=$(git -C "$PROJECT_T_ABS" log -1 --pretty=format:\'%an\' -- "$file_abs_path")
     fi
     
     # File modification timestamp (Unix epoch)
@@ -375,7 +365,7 @@ analyze_file() {
 }
 
 export -f analyze_file # Export function for find -exec
-export PROJECT_ROOT_ABS # Export for analyze_file
+export PROJECT_T_ABS # Export for analyze_file
 
 # Define exclusion patterns for find
 # IMPORTANT: Customize these exclusions for your project
@@ -401,17 +391,16 @@ EXCLUDE_PATTERNS=(
 # Scan for all files initially, then filter in jq or Python for more complex logic
 # This find command lists all files and pipes to jq for aggregation.
 # analyze_file is called for each file.
-find "$PROJECT_ROOT_ABS" \( "${EXCLUDE_PATTERNS[@]}" \) -prune -o -type f -print0 | \
-    xargs -0 -I {} bash -c \'analyze_file "$@"\' _ {} "$PROJECT_ROOT_ABS" | \
-    jq -s \'.\' > "$PROJECT_ROOT_ABS/$INVENTORY_FILE"
+find "$PROJECT_T_ABS" \( "${EXCLUDE_PATTERNS[@]}" \) -prune -o -type f -print0 | \
+    xargs -0 -I {} bash -c \'analyze_file "$@"\' _ {} "$PROJECT_T_ABS" | \
+    jq -s \'.\' > "$PROJECT_T_ABS/$INVENTORY_FILE"
 
-INVENTORY_COUNT=$(jq \'length\' "$PROJECT_ROOT_ABS/$INVENTORY_FILE")
-echo "📊 Inventory complete. Scanned $INVENTORY_COUNT files. Report: $PROJECT_ROOT_ABS/$INVENTORY_FILE"
+INVENTORY_COUNT=$(jq \'length\' "$PROJECT_T_ABS/$INVENTORY_FILE")
+echo "📊 Inventory complete. Scanned $INVENTORY_COUNT files. Report: $PROJECT_T_ABS/$INVENTORY_FILE"
 echo "ℹ️  Note: \'references\' count is a simple grep. \'owner\' info might be basic."
-echo "Next step: Run \'python scripts/cleanup_engine.py $PROJECT_ROOT_ABS/$INVENTORY_FILE\'"
+echo "Next step: Run \'python scripts/cleanup_engine.py $PROJECT_T_ABS/$INVENTORY_FILE\'"
 ```
 **Key features of `comprehensive_inventory.sh`:**
-*   Takes an optional argument for the project root.
 *   Generates a `cleanup_inventory.json` file.
 *   Extracts path, type, size, modification date, simple reference count, expiration (if found in first 5 lines), and Git tracking status.
 *   Applies a basic heuristic for file purpose.
@@ -434,7 +423,6 @@ import sys
 import re
 
 # --- Configuration ---
-# Critical directories (relative to project root) that should largely be ignored
 CRITICAL_DIRS = {
     ".git", "venv", ".venv", "node_modules", "dist", "build", 
     "requirements/frozen", "docs/official_releases", "data/production_seeds",
@@ -483,11 +471,8 @@ logging.basicConfig(
 )
 
 class IntelligentCleanup:
-    def __init__(self, inventory_file_path: str, project_root_path: str, dry_run: bool = True):
-        self.project_root = Path(project_root_path).resolve()
         self.inventory_path = Path(inventory_file_path).resolve()
         self.inventory: list[dict] = self._load_json(self.inventory_path)
-        self.cleanup_registry: dict = self._load_json(self.project_root / CLEANUP_REGISTRY_FILE, default={})
         self.dry_run = dry_run
         self.automation_scripts: set[str] = self._find_scheduled_scripts()
 
@@ -522,10 +507,8 @@ class IntelligentCleanup:
                 parts = line.split()
                 if len(parts) > 5:
                     command_part = " ".join(parts[5:])
-                    # Try to find scripts within the project root
                     # This requires script paths in cron to be absolute or identifiable
                     for item in re.split(r\'\s+|;|&', command_part):
-                        if item.startswith(str(self.project_root)) and Path(item).is_file():
                             scheduled.add(str(Path(item).resolve()))
         except (subprocess.CalledProcessError, FileNotFoundError):
             logging.warning("Crontab not found or no entries for current user. Scheduled script check may be incomplete.")
@@ -535,7 +518,6 @@ class IntelligentCleanup:
     def is_safe_to_remove(self, file_info: dict) -> tuple[bool, str]:
         """Determine if file is safe to remove based on multiple criteria. Returns (is_safe, reason)."""
         file_path = Path(file_info[\'path\']).resolve()
-        relative_path_str = str(file_path.relative_to(self.project_root))
 
         # 1. Critical Directory Check
         if any(crit_dir in file_path.parts for crit_dir in CRITICAL_DIRS):
@@ -635,7 +617,6 @@ class IntelligentCleanup:
             mod_date = datetime.fromtimestamp(int(file_info.get(\'modified_epoch\', 0)), timezone.utc).strftime(\'%Y-%m-%d %H:%M:%S %Z\')
             
             print("-" * 50)
-            print(f"📁 File: {path.relative_to(self.project_root)}")
             print(f"   Reason: {reason}")
             print(f"   Size: {size_kb:.2f} KB, Modified: {mod_date}")
             print(f"   Type: {file_info.get(\'type\', \'N/A\')}, Git Tracked: {file_info.get(\'git_tracked\', False)}")
@@ -679,7 +660,6 @@ class IntelligentCleanup:
 
     def _perform_delete(self, file_info: dict):
         path = Path(file_info[\'path\'])
-        log_message = f"File: {path.relative_to(self.project_root)}, Size: {file_info.get(\'size\',0)}, Git: {file_info.get(\'git_tracked\')}"
         
         if self.dry_run:
             logging.info(f"[DRY RUN] Would delete: {log_message}")
@@ -688,7 +668,6 @@ class IntelligentCleanup:
         try:
             if file_info.get(\'git_tracked\', False):
                 # For git-tracked files, prefer `git rm`
-                subprocess.run([\'git\', \'rm\', str(path)], check=True, cwd=self.project_root)
                 logging.info(f"Git removed: {log_message}")
             else:
                 path.unlink() # Deletes the file
@@ -697,7 +676,6 @@ class IntelligentCleanup:
             # Remove from cleanup_registry if it was there
             if str(path) in self.cleanup_registry:
                 del self.cleanup_registry[str(path)]
-                self._save_json(self.project_root / CLEANUP_REGISTRY_FILE, self.cleanup_registry)
 
         except Exception as e:
             logging.error(f"Error deleting {path}: {e}")
@@ -720,7 +698,6 @@ class IntelligentCleanup:
         import atexit
 
         def register_for_cleanup(filepath: Path, expiration_dt: datetime):
-            registry_path = Path(IntelligentCleanup.project_root / CLEANUP_REGISTRY_FILE if hasattr(IntelligentCleanup, \'project_root\') else CLEANUP_REGISTRY_FILE) # Adjust as needed
             current_registry = {}
             if registry_path.exists():
                 with registry_path.open(\'r\') as f:
@@ -777,10 +754,7 @@ if __name__ == "__main__":
     inventory_fpath = sys.argv[1]
     is_dry_run = "--execute" not in sys.argv
     
-    # Infer project root from inventory file path (assuming inventory is in project root)
-    proj_root = str(Path(inventory_fpath).resolve().parent)
 
-    engine = IntelligentCleanup(inventory_file_path=inventory_fpath, project_root_path=proj_root, dry_run=is_dry_run)
     engine.interactive_cleanup()
     logging.info(f"Cleanup {\'DRY RUN \' if is_dry_run else \'\'}session complete. Log: {LOG_FILE.resolve()}")
 
@@ -875,7 +849,6 @@ class AutomationManager:
 
         self.registry[\'managed_scripts\'][script_id] = {
             \'name\': script_name,
-            \'path\': str(managed_script_path), # Store relative to project root if possible, or absolute
             \'schedule\': schedule,
             \'description\': description,
             \'owner\': owner,
@@ -911,13 +884,13 @@ set -euo pipefail
 SCRIPT_TO_RUN="{script_path.resolve()}"
 HEALTH_FILE="{health_file.resolve()}"
 LOG_FILE="{log_file.resolve()}"
-PROJECT_ROOT="{script_path.parent.parent.resolve()}" # Assuming script is in scripts/automation
+PROJECT_T="{script_path.parent.parent.resolve()}" # Assuming script is in scripts/automation
 
 echo "----------------------------------------" >> "$LOG_FILE"
 echo "$(date \'+\%Y-\%m-\%d \%H:\%M:\%S \%Z\') - Starting $SCRIPT_TO_RUN" >> "$LOG_FILE"
 
 # Ensure Python scripts use project\'s venv if applicable
-# Example: source "$PROJECT_ROOT/venv/bin/activate" && python "$SCRIPT_TO_RUN" >> "$LOG_FILE" 2>&1
+# Example: source "$PROJECT_T/venv/bin/activate" && python "$SCRIPT_TO_RUN" >> "$LOG_FILE" 2>&1
 # Or, if the script is executable and has a shebang:
 if "$SCRIPT_TO_RUN" >> "$LOG_FILE" 2>&1; then
     STATUS="success"
@@ -1030,7 +1003,6 @@ This section details how to reliably schedule and manage the cleanup scripts and
 
 ### Proposed Schedule Framework
 
-Paths are illustrative; adapt them to your project structure (e.g., `/opt/cherry_ai-main/scripts/` or use relative paths if cron is run as the project user from the project root). Ensure scripts are executable.
 
 **1. Daily Maintenance (via `cron`)**
    *   **Purpose:** Routine cleanup of clearly temporary files, log rotation.
@@ -1040,18 +1012,14 @@ Paths are illustrative; adapt them to your project structure (e.g., `/opt/cherry
      # Project Symphony - Daily Maintenance
      SHELL=/bin/bash
      PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-     PROJECT_ROOT=/root/cherry_ai-main # ADJUST THIS
 
      # At 3:05 AM: Run the intelligent cleanup engine in a non-interactive, less aggressive mode
      # This assumes cleanup_engine.py can take flags for non-interactive, specific rule sets.
      # For now, this might just run the inventory to update it.
-     05 3 * * * root cd $PROJECT_ROOT && ./scripts/comprehensive_inventory.sh >> $PROJECT_ROOT/logs/inventory_daily.log 2>&1
      
      # At 3:15 AM: (If cleanup_engine.py supported a non-interactive mode for very safe deletions)
-     # 15 3 * * * root cd $PROJECT_ROOT && python ./scripts/cleanup_engine.py $PROJECT_ROOT/cleanup_inventory.json --non-interactive --ruleset=daily_safe_deletions >> $PROJECT_ROOT/logs/cleanup_daily.log 2>&1
 
      # At 3:30 AM: Rotate application logs (if not handled by logging framework or system logrotate)
-     # 30 3 * * * root cd $PROJECT_ROOT && python ./scripts/rotate_app_logs.py >> $PROJECT_ROOT/logs/log_rotation.log 2>&1
      ```
    *   **Associated Script(s):**
         *   `scripts/comprehensive_inventory.sh` (to keep inventory fresh for checks).
@@ -1065,11 +1033,9 @@ Paths are illustrative; adapt them to your project structure (e.g., `/opt/cherry
      ```cron
      # Project Symphony - Weekly Deep Clean
      # Sunday at 2:00 AM: Update inventory
-     0 2 * * 0 root cd $PROJECT_ROOT && ./scripts/comprehensive_inventory.sh >> $PROJECT_ROOT/logs/inventory_weekly.log 2>&1
      # Sunday at 2:15 AM: Run cleanup engine in interactive mode (output to a log for later review if not truly interactive)
      # This is tricky for cron. Better to run manually or have it generate a report of candidates.
      # Option 1: Generate a report of candidates
-     15 2 * * 0 root cd $PROJECT_ROOT && python ./scripts/cleanup_engine.py $PROJECT_ROOT/cleanup_inventory.json --report-only > $PROJECT_ROOT/reports/weekly_cleanup_candidates.txt
      # Option 2: (If interactive is needed) - this requires someone to be there or a very careful non-interactive mode.
      ```
    *   **Associated Script(s):**
@@ -1099,26 +1065,23 @@ Paths are illustrative; adapt them to your project structure (e.g., `/opt/cherry
       [Service]
       Type=oneshot
       User=your_project_user # Run as appropriate user
-      WorkingDirectory=/root/cherry_ai-main # ADJUST THIS
-      ExecStart=/root/cherry_ai-main/scripts/quick_health_check.sh # ADJUST THIS
       StandardOutput=journal+console 
       ```
     *   **Associated Script (`scripts/quick_health_check.sh`):**
       ```bash
       #!/bin/bash
-      PROJECT_ROOT=/root/cherry_ai-main # ADJUST THIS
-      LOG_FILE="$PROJECT_ROOT/logs/quick_health.log"
+      LOG_FILE="$PROJECT_T/logs/quick_health.log"
       echo "$(date): Running quick health check..." >> "$LOG_FILE"
       
       # Check count of files matching temp patterns in specific dirs (e.g., uploads, processing output)
-      TEMP_FILE_COUNT=$(find "$PROJECT_ROOT/var/temp_processing" -type f -name "tmp_*" -mmin -120 | wc -l) # Temp files in last 2 hours
+      TEMP_FILE_COUNT=$(find "$PROJECT_T/var/temp_processing" -type f -name "tmp_*" -mmin -120 | wc -l) # Temp files in last 2 hours
       if [ "$TEMP_FILE_COUNT" -gt 50 ]; then
           echo "WARNING: High number of recent temp files found: $TEMP_FILE_COUNT" >> "$LOG_FILE"
           # Add notification logic here
       fi
 
       # Check health of registered automation scripts (using health files from AutomationManager)
-      find "$PROJECT_ROOT/status/automation_health" -name "*.health" -type f | while read -r health_file; do
+      find "$PROJECT_T/status/automation_health" -name "*.health" -type f | while read -r health_file; do
           status=$(cat "$health_file")
           if [[ "$status" == failed* ]]; then
               echo "ERROR: Automation script $(basename "$health_file" .health) reported failure: $status" >> "$LOG_FILE"
@@ -1134,7 +1097,6 @@ Paths are illustrative; adapt them to your project structure (e.g., `/opt/cherry
    *   **Example Crontab Entry:**
      ```cron
      # Project Symphony - Monthly Git Maintenance
-     0 4 1 * * root cd $PROJECT_ROOT && git gc --aggressive --prune=now && git remote prune origin >> $PROJECT_ROOT/logs/git_maintenance.log 2>&1
      ```
 
 ### Health Checks and Notifications
@@ -1283,7 +1245,7 @@ While a full dashboard setup is beyond this scope, here are metrics to track, wh
 
 **Phase 1: Setup & Initial Analysis (Weeks 1-2)**
 *   [ ] **Review & Customize:** Thoroughly review this entire framework document with the team. Customize `CRITICAL_DIRS`, `PROTECTED_PATTERNS`, and script paths.
-*   [ ] **Tool Configuration:** Update Roo, Cursor, and any other AI assistant configurations with the new rules and guidelines from Part 2.
+*   [ ] **Tool Configuration:** Update , Cursor, and any other AI assistant configurations with the new rules and guidelines from Part 2.
 *   [ ] **Deploy Core Scripts:**
     *   [ ] Add `scripts/comprehensive_inventory.sh` to the project. Test it.
     *   [ ] Add `scripts/cleanup_engine.py` to the project. Test its dry-run mode.
@@ -1302,7 +1264,7 @@ While a full dashboard setup is beyond this scope, here are metrics to track, wh
 **Phase 3: Ongoing Monitoring & Refinement (Months 2-3 onwards)**
 *   [ ] **Regular Cleanup Sessions:** Schedule and conduct regular (e.g., bi-weekly or monthly) cleanup reviews using `cleanup_engine.py`.
 *   [ ] **Monitor GitHub Actions Reports:** Review reports from the hygiene workflow. Identify patterns and areas for improvement.
-*   [ ] **Refine AI Guidance:** Based on observed AI outputs and developer feedback, refine the rules and prompts for Roo, Cursor, etc.
+*   [ ] **Refine AI Guidance:** Based on observed AI outputs and developer feedback, refine the rules and prompts for , Cursor, etc.
 *   [ ] **Expand `AutomationManager` Usage:** Register all new legitimate automation scripts via the `AutomationManager`.
 *   [ ] **Develop Monitoring Dashboard Data Collection:** Start scripting the collection of key metrics for future dashboarding.
 *   [ ] **Quarterly Review:** Conduct a quarterly review of the framework\'s effectiveness and make adjustments as needed.

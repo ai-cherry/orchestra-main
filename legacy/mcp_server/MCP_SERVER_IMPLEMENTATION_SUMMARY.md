@@ -57,7 +57,6 @@ The MCP server now follows a modern, cloud-native architecture:
 
 ## Security Improvements
 
-- Non-root user in Docker container
 - Secure API key management with Secret Manager (or Lambda equivalent)
 - Proper IAM permissions (or Lambda equivalent for access control)
 - Health checks and monitoring

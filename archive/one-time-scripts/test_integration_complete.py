@@ -1,6 +1,6 @@
 # TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
-"""Comprehensive test suite for Roo integration"""
+"""Comprehensive test suite for  integration"""
     """Test all integration components"""
     def test(self, name, condition, details=""):
         """Run a single test"""
@@ -16,7 +16,6 @@
         """Test database functionality"""
         print("\n📊 Testing Database...")
         
-        db_path = Path("roo_integration.db")
         self.test("Database exists", db_path.exists())
         
         if db_path.exists():
@@ -45,10 +44,9 @@ execute("SELECT name FROM sqlite_master WHERE type='table'")
             conn.close()
     
     def test_mode_files(self):
-        """Test Roo mode files"""
-        print("\n🎭 Testing Roo Modes...")
+        """Test  mode files"""
+        print("\n🎭 Testing  Modes...")
         
-        modes_dir = Path(".roo/modes")
         self.test("Modes directory exists", modes_dir.exists())
         
         if modes_dir.exists():
@@ -76,7 +74,6 @@ execute("SELECT name FROM sqlite_master WHERE type='table'")
         print("\n🔧 Testing Scripts...")
         
         scripts = [
-            "scripts/roo_integration_standalone.py",
             "scripts/auto_mode_selector.py",
             "scripts/parallel_mode_executor.py"
         ]

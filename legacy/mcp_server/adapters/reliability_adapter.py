@@ -186,7 +186,6 @@ class ReliabilityAdapter(FactoryMCPAdapter):
                     "start_time": incident.get("start_time", ""),
                     "detection_time": incident.get("detection_time", ""),
                     "mttr_estimate": incident.get("mttr_estimate", 0),
-                    "root_cause": incident.get("root_cause", ""),
                     "impact": incident.get("impact", {}),
                 }
             )
@@ -237,7 +236,6 @@ class ReliabilityAdapter(FactoryMCPAdapter):
                             "start_time": datetime.now().isoformat(),
                             "detection_time": datetime.now().isoformat(),
                             "mttr_estimate": 30,
-                            "root_cause": "Database connection pool exhaustion",
                             "impact": {
                                 "users_affected": 1500,
                                 "revenue_impact": "$5000/hour",

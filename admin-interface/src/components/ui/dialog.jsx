@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils"
 function Dialog({
   ...props
 }) {
-  return <DialogPrimitive.Root data-slot="dialog" {...props} />;
+  return <DialogPrimitive.t data-slot="dialog" {...props} />;
 }
 
 function DialogTrigger({

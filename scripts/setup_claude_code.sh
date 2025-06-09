@@ -52,9 +52,7 @@ error_exit() {
     exit 1
 }
 
-# Get project root
-PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/..' && pwd)"
-log_info "Project root: $PROJECT_ROOT"
+PROJECT_T="$(cd "$(dirname "${BASH_SOURCE[0]}")/..' && pwd)"
 
 # Check if claude-code is installed
 if ! command -v claude &> /dev/null; then
@@ -75,7 +73,7 @@ mkdir -p "$CLAUDE_CONFIG_DIR" || error_exit "Failed to create config directory"
 
 # Create MCP server registry
 log_info "Creating MCP server registry..."
-MCP_REGISTRY_FILE="$PROJECT_ROOT/mcp_server/server_registry.json"
+MCP_REGISTRY_FILE="$PROJECT_T/mcp_server/server_registry.json"
 
 cat > "$MCP_REGISTRY_FILE" << 'EOF'
 {
@@ -126,7 +124,7 @@ MCP_CONFIG="{
   \"mcpServers\": {"
 
 SERVER_COUNT=0
-for server_file in "$PROJECT_ROOT/mcp_server/servers/"*.py; do
+for server_file in "$PROJECT_T/mcp_server/servers/"*.py; do
     if [ -f "$server_file" ]; then
         server_name=$(basename "$server_file" .py | sed 's/_server$//' | sed 's/_/-/g')
         log_info "Found server: $server_name ($server_file)"
@@ -202,8 +200,8 @@ log_info "Found $SERVER_COUNT MCP servers"
 # Create a project-specific .mcp.json for team sharing
 echo -e "${YELLOW}Creating project MCP configuration...${NC}"
 
-PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-cat > "$PROJECT_ROOT/.mcp.json" << 'EOF'
+PROJECT_T="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cat > "$PROJECT_T/.mcp.json" << 'EOF'
 {
   "name": "AI cherry_ai MCP Configuration",
   "description": "MCP servers for AI cherry_ai development",
@@ -245,7 +243,7 @@ fi
 # Create a launcher script for Cursor
 log_info "Creating Cursor launcher with Claude Code..."
 
-cat > "$PROJECT_ROOT/launch_cursor_with_claude.sh" << 'EOF'
+cat > "$PROJECT_T/launch_cursor_with_claude.sh" << 'EOF'
 #!/bin/bash
 # Launch Cursor with Claude Code integration
 
@@ -290,9 +288,8 @@ log_error() {
     log "ERROR" "$@"
 }
 
-# Get project root
-PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-MCP_SERVER_DIR="$PROJECT_ROOT/mcp_server"
+PROJECT_T="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+MCP_SERVER_DIR="$PROJECT_T/mcp_server"
 
 # Ensure environment is loaded
 if [ -f ~/.Lambda_env_setup.sh ]; then
@@ -416,7 +413,7 @@ fi
 
 # Launch Cursor
 log_info "Launching Cursor..."
-cursor "$PROJECT_ROOT" &
+cursor "$PROJECT_T" &
 CURSOR_PID=$!
 
 # Show helpful information
@@ -452,18 +449,18 @@ while true; do
 done
 EOF
 
-chmod +x "$PROJECT_ROOT/launch_cursor_with_claude.sh" || error_exit "Failed to make launcher executable"
+chmod +x "$PROJECT_T/launch_cursor_with_claude.sh" || error_exit "Failed to make launcher executable"
 
 log_success "Cursor launcher created"
 
 # Create a health check script
 log_info "Creating MCP health check script..."
-cat > "$PROJECT_ROOT/check_mcp_servers.sh" << 'EOF'
+cat > "$PROJECT_T/check_mcp_servers.sh" << 'EOF'
 #!/bin/bash
 # Check MCP server health
 
-PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-MCP_SERVER_DIR="$PROJECT_ROOT/mcp_server"
+PROJECT_T="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+MCP_SERVER_DIR="$PROJECT_T/mcp_server"
 
 echo "Checking MCP server availability..."
 echo ""
@@ -481,7 +478,7 @@ for server_file in "$MCP_SERVER_DIR/servers/"*.py; do
 done
 EOF
 
-chmod +x "$PROJECT_ROOT/check_mcp_servers.sh"
+chmod +x "$PROJECT_T/check_mcp_servers.sh"
 log_success "Health check script created"
 
 # Provide usage instructions

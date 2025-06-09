@@ -3,7 +3,6 @@
 """
 """
     """Architect for advanced system features"""
-        self.base_dir = Path("/root/cherry_ai-main")
         self.src_dir = self.base_dir / "src"
         self.architecture = {
             "created_at": datetime.now().isoformat(),

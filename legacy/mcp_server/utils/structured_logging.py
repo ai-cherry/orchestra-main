@@ -95,17 +95,11 @@ def configure_logging(level: int = logging.INFO, json_output: bool = True, log_f
             pass
             print(f"Error setting up log file: {e}")
 
-    # Configure root logger
-    root_logger = logging.getLogger()
-    root_logger.setLevel(level)
 
     # Remove existing handlers
-    for h in root_logger.handlers:
-        root_logger.removeHandler(h)
 
     # Add our handlers
     for handler in handlers:
-        root_logger.addHandler(handler)
 
     # Log that logging is configured
     logger = cast(StructuredLogger, logging.getLogger(__name__))

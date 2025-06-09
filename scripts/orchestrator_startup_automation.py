@@ -242,7 +242,6 @@
         self.log("\n🤖 Creating automation daemon...")
         
         service_content = f'''
-User={os.environ.get('USER', 'root')}
 WorkingDirectory={os.getcwd()}
 Environment="PATH={os.environ.get('PATH')}"
 ExecStart={sys.executable} {os.path.join(os.getcwd(), 'scripts/conductor_daemon.py')}

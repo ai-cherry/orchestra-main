@@ -19,7 +19,6 @@ def main():
     # Environment
     print("\n📋 Environment")
     print("-" * 40)
-    env_file = root_dir / ".env"
     if env_file.exists():
         print("✓ .env file configured")
         # Count configured services
@@ -40,7 +39,6 @@ def main():
     }
 
     for file, desc in configs.items():
-        path = root_dir / file
         if path.exists():
             print(f"✓ {file} - {desc}")
         else:
@@ -49,13 +47,11 @@ def main():
     # MCP Servers
     print("\n🤖 MCP Servers")
     print("-" * 40)
-    mcp_file = root_dir / ".mcp.json"
     if mcp_file.exists():
         with open(mcp_file, "r") as f:
             mcp_config = json.load(f)
 
         for server_name in mcp_config.get("servers", {}).keys():
-            server_file = root_dir / "mcp_server" / "servers" / f"{server_name}_server.py"
             if server_file.exists():
                 print(f"✓ {server_name} server - Ready")
             else:
@@ -84,7 +80,6 @@ def main():
     }
 
     for script, desc in scripts.items():
-        path = root_dir / script
         if path.exists():
             print(f"✓ {script} - {desc}")
         else:
@@ -93,7 +88,6 @@ def main():
     # Cleanup Status
     print("\n🧹 Cleanup Status")
     print("-" * 40)
-    archive_dir = root_dir / "scripts" / "archive"
     if not archive_dir.exists():
         print("✓ Archive directory removed")
     else:
@@ -106,7 +100,6 @@ def main():
         result = subprocess.run(
             ["grep", "-r", "google-cloud", "--include=*.txt", "requirements/"],
             capture_output=True,
-            cwd=root_dir,
         )
         if result.returncode == 0:
             print("✗ GCP dependencies still in requirements")

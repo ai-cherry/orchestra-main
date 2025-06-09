@@ -44,9 +44,6 @@ target/
 pkg/
 
 # Cleanup artifacts
-.roo/
-.roomodes*
-roo_integration.db
 EOF
 
 # Create MCP configuration

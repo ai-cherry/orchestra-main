@@ -7,7 +7,7 @@
 ## 📊 Current State Assessment
 
 ### ✅ **What's Already Working Well**
-- **Roo Coder Integration:** 10 specialized modes with OpenRouter API
+- ** Coder Integration:** 10 specialized modes with OpenRouter API
 - **MCP Server Architecture:** Code intelligence, Git intelligence, Memory servers
 - **OpenRouter Centralization:** Multiple AI models through single API
 - **Portkey Integration:** Model routing and management
@@ -71,7 +71,7 @@
 **Goal:** Optimal configuration for each AI coding tool
 
 **Tools to Optimize:**
-- **Roo Coder:** Enhanced rules and mode transitions
+- ** Coder:** Enhanced rules and mode transitions
 - **Cursor AI:** Workspace configuration and extensions
 - **OpenAI Codex:** SSH integration and automation
 - **Google Jules:** API integration and prompts
@@ -88,11 +88,10 @@ orchestra-main/
 │   │   ├── settings.json
 │   │   ├── extensions.json
 │   │   └── workspace.code-workspace
-│   ├── roo/                      # Roo Coder configurations
 │   │   ├── modes/               # Mode definitions
 │   │   ├── rules/               # Global and mode-specific rules
 │   │   ├── prompts/             # Prompt templates
-│   │   └── config.json          # Main Roo configuration
+│   │   └── config.json          # Main  configuration
 │   ├── codex/                    # OpenAI Codex configurations
 │   │   ├── setup.sh
 │   │   ├── prompts/
@@ -140,12 +139,10 @@ find . -name "*migration*" -type d -exec rm -rf {} +
 find . -name "*refactor*" -type d -exec rm -rf {} +
 
 # Create new structure
-mkdir -p .ai-tools/{cursor,roo,codex,factory-ai,apis,prompts}
 mkdir -p .ai-tools/prompts/{coding,debugging,architecture,optimization}
 ```
 
 ### Step 2: Centralize Configurations
-- Move `.roo/` contents to `.ai-tools/roo/`
 - Move `.cursor/` contents to `.ai-tools/cursor/`
 - Create unified API configuration in `.ai-tools/apis/`
 - Consolidate all prompt templates
@@ -222,7 +219,7 @@ mkdir -p .ai-tools/prompts/{coding,debugging,architecture,optimization}
 
 ## 🤖 AI Tool Specific Optimizations
 
-### Roo Coder Enhancements
+###  Coder Enhancements
 - **Enhanced Rules:** Performance and stability focused
 - **Mode Transitions:** Automatic based on context
 - **Memory Integration:** Persistent context across sessions

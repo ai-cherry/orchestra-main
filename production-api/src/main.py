@@ -5,7 +5,6 @@ High-performance backend with WebSocket support and database integration
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from flask_socketio import SocketIO, emit, join_room, leave_room
 import asyncio
 import json
 import logging
@@ -290,7 +289,6 @@ def create_app():
         
         if client_id in active_connections:
             active_connections[client_id]['subscriptions'].append(subscription_type)
-            join_room(subscription_type)
             
             emit('subscribed', {
                 'type': subscription_type,
@@ -307,7 +305,6 @@ def create_app():
             subscriptions = active_connections[client_id]['subscriptions']
             if subscription_type in subscriptions:
                 subscriptions.remove(subscription_type)
-                leave_room(subscription_type)
                 
                 emit('unsubscribed', {
                     'type': subscription_type,
@@ -326,7 +323,6 @@ def create_app():
                     'active_connections': len(active_connections),
                     'response_time': 150.5,
                     'timestamp': datetime.utcnow().isoformat()
-                }, room='system_metrics')
                 
                 # Send persona status updates
                 socketio.emit('persona_status_update', {
@@ -334,7 +330,6 @@ def create_app():
                     'sophia': {'status': 'active', 'health': 98.2},
                     'karen': {'status': 'active', 'health': 96.8},
                     'timestamp': datetime.utcnow().isoformat()
-                }, room='persona_status')
                 
                 socketio.sleep(5)  # Update every 5 seconds
                 

@@ -17,7 +17,6 @@ class AITool(Enum):
     CLAUDE = "claude"
     OPENAI = "openai"
     GITHUB_COPILOT = "github_copilot"
-    ROO_CODE = "roo_code"
     OPENROUTER = "openrouter"
     GROK = "grok"
     PERPLEXITY = "perplexity"
@@ -50,9 +49,8 @@ class TaskRequest:
                 self.tool_availability[AITool.GITHUB_COPILOT] = False
                 logger.warning("⚠️ GitHub Copilot: No token found")
             
-            # Roo Code integration (already available)
-            self.ai_tools[AITool.ROO_CODE] = "roo_code_client"  # Placeholder
-            logger.info("✅ Roo Code integration available")
+            #  Code integration (already available)
+            logger.info("✅  Code integration available")
             
             # OpenRouter integration
             if os.environ.get('OPENROUTER_API_KEY'):
@@ -95,9 +93,8 @@ class TaskRequest:
         """Calculate tool performance score for selection"""
         """Process a task using the optimal AI tool"""
         """Execute task with specific tool"""
-                'content': f"Roo Code processing: {task.prompt}",
+                'content': f" Code processing: {task.prompt}",
                 'tokens_used': 0,
-                'model': 'roo-code'
             }
         
         else:

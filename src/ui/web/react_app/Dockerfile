@@ -16,7 +16,6 @@ RUN npm run build
 # Production stage
 FROM nginx:1.25.5-alpine
 
-# Create non-root user for nginx
 RUN addgroup -S nginx && adduser -S -G nginx nginx
 
 # Copy built assets

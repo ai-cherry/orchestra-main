@@ -223,7 +223,6 @@
         analysis = {
             "eigencode": {},
             "cursor_ai": {},
-            "roo_code": {},
             "mcp_server": {}
         }
         
@@ -279,11 +278,9 @@
         analysis["cursor_ai"]["mock_latency"] = time.time() - start
         analysis["cursor_ai"]["status"] = "mock"
         
-        # Roo Code simulation
+        #  Code simulation
         start = time.time()
         await asyncio.sleep(0.12)  # Simulate API call
-        analysis["roo_code"]["mock_latency"] = time.time() - start
-        analysis["roo_code"]["status"] = "mock"
         
         return analysis
     

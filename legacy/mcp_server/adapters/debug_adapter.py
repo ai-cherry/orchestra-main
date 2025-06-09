@@ -79,7 +79,6 @@
         mcp_response = {
             "result": {
                 "diagnosis": result.get("diagnosis", {}),
-                "root_cause": result.get("root_cause", ""),
                 "solutions": self._format_solutions(result.get("solutions", [])),
                 "stack_analysis": result.get("stack_analysis", {}),
                 "performance_insights": result.get("performance_insights", {}),
@@ -182,7 +181,6 @@
                         "severity": "high",
                         "affected_components": ["database", "api"],
                     },
-                    "root_cause": "Database connection pool exhausted due to leaked connections",
                     "solutions": [
                         {
                             "description": "Implement connection pooling with proper cleanup",

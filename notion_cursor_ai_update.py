@@ -7,12 +7,14 @@ Creates a comprehensive status page with all current system information
 import requests
 import json
 from datetime import datetime
+import os
 
 class SimpleNotionUpdater:
     """Simplified Notion updater for Orchestra AI ecosystem"""
     
     def __init__(self):
-        self.api_key = "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"
+        # Prefer environment variable, fallback to provided token
+        self.api_key = os.environ.get("NOTION_API_TOKEN", "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")
         self.headers = {
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json",
@@ -178,7 +180,7 @@ class SimpleNotionUpdater:
                         "object": "block",
                         "type": "bulleted_list_item",
                         "bulleted_list_item": {
-                            "rich_text": [{"type": "text", "text": {"content": "🟢 Roo Code Extension: 10 specialized modes configured, ready for installation"}}]
+                            "rich_text": [{"type": "text", "text": {"content": "🟢  Code Extension: 10 specialized modes configured, ready for installation"}}]
                         }
                     },
                     {
@@ -262,7 +264,7 @@ class SimpleNotionUpdater:
                         "object": "block",
                         "type": "paragraph",
                         "paragraph": {
-                            "rich_text": [{"type": "text", "text": {"content": "All tools work together: Continue.dev for UI + Cursor for infrastructure + Roo for complex planning + MCP for context sharing. Unified development experience with specialized capabilities for maximum productivity."}}]
+                            "rich_text": [{"type": "text", "text": {"content": "All tools work together: Continue.dev for UI + Cursor for infrastructure +  for complex planning + MCP for context sharing. Unified development experience with specialized capabilities for maximum productivity."}}]
                         }
                     },
                     {

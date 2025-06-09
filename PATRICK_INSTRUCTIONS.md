@@ -12,16 +12,16 @@
 
 ### **Primary Development Tools:**
 - **🎯 Cursor IDE**: Quick edits, real-time coding, native AI integration
-- **🤖 Roo Coder**: Complex workflows, specialized modes, boomerang tasks  
+- **🤖  Coder**: Complex workflows, specialized modes, boomerang tasks  
 - **📱 Continue.dev**: UI development with UI-GPT-4O, React/TypeScript specialization
 - **🔧 MCP Servers**: Contextualized coding with live data integration
 
 ### **Tool Selection Guidelines:**
 ```
 ┌─ Quick coding & debugging → Cursor IDE
-├─ Complex multi-step tasks → Roo (boomerang)
+├─ Complex multi-step tasks →  (boomerang)
 ├─ UI/React development → Continue.dev (UI-GPT-4O)
-└─ Architecture & planning → Roo architect mode
+└─ Architecture & planning →  architect mode
 ```
 
 ---
@@ -42,65 +42,54 @@
 
 ---
 
-## 🤖 **ROO CODER SPECIALIZED MODES**
+## 🤖 ** CODER SPECIALIZED MODES**
 
 ### **Available Modes (All Enhanced & Working):**
 
-#### **💻 Developer Mode** (`roo code`)
 - **Model**: DeepSeek R1 (cost-optimized)
 - **Specialization**: Python 3.10, TypeScript, type hints, AI-friendly code
 - **When to use**: General coding, implementation, bug fixes
 - **Custom Instructions**: Enforces Python 3.10 standards, mandatory type hints
 
-#### **🏗 Architect Mode** (`roo architect`)  
 - **Model**: Claude Sonnet 4 (high-intelligence)
 - **Specialization**: PostgreSQL, Weaviate, Pulumi, Lambda Labs infrastructure
 - **When to use**: System design, architecture decisions, infrastructure planning
 - **Custom Instructions**: Hot-swappable modules, EXPLAIN ANALYZE for queries
 
-#### **🪃 Orchestrator Mode** (`roo orchestrator`)
 - **Model**: Claude Sonnet 4 (high-intelligence)  
 - **Specialization**: Complex workflows, task decomposition, boomerang tasks
 - **When to use**: Multi-step processes, coordinating between tools
 - **Custom Instructions**: Atomic task breakdown, dependency graphs, checkpointing
 
-#### **🪲 Debug Mode** (`roo debug`)
 - **Model**: DeepSeek R1 (systematic analysis)
 - **Specialization**: Error analysis, systematic debugging, git blame analysis  
-- **When to use**: Troubleshooting, root cause analysis, error investigation
 - **Custom Instructions**: Scientific method, reproducible test cases
 
-#### **🔍 Research Mode** (`roo research`)
 - **Model**: Gemini 2.5 Pro (comprehensive research)
 - **Specialization**: Best practices, documentation, competitive analysis
 - **When to use**: Learning new technologies, research tasks, documentation
 - **Custom Instructions**: Official docs first, synthesize for AI consumption
 
-#### **📊 Analytics Mode** (`roo analytics`)
 - **Model**: DeepSeek R1 (data processing)
 - **Specialization**: Metrics, performance monitoring, data pipelines
 - **When to use**: Data analysis, KPI tracking, performance optimization
 - **Custom Instructions**: ETL best practices, data quality validation
 
-#### **⚙️ Implementation Mode** (`roo implementation`)
 - **Model**: DeepSeek R1 (operations)
 - **Specialization**: Deployment, Pulumi IaC, Lambda Labs operations
 - **When to use**: Infrastructure deployment, operational tasks
 - **Custom Instructions**: Infrastructure as code, state management
 
-#### **✅ Quality Mode** (`roo quality`)
 - **Model**: DeepSeek R1 (validation)
 - **Specialization**: Code review, testing, standards compliance
 - **When to use**: Quality assurance, code review, testing
 - **Custom Instructions**: Coding standards, test coverage, documentation
 
-#### **🧠 Strategy Mode** (`roo strategy`)
 - **Model**: Claude Opus 4 (strategic thinking)
 - **Specialization**: Technology decisions, long-term architecture
 - **When to use**: Strategic planning, technology selection, roadmapping
 - **Custom Instructions**: Proven technologies, maintenance burden analysis
 
-#### **📝 Documentation Mode** (`roo documentation`)
 - **Model**: Gemini 2.0 Flash (content generation)
 - **Specialization**: AI-optimized documentation, knowledge management
 - **When to use**: Documentation creation, knowledge base updates
@@ -205,17 +194,11 @@ python setup_api_keys.py --verify
 
 ### **Development Workflow:**
 ```
-1. Planning & Architecture → roo architect
-2. Implementation → Cursor IDE (quick) or roo code (complex)
 3. UI Development → Continue.dev /ui or /prototype
-4. Debugging → roo debug or Cursor
-5. Quality Assurance → roo quality
-6. Documentation → roo documentation
 ```
 
 ### **Boomerang Tasks (Complex Multi-Step):**
 ```bash
-# Use roo orchestrator for:
 - Multi-file refactoring
 - Database schema changes
 - Infrastructure deployment
@@ -247,7 +230,7 @@ python setup_api_keys.py --verify
 ## ⚡ **PERFORMANCE OPTIMIZATION**
 
 ### **Cost Optimization:**
-- **OpenRouter Integration**: Cost-effective model routing for Roo
+- **OpenRouter Integration**: Cost-effective model routing for 
 - **Model Selection**: Task-appropriate model assignment
 - **Context Condensing**: Intelligent memory management
 
@@ -274,7 +257,6 @@ python setup_api_keys.py --setup
 
 ### **Common Issues:**
 - **API Key Issues**: Verify `OPENAI_API_KEY` in environment
-- **Roo Mode Issues**: Check `.roo/modes/` files have `customInstructions`
 - **Continue.dev Issues**: Verify config.json has UI-GPT-4O models
 - **MCP Issues**: Start servers with `./start_mcp_system_enhanced.sh`
 
@@ -284,19 +266,14 @@ python setup_api_keys.py --setup
 
 ### **Immediate:**
 1. **✅ Test Continue.dev**: Try `/ui` command in VS Code
-2. **✅ Test Roo**: Run `roo code` or `roo architect`  
-3. **✅ Test Boomerang**: Complex task with `roo orchestrator`
 
 ### **Development Priorities:**
 1. **Admin Interface**: Use Continue.dev `/admin` for dashboard components
 2. **Persona Features**: Use `/persona` for Cherry/Sophia/Karen specific UI
 3. **MCP Integration**: Deploy servers when needed for contextualized coding
-4. **Quality Assurance**: Use `roo quality` for code reviews
 
 ### **Optimization:**
 1. **Monitor API Usage**: Track OpenAI costs and optimize model selection
-2. **Update Documentation**: Use `roo documentation` for knowledge base
-3. **Performance Tuning**: Use `roo analytics` for metrics and optimization
 
 ---
 
@@ -305,7 +282,7 @@ python setup_api_keys.py --setup
 **✅ ALL SYSTEMS OPERATIONAL**
 
 - **Cursor IDE**: ✅ Rules configured, Python 3.10 standards enforced
-- **Roo Coder**: ✅ 10 specialized modes with custom instructions  
+- ** Coder**: ✅ 10 specialized modes with custom instructions  
 - **Continue.dev**: ✅ UI-GPT-4O models configured and tested
 - **MCP Servers**: ✅ Available and ready to deploy
 - **API Keys**: ✅ OpenAI configured and validated

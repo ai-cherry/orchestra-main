@@ -7,7 +7,7 @@
       ],
       "env": {
         "PYTHONPATH": "/var/www/cherry-ai",
-        "PROJECT_ROOT": "/var/www/cherry-ai"
+        "PROJECT_T": "/var/www/cherry-ai"
       },
       "description": "Cherry AI Orchestrator codebase analysis and context provider"
     },

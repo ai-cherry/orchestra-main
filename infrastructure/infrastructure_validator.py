@@ -120,7 +120,6 @@ class InfrastructureValidator:
             result = subprocess.run([
                 'ssh', '-o', 'ConnectTimeout=10', '-o', 'StrictHostKeyChecking=no',
                 '-o', 'PasswordAuthentication=no', '-o', 'PubkeyAuthentication=yes',
-                f'root@{host}', 'echo "SSH test successful"'
             ], capture_output=True, text=True, timeout=15)
             
             if result.returncode == 0:
@@ -329,7 +328,6 @@ class InfrastructureValidator:
             # Check if backup directory exists
             result = subprocess.run([
                 'ssh', '-o', 'ConnectTimeout=10', '-o', 'StrictHostKeyChecking=no',
-                f'root@{staging_host}', 'ls -la /opt/backups/'
             ], capture_output=True, text=True, timeout=15)
             
             if result.returncode == 0:
@@ -342,7 +340,6 @@ class InfrastructureValidator:
                 # Check for recent backups
                 backup_check = subprocess.run([
                     'ssh', '-o', 'ConnectTimeout=10', '-o', 'StrictHostKeyChecking=no',
-                    f'root@{staging_host}', 'find /opt/backups -name "*.sql.gz" -mtime -7 | wc -l'
                 ], capture_output=True, text=True, timeout=15)
                 
                 if backup_check.returncode == 0:

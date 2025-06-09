@@ -34,7 +34,7 @@ batch_processor = AsyncBatchProcessor(batch_size=5, max_wait_time=2.0)
 class MCPServerCreateRequest(BaseModel):
     name: str = Field(..., min_length=3, max_length=100, description="User-friendly name for the MCP server instance")
     description: Optional[str] = Field(default=None, max_length=500)
-    target_ai_coders: List[Literal["RooCoder", "CursorAI", "Claude", "OpenAI_GPT4", "OpenAI_GPT3_5", "Gemini", "Copilot", "Generic"]] = Field(
+    target_ai_coders: List[Literal["Coder", "CursorAI", "Claude", "OpenAI_GPT4", "OpenAI_GPT3_5", "Gemini", "Copilot", "Generic"]] = Field(
         ...,
         description="Primary AI Coder(s) this server instance is intended to support or emulate."
     )
@@ -61,7 +61,7 @@ class MCPServerCreateRequest(BaseModel):
 class MCPServerUpdateRequest(BaseModel):
     name: Optional[str] = Field(default=None, min_length=3, max_length=100)
     description: Optional[str] = Field(default=None, max_length=500)
-    target_ai_coders: Optional[List[Literal["RooCoder", "CursorAI", "Claude", "OpenAI_GPT4", "OpenAI_GPT3_5", "Gemini", "Copilot", "Generic"]]] = None
+    target_ai_coders: Optional[List[Literal["Coder", "CursorAI", "Claude", "OpenAI_GPT4", "OpenAI_GPT3_5", "Gemini", "Copilot", "Generic"]]] = None
     enabled_internal_tools: Optional[List[Literal["copilot", "gemini"]]] = None
     copilot_config_override: Optional[Dict[str, Any]] = None
     gemini_config_override: Optional[Dict[str, Any]] = None

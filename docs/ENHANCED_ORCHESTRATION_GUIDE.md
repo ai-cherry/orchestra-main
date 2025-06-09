@@ -116,7 +116,7 @@ The AI coordination System has been significantly enhanced to operate without Ei
 |-------|------|--------------|--------------|
 | Analyzer | Code Analysis | Cursor AI + Claude | Deep analysis, architecture, dependencies |
 | Implementer | Code Generation | Cursor AI | Implementation, refactoring, optimization |
-| Refiner | Code Refinement | Claude + Roo Code | Review, documentation, testing |
+| Refiner | Code Refinement | Claude +  Code | Review, documentation, testing |
 
 ### Agent Coordination
 

@@ -261,8 +261,6 @@ class PayReadyAgent(BaseSpecializedAgent):
             id=listing_data["id"],
             address=listing_data["address"],
             price=listing_data["price"],
-            bedrooms=listing_data["bedrooms"],
-            bathrooms=listing_data["bathrooms"],
             sqft=listing_data["sqft"],
             amenities=listing_data.get("amenities", []),
             smart_home_features=listing_data.get("smart_home_features", []),

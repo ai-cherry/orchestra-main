@@ -14,7 +14,6 @@ from dataclasses import dataclass, field
 from urllib.parse import urlparse
 
 import yaml
-from pydantic import BaseModel, Field, validator, root_validator
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

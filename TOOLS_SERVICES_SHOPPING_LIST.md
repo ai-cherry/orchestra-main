@@ -306,5 +306,4 @@
 
 **Total estimated monthly cost for full production deployment: $300-500/month**
 
-This investment provides enterprise-grade infrastructure, security, and scalability for your single-user Orchestra AI platform with room for future growth.
 

@@ -2,7 +2,6 @@
 """
 """
     """Validates domain infrastructure configurations"""
-        self.base_dir = Path("/root/cherry_ai-main")
         self.domains = ["personal", "payready", "paragonrx"]
         self.validation_results = {
             "passed": [],

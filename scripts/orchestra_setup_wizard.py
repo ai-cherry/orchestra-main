@@ -3,7 +3,6 @@
 """
 """
     """Interactive setup wizard for Cherry AI."""
-        self.env_file = self.root_dir / ".env"
         self.config = {}
         self.services_status = {}
 
@@ -167,8 +166,6 @@
 
         # Update MCP configuration
         print("Updating MCP configuration...")
-        old_mcp = self.root_dir / ".mcp.json"
-        new_mcp = self.root_dir / ".mcp-clean.json"
         if new_mcp.exists():
             shutil.copy(new_mcp, old_mcp)
             print("✓ MCP configuration updated")

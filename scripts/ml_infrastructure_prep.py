@@ -3,7 +3,6 @@
 """
 """
     """Prepares ML infrastructure components"""
-        self.base_dir = Path("/root/cherry_ai-main")
         self.ml_dir = self.base_dir / "ml"
         self.ml_dir.mkdir(exist_ok=True)
         

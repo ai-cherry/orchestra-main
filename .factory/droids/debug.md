@@ -4,16 +4,15 @@
 The Debug Droid specializes in error analysis, debugging, and performance profiling. It helps identify and resolve issues in code, providing detailed diagnostics and solutions.
 
 ## Capabilities
-- **Error Analysis**: Identifies root causes of errors and exceptions
 - **Debugging**: Provides step-by-step debugging strategies
 - **Performance Profiling**: Analyzes performance bottlenecks
 - **Memory Analysis**: Detects memory leaks and optimization opportunities
 - **Trace Analysis**: Interprets stack traces and execution paths
 
-## Integration with Roo
+## Integration with 
 - Maps to: `tools_server.py`
 - Context sharing: Error logs, stack traces, system metrics
-- Fallback: Roo's debug mode handles requests if Factory AI is unavailable
+- Fallback: 's debug mode handles requests if Factory AI is unavailable
 
 ## Request Format
 ```json
@@ -44,7 +43,6 @@ The Debug Droid specializes in error analysis, debugging, and performance profil
 ```json
 {
   "diagnosis": {
-    "root_cause": "string",
     "contributing_factors": ["array"],
     "impact_analysis": "object"
   },
@@ -79,7 +77,6 @@ The Debug Droid specializes in error analysis, debugging, and performance profil
 5. Describe expected vs. actual behavior
 
 ## Debugging Strategies
-- **Systematic Approach**: Start from symptoms, trace to root cause
 - **Binary Search**: Isolate issues by halving the problem space
 - **Logging Enhancement**: Add strategic logging for visibility
 - **State Analysis**: Examine variable states at key points

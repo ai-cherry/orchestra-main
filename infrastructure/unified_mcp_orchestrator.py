@@ -19,12 +19,7 @@ import os
 import sys
 
 # Add project paths
-project_root = Path(__file__).parent.parent
 sys.path.extend([
-    str(project_root),
-    str(project_root / "sync-server"),
-    str(project_root / "infrastructure"),
-    str(project_root / "scripts")
 ])
 
 # Import optimized database manager

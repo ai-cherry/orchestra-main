@@ -17,7 +17,6 @@ class MemoryScope(str, Enum):
 
 class ToolType(str, Enum):
     """Supported AI tools."""
-    ROO = "roo"
     CLINE = "cline"
     GEMINI = "gemini"
     COPILOT = "copilot"

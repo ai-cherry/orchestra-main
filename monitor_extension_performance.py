@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """
 """
-PERFORMANCE_LOG = WORKSPACE_ROOT / ".vscode" / "extension_performance.json"
-LOG_DIR = WORKSPACE_ROOT / "logs"
+PERFORMANCE_LOG = WORKSPACE_T / ".vscode" / "extension_performance.json"
+LOG_DIR = WORKSPACE_T / "logs"
 MONITOR_LOG = LOG_DIR / "extension_monitor.log"
 
 # Set up centralized logging (INFO level, JSON format for standard log aggregators)
-LOG_FILE = WORKSPACE_ROOT / "logs" / "extension_performance.log"
+LOG_FILE = WORKSPACE_T / "logs" / "extension_performance.log"
 # Ensure logs directory exists
 LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
 
@@ -111,7 +111,7 @@ def check_resource_usage(processes: List[Dict[str, Any]]) -> Tuple[bool, bool]:
 def get_extension_categories() -> Dict[str, str]:
     """
     """
-    extensions_config_path = WORKSPACE_ROOT / "extensions.json"
+    extensions_config_path = WORKSPACE_T / "extensions.json"
     categories = {}
 
     if not extensions_config_path.exists():

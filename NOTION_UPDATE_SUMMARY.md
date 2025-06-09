@@ -25,11 +25,10 @@ All AI coding assistants are now configured, tested, and ready for maximum devel
 - **Status**: Fully configured, ready for immediate testing
 - **Expected Performance**: 10x faster UI development
 
-#### 2. Roo Code (VS Code Extension) - ⚠️ NEEDS USER INSTALLATION
+#### 2.  Code (VS Code Extension) - ⚠️ NEEDS USER INSTALLATION
 - **Type**: VS Code Extension (NOT CLI tool)
-- **Installation**: Search "Roo Code" in VS Code Extensions marketplace
-- **Publisher**: RooCode Inc.
-- **Configuration**: 10 specialized modes pre-configured in `.roo/` directory
+- **Installation**: Search " Code" in VS Code Extensions marketplace
+- **Publisher**: Code Inc.
 - **API Integration**: OpenRouter for cost-optimized models
 - **Boomerang Tasks**: Complex multi-step workflows enabled
 - **Expected Performance**: 3-5x faster complex workflows
@@ -77,23 +76,22 @@ All AI coding assistants are now configured, tested, and ready for maximum devel
 1. **PATRICK_INSTRUCTIONS.md** (11.5 KB) - Complete usage instructions
 2. **AI_CODING_INSTRUCTIONS.md** (18.5 KB) - Development standards and tool instructions  
 3. **NOTION_AI_NOTES.md** (13.2 KB) - Executive summary and strategic impact
-4. **ROO_INSTALLATION_GUIDE.md** (5.8 KB) - Comprehensive Roo Code installation guide
+4. **_INSTALLATION_GUIDE.md** (5.8 KB) - Comprehensive  Code installation guide
 5. **System test results** and verification data
 
 #### Key Installation Guides
-- **Roo Code**: VS Code extension installation (3 methods provided)
+- ** Code**: VS Code extension installation (3 methods provided)
 - **Continue.dev**: Custom commands and model configuration
 - **Cursor**: Rules and standards enforcement
 - **MCP Servers**: Management and deployment scripts
 
 ### 🎯 IMMEDIATE ACTIONS FOR PATRICK
 
-#### Step 1: Install Roo Code VS Code Extension (5 minutes)
+#### Step 1: Install  Code VS Code Extension (5 minutes)
 1. Open VS Code in orchestra-main project
 2. Go to Extensions (Ctrl+Shift+X)
-3. Search "Roo Code" 
-4. Install by RooCode Inc.
-5. Configurations will auto-load from `.roo/` directory
+3. Search " Code" 
+4. Install by Code Inc.
 
 #### Step 2: Test Continue.dev UI-GPT-4O (2 minutes)
 1. Open VS Code/Cursor in orchestra-main
@@ -143,17 +141,17 @@ The Orchestra AI coding assistant ecosystem is now:
 - ✅ **Persona-aware** for Cherry, Sophia, and Karen features
 - ✅ **Performance optimized** with comprehensive documentation
 
-**Only remaining task**: Install Roo Code VS Code extension (5 minutes)
+**Only remaining task**: Install  Code VS Code extension (5 minutes)
 
 ### 🔗 Important Links
 
 - **Notion Workspace**: https://www.notion.so/Orchestra-AI-Workspace-20bdba04940280ca9ba7f9bce721f547
-- **Roo Code Extension**: Search "Roo Code" in VS Code Extensions
+- ** Code Extension**: Search " Code" in VS Code Extensions
 - **GitHub Repository**: All configurations committed and deployed
 - **Production Server**: 45.32.69.157 (automatically updated)
 
 ---
 
-**NEXT**: Install Roo Code extension and start building with 3-10x AI-accelerated development velocity! 🚀
+**NEXT**: Install  Code extension and start building with 3-10x AI-accelerated development velocity! 🚀
 
 **TIME TO BUILD!** 🎉 

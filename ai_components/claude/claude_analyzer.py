@@ -220,10 +220,8 @@
 
         
             pass
-            project_root = Path(project_path)
             
             # Get project structure
-            context["structure"] = self._get_project_structure(project_root)
             
             # Read key configuration files
             config_files = [
@@ -233,7 +231,6 @@
             
             context["config_files"] = {}
             for config_file in config_files:
-                config_path = project_root / config_file
                 if config_path.exists() and config_path.stat().st_size < 10000:  # Limit size
                     try:
 
@@ -251,7 +248,6 @@
                 import subprocess
                 result = subprocess.run(
                     ["git", "log", "--oneline", "-10"],
-                    cwd=project_root,
                     capture_output=True,
                     text=True,
                     timeout=5
@@ -289,7 +285,6 @@
         
         return context
     
-    def _get_project_structure(self, project_root: Path, max_depth: int = 3) -> Dict:
         """Get project directory structure"""
                 return {"...": "max_depth_reached"}
             
@@ -325,7 +320,6 @@
             
             return structure
         
-        return scan_directory(project_root)
     
     def _create_analysis_prompt(self, context: Dict, analysis_type: str) -> str:
         """Create comprehensive analysis prompt for Claude"""
@@ -536,7 +530,6 @@ async def setup_claude_database():
 
 async def main():
     """Example usage of Claude analyzer"""
-                project_path="/root/cherry_ai-main",
                 analysis_type="architecture"
             )
             print("Analysis Result:")

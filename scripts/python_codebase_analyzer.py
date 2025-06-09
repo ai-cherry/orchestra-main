@@ -2,8 +2,6 @@
 """
 """
     """Comprehensive Python codebase analyzer."""
-    def __init__(self, root_path: str = "."):
-        self.root_path = Path(root_path).resolve()
         self.python_files = []
         self.results = {
             "timestamp": datetime.now().isoformat(),
@@ -30,7 +28,6 @@
         }
         
         python_files = []
-        for py_file in self.root_path.rglob("*.py"):
             # Check if any parent directory is in exclude_dirs
             exclude = False
             for parent in py_file.parents:
@@ -196,15 +193,8 @@
             elif potential_dir.exists() and (potential_dir / "__init__.py").exists():
                 current_path = potential_dir
             else:
-                # Try going up to project root and check from there
-                project_root = self.root_path
-                potential_from_root = project_root / "/".join(module_parts[:-1]) / f"{module_parts[-1]}.py"
-                potential_dir_from_root = project_root / "/".join(module_parts)
                 
-                if potential_from_root.exists():
                     return True
-                elif (potential_dir_from_root.exists() and 
-                      (potential_dir_from_root / "__init__.py").exists()):
                     return True
                 break
         
@@ -327,7 +317,6 @@
             broken_imports.extend(file_broken_imports)
             
             # Build imports graph for circular dependency detection
-            relative_path = str(file_path.relative_to(self.root_path))
             module_name = relative_path.replace('/', '.').replace('.py', '')
             
             for imp in imports["standard"] + imports["from"]:

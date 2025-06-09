@@ -15,8 +15,6 @@ class Task:
     """Individual refactoring task"""
     """Current migration state"""
     """Main conductor for the refactoring process"""
-        self.state_file = project_root / ".refactoring_state.json"
-        self.backup_dir = project_root / ""
         self.state = self._load_state()
         self.tasks = self._define_tasks()
     
@@ -180,13 +178,11 @@ class Task:
 
             pass
             subprocess.run(["git", "stash", "push", "-m", f"Backup {name}"], 
-                          cwd=self.project_root, check=True)
             logger.info(f"Created git stash backup: {name}")
         except Exception:
 
             pass
             # Fallback to direct copy
-            shutil.copytree(self.project_root, backup_path, 
                           ignore=shutil.ignore_patterns('.git', '__pycache__', 'venv'))
             logger.info(f"Created directory backup: {backup_path}")
         
@@ -316,7 +312,6 @@ class Task:
             # Try git-based rollback first
             result = subprocess.run(
                 ["git", "stash", "list", "--grep", f"Backup {point_name}"],
-                cwd=self.project_root,
                 capture_output=True,
                 text=True
             )
@@ -324,7 +319,6 @@ class Task:
             if result.returncode == 0 and result.stdout.strip():
                 stash_ref = result.stdout.split(':')[0]
                 subprocess.run(["git", "stash", "apply", stash_ref], 
-                              cwd=self.project_root, check=True)
                 console.print(f"[green]Successfully rolled back using git stash[/green]")
                 return True
             
@@ -386,7 +380,6 @@ class Task:
     # Task implementation methods
     async def _remove_poetry_config(self, progress, task_id):
         """Remove Poetry configuration from pyproject.toml"""
-        pyproject_path = self.project_root / "pyproject.toml"
         
         if pyproject_path.exists():
             with open(pyproject_path, 'r') as f:
@@ -421,19 +414,14 @@ class Task:
             "requirements/frozen/"
         ]
         
-        backup_root = self.backup_dir / "requirements"
-        backup_root.mkdir(parents=True, exist_ok=True)
         
         for old_file in old_files:
-            old_path = self.project_root / old_file
             if old_path.exists():
                 # Create a unique backup name outside the source directory
                 safe_name = old_file.replace("/", "_").replace(".", "_")
-                backup_path = backup_root / f"{safe_name}.backup"
                 if old_path.is_file():
                     shutil.move(str(old_path), str(backup_path))
                 else:
-                    # For directories, move to backup_root with a unique name
                     shutil.move(str(old_path), str(backup_path))
         
         progress.update(task_id, advance=100)
@@ -448,9 +436,7 @@ class Task:
         ]
         
         for router in old_routers:
-            router_path = self.project_root / router
             if router_path.exists():
-                backup_path = self.project_root / f"{router}.backup"
                 shutil.move(router_path, backup_path)
         
         progress.update(task_id, advance=100)
@@ -461,9 +447,7 @@ class Task:
         ]
         
         for db_file in old_db_files:
-            db_path = self.project_root / db_file
             if db_path.exists():
-                backup_path = self.project_root / f"{db_file}.backup"
                 shutil.move(db_path, backup_path)
         
         progress.update(task_id, advance=100)
@@ -471,7 +455,6 @@ class Task:
     async def _migrate_core_imports(self, progress, task_id):
         """Update imports throughout codebase"""
         """Reorganize core directory structure"""
-        core_dir = self.project_root / "core"
         
         # Create subdirectories
         subdirs = ["routing", "config", "monitoring", "health"]

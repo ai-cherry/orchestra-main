@@ -60,7 +60,6 @@ def run_demo():
     manager = OptimizedMemoryManager()
 
     # Register tools with different context windows
-    manager.register_tool("roo", 16000)
     manager.register_tool("cline", 8000)
     manager.register_tool("gemini", 200000)
     manager.register_tool("copilot", 5000)
@@ -69,7 +68,6 @@ def run_demo():
     manager.share_memory(
         "project_info",
         "AI cherry_ai - A framework for cherry_aiting multiple AI tools",
-        "roo",
     )
 
     print("\n2. Creating and sharing medium memory item...")

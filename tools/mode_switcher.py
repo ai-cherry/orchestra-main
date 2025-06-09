@@ -192,7 +192,7 @@ def interactive_mode_switcher(manager: ModeManager):
 
 def main():
     """Main entry point for the mode switcher CLI."""
-        description="AI cherry_ai Mode Switcher - Manage Roo's operation modes and workflows"
+        description="AI cherry_ai Mode Switcher - Manage 's operation modes and workflows"
     )
 
     parser.add_argument("--switch", "-s", help="Switch to the specified mode", metavar="MODE")

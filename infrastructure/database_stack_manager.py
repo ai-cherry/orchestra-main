@@ -70,7 +70,6 @@ class DatabaseStackManager:
             result = subprocess.run([
                 'ssh', '-o', 'ConnectTimeout=10', '-o', 'StrictHostKeyChecking=no',
                 '-o', 'PasswordAuthentication=no', '-o', 'PubkeyAuthentication=yes',
-                f'root@{self.db_server_ip}', 'echo "SSH key auth successful"'
             ], capture_output=True, text=True, timeout=15)
             
             if result.returncode == 0:
@@ -180,7 +179,6 @@ echo "🛠️  Installing additional tools..."
 apt install -y htop curl wget git vim nano
 
 # Create health check script
-cat > /root/health_check.sh << 'EOF'
 #!/bin/bash
 echo "🏥 Orchestra-Main Database Stack Health Check"
 echo "============================================="
@@ -201,10 +199,8 @@ echo "   RAM: $(free -h | grep Mem | awk '{print $2}') total, $(free -h | grep M
 echo "   Disk: $(df -h / | tail -1 | awk '{print $4}') available"
 EOF
 
-chmod +x /root/health_check.sh
 
 # Create database initialization script
-cat > /root/init_orchestra_db.sql << 'EOF'
 -- Orchestra-Main Database Initialization
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS "vector";
@@ -258,10 +254,8 @@ EOF
 
 # Initialize database
 echo "🗃️  Initializing Orchestra database..."
-sudo -u postgres psql -d orchestra_main -f /root/init_orchestra_db.sql
 
 # Create connection test script
-cat > /root/cleaned_reference << 'EOF'
 #!/usr/bin/env python3
 import psycopg2
 import redis
@@ -313,7 +307,6 @@ if __name__ == "__main__":
     print(test_weaviate())
 EOF
 
-chmod +x /root/cleaned_reference
 
 # Install Python dependencies for testing
 echo "🐍 Installing Python dependencies..."
@@ -330,14 +323,11 @@ echo "   Redis: $(hostname -I | awk '{print $1}'):6379"
 echo "   Weaviate: $(hostname -I | awk '{print $1}'):8080"
 echo ""
 echo "🛠️  Management scripts:"
-echo "   Health check: /root/health_check.sh"
 echo ""
 echo ""
 echo "📊 Run health check now:"
-/root/health_check.sh
 echo ""
 echo "🧪 Run connection tests:"
-python3 /root/cleaned_reference
 """
         
         # Save deployment script
@@ -354,7 +344,6 @@ python3 /root/cleaned_reference
             copy_result = subprocess.run([
                 'scp', '-o', 'StrictHostKeyChecking=no',
                 '/home/ubuntu/deploy_database_stack.sh',
-                f'root@{self.db_server_ip}:/root/deploy_database_stack.sh'
             ], capture_output=True, text=True, timeout=30)
             
             if copy_result.returncode == 0:
@@ -363,8 +352,6 @@ python3 /root/cleaned_reference
                 # Execute script
                 exec_result = subprocess.run([
                     'ssh', '-o', 'StrictHostKeyChecking=no',
-                    f'root@{self.db_server_ip}',
-                    'chmod +x /root/deploy_database_stack.sh && /root/deploy_database_stack.sh'
                 ], capture_output=True, text=True, timeout=600)  # 10 minute timeout
                 
                 if exec_result.returncode == 0:
@@ -503,9 +490,7 @@ if __name__ == "__main__":
                 }
             },
             "management_scripts": {
-                "health_check": "/root/health_check.sh",
                 "",
-                "database_init": "/root/init_orchestra_db.sql"
             },
             "connection_strings": {
                 "postgresql": f"postgresql://orchestra:OrchAI_DB_2024!@{self.db_server_ip}:5432/orchestra_main",

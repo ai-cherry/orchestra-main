@@ -1,4 +1,4 @@
-2:I[9107,[],"ClientPageRoot"]
+2:I[9107,[],"ClientPaget"]
 3:I[1061,["64","static/chunks/64-e8ef9874b5da1a62.js","392","static/chunks/392-4cf93a91c306051c.js","931","static/chunks/app/page-b16e6dea02bba46c.js"],"default",1]
 4:I[2779,["64","static/chunks/64-e8ef9874b5da1a62.js","185","static/chunks/app/layout-d167cc1eb5752530.js"],"Providers"]
 5:I[4707,[],""]

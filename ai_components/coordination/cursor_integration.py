@@ -179,7 +179,6 @@ class CursorIntegrationServer:
     """HTTP server for Cursor AI integration"""
         """Initialize server components"""
         api_key = os.getenv("CURSOR_API_KEY")
-        workspace = os.getenv("CURSOR_WORKSPACE", "/root/cherry_ai-main")
         secret_key = os.getenv("JWT_SECRET_KEY", "your-secret-key")
         
         # Initialize components

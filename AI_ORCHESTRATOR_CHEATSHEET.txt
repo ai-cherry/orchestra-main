@@ -5,7 +5,6 @@
 STARTING THE AI ASSISTANT
 ================================================================================
 
-From your terminal at (venv) root@Lambda:~/orchestra-main#
 
 Option 1: Direct AI Code Assistant (RECOMMENDED - Simple & Direct)
 -----------------------------------------------------------------
@@ -35,7 +34,7 @@ SWITCHING BETWEEN AI MODELS
 /model claude      - Use Claude 3 Opus (default, best for complex coding)
 /model openai      - Use GPT-4 (good for general tasks)
 
-Note: OpenRouter and Roo are integrated through the orchestrator system,
+Note: OpenRouter and  are integrated through the orchestrator system,
       not directly accessible via model switching.
 
 
@@ -204,7 +203,6 @@ TROUBLESHOOTING
 ================================================================================
 
 If "command not found":
-- Make sure you're in: /root/orchestra-main
 - Check if file exists: ls scripts/ai_code_assistant.py
 
 If "module not found":

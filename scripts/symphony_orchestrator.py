@@ -26,7 +26,6 @@ class Task:
     """Main coordination engine for all automated tasks"""
     def __init__(self, config_path: str = "config/conductor_config.json"):
         self.config_path = Path(config_path)
-        self.project_root = Path(__file__).parent.parent
         self.tasks: Dict[str, Task] = {}
         self.results: List[TaskResult] = []
         self.running = False
@@ -34,8 +33,6 @@ class Task:
         self.state_file = Path("conductor_state.json")
         
         # Ensure directories exist
-        (self.project_root / "logs").mkdir(exist_ok=True)
-        (self.project_root / "status").mkdir(exist_ok=True)
         
         # Load configuration
         self._load_config()
@@ -178,12 +175,10 @@ class Task:
             try:
 
                 pass
-                # Change to project root for execution
                 process = await asyncio.create_subprocess_shell(
                     task.command,
                     stdout=asyncio.subprocess.PIPE,
                     stderr=asyncio.subprocess.PIPE,
-                    cwd=self.project_root
                 )
                 
                 # Wait for completion with timeout

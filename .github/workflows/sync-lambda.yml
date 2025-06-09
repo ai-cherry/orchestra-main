@@ -23,22 +23,17 @@ jobs:
         uses: appleboy/ssh-action@v0.1.5
         with:
           host: 45.32.69.157
-          username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             set -e
             echo "🔄 Syncing Cherry AI from GitHub..."
             
             # Activate the virtual environment
-            if [ -f /root/cherry_ai-main/venv/bin/activate ]; then
               echo "🚀 Activating virtual environment..."
-              source /root/cherry_ai-main/venv/bin/activate
             else
-              echo "⚠️ Virtual environment not found at /root/cherry_ai-main/venv/bin/activate. Skipping activation."
               # Optionally, you could attempt to create it here or fail the job
             fi
             
-            cd /root/cherry_ai-main
             
             # Pull latest changes
             git pull origin main
@@ -66,10 +61,8 @@ jobs:
         uses: appleboy/ssh-action@v0.1.5
         with:
           host: 45.32.69.157
-          username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd /root/cherry_ai-main
             echo "🏥 Running health check..."
             make health-check || echo "⚠️ Some services may need attention"
             

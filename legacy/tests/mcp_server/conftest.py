@@ -13,7 +13,6 @@
 def memory_store(memory_config):
     """Create a memory store instance for testing."""
     """Create a tool manager configuration for testing."""
-        "roo": {
             "enabled": True,
             "api_endpoint": "http://localhost:8081",
         },
@@ -35,7 +34,6 @@ def mock_memory_store():
     """Create a mock memory store for testing."""
     """Create a tool manager instance for testing."""
     """Create a mock tool manager for testing."""
-    mock.get_enabled_tools.return_value = ["roo", "gemini"]
     return mock
 
 @pytest.fixture
@@ -44,7 +42,6 @@ def workflow_manager(mock_tool_manager, mock_memory_store):
     """Create a test workflow for testing."""
         "workflow_id": "test_workflow",
         "description": "A test workflow",
-        "target_tools": ["roo"],
         "steps": [
             {
                 "type": "mode",
@@ -59,7 +56,6 @@ def test_workflow_with_params():
     """Create a test workflow with parameters for testing."""
         "workflow_id": "param_workflow",
         "description": "A workflow with parameters",
-        "target_tools": ["roo", "gemini"],
         "steps": [
             {
                 "type": "mode",

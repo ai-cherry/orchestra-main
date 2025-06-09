@@ -38,7 +38,6 @@
         # Setup connection for remote commands
         connection = command.remote.ConnectionArgs(
             host=self.droplet.ipv4_address,
-            user="root",
             private_key=self.ssh_private_key,
         )
 
@@ -195,7 +194,6 @@ After=network.target postgresql.service
 
 [Service]
 Type=simple
-User=root
 WorkingDirectory="""
                 """
 Environment="PYTHONPATH="""

@@ -56,7 +56,6 @@ python -m uvicorn agent.app.main:app --host 0.0.0.0 --port 8000
 ```
 
 ### Production Deployment
-The real agents are deployed at `/root/cherry_ai-main` on the production server.
 
 Service configuration: `/etc/systemd/system/cherry_ai-real.service`
 
@@ -181,7 +180,6 @@ python test_real_agents.py
 
 - API requires authentication via `X-API-Key` header
 - Default key should be changed in production
-- Service runs as root (consider creating dedicated user for production)
 
 ## Future Enhancements
 

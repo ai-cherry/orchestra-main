@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils"
 function DropdownMenu({
   ...props
 }) {
-  return <DropdownMenuPrimitive.Root data-slot="dropdown-menu" {...props} />;
+  return <DropdownMenuPrimitive.t data-slot="dropdown-menu" {...props} />;
 }
 
 function DropdownMenuPortal({

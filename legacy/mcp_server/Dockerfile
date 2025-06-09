@@ -15,7 +15,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY mcp_server/ .
 
-# Create non-root user
 RUN useradd -m -u 1000 mcpserveruser && chown -R mcpserveruser:mcpserveruser /app
 USER mcpserveruser
 

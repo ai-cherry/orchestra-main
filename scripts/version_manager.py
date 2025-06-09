@@ -149,8 +149,6 @@ class DockerScanner(DependencyScanner):
 
 class VersionRegistry:
     """Central registry for all version information"""
-        self.registry_path = root_path / ".versions.yaml"
-        self.lock_path = root_path / ".versions.lock"
         self.dependencies: Dict[str, Dependency] = {}
         self.scanners: List[DependencyScanner] = [
             PythonScanner(),
@@ -163,7 +161,6 @@ class VersionRegistry:
         logger.info("Starting comprehensive dependency scan...")
         
         # Run all scanners in parallel
-        tasks = [scanner.scan(self.root_path) for scanner in self.scanners]
         results = await asyncio.gather(*tasks, return_exceptions=True)
         
         # Merge results
@@ -281,9 +278,7 @@ async def main():
         help='Command to execute'
     )
     parser.add_argument(
-        '--root',
         default='.',
-        help='Project root directory (default: current directory)'
     )
     parser.add_argument(
         '--output',
@@ -301,8 +296,6 @@ async def main():
         logging.getLogger().setLevel(logging.DEBUG)
     
     # Initialize registry
-    root_path = Path(args.root).resolve()
-    registry = VersionRegistry(root_path)
     
     try:
 

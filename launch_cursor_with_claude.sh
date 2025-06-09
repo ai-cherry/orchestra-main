@@ -42,9 +42,8 @@ log_error() {
     log "ERROR" "$@"
 }
 
-# Get project root
-PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-MCP_SERVER_DIR="$PROJECT_ROOT/mcp_server"
+PROJECT_T="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+MCP_SERVER_DIR="$PROJECT_T/mcp_server"
 
 # Ensure environment is loaded
 if [ -f ~/.Lambda_env_setup.sh ]; then
@@ -168,7 +167,7 @@ fi
 
 # Launch Cursor
 log_info "Launching Cursor..."
-cursor "$PROJECT_ROOT" &
+cursor "$PROJECT_T" &
 CURSOR_PID=$!
 
 # Show helpful information

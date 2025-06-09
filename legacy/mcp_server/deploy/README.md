@@ -177,7 +177,6 @@ To view logs on a Lambda instance:
 
 ```bash
 # SSH into your Lambda instance
-ssh root@your_Lambda_instance_ip
 
 # View Docker container logs
 docker ps # Find your MCP server container ID

@@ -37,8 +37,6 @@ class PromptManager:
     
     def __init__(self):
         self.redis_client = None
-        self.project_root = Path(__file__).parent.parent.parent
-        self.prompts_dir = self.project_root / ".ai-tools" / "prompts"
         self.prompt_templates = {}
         
     async def initialize(self):
@@ -451,7 +449,6 @@ async def handle_list_tools() -> ListToolsResult:
                         "name": {"type": "string", "description": "Prompt name"},
                         "tool": {
                             "type": "string",
-                            "enum": ["roo", "cursor", "codex", "jules", "factory-ai"],
                             "description": "Target AI tool (optional)"
                         }
                     },
@@ -487,7 +484,6 @@ async def handle_list_tools() -> ListToolsResult:
                         "content": {"type": "string", "description": "Prompt content"},
                         "tool_specific": {
                             "type": "string",
-                            "enum": ["roo", "cursor", "codex", "jules", "factory-ai"],
                             "description": "Make prompt specific to a tool (optional)"
                         }
                     },
@@ -519,7 +515,6 @@ async def handle_list_tools() -> ListToolsResult:
                     "properties": {
                         "tool": {
                             "type": "string",
-                            "enum": ["roo", "cursor", "codex", "jules", "factory-ai", "all"],
                             "description": "AI tool for cheat sheet"
                         },
                         "focus": {
@@ -577,7 +572,6 @@ async def get_prompt(arguments: dict) -> CallToolResult:
     if tool:
         # Customize prompt for specific tool
         tool_customizations = {
-            "roo": "\n\n## Roo Coder Specific:\n- Use mode transitions effectively\n- Leverage memory hooks\n- Follow performance rules",
             "cursor": "\n\n## Cursor IDE Specific:\n- Use workspace settings\n- Leverage extensions\n- Optimize for SSH development",
             "codex": "\n\n## OpenAI Codex Specific:\n- Use approval modes carefully\n- Leverage Git context\n- Focus on automation",
             "jules": "\n\n## Google Jules Specific:\n- Use Google AI capabilities\n- Integrate with Gemini models\n- Focus on code understanding",
@@ -693,8 +687,7 @@ async def generate_cheat_sheet(arguments: dict) -> CallToolResult:
     
     cheat_sheet = f"# {tool.title()} AI Tool Cheat Sheet\n\n"
     
-    if tool == "roo" or tool == "all":
-        cheat_sheet += """## Roo Coder Commands:
+        cheat_sheet += """##  Coder Commands:
 - `switch to architect mode` - System design and architecture
 - `switch to developer mode` - Code implementation
 - `switch to debugger mode` - Systematic debugging

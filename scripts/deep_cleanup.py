@@ -58,7 +58,6 @@
         }
 
         # Categorize file
-        rel_path = str(file_path.relative_to(self.root_dir))
         for category, patterns in self.categories.items():
             if any(pattern in rel_path.lower() for pattern in patterns):
                 analysis["categories"].append(category)
@@ -142,7 +141,6 @@
         """Find all files with GCP references."""
         skip_dirs = {".git", ".mypy_cache", "venv", "__pycache__", "node_modules"}
 
-        for file_path in self.root_dir.rglob("*"):
             if file_path.is_file() and not any(skip in str(file_path) for skip in skip_dirs):
                 try:
 
@@ -186,7 +184,6 @@
         if results["delete"]:
             print("\n🗑️  Files recommended for DELETION:")
             for item in sorted(results["delete"], key=lambda x: str(x["path"])):
-                rel_path = item["path"].relative_to(self.root_dir)
                 print(f"  - {rel_path}")
                 print(f"    Reason: {item['reason']}")
                 print(f"    Categories: {', '.join(item['categories'])}")
@@ -195,7 +192,6 @@
         if results["update"]:
             print("\n✏️  Files recommended for UPDATE:")
             for item in sorted(results["update"], key=lambda x: str(x["path"]))[:10]:
-                rel_path = item["path"].relative_to(self.root_dir)
                 print(f"  - {rel_path}")
                 print(f"    GCP refs: {len(item['gcp_references'])}")
             if len(results["update"]) > 10:
@@ -212,7 +208,6 @@
 
                         pass
                         item["path"].unlink()
-                        print(f"  ✓ Deleted {item['path'].relative_to(self.root_dir)}")
                         deleted += 1
                     except Exception:
 
@@ -221,15 +216,12 @@
                 print(f"\n✅ Deleted {deleted} files")
 
         # Save analysis report
-        report_path = self.root_dir / "deep_cleanup_report.json"
         report_data = {
             "total_files": len(gcp_files),
             "delete": len(results["delete"]),
             "update": len(results["update"]),
             "keep": len(results["keep"]),
             "files": {
-                "delete": [str(x["path"].relative_to(self.root_dir)) for x in results["delete"]],
-                "update": [str(x["path"].relative_to(self.root_dir)) for x in results["update"]][:20],
             },
         }
 

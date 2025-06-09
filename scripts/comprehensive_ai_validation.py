@@ -43,9 +43,8 @@
         print("\n4️⃣ Validating Claude Integration...")
         await self._validate_claude()
         
-        # 5. Test Roo Code Integration
-        print("\n5️⃣ Validating Roo Code Integration...")
-        await self._validate_roo_code()
+        # 5. Test  Code Integration
+        print("\n5️⃣ Validating  Code Integration...")
         
         # 6. Test Factory AI Droids
         print("\n6️⃣ Validating Factory AI Droids...")
@@ -287,8 +286,7 @@ execute_query("SELECT 1")
         
         self.validation_results["components"]["claude"] = claude_results
     
-    async def _validate_roo_code(self) -> None:
-        """Validate Roo Code integration"""
+        """Validate  Code integration"""
             "configuration_status": "unknown",
             "modes_available": 0,
             "mcp_integration": False,
@@ -299,54 +297,37 @@ execute_query("SELECT 1")
 
         
             pass
-            # Check Roo configuration
-            roo_config_path = Path(".roo")
-            if roo_config_path.exists():
-                roo_results["configuration_status"] = "configured"
+            # Check  configuration
                 
                 # Count available modes
-                modes_path = roo_config_path / "modes"
                 if modes_path.exists():
                     mode_files = list(modes_path.glob("*.json"))
-                    roo_results["modes_available"] = len(mode_files)
                 
                 # Check MCP configuration
-                mcp_config_path = roo_config_path / "mcp.json"
                 if mcp_config_path.exists():
-                    roo_results["mcp_integration"] = True
                     
                     with open(mcp_config_path, 'r') as f:
                         mcp_config = json.load(f)
-                        roo_results["mcp_config"] = mcp_config
             else:
-                roo_results["configuration_status"] = "not_configured"
-                roo_results["errors"].append("Roo configuration directory not found")
             
-            # Test memory server integration (used by Roo)
+            # Test memory server integration (used by )
             try:
 
                 pass
                 async with aiohttp.ClientSession() as session:
                     async with session.get(
-                        f"{self.mcp_servers['memory']}/roo/modes"
                     ) as response:
                         if response.status == 200:
-                            roo_results["memory_integration"] = True
                         else:
-                            roo_results["memory_integration"] = False
             except Exception:
 
                 pass
-                roo_results["memory_integration"] = False
                 
         except Exception:
 
                 
             pass
-            roo_results["configuration_status"] = "error"
-            roo_results["errors"].append(str(e))
         
-        self.validation_results["components"]["roo_code"] = roo_results
     
     async def _validate_factory_ai(self) -> None:
         """Validate Factory AI Droids"""
@@ -639,12 +620,10 @@ execute_query("SELECT 1")
         # AI tools scores
         cursor_ai_score = 100 if components.get("cursor_ai", {}).get("integration_status") == "operational" else 0
         claude_score = 100 if components.get("claude", {}).get("integration_status") == "operational" else 0
-        roo_score = 100 if components.get("roo_code", {}).get("configuration_status") == "configured" else 0
         factory_score = 80 if components.get("factory_ai", {}).get("configuration_status") == "configured" else 20
         
         component_scores["cursor_ai"] = cursor_ai_score
         component_scores["claude"] = claude_score
-        component_scores["roo_code"] = roo_score
         component_scores["factory_ai"] = factory_score
         
         # Performance score

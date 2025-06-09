@@ -21,8 +21,6 @@ from datetime import datetime
 class RepositoryCleanup:
     """Clean up repository for optimal AI tool performance."""
     
-    def __init__(self, project_root: str = "."):
-        self.project_root = Path(project_root).resolve()
         self.cleanup_patterns = [
             "*backup*",
             "*migration*", 
@@ -49,7 +47,6 @@ class RepositoryCleanup:
         
         for pattern in self.cleanup_patterns:
             # Find directories matching cleanup patterns
-            for path in self.project_root.rglob(pattern):
                 if path.is_dir() and self._should_cleanup(path):
                     size = self._calculate_directory_size(path)
                     cleanup_candidates.append((path, size))
@@ -63,8 +60,6 @@ class RepositoryCleanup:
             if preserve in str(path):
                 return False
                 
-        # Don't cleanup if it's too close to root
-        relative_path = path.relative_to(self.project_root)
         if len(relative_path.parts) < 2:
             return False
             
@@ -97,7 +92,6 @@ class RepositoryCleanup:
         
         for path, size in candidates:
             preview["directories"].append({
-                "path": str(path.relative_to(self.project_root)),
                 "size_bytes": size,
                 "size_mb": size / (1024 * 1024)
             })
@@ -121,14 +115,12 @@ class RepositoryCleanup:
             try:
                 if dry_run:
                     results["cleaned_directories"].append({
-                        "path": str(path.relative_to(self.project_root)),
                         "size_mb": size / (1024 * 1024),
                         "action": "would_delete"
                     })
                 else:
                     shutil.rmtree(path)
                     results["cleaned_directories"].append({
-                        "path": str(path.relative_to(self.project_root)),
                         "size_mb": size / (1024 * 1024),
                         "action": "deleted"
                     })
@@ -137,7 +129,6 @@ class RepositoryCleanup:
                 
             except Exception as e:
                 results["errors"].append({
-                    "path": str(path.relative_to(self.project_root)),
                     "error": str(e)
                 })
         
@@ -146,7 +137,6 @@ class RepositoryCleanup:
     
     def optimize_gitignore(self):
         """Optimize .gitignore for AI tools."""
-        gitignore_path = self.project_root / ".gitignore"
         
         ai_tool_ignores = [
             "",
@@ -231,8 +221,6 @@ class RepositoryCleanup:
         """Create optimized directory structure for AI tools."""
         ai_tools_dirs = [
             ".ai-tools/cursor",
-            ".ai-tools/roo/modes",
-            ".ai-tools/roo/rules",
             ".ai-tools/codex",
             ".ai-tools/factory-ai",
             ".ai-tools/apis",
@@ -246,7 +234,6 @@ class RepositoryCleanup:
         
         created_dirs = []
         for dir_path in ai_tools_dirs:
-            full_path = self.project_root / dir_path
             try:
                 full_path.mkdir(parents=True, exist_ok=True)
                 created_dirs.append(dir_path)
@@ -309,9 +296,7 @@ def main():
         help="Actually perform cleanup (default is dry run)"
     )
     parser.add_argument(
-        "--project-root",
         default=".",
-        help="Project root directory (default: current directory)"
     )
     parser.add_argument(
         "--output-format",
@@ -328,11 +313,9 @@ def main():
     args = parser.parse_args()
     
     # Initialize cleanup
-    cleanup = RepositoryCleanup(args.project_root)
     
     print("🤖 Repository Cleanup for AI Coding Optimization")
     print("=" * 50)
-    print(f"Project root: {cleanup.project_root}")
     print(f"Mode: {'EXECUTION' if args.execute else 'DRY RUN'}")
     print()
     

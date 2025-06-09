@@ -54,7 +54,6 @@
         # Setup connection for remote commands
         connection = command.remote.ConnectionArgs(
             host=self.droplet.ipv4_address,
-            user="root",
             private_key=self.ssh_private_key,
         )
 
@@ -92,7 +91,6 @@
                 fi
                 
                 # Set permissions
-                chown -R root:root /mnt/vector-data
                 chmod -R 755 /mnt/vector-data
                 """
         modules = "text2vec-openai,reranker-openai"
@@ -136,7 +134,6 @@
 EOF
 
                 # Start Weaviate
-                cd /root
                 docker-compose -f weaviate-compose.yml up -d
 
                 # Wait for Weaviate to be ready
@@ -198,10 +195,8 @@ find $SNAPSHOT_DIR -name "weaviate-*.tar.gz" -type f -mtime +7 -delete
 EOF
 
                 # Make script executable
-                chmod +x /root/snapshot-weaviate.sh
 
                 # Add to crontab
-                (crontab -l 2>/dev/null || echo "") | grep -v "snapshot-weaviate.sh" | { cat; echo "0 3 * * * /root/snapshot-weaviate.sh > /var/log/weaviate-snapshot.log 2>&1"; } | crontab -
             """
                 "droplet_id": self.droplet_id,
                 "droplet_name": self.droplet_name,

@@ -9,7 +9,7 @@ import { buttonVariants } from "@/components/ui/button"
 function AlertDialog({
   ...props
 }) {
-  return <AlertDialogPrimitive.Root data-slot="alert-dialog" {...props} />;
+  return <AlertDialogPrimitive.t data-slot="alert-dialog" {...props} />;
 }
 
 function AlertDialogTrigger({

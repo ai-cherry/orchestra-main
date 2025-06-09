@@ -72,7 +72,6 @@ from fastapi import FastAPI
 app = FastAPI(title="Orchestra AI")
 
 @app.get("/")
-async def root():
     return {"message": "Orchestra AI is running! 🎵"}
 
 @app.get("/health")

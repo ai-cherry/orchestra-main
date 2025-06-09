@@ -82,20 +82,19 @@ staging:
 | **Computed Fields** ✅ | UI performance | DB queries > 100ms | **Implemented** |
 | **Model Validators** ✅ | Business rules | Complex validation logic | **Implemented** |
 | **Field Serializers** ✅ | API consistency | Frontend formatting needs | **Implemented** |
-| **Root Validators** | Cross-field logic | Multi-step validation | **Next** |
+| **t Validators** | Cross-field logic | Multi-step validation | **Next** |
 | **Custom Types** | Domain modeling | Repeated validation patterns | **Future** |
 | **Discriminated Unions** | Polymorphism | Multiple model types | **Future** |
 
 #### Implementation Examples
 
-**Next: Root Validators for Workflow Logic**
+**Next: t Validators for Workflow Logic**
 ```python
 # When you need complex workflow validation
 class WorkflowDefinition(BaseModel):
     steps: List[WorkflowStep]
     dependencies: Dict[str, List[str]]
     
-    @root_validator
     def validate_dependency_graph(cls, values):
         steps = values.get('steps', [])
         deps = values.get('dependencies', {})
@@ -253,4 +252,3 @@ Track these to inform future decisions:
 - **Deployment Success Rate**: % successful deployments
 - **Team Satisfaction**: Developer experience surveys
 
-Remember: **Premature optimization is the root of all evil**. Your current simple, working approach is often better than complex, "perfect" solutions. 

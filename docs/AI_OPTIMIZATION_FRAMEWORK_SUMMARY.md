@@ -19,7 +19,7 @@ This document summarizes the implementation of the Comprehensive AI Codebase Opt
 - Integration preference over standalone scripts
 
 ### 3. Context-Aware Generation
-- Updated AI assistant configurations (Roo, Cursor)
+- Updated AI assistant configurations (, Cursor)
 - Mode-specific rules and constraints
 - Project structure awareness
 - Existing pattern recognition
@@ -35,21 +35,18 @@ This document summarizes the implementation of the Comprehensive AI Codebase Opt
 - Performance requirements
 - AI behavior guidelines
 
-#### `.roo/config/performance_rules.json` (New)
 - Global settings for all modes
 - Mode-specific configurations
 - Cleanup protocols
 - Performance targets
 - Project-specific rule references
 
-#### `.roo/rules-architect/01-core-principles.md` (New)
 - Architecture design philosophy
 - System architecture guidelines
 - Performance requirements
 - Infrastructure as Code standards
 - Decision framework
 
-#### `.roo/rules-code/01-coding-standards.md` (New)
 - Language and environment specifications
 - Code quality standards
 - Performance requirements

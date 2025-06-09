@@ -58,11 +58,9 @@ import ast
         """Discover all Python modules in the project"""
         print("  → Discovering modules...")
         
-        for py_file in self.project_root.rglob("*.py"):
             if any(skip in str(py_file) for skip in ["venv/", "__pycache__", ".git"]):
                 continue
                 
-            rel_path = py_file.relative_to(self.project_root)
             self.modules[str(rel_path)] = {
                 "path": py_file,
                 "imports": set(),
@@ -128,11 +126,9 @@ import ast
         
         config_patterns = ["*.json", "*.yaml", "*.yml", "*.toml", ".env*"]
         for pattern in config_patterns:
-            for config_file in self.project_root.rglob(pattern):
                 if any(skip in str(config_file) for skip in ["venv/", "node_modules/", ".git"]):
                     continue
                     
-                rel_path = config_file.relative_to(self.project_root)
                 try:
 
                     pass
@@ -205,7 +201,6 @@ import ast
         # Check for conflicting function names across different contexts
         mcp_functions = set()
         conductor_functions = set()
-        roo_functions = set()
         
         for module_path, module_info in self.modules.items():
             for func in module_info["functions"]:
@@ -213,13 +208,9 @@ import ast
                     mcp_functions.add(func["name"])
                 elif "cherry_ait" in module_path:
                     conductor_functions.add(func["name"])
-                elif "roo" in module_path or "ai_components" in module_path:
-                    roo_functions.add(func["name"])
         
         # Find overlaps
         mcp_orch = mcp_functions & conductor_functions
-        mcp_roo = mcp_functions & roo_functions
-        orch_roo = conductor_functions & roo_functions
         
         if mcp_orch:
             self.issues["naming_conflicts"].append({
@@ -250,8 +241,7 @@ import ast
             return "MCP"
         elif "cherry_ait" in path:
             return "conductor"
-        elif "roo" in path or "ai_components" in path:
-            return "Roo"
+            return ""
         return "Core"
     
     def analyze_dependencies(self):
@@ -274,16 +264,13 @@ import ast
                 else:
                     # Absolute import
                     import_parts = import_name.split(".")
-                    expected_path = self.project_root / "/".join(import_parts) / "__init__.py"
                     if not expected_path.exists():
-                        expected_path = self.project_root / "/".join(import_parts[:-1]) / f"{import_parts[-1]}.py"
                 
                 if not expected_path.exists():
                     self.issues["dependency_mismatches"].append({
                         "type": "missing_module",
                         "importer": module_path,
                         "import": import_name,
-                        "expected_path": str(expected_path.relative_to(self.project_root)),
                         "severity": "high"
                     })
         
@@ -292,7 +279,6 @@ import ast
     
     def check_requirements_conflicts(self):
         """Check for version conflicts in requirements files"""
-        requirements_files = list(self.project_root.rglob("requirements*.txt"))
         all_deps = defaultdict(list)
         
         for req_file in requirements_files:
@@ -304,7 +290,6 @@ import ast
                         if match:
                             pkg_name = match.group(1)
                             version_spec = match.group(2) or ""
-                            all_deps[pkg_name].append((str(req_file.relative_to(self.project_root)), version_spec))
         
         # Check for conflicts
         for pkg_name, specs in all_deps.items():
@@ -328,7 +313,6 @@ import ast
         # Verify MCP servers are consistently defined
         if mcp_config and conductor_config:
             mcp_servers = set(mcp_config.get("servers", {}).keys())
-            orch_modes = set(conductor_config.get("roo_integration", {}).get("mode_mappings", {}).keys())
             
             # Check for missing mode configurations
             expected_modes = {"code", "architect", "ask", "debug", "conductor", "strategy", 
@@ -398,7 +382,7 @@ import ast
         self.check_conductor_integration()
     
     def check_conductor_integration(self):
-        """Check conductor integration with MCP and Roo"""
+        """Check conductor integration with MCP and """
         conductor_modules = [m for m in self.modules if "cherry_ait" in m]
         
         for module_path in conductor_modules:
@@ -407,11 +391,9 @@ import ast
             # Check for MCP client usage
             has_mcp_import = any("mcp" in imp for imp in module_info["imports"])
             
-            # Check for Roo mode handling
-            module_file = self.project_root / module_path
+            # Check for  mode handling
             with open(module_file, 'r') as f:
                 content = f.read()
-                has_roo_modes = "mode_mappings" in content or "AgentRole" in content
             
             if not has_mcp_import and "cli" not in module_path:
                 self.issues["integration_issues"].append({
@@ -425,7 +407,6 @@ import ast
         print("  → Analyzing error handling...")
         
         for module_path, module_info in self.modules.items():
-            module_file = self.project_root / module_path
             with open(module_file, 'r') as f:
                 content = f.read()
                 
@@ -469,7 +450,6 @@ import ast
         }
         
         for module_path, module_info in self.modules.items():
-            module_file = self.project_root / module_path
             with open(module_file, 'r') as f:
                 content = f.read()
             
@@ -512,7 +492,6 @@ import ast
         
         for module_path, module_info in self.modules.items():
             if "router" in module_path or "api" in module_path:
-                module_file = self.project_root / module_path
                 with open(module_file, 'r') as f:
                     content = f.read()
                 
@@ -585,7 +564,6 @@ import ast
         
         # Check Python version requirements
         python_versions = set()
-        for req_file in self.project_root.rglob("requirements*.txt"):
             with open(req_file, 'r') as f:
                 for line in f:
                     if "python_version" in line:
@@ -606,7 +584,6 @@ import ast
         
         # Check for common runtime issues
         for module_path, module_info in self.modules.items():
-            module_file = self.project_root / module_path
             with open(module_file, 'r') as f:
                 content = f.read()
             
@@ -659,7 +636,6 @@ import ast
         
         # Save full report
         from datetime import datetime
-        report_path = self.project_root / f"audit_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
         with open(report_path, 'w') as f:
             json.dump({
                 "timestamp": datetime.now().isoformat(),
@@ -699,7 +675,7 @@ import ast
                 "changes": {
                     "MCP functions": "Prefix with 'mcp_'",
                     "conductor functions": "Prefix with 'orch_'",
-                    "Roo functions": "Keep current naming"
+                    " functions": "Keep current naming"
                 },
                 "priority": "medium"
             })
@@ -754,7 +730,6 @@ import ast
     
     def create_fix_script(self, fixes):
         """Create automated fix script"""
-        fix_script_path = self.project_root / "scripts/apply_audit_fixes.py"
         with open(fix_script_path, 'w') as f:
             f.write('''
 '''

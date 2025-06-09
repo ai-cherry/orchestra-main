@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils"
 function HoverCard({
   ...props
 }) {
-  return <HoverCardPrimitive.Root data-slot="hover-card" {...props} />;
+  return <HoverCardPrimitive.t data-slot="hover-card" {...props} />;
 }
 
 function HoverCardTrigger({

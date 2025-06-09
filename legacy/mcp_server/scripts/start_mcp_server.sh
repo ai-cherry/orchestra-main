@@ -10,7 +10,7 @@ CONFIG_FILE="mcp_server/config/mcp_config.json"
 LOG_FILE="mcp_server.log"
 PYTHON_CMD="python"
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-REPO_ROOT="$( cd "$SCRIPT_DIR/../.." && pwd )"
+REPO_T="$( cd "$SCRIPT_DIR/../.." && pwd )"
 
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
@@ -81,10 +81,10 @@ if [ -n "$KUBERNETES_SERVICE_HOST" ] || [ -n "$K_SERVICE" ]; then
   # Running in Kubernetes or Cloud Run
   echo "Starting MCP server in cloud environment..."
   $PYTHON_CMD -m mcp_server.main --port=$PORT --config=$CONFIG_FILE > $LOG_FILE 2>&1 &
-elif [ -f "$REPO_ROOT/.dev_mode" ] || [ "$ENVIRONMENT" = "development" ]; then
+elif [ -f "$REPO_T/.dev_mode" ] || [ "$ENVIRONMENT" = "development" ]; then
   # Local development environment detection
   echo "Starting MCP server in local development mode..."
-  cd $REPO_ROOT
+  cd $REPO_T
   $PYTHON_CMD -m mcp_server.main --port=$PORT --config=$CONFIG_FILE --debug
 elif [ -n "$CI" ] || [ -n "$GITHUB_ACTIONS" ]; then
   # CI environment
@@ -93,7 +93,7 @@ elif [ -n "$CI" ] || [ -n "$GITHUB_ACTIONS" ]; then
 else
   # Default: production-like environment
   echo "Starting MCP server in production mode..."
-  cd $REPO_ROOT
+  cd $REPO_T
   nohup $PYTHON_CMD -m mcp_server.main --port=$PORT --config=$CONFIG_FILE > $LOG_FILE 2>&1 &
   echo "MCP server started in background. Check $LOG_FILE for logs."
 fi

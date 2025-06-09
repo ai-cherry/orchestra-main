@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """
 """
-        self.base_dir = Path("/root/cherry_ai-main")
         
     def implement_rate_limiting(self):
         """Implement domain-specific rate limiting"""

@@ -405,7 +405,7 @@
     <div class="container">
         <div class="header">
             <h1>🤖 AI Coding Tools Dashboard</h1>
-            <p>Centralized management for Roo Coder, Cursor AI, OpenAI Codex, Google Jules, and Factory AI</p>
+            <p>Centralized management for  Coder, Cursor AI, OpenAI Codex, Google Jules, and Factory AI</p>
         </div>
 
         <div class="dashboard-grid">
@@ -418,8 +418,7 @@
                 </div>
                 
                 <div class="tool-grid">
-                    <button class="tool-button active" onclick="selectTool('roo')">
-                        🦘 Roo Coder
+                        🦘  Coder
                     </button>
                     <button class="tool-button" onclick="selectTool('cursor')">
                         📝 Cursor AI
@@ -610,7 +609,6 @@
                 <div class="cheat-sheet">
                     <h4>Quick Commands</h4>
                     <div class="cheat-commands">
-                        <div class="cheat-command">ai-tools setup roo --ssh server</div>
                         <div class="cheat-command">ai-tools optimize --type performance</div>
                         <div class="cheat-command">ai-tools analyze --directory src/</div>
                         <div class="cheat-command">ai-tools cleanup --dry-run</div>
@@ -635,7 +633,6 @@
     </div>
 
     <script>
-        let selectedTool = 'roo';
         let terminalHistory = [];
 
         function selectTool(tool) {
@@ -653,8 +650,7 @@
 
         function updateToolInfo(tool) {
             const toolInfo = {
-                roo: {
-                    name: 'Roo Coder',
+                    name: ' Coder',
                     status: 'Active',
                     description: '10 specialized modes with OpenRouter integration',
                     commands: ['switch to architect mode', 'optimize for performance', 'ensure stability']
@@ -690,7 +686,7 @@
 
         function setupAllTools() {
             addTerminalOutput('🚀 Setting up all AI tools...');
-            addTerminalOutput('✅ Roo Coder: Configuration updated');
+            addTerminalOutput('✅  Coder: Configuration updated');
             addTerminalOutput('✅ Cursor IDE: Workspace settings applied');
             addTerminalOutput('⚠️ Codex: SSH setup script created');
             addTerminalOutput('✅ Google Jules: API integration ready');
@@ -765,7 +761,6 @@
                         <label style="display: block; margin-bottom: 5px; font-weight: bold;">Target Tool (Optional):</label>
                         <select name="tool" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc;">
                             <option value="">All Tools</option>
-                            <option value="roo">Roo Coder</option>
                             <option value="cursor">Cursor AI</option>
                             <option value="codex">OpenAI Codex</option>
                             <option value="jules">Google Jules</option>
@@ -810,7 +805,7 @@
             showModal('AI Tools Cheat Sheet', `
                 <div style="display: grid; gap: 20px;">
                     <div>
-                        <h3>🦘 Roo Coder Commands</h3>
+                        <h3>🦘  Coder Commands</h3>
                         <div style="background: #f7fafc; padding: 15px; border-radius: 8px;">
                             <div style="font-family: monospace; margin-bottom: 5px;">switch to architect mode</div>
                             <div style="font-family: monospace; margin-bottom: 5px;">optimize for performance</div>
@@ -872,9 +867,8 @@
             const cmd = command.toLowerCase();
             
             if (cmd.includes('setup')) {
-                if (cmd.includes('roo')) {
-                    addTerminalOutput('🦘 Setting up Roo Coder...');
-                    addTerminalOutput('✅ Roo configuration updated');
+                    addTerminalOutput('🦘 Setting up  Coder...');
+                    addTerminalOutput('✅  configuration updated');
                 } else if (cmd.includes('cursor')) {
                     addTerminalOutput('📝 Setting up Cursor IDE...');
                     addTerminalOutput('✅ Workspace settings applied');

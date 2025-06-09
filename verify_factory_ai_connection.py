@@ -14,7 +14,6 @@
     # Check current directory
     print(f"\n📂 Working Directory:")
     print(f"   Current path: {os.getcwd()}")
-    print(f"   Expected path: /root/cherry_ai-main")
 
     # Check git repository
     print("\n🔗 Git Repository:")
@@ -74,8 +73,6 @@
     if not os.environ.get("VIRTUAL_ENV"):
         issues.append("Activate virtual environment: source venv/bin/activate")
 
-    if os.getcwd() != "/root/cherry_ai-main":
-        issues.append("Change to correct directory: cd /root/cherry_ai-main")
 
     if not Path(".factory-ai-config").exists():
         issues.append("Factory AI config missing - run initial setup")

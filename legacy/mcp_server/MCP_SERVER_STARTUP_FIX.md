@@ -69,14 +69,12 @@ CMD ["python", "-m", "mcp_server.run_mcp_server"]
 
 ### 6. Created Startup Helper Script
 
-Added a simple startup script (`start_mcp_server.sh`) in the project root to simplify the development workflow.
 
 ## How to Run the MCP Server
 
 ### Option 1: Using the Startup Helper (Recommended for Development)
 
 ```bash
-# From the project root
 ./start_mcp_server.sh
 ```
 

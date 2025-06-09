@@ -9,7 +9,6 @@ MCP (Model Context Protocol) servers are started automatically by Cursor when yo
 ### 1. Ensure Dependencies are Installed
 
 ```bash
-cd /root/cherry_ai-main
 source venv/bin/activate
 pip install mcp psycopg weaviate-client
 ```
@@ -22,8 +21,6 @@ Add to your Cursor settings (Cmd/Ctrl + , → Settings → MCP):
 {
   "mcpServers": {
     "cherry_ai-memory": {
-      "command": "/root/cherry_ai-main/venv/bin/python",
-      "args": ["/root/cherry_ai-main/mcp_server/servers/memory_server.py"],
       "env": {
         "POSTGRES_HOST": "localhost",
         "POSTGRES_PORT": "5432",
@@ -35,16 +32,12 @@ Add to your Cursor settings (Cmd/Ctrl + , → Settings → MCP):
       }
     },
     "cherry_ai-conductor": {
-      "command": "/root/cherry_ai-main/venv/bin/python",
-      "args": ["/root/cherry_ai-main/mcp_server/servers/conductor_server.py"],
       "env": {
         "API_URL": "http://localhost:8080",
         "API_KEY": "4010007a9aa5443fc717b54e1fd7a463260965ec9e2fce297280cf86f1b3a4bd"
       }
     },
     "cherry_ai-tools": {
-      "command": "/root/cherry_ai-main/venv/bin/python",
-      "args": ["/root/cherry_ai-main/mcp_server/servers/tools_server.py"]
     }
   }
 }

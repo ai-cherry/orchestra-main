@@ -35,7 +35,6 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Create non-root user
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
@@ -47,7 +46,6 @@ COPY --from=builder /app/.next/static ./.next/static
 # Set correct permissions
 RUN chown -R nextjs:nodejs /app
 
-# Switch to non-root user
 USER nextjs
 
 # Expose port

@@ -144,7 +144,6 @@ async def startup_event():
 async def track_metrics(request: Request, call_next):
     """Track request metrics"""
 @app.get("/")
-async def root():
     """Gateway information"""
         "service": "MCP Gateway",
         "version": "2.0.0",

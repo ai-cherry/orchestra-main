@@ -262,9 +262,7 @@ class FileProcessor:
                     zip_ref.extractall(temp_dir)
                     
                     # Process each extracted file
-                    for root, dirs, files in os.walk(temp_dir):
                         for file in files:
-                            extracted_path = os.path.join(root, file)
                             relative_path = os.path.relpath(extracted_path, temp_dir)
                             
                             # Create metadata for extracted file
@@ -465,9 +463,7 @@ class IngestionPipeline:
         total_files = 0
         successful = 0
         
-        for root, dirs, files in os.walk(directory_path):
             for file in files:
-                file_path = os.path.join(root, file)
                 total_files += 1
                 
                 result = await self.ingest_file(file_path, persona, source="directory")

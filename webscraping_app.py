@@ -101,8 +101,7 @@ async def health_check():
     }
 
 @app.get("/")
-async def root():
-    """Root endpoint."""
+    """t endpoint."""
         "service": "Web Scraping AI Agents",
         "version": "1.0.0",
         "status": "running",

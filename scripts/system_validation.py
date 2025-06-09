@@ -94,7 +94,6 @@ if __name__ == "__main__":
                 task_id="test_analysis",
                 name="Test Analysis Task",
                 agent_role=AgentRole.ANALYZER,
-                inputs={"codebase_path": "/root/cherry_ai-main"},
                 priority=TaskPriority.HIGH,
                 timeout=30
             )
@@ -234,7 +233,6 @@ if __name__ == "__main__":
                 name="Integration Analysis",
                 agent_role=AgentRole.ANALYZER,
                 inputs={
-                    "codebase_path": "/root/cherry_ai-main",
                     "options": {"depth": "basic"}
                 },
                 timeout=60
@@ -303,7 +301,6 @@ if __name__ == "__main__":
                     task_id="analyze",
                     name="Analyze Code",
                     agent_role=AgentRole.ANALYZER,
-                    inputs={"codebase_path": "/root/cherry_ai-main"},
                     priority=TaskPriority.HIGH
                 ),
                 TaskDefinition(
@@ -364,7 +361,6 @@ if __name__ == "__main__":
                     task_id="perf_test",
                     name="Performance Test",
                     agent_role=AgentRole.ANALYZER,
-                    inputs={"codebase_path": "/root/cherry_ai-main"},
                     cache_key=None  # Disable caching for accurate measurement
                 )
                 
@@ -401,7 +397,6 @@ if __name__ == "__main__":
                     task_id=f"parallel_task_{i}",
                     name=f"Parallel Task {i}",
                     agent_role=AgentRole.ANALYZER,
-                    inputs={"codebase_path": "/root/cherry_ai-main"},
                     priority=TaskPriority.NORMAL
                 ))
             
@@ -428,7 +423,6 @@ if __name__ == "__main__":
     
     async def _test_large_codebase_analysis(self) -> Dict:
         """Test analysis performance on large codebase"""
-                "/root/cherry_ai-main",
                 {"depth": "comprehensive"}
             )
             execution_time = time.time() - start_time
@@ -472,7 +466,6 @@ if __name__ == "__main__":
                         task_id="stress_test",
                         name="Stress Test",
                         agent_role=AgentRole.ANALYZER,
-                        inputs={"codebase_path": "/root/cherry_ai-main"}
                     )
                     return await self.conductor.execute_workflow(wf_id, [task])
                 
@@ -501,7 +494,6 @@ if __name__ == "__main__":
     
     async def _test_memory_stress(self) -> Dict:
         """Test system memory usage under load"""
-                    "/root/cherry_ai-main",
                     {"depth": "comprehensive"}
                 ))
             

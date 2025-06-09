@@ -51,7 +51,6 @@ We've optimized the Docker configuration for better security, performance, and m
 
 - **Multi-Stage Builds**: Separate build and runtime environments for smaller images.
 - **Resource Limits**: Explicit resource limits for containers.
-- **Security Hardening**: Non-root user, minimal dependencies, and secure defaults.
 - **Environment Variables**: Consistent environment variable handling.
 
 ### Implementation Files

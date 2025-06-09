@@ -15,10 +15,8 @@ class FeatureRegistry:
     _registry: Dict[str, ImplementationStatus] = {}
 
     @staticmethod
-    def scan_todos(root_dir: str = "../.."):
         """Scan codebase for TODOs and register them."""
         todos = []
-        for dirpath, _, filenames in os.walk(root_dir):
             for fname in filenames:
                 if fname.endswith('.py'):
                     fpath = os.path.join(dirpath, fname)

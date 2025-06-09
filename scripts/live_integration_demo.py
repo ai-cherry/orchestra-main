@@ -3,7 +3,6 @@
 """
 """
     """Demonstrate all integration features"""
-        self.db_path = Path("roo_integration.db")
         self.demo_results = []
         
     def print_section(self, title):

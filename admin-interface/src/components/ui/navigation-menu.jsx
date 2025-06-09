@@ -12,7 +12,7 @@ function NavigationMenu({
   ...props
 }) {
   return (
-    <NavigationMenuPrimitive.Root
+    <NavigationMenuPrimitive.t
       data-slot="navigation-menu"
       data-viewport={viewport}
       className={cn(
@@ -22,7 +22,7 @@ function NavigationMenu({
       {...props}>
       {children}
       {viewport && <NavigationMenuViewport />}
-    </NavigationMenuPrimitive.Root>
+    </NavigationMenuPrimitive.t>
   );
 }
 

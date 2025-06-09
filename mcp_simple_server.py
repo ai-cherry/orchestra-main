@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 🚀 Simple Working MCP Server for Orchestra AI
-Provides basic context sharing capabilities for Cursor, Roo, and Continue
+Provides basic context sharing capabilities for Cursor, , and Continue
 """
 
 import asyncio
@@ -105,7 +105,6 @@ class SimpleOrchestralMCPServer:
                         "openai_api": "configured",
                         "mcp_server": "connected"
                     }
-                elif requesting_tool == "roo":
                     context = {
                         "modes": "10 specialized modes available",
                         "openrouter_api": "configured for cost optimization",
@@ -122,7 +121,6 @@ class SimpleOrchestralMCPServer:
                 else:
                     context = {
                         "general_context": "Orchestra AI ecosystem",
-                        "available_tools": ["cursor", "roo", "continue"],
                         "mcp_server": "operational"
                     }
                 
@@ -140,7 +138,6 @@ class SimpleOrchestralMCPServer:
                     optimal_tool = "continue"
                     reason = "UI-GPT-4o excels at React/TypeScript component generation"
                 elif "complex" in task_description.lower() or "workflow" in task_type.lower():
-                    optimal_tool = "roo"
                     reason = "Specialized modes handle complex workflows optimally"
                 else:
                     optimal_tool = "cursor"
@@ -159,7 +156,6 @@ class SimpleOrchestralMCPServer:
                     "openai_api": "configured",
                     "openrouter_api": "configured",
                     "cursor_rules": "active",
-                    "roo_modes": "10 available",
                     "continue_config": "ui-gpt-4o ready"
                 }
                 

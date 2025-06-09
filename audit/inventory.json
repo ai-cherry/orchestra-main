@@ -21,13 +21,6 @@
     "mcp_server/managers/standard_memory_manager.py",
     "mcp_server/managers/performance_memory_manager.py",
     "mcp_server/scripts/deploy_monitoring.py",
-    "mcp_server/roo/memory_hooks.py",
-    "mcp_server/roo/rules.py",
-    "mcp_server/roo/modes.py",
-    "mcp_server/roo/transitions.py",
-    "mcp_server/roo/__init__.py",
-    "mcp_server/roo/adapters/gemini_adapter.py",
-    "mcp_server/roo/adapters/__init__.py",
     "mcp_server/interfaces/memory_manager.py",
     "mcp_server/interfaces/storage.py",
     "mcp_server/interfaces/__init__.py",
@@ -403,7 +396,6 @@
     "packages/vertex_client/run_api_server.py"
   ],
   "adapters": [
-    "mcp_server/roo/adapters/gemini_adapter.py",
     "mcp_server/interfaces/tool_adapter.py",
     "mcp_server/storage/sync_storage_adapter.py",
     "mcp_server/storage/memory_adapter.py",

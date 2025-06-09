@@ -25,7 +25,7 @@ add_env_var() {
 
 # Core Cherry AI Configuration
 add_env_var "CHERRY_AI_ENV" "development"
-add_env_var "PROJECT_ROOT" "/workspace"
+add_env_var "PROJECT_T" "/workspace"
 add_env_var "PYTHONPATH" "/workspace:/workspace/mcp_server"
 
 # API Keys (will be populated from GitHub secrets in production)

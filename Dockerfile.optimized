@@ -23,7 +23,6 @@ RUN pip install --no-cache-dir \
 # Copy application code
 COPY . .
 
-# Create non-root user
 RUN useradd -m -u 1000 optimizeduser && chown -R optimizeduser:optimizeduser /app
 USER optimizeduser
 

@@ -17,7 +17,7 @@ These enhancements improve the maintainability, flexibility, and observability o
 
 The configuration system is based on Pydantic models, which provide validation, serialization, and deserialization capabilities. The main configuration classes are:
 
-- `MemoryConfig`: Root configuration for the memory system
+- `MemoryConfig`: t configuration for the memory system
 - `MongoDB
 - `RedisConfig`: Configuration for Redis backend
 - `InMemoryConfig`: Configuration for in-memory backend

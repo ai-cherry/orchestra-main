@@ -300,7 +300,6 @@ sudo systemctl start symphony-conductor
 
 1. **File Permissions**: Ensure scripts are executable only by authorized users
 2. **Cleanup Safety**: Protected patterns prevent critical file deletion
-3. **Service User**: Runs as non-root user by default
 4. **Audit Trail**: All actions logged with timestamps
 
 ## Performance Tuning

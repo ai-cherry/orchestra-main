@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 🎯 Unified MCP Server for Orchestra AI - Clean & Simple Implementation
-Provides shared context and capabilities across Cursor, Roo, and Continue
+Provides shared context and capabilities across Cursor, , and Continue
 Integrated with Notion workspace for centralized project management
 """
 
@@ -150,7 +150,6 @@ class ContextManager:
             # Sync important context to shared memory
             if tool_name == "cursor" and "file_changes" in context:
                 self.shared_memory["recent_changes"] = context["file_changes"]
-            elif tool_name == "roo" and "architecture" in context:
                 self.shared_memory["architecture"] = context["architecture"]
             elif tool_name == "continue" and "ui_components" in context:
                 self.shared_memory["components"] = context["ui_components"]
@@ -177,7 +176,6 @@ class ContextManager:
                 "recent_changes": self.shared_memory.get("recent_changes", []),
                 "architecture": self.shared_memory.get("architecture", {})
             })
-        elif requesting_tool == "roo":
             base_context.update({
                 "project_context": self.shared_memory.get("project_context", {}),
                 "workflows": self.shared_memory.get("workflows", []),
@@ -218,11 +216,9 @@ class OrchestralMCPServer:
             return [
                 types.Tool(
                     name="register_tool",
-                    description="Register a coding tool (cursor, roo, continue) for context sharing",
                     inputSchema={
                         "type": "object",
                         "properties": {
-                            "tool_name": {"type": "string", "enum": ["cursor", "roo", "continue"]},
                         },
                         "required": ["tool_name"]
                     }
@@ -346,17 +342,15 @@ class OrchestralMCPServer:
         """Simple task routing logic"""
         description_lower = description.lower()
         
-        # Notion tasks go to Roo
+        # Notion tasks go to 
         if task_type == "notion" or "notion" in description_lower:
-            return "roo"
         
         # UI tasks go to Continue
         if task_type == "ui" or any(word in description_lower for word in ["component", "interface", "react", "ui"]):
             return "continue"
         
-        # Complex workflows go to Roo
+        # Complex workflows go to 
         if task_type == "workflow" or complexity == "complex" or "research" in description_lower:
-            return "roo"
         
         # Simple coding goes to Cursor
         if task_type in ["coding", "debug"] and complexity in ["simple", "medium"]:
@@ -369,7 +363,6 @@ class OrchestralMCPServer:
         """Get routing explanation"""
         reasons = {
             "continue": "UI-GPT-4o excels at React/TypeScript and UI development",
-            "roo": "Specialized modes handle complex workflows and research optimally", 
             "cursor": "Native AI integration provides best experience for general coding"
         }
         return reasons.get(tool, "General purpose tool selection")

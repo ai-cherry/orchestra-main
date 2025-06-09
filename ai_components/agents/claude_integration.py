@@ -181,9 +181,8 @@ class ClaudeIntegration:
             logger.error(f"Security audit failed: {e}")
             raise
     
-    async def enhance_roo_code_analysis(self, roo_code_config: Dict, 
                                       project_context: Dict) -> Dict:
-        """Enhance Roo Code with Claude Max capabilities"""
+        """Enhance  Code with Claude Max capabilities"""
             enhancement_prompt = f"""
 """
                 "enhanced_config": enhancements,
@@ -195,7 +194,7 @@ class ClaudeIntegration:
 
             
             pass
-            logger.error(f"Roo Code enhancement failed: {e}")
+            logger.error(f" Code enhancement failed: {e}")
             raise
     
     async def _call_claude_api(self, capability: ClaudeCapability, prompt: str) -> str:
@@ -410,8 +409,7 @@ Format the response as structured JSON for processing.
             "raw_audit": raw_result
         }
     
-    def _parse_roo_enhancements(self, raw_result: str) -> Dict:
-        """Parse Roo Code enhancement suggestions"""
+        """Parse  Code enhancement suggestions"""
             "architect_mode": {
                 "enhancements": ["Enhancement suggestions"],
                 "config_updates": {}

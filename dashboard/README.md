@@ -66,7 +66,7 @@ If the setup script fails, follow these steps:
 dashboard/
 ├── app/                    # Next.js app directory
 │   ├── globals.css        # Global styles
-│   ├── layout.tsx         # Root layout
+│   ├── layout.tsx         # t layout
 │   └── page.tsx           # Home page
 ├── components/            # React components
 │   ├── ConversationalInterface/

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 🔍 Minimal Weaviate MCP Server for Testing
-Provides basic vector database capabilities for Roo integration
+Provides basic vector database capabilities for  integration
 """
 
 import json

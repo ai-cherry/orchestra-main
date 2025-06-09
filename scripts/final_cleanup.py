@@ -76,8 +76,6 @@
 
         files_to_delete = []
         for pattern in outdated_patterns:
-            files_to_delete.extend(self.root_dir.glob(pattern))
-            files_to_delete.extend(self.root_dir.glob(f"**/{pattern}"))
 
         return list(set(files_to_delete))
 
@@ -85,7 +83,6 @@
         """Find files that contain GCP references."""
         skip_dirs = {".git", ".mypy_cache", "venv", "__pycache__", "node_modules"}
 
-        for file_path in self.root_dir.rglob("*"):
             if file_path.is_file() and not any(skip in str(file_path) for skip in skip_dirs):
                 try:
 
@@ -142,7 +139,6 @@
         if outdated_files:
             print(f"\nFound {len(outdated_files)} files to delete:")
             for f in sorted(outdated_files):
-                print(f"  - {f.relative_to(self.root_dir)}")
 
             response = input("\nDelete these files? (y/N): ")
             if response.lower() == "y":
@@ -151,7 +147,6 @@
 
                         pass
                         f.unlink()
-                        print(f"  ✓ Deleted {f.relative_to(self.root_dir)}")
                     except Exception:
 
                         pass
@@ -176,7 +171,6 @@
         if gcp_files:
             print(f"\nFound {len(gcp_files)} files with GCP references:")
             for f in sorted(gcp_files)[:20]:  # Show first 20
-                print(f"  - {f.relative_to(self.root_dir)}")
             if len(gcp_files) > 20:
                 print(f"  ... and {len(gcp_files) - 20} more")
 
@@ -186,7 +180,6 @@
                 for f in gcp_files:
                     if self.update_file_content(f):
                         updated += 1
-                        print(f"  ✓ Updated {f.relative_to(self.root_dir)}")
                 print(f"\n✅ Updated {updated} files")
 
         # Update specific configuration files
@@ -221,7 +214,6 @@
         }
 
         for file_path, replacements in updates.items():
-            full_path = self.root_dir / file_path
             if full_path.exists():
                 try:
 

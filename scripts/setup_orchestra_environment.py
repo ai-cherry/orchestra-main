@@ -3,8 +3,6 @@
 """
 """
     """Setup Cherry AI environment."""
-        self.env_file = self.root_dir / ".env"
-        self.env_example = self.root_dir / "env.example"
         self.errors: List[str] = []
         self.warnings: List[str] = []
 
@@ -97,7 +95,6 @@
         """Install Python dependencies."""
         print("\n📦 Installing dependencies...")
 
-        req_file = self.root_dir / "requirements" / "base.txt"
         with open(req_file, "r") as f:
             requirements = f.read()
 
@@ -132,15 +129,12 @@
         print("\n🔧 Updating configurations...")
 
         # Replace old MCP config with clean one
-        old_mcp = self.root_dir / ".mcp.json"
-        new_mcp = self.root_dir / ".mcp-clean.json"
 
         if new_mcp.exists():
             shutil.copy(new_mcp, old_mcp)
             print("  ✓ Updated MCP configuration")
 
         # Update docker-compose to ensure no GCP refs
-        docker_compose = self.root_dir / "docker-compose.yml"
         if docker_compose.exists():
             with open(docker_compose, "r") as f:
                 content = f.read()
@@ -155,7 +149,6 @@
         print("\n🤖 Setting up AI context...")
 
         # Update .ai-context-index.md
-        context_index = self.root_dir / ".ai-context-index.md"
         new_content = """
 """
         with open(context_index, "w") as f:
@@ -163,7 +156,6 @@
         print("  ✓ Updated AI context index")
 
         # Create a new context file for the current architecture
-        arch_context = self.root_dir / "ARCHITECTURE_CONTEXT.md"
         arch_content = """
 """
         with open(arch_context, "w") as f:
@@ -189,7 +181,6 @@
         ]
 
         for file in key_files:
-            if (self.root_dir / file).exists():
                 print(f"  ✓ {file} exists")
             else:
                 self.errors.append(f"{file} not found")
@@ -202,7 +193,6 @@
                 "-r",
                 "google-cloud",
                 "--include=*.txt",
-                str(self.root_dir / "requirements"),
             ],
             capture_output=True,
             text=True,
