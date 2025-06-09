@@ -1,6 +1,0 @@
-config:
-  cherry-ai-infrastructure:k8s_node_plan: vc2-4c-8gb
-  cherry-ai-infrastructure:monitoring_plan: vc2-2c-4gb
-  cherry-ai-infrastructure:postgres_plan: Lambda-dbaas-business-cc-2-110-4
-  cherry-ai-infrastructure:redis_plan: Lambda-dbaas-startup-cc-1-55-2
-  cherry-ai-infrastructure:region: ewr
