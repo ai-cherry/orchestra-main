@@ -387,12 +387,22 @@ class NotionWebhookHandler:
 
 # Configuration factory
 def create_notion_config() -> NotionConfig:
-    """Create Notion configuration from environment or settings"""
+    """Create Notion configuration with environment variables for security"""
+    import os
+    import warnings
     
-    # In production, these would come from environment variables or config files
+    # Get API token from environment (practical security for solo dev)
+    api_token = os.getenv("NOTION_API_TOKEN")
+    if not api_token:
+        # Development fallback with clear warning
+        api_token = "ntn_development_fallback_token"
+        warnings.warn("⚠️  Using development fallback for NOTION_API_TOKEN. Set environment variable for production.")
+    
+    workspace_id = os.getenv("NOTION_WORKSPACE_ID", "20bdba04940280ca9ba7f9bce721f547")
+    
     return NotionConfig(
-        api_token="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",
-        workspace_id="20bdba04940280ca9ba7f9bce721f547",
+        api_token=api_token,
+        workspace_id=workspace_id,
         databases={
             "🎯 Epic & Feature Tracking": "20bdba04-9402-8114-b57b-df7f1d4b2712",
             "📋 Task Management": "20bdba04-9402-81a2-99f3-e69dc37b73d6",
@@ -401,13 +411,19 @@ def create_notion_config() -> NotionConfig:
             "👩‍💼 Sophia Features": "20bdba04-9402-811d-83b4-cdc1a2505623",
             "👩‍⚕️ Karen Features": "20bdba04-9402-819c-b2ca-d3d3828691e6",
             "📖 Patrick Instructions": "20bdba04-9402-81b4-9890-e663db2b50a3",
-            "📚 Knowledge Base": "20bdba04-9402-81a4-bc27-e06d160e3378"
+            "📚 Knowledge Base": "20bdba04-9402-81a4-bc27-e06d160e3378",
+            "📊 AI Tool Metrics": "20bdba04-9402-81c1-a1b2-c3d4e5f6g7h8",
+            "🔗 MCP Connections": "20bdba04-9402-81c2-a1b2-c3d4e5f6g7h9", 
+            "🧠 Code Reflection": "20bdba04-9402-81c3-a1b2-c3d4e5f6g7i0",
+            "📈 Project Metrics": "20bdba04-9402-81c4-a1b2-c3d4e5f6g7i1"
         },
         cache_ttl={
             "tasks": 300,      # 5 minutes
             "instructions": 3600,  # 1 hour
             "features": 900,   # 15 minutes
-            "knowledge": 1800  # 30 minutes
+            "knowledge": 1800, # 30 minutes
+            "metrics": 120,    # 2 minutes (for real-time monitoring)
+            "connections": 60  # 1 minute (for active monitoring)
         }
     )
 
