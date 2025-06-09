@@ -1,7 +1,7 @@
-FROM python:3.10-bullseye
+FROM python:3.10.13-bullseye
 
 # Install system dependencies
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     vim \
     curl \
@@ -25,7 +25,7 @@ ENV POETRY_NO_INTERACTION=1 \
     POETRY_CACHE_DIR=/tmp/poetry_cache
 
 # Create non-root user
-RUN useradd -m -s /bin/bash developer
+RUN useradd -m -u 1000 developer
 USER developer
 WORKDIR /workspace
 
@@ -47,3 +47,5 @@ RUN echo 'PS1="\[\033[1;36m\]🐳 orchestra-dev\[\033[0m\] \[\033[1;34m\]\w\[\03
 
 # Keep container running
 CMD ["/bin/bash"]
+
+
