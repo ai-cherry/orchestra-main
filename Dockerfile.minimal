@@ -1,4 +1,4 @@
-FROM python:3.10-slim
+FROM python:3.10.13-slim
 
 WORKDIR /app
 
@@ -11,5 +11,11 @@ COPY core/ ./core/
 COPY agent/ ./agent/
 COPY packages/ ./packages/
 
+# Create non-root user
+RUN useradd -m -u 1000 minimaluser && chown -R minimaluser:minimaluser /app
+USER minimaluser
+
 # Run the app
 CMD ["gunicorn", "core.orchestrator.src.api.app:app", "-k", "uvicorn.workers.UvicornWorker", "-w", "4", "-b", "0.0.0.0:8000"]
+
+

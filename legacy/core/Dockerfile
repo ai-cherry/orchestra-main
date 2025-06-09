@@ -1,4 +1,4 @@
-FROM python:3.10-slim
+FROM python:3.10.13-slim
 
 WORKDIR /app
 
@@ -9,5 +9,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY core/ .
 
+# Create non-root user
+RUN useradd -m -u 1000 legacycoreuser && chown -R legacycoreuser:legacycoreuser /app
+USER legacycoreuser
+
 # Run the FastAPI application
 CMD ["uvicorn", "core.main:app", "--host", "0.0.0.0", "--port", "8000"]
+
+
