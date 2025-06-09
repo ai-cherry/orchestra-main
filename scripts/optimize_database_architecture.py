@@ -16,9 +16,6 @@ from pathlib import Path
 from typing import Dict, List, Optional
 from datetime import datetime
 
-# Add project root to Python path
-project_root = Path(__file__).parent.parent
-sys.path.insert(0, str(project_root))
 
 # Configure logging
 logging.basicConfig(
@@ -153,7 +150,6 @@ track_functions = pl
 """
             
             # Write configuration to file
-            config_path = project_root / "postgresql-ai-optimized.conf"
             config_path.write_text(postgres_config)
             
             self.optimization_results["optimizations_applied"].append({
@@ -226,7 +222,6 @@ syslog-enabled yes
 syslog-ident redis-ai
 """
             
-            config_path = project_root / "redis-ai-optimized.conf"
             config_path.write_text(redis_config)
             
             self.optimization_results["optimizations_applied"].append({
@@ -353,7 +348,6 @@ syslog-ident redis-ai
                 }
             }
             
-            config_path = project_root / "docker-compose.optimized.yml"
             with open(config_path, 'w') as f:
                 import yaml
                 yaml.dump(docker_compose, f, default_flow_style=False, sort_keys=False)
@@ -423,7 +417,6 @@ AI_MESSAGE_QUEUE_SIZE=1000
 COLLABORATION_STATE_TTL=7200
 """
             
-            env_path = project_root / ".env.optimized.template"
             env_path.write_text(env_template)
             
             self.optimization_results["optimizations_applied"].append({
@@ -451,7 +444,6 @@ COLLABORATION_STATE_TTL=7200
             
             for pattern in search_patterns:
                 # Search in Python files
-                for py_file in project_root.rglob("*.py"):
                     try:
                         content = py_file.read_text()
                         if pattern in content:
@@ -478,7 +470,6 @@ COLLABORATION_STATE_TTL=7200
                 ]
             }
             
-            migration_path = project_root / "pinecone_migration_plan.json"
             with open(migration_path, 'w') as f:
                 json.dump(migration_plan, f, indent=2)
             
@@ -513,9 +504,6 @@ import logging
 from pathlib import Path
 import sys
 
-# Add project root to path
-project_root = Path(__file__).parent.parent
-sys.path.insert(0, str(project_root))
 
 from scripts.optimize_database_architecture import DatabaseArchitectureOptimizer
 
@@ -570,7 +558,6 @@ if __name__ == "__main__":
     asyncio.run(populate_mcp_knowledge())
 '''
             
-            script_path = project_root / "scripts" / "populate_mcp_knowledge.py"
             script_path.write_text(mcp_script)
             script_path.chmod(0o755)  # Make executable
             
@@ -662,7 +649,6 @@ if __name__ == "__main__":
                 }
             }
             
-            benchmark_path = project_root / "performance_benchmarks.json"
             with open(benchmark_path, 'w') as f:
                 json.dump(benchmarks, f, indent=2)
             
@@ -696,7 +682,6 @@ if __name__ == "__main__":
         self.optimization_results["end_time"] = datetime.now().isoformat()
         self.optimization_results["total_optimizations"] = len(self.optimization_results["optimizations_applied"])
         
-        results_path = project_root / "database_optimization_results.json"
         with open(results_path, 'w') as f:
             json.dump(self.optimization_results, f, indent=2)
         

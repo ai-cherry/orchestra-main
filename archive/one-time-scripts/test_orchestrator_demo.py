@@ -33,7 +33,6 @@
                 task_id="analyze_project",
                 name="Analyze cherry_ai Project",
                 agent_role=AgentRole.ANALYZER,
-                inputs={"codebase_path": "/root/cherry_ai-main"},
                 priority=1,
                 timeout=60
             ),

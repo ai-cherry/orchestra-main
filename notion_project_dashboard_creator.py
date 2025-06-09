@@ -109,7 +109,7 @@ class ProjectDashboardCreator:
                 "type": "paragraph",
                 "paragraph": {
                     "rich_text": [
-                        {"text": {"content": "Orchestra AI is a Complete AI Orchestration Platform that unifies multiple AI coding tools (Cursor, Roo, Continue) with intelligent task routing, shared context management, and comprehensive Notion-based project oversight. Our goal is to achieve maximum development velocity while maintaining enterprise-grade quality standards."}}
+                        {"text": {"content": "Orchestra AI is a Complete AI Orchestration Platform that unifies multiple AI coding tools (Cursor, , Continue) with intelligent task routing, shared context management, and comprehensive Notion-based project oversight. Our goal is to achieve maximum development velocity while maintaining enterprise-grade quality standards."}}
                     ]
                 }
             },
@@ -523,7 +523,7 @@ class ProjectDashboardCreator:
                 "type": "bulleted_list_item",
                 "bulleted_list_item": {
                     "rich_text": [
-                        {"text": {"content": "Roo", "annotations": {"bold": True}}},
+                        {"text": {"content": "", "annotations": {"bold": True}}},
                         {"text": {"content": " → Complex workflows, architecture decisions, research tasks"}}
                     ]
                 }

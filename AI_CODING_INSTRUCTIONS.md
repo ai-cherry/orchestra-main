@@ -44,16 +44,9 @@ AI Models: OpenAI GPT-4O, DeepSeek R1, Claude Sonnet/Opus, Gemini
 # - Performance-first approach
 ```
 
-### **🤖 Roo Coder - Specialized Modes**
+### **🤖  Coder - Specialized Modes**
 ```bash
 # Mode Selection:
-roo code        # General coding (DeepSeek R1)
-roo architect   # System design (Claude Sonnet 4)
-roo orchestrator # Complex workflows (Claude Sonnet 4) 
-roo debug       # Systematic debugging (DeepSeek R1)
-roo research    # Documentation/research (Gemini 2.5 Pro)
-roo quality     # Code review/testing (DeepSeek R1)
-roo strategy    # Technical decisions (Claude Opus 4)
 
 # Boomerang tasks for multi-step processes:
 # - Database schema changes
@@ -89,7 +82,6 @@ orchestra-main/
 ├── admin-interface/     # Admin UI (React/TypeScript)
 ├── production-api/      # Main API (FastAPI/Python)
 ├── legacy/             # Legacy components (migrate gradually)
-├── .roo/               # Roo configuration and modes
 ├── .continue/          # Continue.dev configuration
 └── src/                # Core application code
 ```
@@ -220,7 +212,7 @@ async def mcp_operation(server: str, operation: str, params: Dict) -> Any:
 ```python
 # Cross-tool context via orchestra-unified MCP server
 async def share_context(tool: str, context: Dict[str, Any]) -> bool:
-    """Share context between Cursor, Roo, and Continue"""
+    """Share context between Cursor, , and Continue"""
     return await mcp_client.update_context(tool, context)
 
 async def get_shared_context(requesting_tool: str) -> Dict[str, Any]:
@@ -617,7 +609,6 @@ class OrchestralService:
 
 ### **Development Velocity:**
 - **Code generation**: 3-5x faster with AI assistants
-- **Bug resolution**: <2 hours average with roo debug
 - **UI development**: 10x faster with Continue.dev UI-GPT-4O
 - **Architecture decisions**: Documented and rationale-backed
 

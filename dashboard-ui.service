@@ -17,7 +17,6 @@ ExecStartPre=/usr/bin/npm run build
 ExecStart=/usr/bin/npm run start # This runs `next start` which typically uses port 3000
 
 Restart=always
-User=ubuntu # Or a dedicated non-root user if created
 Group=ubuntu # Or a dedicated group
 
 # Output logging

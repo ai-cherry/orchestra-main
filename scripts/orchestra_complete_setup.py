@@ -3,7 +3,6 @@
 """
 """
     """Complete setup and cleanup for Cherry AI."""
-        self.env_file = self.root_dir / ".env"
         self.config = {}
         self.removed_files: List[str] = []
         self.updated_files: List[str] = []
@@ -41,12 +40,10 @@
 
         # Find and remove archive directories
         archive_dirs = [
-            self.root_dir / "scripts" / "archive",
         ]
 
         for archive_dir in archive_dirs:
             if archive_dir.exists():
-                print(f"  Removing {archive_dir.relative_to(self.root_dir)}/")
                 shutil.rmtree(archive_dir)
                 self.removed_files.append(str(archive_dir))
 
@@ -54,27 +51,22 @@
         files_with_refs = {
             "execute_strategy_workflow.py": [
                 (
-                    "from roo_workflow_manager import SubtaskManager",
                     "# Removed archive import",
                 ),
                 (
-                    "Could not import Roo's workflow manager",
+                    "Could not import 's workflow manager",
                     "Workflow manager not available",
                 ),
             ],
-            "mcp_server/demo_memory_sync.py": [('"roo_workflow_manager",', '# "roo_workflow_manager", # Removed')],
             "mcp_cli.py": [
                 (
-                    "from roo_workflow_manager import MODE_MAP as ROO_MODES",
                     "# Removed archive import",
                 ),
-                ("roo_workflow_manager.py", "workflow manager"),
             ],
         }
 
         # Update files
         for file_path, replacements in files_with_refs.items():
-            full_path = self.root_dir / file_path
             if full_path.exists():
                 print(f"  Updating {file_path}")
                 with open(full_path, "r") as f:
@@ -245,7 +237,6 @@
         }
 
         # Save MCP configuration
-        mcp_path = self.root_dir / ".mcp.json"
         with open(mcp_path, "w") as f:
             json.dump(mcp_config, f, indent=2)
         print("  ✓ Created automated MCP configuration")
@@ -255,7 +246,6 @@
 
     def create_mcp_servers(self):
         """Create MCP server implementations."""
-        servers_dir = self.root_dir / "mcp_server" / "servers"
         servers_dir.mkdir(parents=True, exist_ok=True)
 
         # Base server template
@@ -349,7 +339,6 @@ echo "✓ Cherry AI stopped"
         scripts = {"start_cherry_ai.sh": start_script, "stop_cherry_ai.sh": stop_script}
 
         for filename, content in scripts.items():
-            script_path = self.root_dir / filename
             with open(script_path, "w") as f:
                 f.write(content)
             script_path.chmod(0o755)
@@ -362,11 +351,7 @@ echo "✓ Cherry AI stopped"
 
         checks = {
             ".env exists": self.env_file.exists(),
-            ".mcp.json exists": (self.root_dir / ".mcp.json").exists(),
             "Redis configured": bool(self.config.get("REDIS_HOST")),
-            "No archive directories": not (self.root_dir / "scripts" / "archive").exists(),
-            "MCP servers created": (self.root_dir / "mcp_server" / "servers" / "conductor_server.py").exists(),
-            "Start script created": (self.root_dir / "start_cherry_ai.sh").exists(),
         }
 
         all_good = True

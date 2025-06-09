@@ -136,12 +136,10 @@ class ImplementationValidator:
         credentials = []
         patterns = ['password=', 'api_key=', 'secret=', 'token=']
         
-        for root, dirs, files in os.walk('.'):
             dirs[:] = [d for d in dirs if d not in ['venv', '__pycache__', '.git', 'node_modules']]
             
             for file in files:
                 if file.endswith('.py'):
-                    file_path = os.path.join(root, file)
                     try:
                         with open(file_path, 'r') as f:
                             for i, line in enumerate(f, 1):
@@ -207,7 +205,6 @@ class ImplementationValidator:
         
         # Check for test files
         test_files = []
-        for root, dirs, files in os.walk('.'):
             for file in files:
                 if file.startswith('test_') and file.endswith('.py'):
                     test_files.append(file)

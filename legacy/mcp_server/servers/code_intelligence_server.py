@@ -22,7 +22,6 @@ class CodeIntelligenceServer:
 
     def __init__(self):
         self.server = Server("code-intelligence")
-        self.project_root = Path.cwd()
         self.file_cache: Dict[str, Dict] = {}
         self.dependency_graph: Dict[str, Set[str]] = {}
         self._setup_handlers()
@@ -250,7 +249,6 @@ class CodeIntelligenceServer:
         for ext in file_extensions:
             cmd = [
                 "grep", "-rn", "--include=f*{ext}",
-                symbol_name, str(self.project_root)
             ]
             
             # Add exclusions
@@ -283,7 +281,6 @@ class CodeIntelligenceServer:
         output += "🔄 Analyzing import dependencies...\n\n"
         
         # Basic implementation - can be enhanced
-        all_py_files = list(self.project_root.rglob("*.py"))
         import_map = {}
         
         for py_file in all_py_files:
@@ -301,7 +298,6 @@ class CodeIntelligenceServer:
                     elif isinstance(node, ast.ImportFrom) and node.module:
                         imports.append(node.module)
                 
-                relative_path = py_file.relative_to(self.project_root)
                 import_map[str(relative_path)] = imports
                 
             except Exception:

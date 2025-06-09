@@ -103,7 +103,6 @@ if enable_micro_cache:
     # Setup connection for remote commands
     micro_cache_connection = command.remote.ConnectionArgs(
         host=micro_cache_droplet.ipv4_address,
-        user="root",
         private_key=ssh_private_key,
     )
 
@@ -186,7 +185,6 @@ setup_cherry_ai_service = command.remote.Command(
     f"setup-cherry_ai-service-{env}",
     connection=command.remote.ConnectionArgs(
         host=app_droplet.ipv4_address,
-        user="root",
         private_key=ssh_private_key,
     ),
     create=Output.all(
@@ -225,7 +223,6 @@ chmod +x /opt/cherry_ai/migrations/run_migration.sh
     f"setup-latency-monitoring-{env}",
     connection=command.remote.ConnectionArgs(
         host=app_droplet.ipv4_address,
-        user="root",
         private_key=ssh_private_key,
     ),
     create=Output.all(

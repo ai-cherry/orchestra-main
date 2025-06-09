@@ -22,7 +22,6 @@ class UpdateCandidate:
         """Calculate risk score for this update"""
     """Result of an update operation"""
     """Handles automated dependency updates"""
-        self.backup_dir = root_path / ".version-backups"
         self.backup_dir.mkdir(exist_ok=True)
         
     async def find_updates(self) -> List[UpdateCandidate]:
@@ -177,24 +176,19 @@ class UpdateCandidate:
         # Backup relevant files based on dependency type
         if dependency.type == ComponentType.PYTHON:
             # Backup requirements files
-            req_dir = self.root_path / "requirements"
             if req_dir.exists():
                 shutil.copytree(req_dir, backup_path / "requirements")
                 
         elif dependency.type == ComponentType.JAVASCRIPT:
             # Backup package.json and lock files
             for pattern in ["**/package.json", "**/package-lock.json", "**/pnpm-lock.yaml"]:
-                for file_path in self.root_path.glob(pattern):
                     if "node_modules" not in str(file_path):
-                        relative_path = file_path.relative_to(self.root_path)
                         dest_path = backup_path / relative_path
                         dest_path.parent.mkdir(parents=True, exist_ok=True)
                         shutil.copy2(file_path, dest_path)
                         
         elif dependency.type == ComponentType.DOCKER:
             # Backup Dockerfiles
-            for dockerfile in self.root_path.glob("**/Dockerfile*"):
-                relative_path = dockerfile.relative_to(self.root_path)
                 dest_path = backup_path / relative_path
                 dest_path.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(dockerfile, dest_path)
@@ -212,7 +206,6 @@ class UpdateCandidate:
             
         # Parse source file location
         file_name, line_num = dep.source_file.split(':')
-        file_path = self.root_path / "requirements" / file_name
         
         if not file_path.exists():
             raise FileNotFoundError(f"Requirements file not found: {file_path}")
@@ -245,7 +238,6 @@ class UpdateCandidate:
         """Update JavaScript dependency in package.json"""
             raise ValueError(f"No source file for dependency {dep.name}")
             
-        file_path = self.root_path / dep.source_file
         
         if not file_path.exists():
             raise FileNotFoundError(f"Package.json not found: {file_path}")
@@ -291,7 +283,6 @@ class UpdateCandidate:
         """Update Docker base image in Dockerfile"""
             raise ValueError(f"No source file for dependency {dep.name}")
             
-        file_path = self.root_path / dep.source_file
         
         if not file_path.exists():
             raise FileNotFoundError(f"Dockerfile not found: {file_path}")
@@ -320,7 +311,6 @@ class UpdateCandidate:
                 
         elif candidate.dependency.type == ComponentType.JAVASCRIPT:
             # Run JavaScript tests
-            admin_ui_path = self.root_path / "admin-ui"
             if admin_ui_path.exists():
                 try:
 
@@ -340,13 +330,11 @@ class UpdateCandidate:
                     
         elif candidate.dependency.type == ComponentType.DOCKER:
             # Build Docker image to test
-            dockerfile_path = self.root_path / candidate.dependency.source_file
             try:
 
                 pass
                 result = subprocess.run(
                     ['docker', 'build', '-f', str(dockerfile_path), '.'],
-                    cwd=self.root_path,
                     capture_output=True,
                     timeout=600  # 10 minute timeout
                 )
@@ -383,7 +371,6 @@ class UpdateCandidate:
             # Restore requirements files
             backup_req = backup_path / "requirements"
             if backup_req.exists():
-                dest_req = self.root_path / "requirements"
                 shutil.rmtree(dest_req, ignore_errors=True)
                 shutil.copytree(backup_req, dest_req)
                 
@@ -391,7 +378,6 @@ class UpdateCandidate:
             # Restore package.json files
             for backup_file in backup_path.rglob("package*.json"):
                 relative_path = backup_file.relative_to(backup_path)
-                dest_file = self.root_path / relative_path
                 dest_file.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(backup_file, dest_file)
                 
@@ -399,7 +385,6 @@ class UpdateCandidate:
             # Restore Dockerfiles
             for backup_file in backup_path.rglob("Dockerfile*"):
                 relative_path = backup_file.relative_to(backup_path)
-                dest_file = self.root_path / relative_path
                 dest_file.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(backup_file, dest_file)
                 

@@ -9,7 +9,6 @@ class MobileAppIntegration:
     """Setup mobile app integration for Cherry AI"""
     
     def __init__(self):
-        self.base_dir = Path("/root/cherry_ai-main")
         self.mobile_api_created = False
     
     def create_mobile_api(self):

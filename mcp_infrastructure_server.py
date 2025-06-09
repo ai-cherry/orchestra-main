@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 🏗 Minimal Infrastructure MCP Server for Testing
-Provides basic infrastructure management capabilities for Roo integration
+Provides basic infrastructure management capabilities for  integration
 """
 
 import json

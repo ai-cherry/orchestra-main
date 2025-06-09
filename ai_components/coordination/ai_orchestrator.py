@@ -578,7 +578,6 @@ async def main():
             task_id="analyze_codebase",
             name="Analyze Codebase with AI",
             agent_role=AgentRole.ANALYZER,
-            inputs={"codebase_path": "/root/cherry_ai-main"},
             priority=1
         ),
         TaskDefinition(

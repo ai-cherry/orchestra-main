@@ -189,7 +189,6 @@ Test coverage includes:
 ### Circuit Breaker Stays Open
 - Check Factory AI service health
 - Verify API credentials
-- Review error logs for root cause
 
 ### High Fallback Rate
 - Monitor Factory AI latency

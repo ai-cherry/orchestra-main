@@ -10,8 +10,8 @@
     print("✓ Test environment variables configured")
 
 def update_conductor_config():
-    """Update conductor config with complete Roo mode mappings"""
-    print("\n🎭 Updating Roo mode configurations...")
+    """Update conductor config with complete  mode mappings"""
+    print("\n🎭 Updating  mode configurations...")
     
     config_path = Path("config/conductor_config.json")
     
@@ -19,10 +19,8 @@ def update_conductor_config():
     with open(config_path, 'r') as f:
         config = json.load(f)
     
-    # Update Roo mode mappings with complete configuration
-    config["roo_integration"]["mode_mappings"] = {
+    # Update  mode mappings with complete configuration
         "code": {
-            "agent_id": "roo_code_agent",
             "capabilities": ["code_generation", "code_review", "refactoring", "debugging", "testing"],
             "model": "anthropic/claude-opus-4",
             "context_limit": 200000,
@@ -30,7 +28,6 @@ def update_conductor_config():
             "tools": ["read_file", "write_file", "execute_command", "search_files"]
         },
         "architect": {
-            "agent_id": "roo_architect_agent",
             "capabilities": ["system_design", "architecture_review", "component_design", "integration_planning"],
             "model": "anthropic/claude-opus-4",
             "context_limit": 200000,
@@ -38,7 +35,6 @@ def update_conductor_config():
             "tools": ["read_file", "list_files", "search_files", "create_diagram"]
         },
         "ask": {
-            "agent_id": "roo_ask_agent",
             "capabilities": ["question_answering", "explanation", "guidance"],
             "model": "anthropic/claude-3.5-sonnet",
             "context_limit": 100000,
@@ -46,15 +42,12 @@ def update_conductor_config():
             "tools": ["search_knowledge", "read_file"]
         },
         "debug": {
-            "agent_id": "roo_debug_agent",
-            "capabilities": ["error_analysis", "root_cause_analysis", "fix_suggestion", "testing"],
             "model": "anthropic/claude-opus-4",
             "context_limit": 200000,
             "temperature": 0.1,
             "tools": ["read_file", "execute_command", "analyze_logs", "run_tests"]
         },
         "conductor": {
-            "agent_id": "roo_conductor_agent",
             "capabilities": ["task_decomposition", "agent_coordination", "context_management", "workflow_optimization"],
             "model": "anthropic/claude-opus-4",
             "context_limit": 200000,
@@ -62,7 +55,6 @@ def update_conductor_config():
             "tools": ["create_workflow", "assign_task", "monitor_progress", "manage_context"]
         },
         "strategy": {
-            "agent_id": "roo_strategy_agent",
             "capabilities": ["technology_selection", "optimization_planning", "risk_assessment", "roadmap_creation"],
             "model": "anthropic/claude-opus-4",
             "context_limit": 200000,
@@ -70,7 +62,6 @@ def update_conductor_config():
             "tools": ["analyze_requirements", "compare_technologies", "create_roadmap"]
         },
         "research": {
-            "agent_id": "roo_research_agent",
             "capabilities": ["best_practices_research", "benchmarking", "solution_exploration", "documentation_analysis"],
             "model": "anthropic/claude-3.5-sonnet",
             "context_limit": 100000,
@@ -78,7 +69,6 @@ def update_conductor_config():
             "tools": ["search_web", "analyze_docs", "compare_solutions"]
         },
         "analytics": {
-            "agent_id": "roo_analytics_agent",
             "capabilities": ["metrics_analysis", "performance_monitoring", "reporting", "visualization"],
             "model": "anthropic/claude-3.5-sonnet",
             "context_limit": 100000,
@@ -86,7 +76,6 @@ def update_conductor_config():
             "tools": ["query_metrics", "create_dashboard", "generate_report"]
         },
         "implementation": {
-            "agent_id": "roo_implementation_agent",
             "capabilities": ["deployment", "process_execution", "infrastructure_as_code", "automation"],
             "model": "anthropic/claude-opus-4",
             "context_limit": 200000,
@@ -94,7 +83,6 @@ def update_conductor_config():
             "tools": ["execute_command", "deploy_infrastructure", "run_automation"]
         },
         "quality": {
-            "agent_id": "roo_quality_agent",
             "capabilities": ["validation", "performance_verification", "compliance_checking", "test_automation"],
             "model": "anthropic/claude-3.5-sonnet",
             "context_limit": 100000,
@@ -102,7 +90,6 @@ def update_conductor_config():
             "tools": ["run_tests", "check_compliance", "validate_performance"]
         },
         "documentation": {
-            "agent_id": "roo_documentation_agent",
             "capabilities": ["documentation_generation", "process_documentation", "standard_maintenance", "knowledge_organization"],
             "model": "anthropic/claude-3.5-sonnet",
             "context_limit": 100000,
@@ -115,7 +102,7 @@ def update_conductor_config():
     with open(config_path, 'w') as f:
         json.dump(config, f, indent=2)
     
-    print("✓ Roo mode configurations updated")
+    print("✓  mode configurations updated")
 
 def create_mcp_test_script():
     """Create a script to test MCP connections"""

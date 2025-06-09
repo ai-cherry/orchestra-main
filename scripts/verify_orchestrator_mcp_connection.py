@@ -6,7 +6,6 @@
             "timestamp": datetime.now().isoformat(),
             "mcp_servers": {},
             "conductor_config": {},
-            "roo_integration": {},
             "connections": {},
             "errors": []
         }
@@ -71,20 +70,11 @@
             with open(config_path, 'r') as f:
                 orch_config = json.load(f)
             
-            # Extract Roo integration settings
-            roo_integration = orch_config.get("roo_integration", {})
-            self.results["roo_integration"] = {
-                "enabled": roo_integration.get("enabled", False),
-                "modes": list(roo_integration.get("mode_mappings", {}).keys()),
+            # Extract  integration settings
                 "api_routing": {
-                    "circuit_breaker": roo_integration.get("api_routing", {}).get("circuit_breaker", {}).get("failure_threshold"),
-                    "retry_strategy": roo_integration.get("api_routing", {}).get("retry_strategy", {}).get("max_retries")
                 },
-                "weaviate_integration": roo_integration.get("weaviate_integration", {}).get("enabled", False)
             }
             
-            print(f"✓ Roo integration: {'Enabled' if roo_integration.get('enabled') else 'Disabled'}")
-            print(f"✓ Configured modes: {len(self.results['roo_integration']['modes'])}")
             
             return orch_config
             
@@ -136,7 +126,7 @@
         print("\n🔍 Checking environment variables...")
         
         required_vars = {
-            "OPENROUTER_API_KEY": "Roo Coder API access",
+            "OPENROUTER_API_KEY": " Coder API access",
             "POSTGRES_HOST": "Database connection",
             "POSTGRES_DB": "Database name",
             "WEAVIATE_HOST": "Vector store connection",
@@ -225,19 +215,16 @@
         self.results["connections"] = connection_results
         return connection_results
     
-    def check_roo_mode_availability(self) -> Dict[str, bool]:
-        """Check if Roo modes are properly configured"""
-        print("\n🔍 Checking Roo mode availability...")
+        """Check if  modes are properly configured"""
+        print("\n🔍 Checking  mode availability...")
         
         mode_status = {}
-        modes = self.results["roo_integration"].get("modes", [])
         
         # Load the actual conductor config to check mode mappings
         config_path = Path("config/conductor_config.json")
         if config_path.exists():
             with open(config_path, 'r') as f:
                 orch_config = json.load(f)
-            mode_mappings = orch_config.get("roo_integration", {}).get("mode_mappings", {})
         else:
             mode_mappings = {}
         
@@ -259,7 +246,6 @@
             else:
                 print(f"  ✗ {mode}: Missing configuration")
         
-        self.results["roo_modes"] = mode_status
         return mode_status
     
     def verify_conductor_components(self) -> Dict[str, bool]:
@@ -293,22 +279,18 @@
         
         # Calculate overall status
         mcp_configured = len(self.results["mcp_servers"].get("configured", [])) > 0
-        roo_enabled = self.results["roo_integration"].get("enabled", False)
         syntax_valid = all(self.results["mcp_servers"].get("syntax_check", {}).values()) if self.results["mcp_servers"].get("syntax_check") else False
         env_complete = all(self.results.get("environment", {}).values()) if self.results.get("environment") else False
-        modes_configured = all(self.results.get("roo_modes", {}).values()) if self.results.get("roo_modes") else False
         components_present = all(self.results.get("components", {}).values()) if self.results.get("components") else False
         
         self.results["summary"] = {
             "mcp_servers_configured": mcp_configured,
-            "roo_integration_enabled": roo_enabled,
             "syntax_validation_passed": syntax_valid,
             "environment_complete": env_complete,
             "all_modes_configured": modes_configured,
             "components_present": components_present,
             "overall_status": all([
                 mcp_configured,
-                roo_enabled,
                 syntax_valid,
                 env_complete,
                 modes_configured,
@@ -334,7 +316,6 @@
         summary = self.results.get("summary", {})
         
         print(f"\n🔌 MCP Servers Configured: {'✓' if summary.get('mcp_servers_configured') else '✗'}")
-        print(f"🤖 Roo Integration Enabled: {'✓' if summary.get('roo_integration_enabled') else '✗'}")
         print(f"📝 Syntax Validation: {'✓ Passed' if summary.get('syntax_validation_passed') else '✗ Failed'}")
         print(f"🔐 Environment Variables: {'✓ Complete' if summary.get('environment_complete') else '✗ Incomplete'}")
         print(f"🎭 All Modes Configured: {'✓' if summary.get('all_modes_configured') else '✗'}")
@@ -352,7 +333,7 @@
 
 def main():
     """Main verification function"""
-    print("🚀 Verifying Roo Coder MCP Service and AI conductor Connection")
+    print("🚀 Verifying  Coder MCP Service and AI conductor Connection")
     print("="*60)
     
     verifier = conductorMCPVerifier()
@@ -363,7 +344,6 @@ def main():
     verifier.test_mcp_server_syntax()
     verifier.check_environment_variables()
     verifier.test_mcp_server_connections()
-    verifier.check_roo_mode_availability()
     verifier.verify_conductor_components()
     
     # Generate report and summary

@@ -63,7 +63,7 @@ if kill -0 "$PID" 2>/dev/null; then
     log ""
     log "🔗 Integration Ready:"
     log "   - Cursor: Native AI integration"
-    log "   - Roo: 10 specialized modes via OpenRouter"
+    log "   - : 10 specialized modes via OpenRouter"
     log "   - Continue: UI-GPT-4O via OpenAI"
 else
     error "❌ Simple MCP Server failed to start"

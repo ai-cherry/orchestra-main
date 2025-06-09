@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   description: "Admin dashboard for the AI Agent service",
 };
 
-export default function RootLayout({
+export default function tLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;

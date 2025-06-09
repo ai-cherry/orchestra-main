@@ -83,7 +83,6 @@ import asyncio
 import subprocess
 from pathlib import Path
 
-# Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 def start_server(name, command, args):

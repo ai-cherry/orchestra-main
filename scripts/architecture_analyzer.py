@@ -2,7 +2,6 @@
 """
 """
     """Comprehensive architecture analysis tool"""
-        self.base_dir = Path("/root/cherry_ai-main")
         self.domains = ["Personal", "PayReady", "ParagonRX"]
         self.analysis_results = {
             "timestamp": datetime.now().isoformat(),
@@ -30,8 +29,6 @@
         }
         
         # Scan directory structure
-        for root, dirs, files in os.walk(self.base_dir):
-            rel_path = Path(root).relative_to(self.base_dir)
             
             # Check for modular directory patterns
             for indicator in modular_indicators:
@@ -64,10 +61,8 @@
         
         # Scan # TODO: Consider using list comprehension for better performance
  for domain-specific files
-        for root, dirs, files in os.walk(self.base_dir):
             for file in files:
                 if file.endswith(('.py', '.ts', '.js')):
-                    file_path = Path(root) / file
                     rel_path = file_path.relative_to(self.base_dir)
                     
                     # Check which domain this file belongs to
@@ -195,10 +190,8 @@
         }
         
         # Search for integration patterns
-        for root, dirs, files in os.walk(self.base_dir):
             for file in files:
                 if file.endswith(('.py', '.ts', '.js', '.yaml', '.json')):
-                    file_path = Path(root) / file
                     try:
 
                         pass

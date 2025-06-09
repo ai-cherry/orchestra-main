@@ -7,7 +7,7 @@ import { HttpUrl } from "pydantic"; // Assuming HttpUrl might be part of the sha
 
 // Literal types - Replicate these from Pydantic models if not already shared
 // For simplicity, using string for now, but could be stricter with string literal unions.
-type MCPTargetAICoder = "RooCoder" | "CursorAI" | "Claude" | "OpenAI_GPT4" | "OpenAI_GPT3_5" | "Gemini" | "Copilot" | "Generic";
+type MCPTargetAICoder = "Coder" | "CursorAI" | "Claude" | "OpenAI_GPT4" | "OpenAI_GPT3_5" | "Gemini" | "Copilot" | "Generic";
 type MCPEnabledInternalTool = "copilot" | "gemini";
 type MCPDesiredStatus = "running" | "stopped";
 type MCPAIProviderName = "openai" | "claude" | "gemini" | "copilot" | "custom";

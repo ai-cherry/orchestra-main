@@ -107,13 +107,10 @@ def main():
         config = get_pulumi_config()
 
         # Generate .env file
-        project_root = Path(__file__).parent.parent
-        env_path = project_root / ".env"
 
         generate_env_file(config, env_path)
 
         # Add to .gitignore if not already there
-        gitignore_path = project_root / ".gitignore"
         if gitignore_path.exists():
             gitignore_content = gitignore_path.read_text()
             if ".env" not in gitignore_content:

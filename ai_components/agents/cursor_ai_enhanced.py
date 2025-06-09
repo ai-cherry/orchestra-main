@@ -285,7 +285,6 @@ class EnhancedCursorAIAgent:
                 "error_info": error_info or {},
                 "include_stack_trace": True,
                 "suggest_fixes": True,
-                "analyze_root_cause": True
             }
             
             result = await self.circuit_breaker.call(
@@ -560,7 +559,6 @@ def get_enhanced_cursor_ai() -> EnhancedCursorAIAgent:
 
         pass
         analysis = await cursor_ai.analyze_project(
-            "/root/cherry_ai-main",
             {
                 "depth": "comprehensive",
                 "include_metrics": True,

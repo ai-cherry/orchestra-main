@@ -216,7 +216,7 @@ def get_database_schemas() -> Dict[str, Dict[str, Any]]:
             "properties": {
                 "Task": {"type": "title", "required": True},
                 "Status": {"type": "select", "options": ["Ready", "In Progress", "Review", "Done", "Blocked"]},
-                "Assignee": {"type": "select", "options": ["Human Developer", "Cursor AI", "Roo AI", "Continue AI"]},
+                "Assignee": {"type": "select", "options": ["Human Developer", "Cursor AI", " AI", "Continue AI"]},
                 "Priority": {"type": "select", "options": ["Low", "Medium", "High", "Critical"]},
                 "Type": {"type": "select", "options": ["Feature", "Bug", "Refactor", "Documentation", "Infrastructure"]},
                 "Epic": {"type": "relation", "relation_to": "epic_tracking"},
@@ -234,7 +234,7 @@ def get_database_schemas() -> Dict[str, Dict[str, Any]]:
             "properties": {
                 "Title": {"type": "title", "required": True},
                 "Type": {"type": "select", "options": ["Code", "Config", "Deploy", "Debug", "Research", "Review"]},
-                "Tool Used": {"type": "select", "options": ["Manual", "Cursor", "Roo", "Continue", "GitHub", "Notion"]},
+                "Tool Used": {"type": "select", "options": ["Manual", "Cursor", "", "Continue", "GitHub", "Notion"]},
                 "Date": {"type": "date", "required": True},
                 "Files Changed": {"type": "number"},
                 "Lines Added": {"type": "number"},
@@ -256,7 +256,7 @@ def get_database_schemas() -> Dict[str, Dict[str, Any]]:
                 "Rule Content": {"type": "rich_text", "required": True},
                 "Examples": {"type": "rich_text"},
                 "Rationale": {"type": "rich_text"},
-                "Tools Applied": {"type": "multi_select", "options": ["Cursor", "Roo", "Continue", "All"]},
+                "Tools Applied": {"type": "multi_select", "options": ["Cursor", "", "Continue", "All"]},
                 "Last Updated": {"type": "date"}
             }
         },
@@ -292,7 +292,7 @@ def get_database_schemas() -> Dict[str, Dict[str, Any]]:
             "name": "📊 AI Tool Performance Metrics",
             "purpose": "Performance tracking for AI coding tools",
             "properties": {
-                "Tool": {"type": "select", "options": ["Cursor", "Roo", "Continue", "MCP Server"], "required": True},
+                "Tool": {"type": "select", "options": ["Cursor", "", "Continue", "MCP Server"], "required": True},
                 "Metric Type": {"type": "select", "options": ["Performance", "Usage", "Quality", "Error Rate"]},
                 "Value": {"type": "number"},
                 "Unit": {"type": "select", "options": ["Milliseconds", "Requests", "Percentage", "Count"]},

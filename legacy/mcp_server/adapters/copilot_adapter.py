@@ -233,7 +233,6 @@
                     "end": {"line": 20, "character": 0},
                 },
                 "open_files": ["file1.py", "file2.py"],
-                "project_root": "/workspaces/project",
                 "language_id": "python",
             }
         except Exception:

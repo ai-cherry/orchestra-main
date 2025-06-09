@@ -1,7 +1,4 @@
 {
-  "workspace": "/root/orchestra-main",
-  "python_executable": "/root/orchestra-main/venv/bin/python",
-  "activate_command": "source /root/orchestra-main/venv/bin/activate",
   "environment": "production",
   "repository": {
     "url": "https://github.com/ai-cherry/orchestra-main",

@@ -13,7 +13,6 @@ from typing import Dict, List, Tuple, Any, Optional
 from typing_extensions import Optional
 
 # --- Configuration ---
-# Critical directories (relative to project root) that should largely be ignored
 CRITICAL_DIRS = {
     ".git", "venv", ".venv", "node_modules", "dist", "build", 
     "requirements/frozen", "docs/official_releases", "data/production_seeds",
@@ -73,12 +72,9 @@ logging.basicConfig(
 )
 
 class IntelligentCleanup:
-    def __init__(self, inventory_file_path: str, project_root_path: str, dry_run: bool = True):
-        self.project_root = Path(project_root_path).resolve()
         self.inventory_path = Path(inventory_file_path).resolve()
         self.inventory: List[Dict[str, Any]] = self._load_json(self.inventory_path)
         self.cleanup_registry: Dict[str, Any] = self._load_json(
-            self.project_root / CLEANUP_REGISTRY_FILE, default={}
         )
         self.dry_run = dry_run
         self.automation_scripts: set[str] = self._find_scheduled_scripts()
@@ -111,10 +107,8 @@ class IntelligentCleanup:
     def _find_scheduled_scripts(self) -> set[str]:
         """Rudimentary check for scheduled scripts (crontab for current user). More robust checks needed for system-wide."""
                     command_part = " ".join(parts[5:])
-                    # Try to find scripts within the project root
                     # This requires script paths in cron to be absolute or identifiable
                     for item in re.split(r'\s+|;|&', command_part):
-                        if item.startswith(str(self.project_root)) and Path(item).is_file():
                             scheduled.add(str(Path(item).resolve()))
         except Exception:
 
@@ -132,7 +126,6 @@ class IntelligentCleanup:
             )
             # Parse systemd timer output for project-related services
             for line in systemctl_output.splitlines():
-                if str(self.project_root) in line:
                     # Extract service name and try to find associated script
                     parts = line.split()
                     if len(parts) >= 5:
@@ -148,7 +141,6 @@ class IntelligentCleanup:
 
     def is_safe_to_remove(self, file_info: Dict[str, Any]) -> Tuple[bool, str]:
         """Determine if file is safe to remove based on multiple criteria. Returns (is_safe, reason)."""
-            return False, "File is outside project root"
 
         # 1. Critical Directory Check
         if any(crit_dir in file_path.parts for crit_dir in CRITICAL_DIRS):
@@ -253,7 +245,6 @@ class IntelligentCleanup:
             ).strftime('%Y-%m-%d %H:%M:%S %Z')
             
             print("-" * 50)
-            print(f"📁 File: {path.relative_to(self.project_root)}")
             print(f"   Reason: {reason}")
             print(f"   Size: {size_kb:.2f} KB, Modified: {mod_date}")
             print(f"   Type: {file_info.get('type', 'N/A')}, Git Tracked: {file_info.get('git_tracked', False)}")
@@ -314,7 +305,6 @@ class IntelligentCleanup:
             try:
 
                 pass
-                logging.info(f"Deleting: {path.relative_to(self.project_root)} - {reason}")
                 self._perform_delete(file_info)
                 deleted_count += 1
             except Exception:
@@ -341,7 +331,6 @@ class IntelligentCleanup:
 
     def _perform_delete(self, file_info: Dict[str, Any]):
         path = Path(file_info['path'])
-        log_message = f"File: {path.relative_to(self.project_root)}, Size: {file_info.get('size',0)}, Git: {file_info.get('git_tracked')}"
         
         if self.dry_run:
             logging.info(f"[DRY RUN] Would delete: {log_message}")
@@ -353,7 +342,6 @@ class IntelligentCleanup:
             pass
             if file_info.get('git_tracked', False):
                 # For git-tracked files, prefer `git rm`
-                subprocess.run(['git', 'rm', str(path)], check=True, cwd=self.project_root)
                 logging.info(f"Git removed: {log_message}")
             else:
                 path.unlink() # Deletes the file
@@ -362,7 +350,6 @@ class IntelligentCleanup:
             # Remove from cleanup_registry if it was there
             if str(path) in self.cleanup_registry:
                 del self.cleanup_registry[str(path)]
-                self._save_json(self.project_root / CLEANUP_REGISTRY_FILE, self.cleanup_registry)
 
         except Exception:
 
@@ -392,7 +379,6 @@ class IntelligentCleanup:
         for file_info, reason in candidates_for_review:
             path = Path(file_info['path'])
             report["candidates"].append({
-                "path": str(path.relative_to(self.project_root)),
                 "reason": reason,
                 "size": file_info.get('size', 0),
                 "type": file_info.get('type', 'unknown'),
@@ -460,12 +446,9 @@ if __name__ == "__main__":
     
     args = parser.parse_args()
     
-    # Infer project root from inventory file path (assuming inventory is in project root)
-    proj_root = str(Path(args.inventory_file).resolve().parent)
     
     engine = IntelligentCleanup(
         inventory_file_path=args.inventory_file, 
-        project_root_path=proj_root, 
         dry_run=not args.execute
     )
     

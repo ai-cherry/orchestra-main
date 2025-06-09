@@ -183,7 +183,6 @@ result = client.query.get("Memory", ["content", "metadata"]).with_near_vector({
 
 ### 1. Run Infrastructure Purge Script
 ```bash
-cd /root/cherry_ai-main
 python scripts/purge_unwanted_infrastructure.py
 ```
 

@@ -4,12 +4,10 @@
 """
     """Main conductor that coordinates all AI components"""
         """Load conductor configuration"""
-            "workspace_path": os.getenv("WORKSPACE_PATH", "/root/cherry_ai-main"),
             "weaviate_url": os.getenv("WEAVIATE_URL", "http://localhost:8080"),
             "postgres_url": os.getenv("DATABASE_URL"),
             "mcp_port": int(os.getenv("MCP_PORT", "8765")),
             "cursor_port": int(os.getenv("CURSOR_PORT", "8090")),
-            "monitoring_paths": ["/root/cherry_ai-main"],
             "enable_autoscaling": os.getenv("ENABLE_AUTOSCALING", "true").lower() == "true"
         }
     
@@ -26,9 +24,7 @@
         self.components["mcp_conductor"] = mcp_conductor
         
         # 3. Register AI Agents
-        roo_agent = RooAgent()
         factory_agent = FactoryAIAgent()
-        mcp_conductor.register_agent(roo_agent)
         mcp_conductor.register_agent(factory_agent)
         
         # 4. Initialize existing AI conductor
@@ -83,7 +79,6 @@
             workflow["steps"] = [
                 {
                     "id": "analyze_changes",
-                    "agent_id": "roo_agent",
                     "task": {
                         "action": "code_review",
                         "files": [t["file"] for t in context["triggers"]],
@@ -92,7 +87,6 @@
                 },
                 {
                     "id": "suggest_improvements",
-                    "agent_id": "roo_agent",
                     "task": {
                         "action": "refactoring",
                         "based_on": "analyze_changes",
@@ -120,7 +114,6 @@
             workflow["steps"] = [
                 {
                     "id": "analyze_impact",
-                    "agent_id": "roo_agent",
                     "task": {
                         "action": "impact_analysis",
                         "files": [t["file"] for t in context["triggers"]]
@@ -136,7 +129,6 @@
                 },
                 {
                     "id": "execute_refactoring",
-                    "agent_id": "roo_agent",
                     "task": {
                         "action": "apply_refactoring",
                         "plan": "create_refactoring_plan"
@@ -177,7 +169,6 @@
                 "steps": [
                     {
                         "id": "full_review",
-                        "agent_id": "roo_agent",
                         "task": {
                             "action": "comprehensive_review",
                             "scope": self.config["workspace_path"],
@@ -194,7 +185,6 @@
                 "steps": [
                     {
                         "id": "analyze_performance",
-                        "agent_id": "roo_agent",
                         "task": {
                             "action": "performance_analysis",
                             "threshold": context["params"]["threshold"]

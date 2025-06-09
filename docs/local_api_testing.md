@@ -12,7 +12,6 @@ Before deploying your FastAPI backend to
 First, make sure all dependencies are installed:
 
 ```bash
-# Navigate to the project root
 cd /workspaces/cherry_ai-main
 
 # Using pip
@@ -117,7 +116,6 @@ kill -9 <PID>
 If you encounter module import errors:
 
 ```bash
-# Make sure your PYTHONPATH includes the project root
 export PYTHONPATH=$PYTHONPATH:/workspaces/cherry_ai-main
 
 # Then run the API again

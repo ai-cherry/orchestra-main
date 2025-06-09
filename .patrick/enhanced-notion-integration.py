@@ -6,7 +6,7 @@ Comprehensive project management and documentation system
 Features:
 - Latest Notion API (2023-06-28)
 - Optimized database schemas
-- Cross-tool integration (Roo/Continue/Cursor)
+- Cross-tool integration (/Continue/Cursor)
 - Automated Patrick Instructions management
 - Real-time project tracking
 - File upload via external hosting
@@ -207,7 +207,7 @@ class EnhancedNotionIntegration:
                 "select": {
                     "options": [
                         {"name": "Cursor", "color": "blue"},
-                        {"name": "Roo", "color": "green"},
+                        {"name": "", "color": "green"},
                         {"name": "Continue", "color": "purple"},
                         {"name": "Manual", "color": "gray"}
                     ]
@@ -441,18 +441,17 @@ class EnhancedNotionIntegration:
         return workflows
     
     # Cross-tool integration methods
-    async def log_roo_session(self, session_data: Dict[str, Any]) -> str:
-        """Log Roo Coder session to development log"""
+        """Log  Coder session to development log"""
         if not self.config.development_log_db:
             raise ValueError("Development log database not configured")
         
         page_data = {
             "parent": {"database_id": self.config.development_log_db},
             "properties": {
-                "Title": {"title": [{"text": {"content": f"Roo Session: {session_data.get('task', 'Unknown')}"}}]},
+                "Title": {"title": [{"text": {"content": f" Session: {session_data.get('task', 'Unknown')}"}}]},
                 "Date": {"date": {"start": datetime.date.today().isoformat()}},
                 "Type": {"select": {"name": session_data.get("type", "Code")}},
-                "Tool Used": {"select": {"name": "Roo"}},
+                "Tool Used": {"select": {"name": ""}},
                 "Notes": {"rich_text": [{"text": {"content": session_data.get("notes", "")}}]}
             }
         }

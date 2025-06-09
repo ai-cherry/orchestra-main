@@ -6,9 +6,7 @@ region = config.get("region") or "sfo2"  # Ensure this region supports App Platf
 hostname = config.get("hostname") or (
     f"superagi-{env}-sfo2-01" if env == "dev" else "ubuntu-s-2vcpu-8gb-160gb-intel-sfo2-01"
 )
-# SSH authentication – either pubkey+private key or root password
 
-root_password = config.get_secret("root_password")
 ssh_pubkey_path = config.get("ssh_pubkey_path")  # Path to local SSH public key file
 ssh_private_key_path = config.get_secret("ssh_private_key_path")  # Path to local SSH private key file
 
@@ -56,20 +54,15 @@ if ssh_private_key_path:
             ssh_private_key_content = f.read()
         connection = command.remote.ConnectionArgs(
             host=droplet.ipv4_address,
-            user="root",
             private_key=ssh_private_key_content,
         )
     else:
         raise pulumi.RunError("ssh_private_key_path is configured but empty")
-elif root_password:
     connection = command.remote.ConnectionArgs(
         host=droplet.ipv4_address,
-        user="root",
-        password=root_password,
     )
 else:
     # Fallback or error if no auth method provided
-    raise pulumi.RunError("Either root_password or ssh_private_key_path must be provided for droplet connection.")
 
 run_superagi = command.remote.Command(
     f"run-superagi-{env}",

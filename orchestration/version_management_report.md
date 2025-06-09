@@ -74,7 +74,6 @@ Container Analysis:
     - No image pinning by digest
     
   Security Concerns:
-    - No non-root user in some Dockerfiles
     - Missing security scanning
     - No multi-stage optimization in older files
 ```
@@ -206,7 +205,6 @@ sed -i 's/"latest"/"^5.0.0"/g' admin-ui/package.json
 # Update all Dockerfiles to use specific versions
 FROM python:3.10.12-slim-bookworm@sha256:specific-hash
 
-# Add non-root user
 RUN useradd -m -u 1000 appuser
 USER appuser
 ```

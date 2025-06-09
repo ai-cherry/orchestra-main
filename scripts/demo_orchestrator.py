@@ -86,14 +86,12 @@ async def demo_agent_coordination():
             task_id="analyze_code",
             name="Code Analysis",
             agent_role=AgentRole.ANALYZER,
-            inputs={"code_path": "/root/cherry_ai-main", "focus": "performance"},
             priority=1
         ),
         TaskDefinition(
             task_id="security_scan",
             name="Security Scan",
             agent_role=AgentRole.ANALYZER,  # Using ANALYZER for security scanning
-            inputs={"code_path": "/root/cherry_ai-main", "scan_type": "vulnerabilities"},
             priority=1
         ),
         TaskDefinition(
@@ -220,7 +218,7 @@ async def main():
     """Run all demonstrations"""
     print("🎼 AI CONDUCTOR DEMONSTRATION")
     print("="*60)
-    print("Showcasing Roo Coder integration with AI conductor")
+    print("Showcasing  Coder integration with AI conductor")
     
     # Run demonstrations
     await demo_task_decomposition()
@@ -240,7 +238,7 @@ async def main():
     
     print("\n🚀 The AI conductor is fully operational!")
     print("  • MCP integration provides context persistence")
-    print("  • Roo modes enable specialized agent capabilities")
+    print("  •  modes enable specialized agent capabilities")
     print("  • Workflow automation ready for production use")
 
 if __name__ == "__main__":

@@ -125,8 +125,6 @@ def create_cherry_ai_database():
         }
     }
     
-    # First, create a root page for the database
-    root_page_data = {
         "parent": {"type": "workspace", "workspace": True},
         "properties": {
             "title": [{"type": "text", "text": {"content": "🍒 Cherry AI Development Hub"}}]
@@ -146,15 +144,9 @@ def create_cherry_ai_database():
     }
     
     try:
-        # Create root page
-        response = requests.post('https://api.notion.com/v1/pages', headers=headers, json=root_page_data)
         
         if response.status_code == 200:
-            root_page_id = response.json()['id']
-            print(f'✅ Created root page: {root_page_id}')
             
-            # Now create database as child of root page
-            database_data['parent']['page_id'] = root_page_id
             
             response = requests.post('https://api.notion.com/v1/databases', headers=headers, json=database_data)
             
@@ -176,7 +168,6 @@ def create_cherry_ai_database():
                 print(f'❌ Failed to create database: {response.status_code} - {response.text}')
                 return None
         else:
-            print(f'❌ Failed to create root page: {response.status_code} - {response.text}')
             return None
             
     except Exception as e:

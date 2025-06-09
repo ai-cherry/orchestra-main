@@ -104,7 +104,6 @@ class OptimizedWorkflowExecutor:
                 "id": "analyze",
                 "type": "analyze_code",
                 "agent": "mock_analyzer",
-                "input": {"path": "/root/cherry_ai-main"}
             },
             {
                 "id": "implement",
@@ -115,7 +114,6 @@ class OptimizedWorkflowExecutor:
             {
                 "id": "refine",
                 "type": "refine_code",
-                "agent": "roo_code",
                 "dependencies": ["implement"]
             }
         ]

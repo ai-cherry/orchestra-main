@@ -34,7 +34,6 @@ The AI coordination system follows a layered architecture with clear separation 
 
    - **Responsibility**: Service discovery and lifecycle management
    - **Interfaces**: Registration, lookup, initialization, cleanup
-   - **Dependencies**: None (root component)
 
 2. **Event Bus** (`unified_event_bus.py`)
 

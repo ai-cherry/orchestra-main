@@ -220,7 +220,6 @@
       "component": "Code Quality",
       "category": "Clean Code",
       "severity": "QualityLevel.GOOD",
-      "description": "Generally follows clean code principles with room for improvement",
       "recommendations": [
         "Reduce function complexity in conversation engine",
         "Extract magic numbers to constants",

@@ -3,7 +3,6 @@
 """
 """
     """Plans and executes integration of advanced system"""
-        self.base_dir = Path("/root/cherry_ai-main")
         self.plan = {
             "created_at": datetime.now().isoformat(),
             "phases": [],
@@ -272,7 +271,6 @@ if __name__ == "__main__":
     
     # Static files (React app)
     location / {
-        root /var/www/cherry_ai-ui;
         try_files $uri $uri/ /index.html;
         
         # Cache static assets

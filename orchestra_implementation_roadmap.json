@@ -144,7 +144,6 @@
       "code_changes": [
         {
           "file": "alembic.ini",
-          "changes": "\n[alembic]\nscript_location = migrations\nprepend_sys_path = .\nversion_path_separator = os\nsqlalchemy.url = postgresql://%(DB_USER)s:%(DB_PASS)s@%(DB_HOST)s/%(DB_NAME)s\n\n[loggers]\nkeys = root,sqlalchemy,alembic\n\n[handlers]\nkeys = console\n\n[formatters]\nkeys = generic"
         }
       ]
     },

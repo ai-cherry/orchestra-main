@@ -149,7 +149,6 @@ Per `docs/CLEANUP_AND_OPTIMIZATION_PLAN.md`:
 1. **Portkey is Primary**: All AI interactions go through Portkey for unified management
 2. **OpenRouter is Catalog**: Access 300+ models for specialized needs
 3. **Cost Controlled**: Built-in limits prevent runaway costs
-4. **Future-Proof**: Easy to add new providers or switch models
 5. **Developer-Friendly**: Clear documentation and migration tools
 
 ## 📞 Support Resources

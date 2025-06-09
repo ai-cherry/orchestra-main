@@ -28,10 +28,6 @@ logger = logging.getLogger(__name__)
 class MigrationOrchestrator:
     """Orchestrates the refactoring migration across all phases."""
     
-    def __init__(self, workspace_root: Path = None):
-        self.workspace_root = workspace_root or Path.cwd()
-        self.backup_dir = self.workspace_root / ""
-        self.state_file = self.workspace_root / ".migration_state.json"
         self.state = self._load_state()
         
     def _load_state(self) -> Dict:
@@ -118,7 +114,6 @@ class MigrationOrchestrator:
         
         # Task 1: Remove Poetry configuration
         def remove_poetry_config():
-            pyproject_path = self.workspace_root / "pyproject.toml"
             if pyproject_path.exists():
                 # Backup first
                 self._create_backup([pyproject_path], "poetry_config")
@@ -151,12 +146,10 @@ class MigrationOrchestrator:
         
         # Task 2: Consolidate requirements
         def consolidate_requirements():
-            req_dir = self.workspace_root / "requirements"
             if req_dir.exists():
                 self._create_backup([req_dir], "requirements_old")
             
             # Create unified requirements
-            unified_req = self.workspace_root / "requirements.txt"
             req_content = """# Orchestra AI - Unified Requirements
 # Core Framework
 fastapi==0.115.12
@@ -239,7 +232,6 @@ trio==0.27.0
         # Task 3: Deploy unified configuration
         def deploy_unified_config():
             # Check if core/config directory exists
-            config_dir = self.workspace_root / "core" / "config"
             config_dir.mkdir(parents=True, exist_ok=True)
             
             # Check if unified config was already created
@@ -269,7 +261,6 @@ trio==0.27.0
         
         # Task 1: Deploy unified LLM router
         def deploy_unified_llm_router():
-            llm_dir = self.workspace_root / "core" / "llm"
             llm_dir.mkdir(parents=True, exist_ok=True)
             
             # Check if unified router exists
@@ -283,7 +274,6 @@ trio==0.27.0
         
         # Task 2: Deploy unified database
         def deploy_unified_database():
-            db_dir = self.workspace_root / "shared" / "database"
             db_dir.mkdir(parents=True, exist_ok=True)
             
             # Check if unified database exists
@@ -307,7 +297,6 @@ trio==0.27.0
             
             files_to_backup = []
             for file_path in duplicate_files:
-                full_path = self.workspace_root / file_path
                 if full_path.exists():
                     files_to_backup.append(full_path)
             

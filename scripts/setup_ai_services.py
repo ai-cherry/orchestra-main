@@ -96,12 +96,12 @@ def setup_simulation_services() -> Dict[str, str]:
     
     config = {
         'CURSOR_API_KEY': 'simulation_mode',
-        'ROO_CODE_MODE': 'enhanced_integration',
-        'ROO_CODE_ENDPOINT': 'via_openrouter'
+        '_CODE_MODE': 'enhanced_integration',
+        '_CODE_ENDPOINT': 'via_openrouter'
     }
     
     print("  ✅ Cursor AI: Set to simulation mode (API not yet public)")
-    print("  ✅ Roo Code: Enhanced integration mode")
+    print("  ✅  Code: Enhanced integration mode")
     
     return config
 
@@ -135,9 +135,9 @@ def update_env_file(new_config: Dict[str, str]) -> None:
             if key in final_config:
                 f.write(f"{key}={final_config[key]}\n")
         
-        # Roo Code configuration
-        f.write("\n# Roo Code Configuration\n")
-        for key in ['ROO_CODE_MODE', 'ROO_CODE_ENDPOINT']:
+        #  Code configuration
+        f.write("\n#  Code Configuration\n")
+        for key in ['_CODE_MODE', '_CODE_ENDPOINT']:
             if key in final_config:
                 f.write(f"{key}={final_config[key]}\n")
         
@@ -148,7 +148,7 @@ def update_env_file(new_config: Dict[str, str]) -> None:
                                     'POSTGRES_USER', 'POSTGRES_PASSWORD', 'WEAVIATE_URL', 
                                     'WEAVIATE_API_KEY', 'PORTKEY_OPENAI_VIRTUAL_KEY', 
                                     'PORTKEY_ANTHROPIC_VIRTUAL_KEY', 'PORTKEY_API_KEY',
-                                    'ROO_CODE_MODE', 'ROO_CODE_ENDPOINT']:
+                                    '_CODE_MODE', '_CODE_ENDPOINT']:
                 f.write(f"{key}={value}\n")
 
 def test_configuration() -> None:

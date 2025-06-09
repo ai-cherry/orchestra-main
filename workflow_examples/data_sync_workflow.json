@@ -1,7 +1,6 @@
 [
   {
     "type": "comment",
-    "content": "IMPORTANT: This workflow is designed for the roo_workflow_manager.py utility, which is completely separate from the main Project cherry_ai implementation."
   },
   {
     "type": "mode",

@@ -10,7 +10,6 @@ set -e
 #
 # The script:
 #
-# - Requires `root` or `sudo` privileges to run.
 # - Attempts to detect your Linux distribution and version and configure your
 #   package management system for you.
 # - Doesn't allow you to customize most installation parameters.
@@ -44,7 +43,6 @@ set -e
 #
 #   $ sh install-docker.sh --dry-run
 #
-# 4. run the script either as root, or using sudo to perform the installation.
 #
 #   $ sudo sh install-docker.sh
 #
@@ -267,7 +265,6 @@ get_distribution() {
 	echo "$lsb_dist"
 }
 
-echo_docker_as_nonroot() {
 	if is_dry_run; then
 		return
 	fi
@@ -284,19 +281,14 @@ echo_docker_as_nonroot() {
 	echo
 	if version_gte "20.10"; then
 		echo "To run Docker as a non-privileged user, consider setting up the"
-		echo "Docker daemon in rootless mode for your user:"
 		echo
-		echo "    dockerd-rootless-setuptool.sh install"
 		echo
-		echo "Visit https://docs.docker.com/go/rootless/ to learn about rootless mode."
 		echo
 	fi
 	echo
-	echo "To run the Docker daemon as a fully privileged service, but granting non-root"
 	echo "users access, refer to https://docs.docker.com/go/daemon-access/"
 	echo
 	echo "WARNING: Access to the remote API on a privileged Docker daemon is equivalent"
-	echo "         to root access on the host. Refer to the 'Docker daemon attack surface'"
 	echo "         documentation for details: https://docs.docker.com/go/attack-surface/"
 	echo
 	echo "================================================================================"
@@ -388,14 +380,12 @@ do_install() {
 	user="$(id -un 2>/dev/null || true)"
 
 	sh_c='sh -c'
-	if [ "$user" != 'root' ]; then
 		if command_exists sudo; then
 			sh_c='sudo -E sh -c'
 		elif command_exists su; then
 			sh_c='su -c'
 		else
 			cat >&2 <<-'EOF'
-			Error: this installer needs the ability to run commands as root.
 			We are unable to find either "sudo" or "su" available to make this happen.
 			EOF
 			exit 1
@@ -492,7 +482,6 @@ do_install() {
 		ubuntu.bionic|ubuntu.xenial|ubuntu.trusty)
 			deprecation_notice "$lsb_dist" "$dist_version"
 			;;
-		ubuntu.mantic|ubuntu.lunar|ubuntu.kinetic|ubuntu.impish|ubuntu.hirsute|ubuntu.groovy|ubuntu.eoan|ubuntu.disco|ubuntu.cosmic)
 			deprecation_notice "$lsb_dist" "$dist_version"
 			;;
 		fedora.*)
@@ -551,7 +540,6 @@ do_install() {
 						pkgs="$pkgs docker-ce-cli${cli_pkg_version%=} containerd.io"
 				fi
 				if version_gte "20.10"; then
-						pkgs="$pkgs docker-compose-plugin docker-ce-rootless-extras$pkg_version"
 				fi
 				if version_gte "23.0"; then
 						pkgs="$pkgs docker-buildx-plugin"
@@ -561,7 +549,6 @@ do_install() {
 				fi
 				$sh_c "DEBIAN_FRONTEND=noninteractive apt-get -y -qq install $pkgs >/dev/null"
 			)
-			echo_docker_as_nonroot
 			exit 0
 			;;
 		centos|fedora|rhel)
@@ -653,7 +640,6 @@ do_install() {
 					fi
 				fi
 				if version_gte "20.10"; then
-					pkgs="$pkgs docker-compose-plugin docker-ce-rootless-extras$pkg_version"
 				fi
 				if version_gte "23.0"; then
 						pkgs="$pkgs docker-buildx-plugin"
@@ -663,7 +649,6 @@ do_install() {
 				fi
 				$sh_c "$pkg_manager $pkg_manager_flags install $pkgs"
 			)
-			echo_docker_as_nonroot
 			exit 0
 			;;
 		sles)

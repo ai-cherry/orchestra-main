@@ -1,7 +1,7 @@
 import json
 import os
 
-ROOTS = [
+TS = [
     "mcp_server",
     "tools",
     "scripts",
@@ -18,8 +18,6 @@ inventory = {
     "adapters": [],
 }
 
-for root in ROOTS:
-    for dirpath, dirnames, filenames in os.walk(root):
         for fname in filenames:
             path = os.path.join(dirpath, fname)
             if fname.endswith(".py"):

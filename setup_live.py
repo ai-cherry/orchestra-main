@@ -122,7 +122,7 @@ def setup_workspace_live():
                     "type": "Infrastructure",
                     "priority": "Medium",
                     "assignee": "Karen",
-                    "tool": "Roo Coder",
+                    "tool": " Coder",
                     "description": "Implement automated monitoring and alerts for Lambda Labs GPU usage and costs."
                 }
             ]
@@ -234,8 +234,6 @@ def setup_workspace_live():
         except Exception as e:
             print(f"   ⚠️ Could not add Patrick Instructions: {e}")
     
-    # Update root page with database links
-    print("4️⃣ Updating root page with database links...")
     try:
         # Create page content with database links
         page_blocks = [
@@ -312,19 +310,15 @@ def setup_workspace_live():
         )
         
         if response.status_code == 200:
-            print("   ✅ Root page updated with database links and setup information")
+            print("   ✅ t page updated with database links and setup information")
         else:
-            print(f"   ⚠️ Could not update root page: {response.status_code} - {response.text}")
             
     except Exception as e:
-        print(f"   ⚠️ Error updating root page: {e}")
     
     # Save configuration
     config = {
         "setup_date": datetime.now().isoformat(),
         "setup_version": "2.0 - Live Execution",
-        "root_page_id": page_id,
-        "root_page_url": f"https://www.notion.so/Orchestra-AI-Workspace-{page_id}",
         "api_token": api_key,
         "databases": databases,
         "databases_created": len(databases),
@@ -337,7 +331,7 @@ def setup_workspace_live():
     print("\n" + "="*80)
     print("🎉 ORCHESTRA AI NOTION WORKSPACE SETUP COMPLETE!")
     print("="*80)
-    print(f"✅ Root Page: https://www.notion.so/Orchestra-AI-Workspace-{page_id}")
+    print(f"✅ t Page: https://www.notion.so/Orchestra-AI-Workspace-{page_id}")
     print(f"✅ Databases Created: {len(databases)}")
     print(f"✅ Configuration Saved: orchestra_notion_config_live.json")
     print()
@@ -439,7 +433,7 @@ def get_task_schema():
             "select": {
                 "options": [
                     {"name": "Cursor", "color": "blue"},
-                    {"name": "Roo Coder", "color": "green"},
+                    {"name": " Coder", "color": "green"},
                     {"name": "Continue", "color": "purple"},
                     {"name": "Manual", "color": "gray"}
                 ]
@@ -467,7 +461,7 @@ def get_dev_log_schema():
             "select": {
                 "options": [
                     {"name": "Cursor", "color": "blue"},
-                    {"name": "Roo", "color": "green"},
+                    {"name": "", "color": "green"},
                     {"name": "Continue", "color": "purple"},
                     {"name": "Manual", "color": "gray"}
                 ]

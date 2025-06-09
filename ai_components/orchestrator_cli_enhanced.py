@@ -98,7 +98,7 @@ def implement(ctx, analysis, focus, dry_run):
               help='Refinement priorities')
 @click.pass_context
 def refine(ctx, stack, priorities):
-    """Refine technology stack with Roo Code"""
+    """Refine technology stack with  Code"""
         click.echo(f"Refining {stack} stack...")
         if priorities:
             click.echo(f"Priorities: {', '.join(priorities)}")
@@ -183,7 +183,6 @@ def eigencode():
 @click.pass_context
 def status(ctx):
     """Check EigenCode installation status"""
-        "/root/.eigencode/bin/eigencode",
         "/usr/local/bin/eigencode",
         "/usr/bin/eigencode",
         os.path.expanduser("~/.eigencode/bin/eigencode")
@@ -406,7 +405,6 @@ def security():
 
 @security.command()
 @click.option('--service', '-s', required=True,
-              type=click.Choice(['eigencode', 'cursor', 'roo', 'postgres', 'weaviate']),
               help='Service to rotate secrets for')
 @click.pass_context
 def rotate_secrets(ctx, service):
@@ -663,14 +661,13 @@ def status(ctx):
     # Check EigenCode
     click.echo("\nAI Agents:")
     eigencode_status = "✗ Not installed"
-    for path in ["/root/.eigencode/bin/eigencode", "/usr/local/bin/eigencode"]:
         if os.path.exists(path):
             eigencode_status = "✓ Installed"
             break
     
     click.echo(f"  EigenCode: {eigencode_status}")
     click.echo(f"  Cursor AI: ✓ Ready (API)")
-    click.echo(f"  Roo Code: ✓ Ready (API)")
+    click.echo(f"   Code: ✓ Ready (API)")
     
     # Environment check
     click.echo("\nEnvironment:")

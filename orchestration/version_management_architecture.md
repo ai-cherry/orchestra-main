@@ -142,23 +142,17 @@ class Dependency:
 class VersionManager:
     """Centralized version management for Python dependencies"""
     
-    def __init__(self, root_dir: Path):
-        self.root_dir = root_dir
-        self.versions_file = root_dir / ".versions.yaml"
-        self.lock_file = root_dir / ".versions.lock"
         
     def scan_dependencies(self) -> Dict[str, List[Dependency]]:
         """Scan all Python dependencies across the project"""
         dependencies = {}
         
         # Scan requirements files
-        req_dir = self.root_dir / "requirements"
         for req_file in req_dir.glob("*.txt"):
             deps = self._parse_requirements(req_file)
             dependencies[req_file.name] = deps
             
         # Scan pyproject.toml
-        if (self.root_dir / "pyproject.toml").exists():
             pyproject_deps = self._parse_pyproject()
             dependencies["pyproject.toml"] = pyproject_deps
             
@@ -220,7 +214,7 @@ export class JSVersionManager {
   private packageJson: any;
   private lockFile: any;
   
-  constructor(private projectRoot: string) {
+  constructor(private projectt: string) {
     this.loadPackageFiles();
   }
   

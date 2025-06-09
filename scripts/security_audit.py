@@ -104,14 +104,12 @@
         
         for dir_path in code_dirs:
             if os.path.exists(dir_path):
-                for root, dirs, files in os.walk(dir_path):
                     # Skip .git and __pycache__
                     dirs[:] = [d for d in dirs if d not in ['.git', '__pycache__']]
                     
                     # TODO: Consider using list comprehension for better performance
  for file in files:
                         if file.endswith(('.py', '.yml', '.yaml', '.json', '.sh')):
-                            file_path = os.path.join(root, file)
                             try:
 
                                 pass
@@ -323,10 +321,8 @@ async def create_task(...):"""
         
         # Check for proper scoping in code
         weaviate_usage_files = []
-        for root, dirs, files in os.walk("ai_components"):
             for file in files:
                 if file.endswith('.py'):
-                    file_path = os.path.join(root, file)
                     try:
 
                         pass

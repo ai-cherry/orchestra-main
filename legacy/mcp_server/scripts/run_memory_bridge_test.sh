@@ -3,7 +3,6 @@
 
 set -e
 
-# Change to the project root directory
 cd /workspaces/cherry_ai-main
 
 # Run the memory bridge test

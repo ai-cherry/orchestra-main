@@ -111,7 +111,7 @@ def main():
         "WEAVIATE_API_KEY": "Weaviate API Key",
         "WEAVIATE_URL": "Weaviate Endpoint",
         "PULUMI_CONFIG_PASSPHRASE": "Pulumi Passphrase",
-        "DO_ROOT_PASSWORD": "DigitalOcean Root Password",
+        "DO_T_PASSWORD": "DigitalOcean t Password",
         "GITHUB_PAT": "GitHub Personal Access Token",
     }
 

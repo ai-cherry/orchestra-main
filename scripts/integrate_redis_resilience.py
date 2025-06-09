@@ -154,7 +154,6 @@ def main():
     # Also update other files that use Redis
     other_files = [
         Path("mcp_server/storage/async_memory_store.py"),
-        Path("mcp_server/roo/orchestra_integration.py"),
     ]
     
     print("\n📄 Checking other Redis-using files...")

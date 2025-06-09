@@ -238,14 +238,11 @@ subprocess.run([) - Use subprocess.run() instead!")
                 }
 
         # Scan Python files
-        for root, _dirs, files in os.walk(self.project_root):
             # Skip virtual environment
-            if "venv" in root or "__pycache__" in root:
                 continue
 
             for file in files:
                 if file.endswith(".py"):
-                    filepath = os.path.join(root, file)
                     results = self.check_file(filepath)
 
                     if results["errors"] or results["warnings"]:

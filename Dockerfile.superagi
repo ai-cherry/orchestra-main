@@ -33,14 +33,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Create non-root user
 RUN useradd -m -u 1000 superagi
 
 # Set working directory
 WORKDIR /app
 
 # Copy Python packages from builder
-COPY --from=builder /root/.local /home/superagi/.local
 
 # Copy SuperAGI code
 COPY --from=builder /build/superagi /app/superagi
@@ -58,7 +56,6 @@ COPY scripts/orchestra_adapter.py /app/
 RUN mkdir -p /app/data /app/logs /app/config && \
     chown -R superagi:superagi /app
 
-# Switch to non-root user
 USER superagi
 
 # Add local bin to PATH

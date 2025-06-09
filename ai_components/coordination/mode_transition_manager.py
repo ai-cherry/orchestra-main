@@ -1,5 +1,5 @@
 # TODO: Consider adding connection pooling configuration
-"""Mode Transition Manager for seamless transitions between Roo modes."""
+"""Mode Transition Manager for seamless transitions between  modes."""
     """Types of mode transitions."""
     AUTOMATIC = "automatic"  # System-initiated
     MANUAL = "manual"  # User-initiated
@@ -21,12 +21,12 @@ class TransitionContext:
     """Context preserved during mode transitions."""
     """Rule for automatic mode transitions."""
     """Record of a mode transition."""
-    """Manages seamless transitions between Roo modes."""
+    """Manages seamless transitions between  modes."""
         """Initialize the transition manager."""
         """Initialize automatic transition rules."""
                 name="code_error_to_debug",
-                from_mode=RooMode.CODE,
-                to_mode=RooMode.DEBUG,
+                from_mode=Mode.CODE,
+                to_mode=Mode.DEBUG,
                 condition="'error' in context.get('last_result', {})",
                 priority=90,
                 description="Transition to debug mode on code errors",
@@ -34,8 +34,8 @@ class TransitionContext:
             # Research to Implementation transitions
             TransitionRule(
                 name="research_to_implementation",
-                from_mode=RooMode.RESEARCH,
-                to_mode=RooMode.IMPLEMENTATION,
+                from_mode=Mode.RESEARCH,
+                to_mode=Mode.IMPLEMENTATION,
                 condition="context.get('research_complete', False)",
                 priority=80,
                 description="Move to implementation after research",
@@ -43,8 +43,8 @@ class TransitionContext:
             # Architect to Code transitions
             TransitionRule(
                 name="architect_to_code",
-                from_mode=RooMode.ARCHITECT,
-                to_mode=RooMode.CODE,
+                from_mode=Mode.ARCHITECT,
+                to_mode=Mode.CODE,
                 condition="context.get('design_approved', False)",
                 priority=85,
                 description="Start coding after architecture approval",
@@ -52,8 +52,8 @@ class TransitionContext:
             # Quality to Debug transitions
             TransitionRule(
                 name="quality_issues_to_debug",
-                from_mode=RooMode.QUALITY,
-                to_mode=RooMode.DEBUG,
+                from_mode=Mode.QUALITY,
+                to_mode=Mode.DEBUG,
                 condition="len(context.get('quality_issues', [])) > 0",
                 priority=75,
                 description="Debug quality issues",
@@ -61,8 +61,8 @@ class TransitionContext:
             # Strategy to Research transitions
             TransitionRule(
                 name="strategy_needs_research",
-                from_mode=RooMode.STRATEGY,
-                to_mode=RooMode.RESEARCH,
+                from_mode=Mode.STRATEGY,
+                to_mode=Mode.RESEARCH,
                 condition="context.get('needs_research', False)",
                 priority=70,
                 description="Research for strategy decisions",
@@ -73,8 +73,8 @@ class TransitionContext:
     async def initiate_transition(
         self,
         session_id: str,
-        from_mode: RooMode,
-        to_mode: RooMode,
+        from_mode: Mode,
+        to_mode: Mode,
         context: Dict[str, Any],
         transition_type: TransitionType = TransitionType.MANUAL,
     ) -> str:
@@ -206,19 +206,19 @@ class TransitionContext:
         }
 
         # Mode-specific preservation
-        if transition.from_mode == RooMode.CODE:
+        if transition.from_mode == Mode.CODE:
             preserved["code_context"] = {
                 "last_code": transition.artifacts.get("last_code", ""),
                 "language": transition.artifacts.get("language", "python"),
                 "errors": transition.artifacts.get("errors", []),
             }
-        elif transition.from_mode == RooMode.ARCHITECT:
+        elif transition.from_mode == Mode.ARCHITECT:
             preserved["design_context"] = {
                 "architecture": transition.artifacts.get("architecture", {}),
                 "components": transition.artifacts.get("components", []),
                 "decisions": transition.artifacts.get("decisions", []),
             }
-        elif transition.from_mode == RooMode.RESEARCH:
+        elif transition.from_mode == Mode.RESEARCH:
             preserved["research_context"] = {
                 "findings": transition.artifacts.get("findings", []),
                 "sources": transition.artifacts.get("sources", []),
@@ -241,20 +241,20 @@ class TransitionContext:
         handoff["summary"] = summary
 
         # Mode-specific handoff
-        if transition.to_mode == RooMode.DEBUG:
+        if transition.to_mode == Mode.DEBUG:
             handoff["debug_context"] = {
                 "error_context": preserved.get("code_context", {}).get("errors", []),
                 "last_operation": transition.task,
                 "relevant_files": transition.files,
             }
-        elif transition.to_mode == RooMode.CODE:
+        elif transition.to_mode == Mode.CODE:
             handoff["coding_context"] = {
                 "requirements": preserved.get("design_context", {}).get(
                     "architecture", {}
                 ),
                 "previous_attempts": transition.artifacts.get("attempts", []),
             }
-        elif transition.to_mode == RooMode.IMPLEMENTATION:
+        elif transition.to_mode == Mode.IMPLEMENTATION:
             handoff["implementation_context"] = {
                 "research_findings": preserved.get("research_context", {}).get(
                     "findings", []
@@ -277,11 +277,11 @@ class TransitionContext:
         ]
 
         # Add mode-specific summary
-        if transition.from_mode == RooMode.CODE and "errors" in transition.artifacts:
+        if transition.from_mode == Mode.CODE and "errors" in transition.artifacts:
             summary_parts.append(
                 f"Errors encountered: {len(transition.artifacts['errors'])}"
             )
-        elif transition.from_mode == RooMode.RESEARCH and "findings" in transition.artifacts:
+        elif transition.from_mode == Mode.RESEARCH and "findings" in transition.artifacts:
             summary_parts.append(
                 f"Research findings: {len(transition.artifacts['findings'])}"
             )
@@ -289,8 +289,8 @@ class TransitionContext:
         return "\n".join(summary_parts)
 
     async def suggest_transition(
-        self, session_id: str, current_mode: RooMode, context: Dict[str, Any]
-    ) -> Optional[Tuple[RooMode, str]]:
+        self, session_id: str, current_mode: Mode, context: Dict[str, Any]
+    ) -> Optional[Tuple[Mode, str]]:
         """
         """
                 logger.warning(f"Error evaluating rule {rule.name}: {e}")
@@ -325,8 +325,8 @@ class TransitionContext:
             """
                     id=row["id"],
                     session_id=row["session_id"],
-                    from_mode=RooMode(row["from_mode"]),
-                    to_mode=RooMode(row["to_mode"]),
+                    from_mode=Mode(row["from_mode"]),
+                    to_mode=Mode(row["to_mode"]),
                     transition_type=TransitionType(row["transition_type"]),
                     state=TransitionState(row["state"]),
                     context=json.loads(row["context"]),

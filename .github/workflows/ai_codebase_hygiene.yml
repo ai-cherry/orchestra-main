@@ -109,19 +109,15 @@ jobs:
           cat > /tmp/check_complex.py << 'EOF'
           import ast
           import os
-          for root, dirs, files in os.walk('.'):
-              if '.git' in root or 'venv' in root:
                   continue
               for file in files:
                   if file.endswith('.py'):
                       try:
-                          with open(os.path.join(root, file)) as f:
                               tree = ast.parse(f.read())
                           for node in ast.walk(tree):
                               if isinstance(node, ast.FunctionDef):
                                   if hasattr(node, 'end_lineno') and hasattr(node, 'lineno'):
                                       if node.end_lineno - node.lineno > 50:
-                                          print(f'{os.path.join(root, file)}:{node.lineno} - {node.name} ({node.end_lineno - node.lineno} lines)')
                       except: pass
           EOF
           python /tmp/check_complex.py | head -20 || true

@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils"
 function ContextMenu({
   ...props
 }) {
-  return <ContextMenuPrimitive.Root data-slot="context-menu" {...props} />;
+  return <ContextMenuPrimitive.t data-slot="context-menu" {...props} />;
 }
 
 function ContextMenuTrigger({

@@ -156,9 +156,6 @@
     }
   },
   "ai_agents": {
-    "roo": {
-      "name": "roo",
-      "type": "roo",
       "mcp_servers": [
         "memory",
         "conductor",

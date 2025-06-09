@@ -15,7 +15,7 @@ function Tooltip({
 }) {
   return (
     <TooltipProvider>
-      <TooltipPrimitive.Root data-slot="tooltip" {...props} />
+      <TooltipPrimitive.t data-slot="tooltip" {...props} />
     </TooltipProvider>
   );
 }

@@ -51,7 +51,6 @@
                 },
                 'annotations': {
                     'summary': 'Low disk space',
-                    'description': 'Less than 10% disk space remaining on root filesystem'
                 }
             }
         ]
@@ -116,7 +115,7 @@
                             },
                             {
                                 "expr": "rate(conductor_agent_tasks_total{agent='refiner'}[5m])",
-                                "legendFormat": "Roo Code"
+                                "legendFormat": " Code"
                             }
                         ]
                     }

@@ -21,7 +21,6 @@ scripts/           # Automation tools
 
 ## Development Workflow
 1. SSH to server or use Cursor Remote
-2. Edit files directly in /root/cherry_ai-main
 3. Changes are instant
 4. Use `make` commands for service management
 

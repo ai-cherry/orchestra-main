@@ -27,7 +27,7 @@ class MemoryKey:
         agent_id: Optional[str] = None,
     ):
         """
-            namespace: The namespace for the key (e.g., "RooMCP", "Project123")
+            namespace: The namespace for the key (e.g., "MCP", "Project123")
             key: The base key name
             scope: Optional scope within the namespace (e.g., "AuthModule", "DataLayer")
             user_id: Optional user ID for user-specific memory

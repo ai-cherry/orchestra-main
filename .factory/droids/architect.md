@@ -10,10 +10,10 @@ The Architect Droid specializes in system design, architecture planning, and int
 - **Pattern Recognition**: Identifies and applies appropriate design patterns
 - **Performance Optimization**: Suggests architectural improvements for performance
 
-## Integration with Roo
+## Integration with 
 - Maps to: `conductor_server.py`
 - Context sharing: Full system architecture context
-- Fallback: Roo's architect mode handles requests if Factory AI is unavailable
+- Fallback: 's architect mode handles requests if Factory AI is unavailable
 
 ## Request Format
 ```json

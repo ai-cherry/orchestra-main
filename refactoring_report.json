@@ -136,7 +136,6 @@
       "fixed": true
     },
     {
-      "file": "scripts/test_roo_integration_simple.py",
       "type": "reference_cleanup",
       "line": 0,
       "description": "Removed references to deleted files",

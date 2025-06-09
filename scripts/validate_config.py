@@ -31,7 +31,6 @@
                         "retry_attempts": {"type": "integer", "minimum": 0}
                     }
                 },
-                "roo_code": {
                     "type": "object",
                     "properties": {
                         "enabled": {"type": "boolean"},

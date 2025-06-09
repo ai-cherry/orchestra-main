@@ -1,4 +1,3 @@
-# Ignore all markdown files except README.md and .roo rules
 # Python bytecode and cache
 __pycache__/
 *.py[cod]
@@ -74,7 +73,6 @@ nohup.out
 *.md
 !README.md
 !docs/HIGH_LEVEL_ARCHITECTURE.md
-!.roo/**/*.md
 
 # Environment variables
 # API Keys

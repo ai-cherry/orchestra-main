@@ -14,12 +14,9 @@ from collections import defaultdict
 from typing import Dict, List, Tuple, Set
 
 class CodeAuditScanner:
-    def __init__(self, root_path: str = "."):
-        self.root_path = Path(root_path).resolve()
         self.results = {
             "scan_metadata": {
                 "timestamp": datetime.now().isoformat(),
-                "root_path": str(self.root_path)
             },
             "file_inventory": defaultdict(list),
             "syntax_errors": [],
@@ -69,7 +66,6 @@ class CodeAuditScanner:
 
     def scan_codebase(self):
         """Main entry point for scanning the codebase"""
-        print(f"Starting code audit scan at: {self.root_path}")
         print("=" * 80)
         
         # Step 1: Inventory files
@@ -90,13 +86,10 @@ class CodeAuditScanner:
         """Create an inventory of all files by type"""
         print("\n📁 Creating file inventory...")
         
-        for root, dirs, files in os.walk(self.root_path):
             # Skip unwanted directories
             dirs[:] = [d for d in dirs if d not in self.skip_dirs]
             
             for file in files:
-                file_path = Path(root) / file
-                relative_path = file_path.relative_to(self.root_path)
                 
                 # Categorize by extension
                 ext = file_path.suffix.lower()
@@ -128,7 +121,6 @@ class CodeAuditScanner:
         print(f"\n🐍 Analyzing {len(python_files)} Python files...")
         
         for file_path in python_files:
-            full_path = self.root_path / file_path
             try:
                 with open(full_path, 'r', encoding='utf-8') as f:
                     content = f.read()
@@ -218,7 +210,6 @@ class CodeAuditScanner:
         print(f"\n📜 Analyzing {len(js_files)} JavaScript/TypeScript files...")
         
         for file_path in js_files:
-            full_path = self.root_path / file_path
             try:
                 with open(full_path, 'r', encoding='utf-8') as f:
                     content = f.read()
@@ -275,7 +266,6 @@ class CodeAuditScanner:
         print(f"\n🐚 Analyzing {len(shell_files)} shell scripts...")
         
         for file_path in shell_files:
-            full_path = self.root_path / file_path
             try:
                 # Use shellcheck if available
                 result = subprocess.run(
@@ -313,7 +303,6 @@ class CodeAuditScanner:
         if json_files:
             print(f"\n📋 Analyzing {len(json_files)} JSON files...")
             for file_path in json_files:
-                full_path = self.root_path / file_path
                 try:
                     with open(full_path, 'r', encoding='utf-8') as f:
                         json.load(f)

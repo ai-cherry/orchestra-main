@@ -1,6 +1,6 @@
 #!/bin/bash
 # AI Tools Installation Script
-# Installs EigenCode, Cursor AI, and Roo Code with proper configuration
+# Installs EigenCode, Cursor AI, and  Code with proper configuration
 
 set -e  # Exit on error
 
@@ -27,19 +27,15 @@ print_warning() {
     echo -e "${YELLOW}[WARNING]${NC} $1"
 }
 
-# Check if running as root
 if [[ $EUID -ne 0 ]]; then
-   print_error "This script must be run as root"
    exit 1
 fi
 
 # Base directory
-BASE_DIR="/root/cherry_ai-main/ai_components"
 cd $BASE_DIR
 
 # Create necessary directories
 print_status "Creating directory structure..."
-mkdir -p eigencode cursor_ai roo_code logs configs
 
 # Install Python dependencies
 print_status "Installing Python dependencies..."
@@ -78,7 +74,6 @@ agents:
     timeout: 900
     retry_attempts: 2
     
-  roo_code:
     enabled: true
     timeout: 600
     retry_attempts: 3
@@ -125,7 +120,6 @@ AIRBYTE_WORKSPACE_ID=your_workspace_id
 # AI Tool API Keys
 EIGENCODE_API_KEY=your_eigencode_api_key
 CURSOR_AI_API_KEY=your_cursor_ai_api_key
-ROO_CODE_API_KEY=your_roo_code_api_key
 
 # MCP Server Configuration
 MCP_SERVER_URL=http://localhost:8080
@@ -211,13 +205,12 @@ if __name__ == "__main__":
     print("Use this module to interact with Cursor AI API")
 EOF
 
-# Roo Code setup
-print_status "Setting up Roo Code integration..."
-cat > roo_code/roo_integration.py << 'EOF'
+#  Code setup
+print_status "Setting up  Code integration..."
 #!/usr/bin/env python3
 """
-Roo Code Integration Module
-Provides API wrapper for Roo Code operations
+ Code Integration Module
+Provides API wrapper for  Code operations
 """
 
 import os
@@ -225,12 +218,11 @@ import json
 import aiohttp
 from typing import Dict, List, Optional
 
-class RooCodeClient:
-    """Roo Code API Client"""
+class CodeClient:
+    """ Code API Client"""
     
     def __init__(self, api_key: str = None):
-        self.api_key = api_key or os.environ.get('ROO_CODE_API_KEY')
-        self.base_url = "https://api.roo.code/v1"
+        self.api_key = api_key or os.environ.get('_CODE_API_KEY')
         
     async def refine_technology_stack(self, stack_config: Dict) -> Dict:
         """Refine technology stack for ease of use"""
@@ -258,8 +250,8 @@ class RooCodeClient:
         }
 
 if __name__ == "__main__":
-    print("Roo Code Integration Module")
-    print("Use this module to interact with Roo Code API")
+    print(" Code Integration Module")
+    print("Use this module to interact with  Code API")
 EOF
 
 # Create MCP server integration
@@ -302,7 +294,6 @@ class Task(TaskCreate):
     updated_at: datetime = datetime.now()
 
 @app.get("/")
-async def root():
     return {"message": "AI conductor MCP Server", "version": "1.0.0"}
 
 @app.post("/tasks", response_model=Task)
@@ -381,7 +372,7 @@ from coordination.ai_conductor import (
 
 @click.group()
 def cli():
-    """AI conductor CLI - Coordinate EigenCode, Cursor AI, and Roo Code"""
+    """AI conductor CLI - Coordinate EigenCode, Cursor AI, and  Code"""
     pass
 
 @cli.command()
@@ -445,7 +436,7 @@ def implement(analysis, focus):
 @cli.command()
 @click.option('--stack', '-s', default='python_postgres_weaviate', help='Technology stack')
 def refine(stack):
-    """Refine technology stack with Roo Code"""
+    """Refine technology stack with  Code"""
     click.echo(f"Refining {stack} stack...")
     
     async def run_refinement():
@@ -515,7 +506,6 @@ cat > configs/example_workflow.json << EOF
       "name": "Analyze Codebase",
       "agent": "analyzer",
       "inputs": {
-        "codebase_path": "/root/cherry_ai-main",
         "focus_areas": ["performance", "scalability", "maintainability"]
       },
       "priority": 1
@@ -554,12 +544,8 @@ After=network.target
 
 [Service]
 Type=simple
-User=root
-WorkingDirectory=/root/cherry_ai-main/mcp_server
-ExecStart=/usr/bin/python3 /root/cherry_ai-main/mcp_server/coordinator_server.py
 Restart=always
 RestartSec=10
-Environment="PYTHONPATH=/root/cherry_ai-main"
 
 [Install]
 WantedBy=multi-user.target
@@ -574,13 +560,13 @@ print_status "Creating documentation..."
 cat > README.md << 'EOF'
 # AI coordination System
 
-This system coordinates between EigenCode, Cursor AI, and Roo Code to provide comprehensive code analysis, implementation, and refinement capabilities.
+This system coordinates between EigenCode, Cursor AI, and  Code to provide comprehensive code analysis, implementation, and refinement capabilities.
 
 ## Components
 
 1. **EigenCode** - Holistic codebase analysis
 2. **Cursor AI** - Performance-focused implementation
-3. **Roo Code** - Technology stack refinement for ease of use
+3. ** Code** - Technology stack refinement for ease of use
 
 ## Setup
 

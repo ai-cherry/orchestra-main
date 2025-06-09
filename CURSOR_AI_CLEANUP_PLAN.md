@@ -1,38 +1,20 @@
-# 🎯 CURSOR AI OPTIMIZATION & ROO CLEANUP PLAN
+# 🎯 CURSOR AI OPTIMIZATION &  CLEANUP PLAN
 
 ## 🛑 IMMEDIATE CLEANUP TASKS
 
-### 1. ROO-RELATED FILES TO REMOVE
+### 1. -RELATED FILES TO REMOVE
 ```bash
-# Core Roo files
-.roomodes*
-.roo/
-complete_roo_setup.sh
-manage_roo_system.sh
-mcp_roo_server.py
-start_roo_dev.sh
-setup_roo_complete.sh
-roo_integration.db
+# Core  files
 
 # Legacy adapters and integrations
-legacy/mcp_server/adapters/roo_adapter.py
-ai_components/coordination/roo_mcp_adapter.py
-ai_components/tests/test_roo_integration.py
-test_roo_integration.py
 
 # Archive scripts
-archive/one-time-scripts/test_roo_integration*.py
 
 # Database migrations
-migrations/004_roo_integration_tables.sql
 
 # Requirements files
-requirements/minimal_roo.txt
-requirements/roo_integration.txt
 
 # Scripts
-scripts/auto_start_orchestra_roo.py
-scripts/complete_roo_integration_setup.py
 ```
 
 ### 2. CONTINUE.DEV REFERENCES TO REMOVE
@@ -111,10 +93,7 @@ __pycache__/
 target/
 pkg/
 
-# Roo cleanup artifacts
-.roo/
-.roomodes*
-roo_integration.db
+#  cleanup artifacts
 ```
 
 ### Phase 2: MCP Server Integration (Day 2)
@@ -224,7 +203,6 @@ Check: 1) Shared dependencies 2) Cross-service APIs 3) Infrastructure dependenci
 
 ## Monorepo Guidelines
 - Always identify which project/service you're working on
-- Reference related files using relative paths from project root
 - Consider cross-project dependencies when making changes
 - Maintain architectural consistency across projects
 
@@ -291,32 +269,14 @@ Check: 1) Shared dependencies 2) Cross-service APIs 3) Infrastructure dependenci
 ### Cleanup Script
 ```bash
 #!/bin/bash
-# Remove all Roo-related files
-rm -rf .roo/
-rm -f .roomodes*
-rm -f complete_roo_setup.sh
-rm -f manage_roo_system.sh
-rm -f mcp_roo_server.py
-rm -f start_roo_dev.sh
-rm -f setup_roo_complete.sh
-rm -f roo_integration.db
-rm -f test_roo_integration.py
-rm -rf legacy/mcp_server/adapters/roo_adapter.py
-rm -rf ai_components/coordination/roo_mcp_adapter.py
-rm -rf ai_components/tests/test_roo_integration.py
-rm -rf archive/one-time-scripts/test_roo_integration*.py
-rm -rf migrations/004_roo_integration_tables.sql
-rm -rf requirements/minimal_roo.txt
-rm -rf requirements/roo_integration.txt
-rm -rf scripts/auto_start_orchestra_roo.py
-rm -rf scripts/complete_roo_integration_setup.py
+# Remove all -related files
 
 # Clean up any continue.dev references
 rm -rf .continue/
 rm -f continue.json
 rm -f .vscode/continue.json
 
-echo "✅ Roo and Continue.dev cleanup complete"
+echo "✅  and Continue.dev cleanup complete"
 ```
 
 ### Cursor Setup Script
@@ -373,5 +333,5 @@ echo "✅ Cursor AI setup complete"
 - Comprehensive error handling and logging
 - Security-first development practices
 
-This plan transforms your development environment from Roo-dependent to Cursor AI-optimized, providing superior automation, performance, and development experience specifically tuned for your Orchestra AI monorepo.
+This plan transforms your development environment from -dependent to Cursor AI-optimized, providing superior automation, performance, and development experience specifically tuned for your Orchestra AI monorepo.
 

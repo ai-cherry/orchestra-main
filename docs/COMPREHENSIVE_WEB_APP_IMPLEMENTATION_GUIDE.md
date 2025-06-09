@@ -126,7 +126,7 @@ export const metadata: Metadata = {
   description: 'Modern AI-powered workflow coordination',
 };
 
-export default function RootLayout({
+export default function tLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -521,7 +521,7 @@ cherry_ai/
 ├── .env.example               # Environment variables template
 ├── docker-compose.yml         # Local development
 ├── turbo.json                 # Turborepo config
-└── package.json               # Root package.json
+└── package.json               # t package.json
 ```
 
 ---

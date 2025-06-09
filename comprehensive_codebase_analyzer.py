@@ -455,7 +455,6 @@ class CodebaseAnalyzer:
                 'syntax_errors': {
                     'total': len([i for i in self.issues['critical'] if i['type'] == 'syntax_error']),
                     'pattern': 'Widespread indentation errors across codebase',
-                    'root_cause': 'Likely file corruption or mass editing issue',
                     'immediate_action': 'Run automated indentation fixer'
                 },
                 'blocking_issues': [

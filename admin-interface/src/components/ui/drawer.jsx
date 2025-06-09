@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils"
 function Drawer({
   ...props
 }) {
-  return <DrawerPrimitive.Root data-slot="drawer" {...props} />;
+  return <DrawerPrimitive.t data-slot="drawer" {...props} />;
 }
 
 function DrawerTrigger({

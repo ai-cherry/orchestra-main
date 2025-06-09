@@ -3,7 +3,6 @@ import asyncio
 """
 """
     """Comprehensive infrastructure validation and optimization analyzer"""
-        self.base_dir = Path("/root/cherry_ai-main")
         self.validation_results = {
             "timestamp": datetime.now().isoformat(),
             "overall_score": 0,
@@ -416,7 +415,6 @@ import asyncio
         """Generate script to implement identified optimizations"""
 """
 """
-        self.base_dir = Path("/root/cherry_ai-main")
         
     def implement_rate_limiting(self):
         """Implement domain-specific rate limiting"""

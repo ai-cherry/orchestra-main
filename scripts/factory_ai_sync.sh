@@ -8,7 +8,6 @@ echo "🔄 Factory AI Sync Script"
 echo "========================="
 
 # Navigate to the correct directory
-cd /root/cherry_ai-main
 
 # Activate virtual environment
 source venv/bin/activate

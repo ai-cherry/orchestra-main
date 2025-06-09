@@ -13,7 +13,6 @@
       "status": "\u26a0\ufe0f IDENTIFIED",
       "issue": "Bot tokens cannot create databases directly in workspace",
       "solution": "Requires existing page as parent for database creation",
-      "workaround": "Create root page first, then databases as children"
     },
     "integration_capabilities": {
       "status": "\u2705 COMPREHENSIVE",
@@ -21,7 +20,7 @@
         "Complete database schemas designed for all Orchestra components",
         "Patrick Instructions automation framework",
         "AI agent performance tracking",
-        "Cross-tool integration (Cursor, Roo, Continue)",
+        "Cross-tool integration (Cursor, , Continue)",
         "GitHub webhook integration",
         "Lambda Labs monitoring"
       ]

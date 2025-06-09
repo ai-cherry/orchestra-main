@@ -76,9 +76,9 @@ def handle_run_command(args: Dict[str, Any]) -> None:
     context = args["--context"]
 
     # Verify mode is valid for the tool
-    if tool == AITool.ROO and mode not in ROO_MODES:
-        print(f"Invalid mode '{mode}' for Roo.")
-        print(f"Available modes: {', '.join(ROO_MODES.keys())}")
+    if tool == AITool. and mode not in _MODES:
+        print(f"Invalid mode '{mode}' for .")
+        print(f"Available modes: {', '.join(_MODES.keys())}")
         sys.exit(1)
     elif tool == AITool.CLINE and mode not in CLINE_MODES:
         print(f"Invalid mode '{mode}' for Cline.")
@@ -227,8 +227,8 @@ def handle_list_command(args: Dict[str, Any]) -> None:
         for tool in AITool:
             print(f"  - {tool.value}")
 
-        print("\nRoo modes:")
-        for mode, display_name in ROO_MODES.items():
+        print("\n modes:")
+        for mode, display_name in _MODES.items():
             print(f"  - {mode}: {display_name}")
 
         print("\nCline modes:")

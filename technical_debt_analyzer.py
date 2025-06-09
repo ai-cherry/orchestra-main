@@ -18,8 +18,6 @@ from typing import Dict, List, Tuple, Optional, Set
 import importlib.util
 
 class TechnicalDebtAnalyzer:
-    def __init__(self, root_path: str = "."):
-        self.root_path = Path(root_path).resolve()
         self.findings = {
             "timestamp": datetime.now().isoformat(),
             "critical_issues": [],
@@ -114,7 +112,6 @@ class TechnicalDebtAnalyzer:
         """Analyze individual Python file for issues"""
         findings = []
         lines = content.splitlines()
-        relative_path = file_path.relative_to(self.root_path)
         
         # Check file size
         if len(lines) > 1000:
@@ -294,7 +291,6 @@ class TechnicalDebtAnalyzer:
         print("📦 Analyzing dependencies...")
         
         # Check requirements files
-        req_files = list(Path(self.root_path).glob("requirements*.txt"))
         
         if not req_files:
             self.findings['high_priority'].append({
@@ -325,7 +321,6 @@ class TechnicalDebtAnalyzer:
             if unpinned:
                 self.findings['medium_priority'].append({
                     "type": "unpinned_dependencies",
-                    "file": str(req_file.relative_to(self.root_path)),
                     "severity": "medium",
                     "issue": f"Found {len(unpinned)} unpinned dependencies",
                     "recommendation": "Pin all dependencies to specific versions",
@@ -376,7 +371,6 @@ class TechnicalDebtAnalyzer:
                     "recommendation": "Remove duplicates or extract to shared module",
                     "effort": "1-2 hours",
                     "impact": "Reduces maintenance burden",
-                    "files": [str(f.relative_to(self.root_path)) for f in files]
                 })
     
     def _check_naming_conventions(self):
@@ -445,8 +439,6 @@ class TechnicalDebtAnalyzer:
         print("🧪 Analyzing test coverage...")
         
         # Count test files vs source files
-        test_files = list(Path(self.root_path).rglob("test_*.py"))
-        test_files.extend(list(Path(self.root_path).rglob("*_test.py")))
         source_files = list(self._get_python_files())
         
         # Filter out test files from source files
@@ -478,14 +470,12 @@ class TechnicalDebtAnalyzer:
                 # Check for common performance anti-patterns
                 if 'time.sleep' in content:
                     performance_issues.append({
-                        "file": str(py_file.relative_to(self.root_path)),
                         "issue": "Uses time.sleep - consider async alternatives"
                     })
                 
                 # Check for inefficient string concatenation in loops
                 if re.search(r'for .+ in .+:\s*\n\s*\w+\s*\+=\s*["\']', content):
                     performance_issues.append({
-                        "file": str(py_file.relative_to(self.root_path)),
                         "issue": "String concatenation in loop - use join() or list comprehension"
                     })
             except:
@@ -516,14 +506,12 @@ class TechnicalDebtAnalyzer:
                 # Check for SQL injection risks
                 if re.search(r'(execute|cursor)\s*\(\s*["\'].*%[s|d]', content):
                     security_issues.append({
-                        "file": str(py_file.relative_to(self.root_path)),
                         "issue": "Potential SQL injection - use parameterized queries"
                     })
                 
                 # Check for eval usage
                 if 'eval(' in content:
                     security_issues.append({
-                        "file": str(py_file.relative_to(self.root_path)),
                         "issue": "Uses eval() - security risk"
                     })
             except:
@@ -545,7 +533,6 @@ class TechnicalDebtAnalyzer:
         print("📚 Analyzing documentation...")
         
         # Check for README
-        readme_files = list(Path(self.root_path).glob("README*"))
         if not readme_files:
             self.findings['high_priority'].append({
                 "type": "missing_documentation",
@@ -590,13 +577,11 @@ class TechnicalDebtAnalyzer:
     def _get_python_files(self) -> List[Path]:
         """Get all Python files in the project"""
         python_files = []
-        for root, dirs, files in os.walk(self.root_path):
             # Skip unwanted directories
             dirs[:] = [d for d in dirs if d not in self.skip_dirs]
             
             for file in files:
                 if file.endswith('.py'):
-                    python_files.append(Path(root) / file)
         
         return python_files
     

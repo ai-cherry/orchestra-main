@@ -3,7 +3,6 @@
 """
 """
     """Test all Cherry AI system components"""
-        self.base_dir = Path("/root/cherry_ai-main")
         self.test_results = {
             "timestamp": datetime.now().isoformat(),
             "environment": {},

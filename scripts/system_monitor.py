@@ -30,7 +30,6 @@ NC = '\033[0m'  # No Color
 
 class SystemMonitor:
     def __init__(self):
-        self.project_root = Path("/root/orchestra-main")
         self.services = {
             "PostgreSQL": {"port": 5432, "container": "orchestra_postgres"},
             "Redis": {"port": 6379, "container": "orchestra_redis"},
@@ -118,10 +117,7 @@ class SystemMonitor:
                 pass
                 
         # Start new process
-        log_file = self.project_root / f"logs/mcp_{name}.log"
-        pid_file = self.project_root / f"logs/mcp_{name}.pid"
         
-        cmd = f"cd {self.project_root} && nohup python3 -m {config['module']} > {log_file} 2>&1 & echo $! > {pid_file}"
         code, out, err = self.run_command(["bash", "-c", cmd])
         
         return code == 0
@@ -221,7 +217,6 @@ class SystemMonitor:
         print(f"\n{YELLOW}Starting MCP servers...{NC}")
         
         # Create logs directory
-        logs_dir = self.project_root / "logs"
         logs_dir.mkdir(exist_ok=True)
         
         for name, config in self.mcp_servers.items():
@@ -292,7 +287,6 @@ class SystemMonitor:
                 "5": "logs/mcp_tools.log",
                 "6": "logs/mcp_orchestrator.log"
             }
-            log_file = self.project_root / log_files[choice]
             if log_file.exists():
                 with open(log_file) as f:
                     logs = f.readlines()[-50:]
@@ -310,7 +304,6 @@ class SystemMonitor:
         """Run system tests"""
         print(f"\n{YELLOW}Running system tests...{NC}")
         
-        test_script = self.project_root / ""
         if test_script.exists():
             code, out, err = self.run_command(["python3", str(test_script)])
             print(out)
@@ -355,7 +348,6 @@ class SystemMonitor:
             }
             
         # Save report
-        report_file = self.project_root / f"system_status_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
         with open(report_file, "w") as f:
             json.dump(report, f, indent=2)
             

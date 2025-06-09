@@ -62,7 +62,7 @@ def setup_coding_assistant_databases():
                     "multi_select": {
                         "options": [
                             {"name": "Cursor", "color": "blue"},
-                            {"name": "Roo Coder", "color": "green"},
+                            {"name": " Coder", "color": "green"},
                             {"name": "Continue", "color": "purple"},
                             {"name": "GitHub Copilot", "color": "gray"},
                             {"name": "All Tools", "color": "red"}
@@ -138,7 +138,7 @@ def setup_coding_assistant_databases():
                     "multi_select": {
                         "options": [
                             {"name": "Cursor", "color": "blue"},
-                            {"name": "Roo Coder", "color": "green"},
+                            {"name": " Coder", "color": "green"},
                             {"name": "Continue", "color": "purple"},
                             {"name": "Orchestra AI", "color": "red"}
                         ]
@@ -208,7 +208,7 @@ def setup_coding_assistant_databases():
                     "select": {
                         "options": [
                             {"name": "Cursor", "color": "blue"},
-                            {"name": "Roo Coder", "color": "green"},
+                            {"name": " Coder", "color": "green"},
                             {"name": "Continue", "color": "purple"},
                             {"name": "Manual Analysis", "color": "gray"},
                             {"name": "Automated Tool", "color": "orange"}
@@ -238,7 +238,7 @@ def setup_coding_assistant_databases():
                     "select": {
                         "options": [
                             {"name": "Cursor", "color": "blue"},
-                            {"name": "Roo Coder", "color": "green"},
+                            {"name": " Coder", "color": "green"},
                             {"name": "Continue", "color": "purple"},
                             {"name": "Orchestra AI", "color": "red"},
                             {"name": "GitHub Copilot", "color": "gray"},
@@ -380,7 +380,6 @@ def setup_coding_assistant_databases():
                 "Connection Name": {"title": [{"text": {"content": "Orchestra File System MCP"}}]},
                 "MCP Type": {"select": {"name": "File System"}},
                 "Status": {"select": {"name": "Active"}},
-                "Configuration": {"rich_text": [{"text": {"content": "{\n  \"root_path\": \"/tmp/orchestra-main\",\n  \"allowed_extensions\": [\".py\", \".ts\", \".tsx\", \".md\"],\n  \"max_file_size\": \"10MB\"\n}"}}]},
                 "Context Scope": {"multi_select": [{"name": "Project-wide"}]},
                 "Memory Retention": {"select": {"name": "Session"}},
                 "Connected Tools": {"multi_select": [{"name": "Cursor"}, {"name": "Continue"}]},
@@ -413,8 +412,6 @@ def setup_coding_assistant_databases():
             except Exception as e:
                 print(f"❌ Error adding MCP connection: {str(e)}")
     
-    # Update root page with new database links
-    print("\n🔗 Updating root page with new databases...")
     
     try:
         # Get current page content
@@ -468,12 +465,9 @@ def setup_coding_assistant_databases():
             )
             
             if append_response.status_code == 200:
-                print("✅ Updated root page with new database links")
             else:
-                print(f"❌ Failed to update root page: {append_response.text}")
                 
     except Exception as e:
-        print(f"❌ Error updating root page: {str(e)}")
     
     # Save configuration
     config = {
@@ -491,7 +485,6 @@ def setup_coding_assistant_databases():
     print("=" * 70)
     print(f"✅ Created {len(created_databases)} new databases")
     print("✅ Added sample data and configurations")
-    print("✅ Updated root page with database links")
     print("✅ Configuration saved to coding_assistant_config.json")
     print("\n🔗 New Database URLs:")
     for db_name, db_id in created_databases.items():

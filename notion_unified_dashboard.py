@@ -114,7 +114,7 @@ class NotionDashboardManager:
                 "object": "block",
                 "type": "paragraph",
                 "paragraph": {
-                    "rich_text": [{"type": "text", "text": {"content": "Orchestra AI is a comprehensive AI orchestration platform that unifies multiple AI coding assistants (Cursor, Roo, Continue) with intelligent workflow automation, real-time Notion integration, and multi-platform deployment capabilities. Built for solo developers who demand enterprise-grade quality with maximum productivity."}}]
+                    "rich_text": [{"type": "text", "text": {"content": "Orchestra AI is a comprehensive AI orchestration platform that unifies multiple AI coding assistants (Cursor, , Continue) with intelligent workflow automation, real-time Notion integration, and multi-platform deployment capabilities. Built for solo developers who demand enterprise-grade quality with maximum productivity."}}]
                 }
             },
             
@@ -153,7 +153,7 @@ class NotionDashboardManager:
                 "object": "block",
                 "type": "bulleted_list_item",
                 "bulleted_list_item": {
-                    "rich_text": [{"type": "text", "text": {"content": "✅ Roo Code: 10 specialized modes for complex workflows and research"}}]
+                    "rich_text": [{"type": "text", "text": {"content": "✅  Code: 10 specialized modes for complex workflows and research"}}]
                 }
             },
             {
@@ -345,7 +345,7 @@ class NotionDashboardManager:
                 "object": "block",
                 "type": "bulleted_list_item",
                 "bulleted_list_item": {
-                    "rich_text": [{"type": "text", "text": {"content": "🧠 Context Sharing: Unified context management across Cursor, Roo, and Continue"}}]
+                    "rich_text": [{"type": "text", "text": {"content": "🧠 Context Sharing: Unified context management across Cursor, , and Continue"}}]
                 }
             },
             {
@@ -403,7 +403,7 @@ class NotionDashboardManager:
                 "object": "block",
                 "type": "numbered_list_item",
                 "numbered_list_item": {
-                    "rich_text": [{"type": "text", "text": {"content": "Use Roo specialized modes for research and complex workflows"}}]
+                    "rich_text": [{"type": "text", "text": {"content": "Use  specialized modes for research and complex workflows"}}]
                 }
             },
             

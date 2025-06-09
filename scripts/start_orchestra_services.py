@@ -4,7 +4,6 @@ import asyncio
 """
 """
     """Manages Cherry AI services"""
-        self.venv_path = self.project_root / "venv"
         self.services_status = {}
         
     def check_docker(self) -> bool:
@@ -120,9 +119,6 @@ import asyncio
             
             # Check for docker-compose file
             compose_files = [
-                self.project_root / "docker-compose.yml",
-                self.project_root / "docker-compose.yaml",
-                self.project_root / "deploy" / "docker-compose.yml"
             ]
             
             compose_file = None
@@ -181,7 +177,6 @@ import asyncio
                 return True, f"Port {port} already in use (server may be running)"
             
             # Start the server
-            log_file = self.project_root / "logs" / f"mcp_{server_name}.log"
             log_file.parent.mkdir(exist_ok=True)
             
             with open(log_file, 'a') as log:
@@ -189,11 +184,9 @@ import asyncio
                     [str(self.venv_path / "bin" / "python"), script_path],
                     stdout=log,
                     stderr=log,
-                    cwd=str(self.project_root)
                 )
                 
                 # Save PID
-                pid_file = self.project_root / "logs" / f"mcp_{server_name}.pid"
                 pid_file.write_text(str(process.pid))
                 
                 await asyncio.sleep(2)  # Wait for server to start
@@ -237,7 +230,6 @@ if __name__ == "__main__":
         }
         
         for server_name, (script_path, port) in mcp_servers.items():
-            if (self.project_root / script_path).exists():
                 status = self.start_mcp_server(server_name, script_path, port)
                 self.services_status[f"mcp_{server_name}"] = status
             else:

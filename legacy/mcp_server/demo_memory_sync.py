@@ -58,7 +58,6 @@ class MockToolAdapter:
 
 def setup_demo_environment() -> MemorySyncEngine:
     """Set up the demo environment with mock tools."""
-    roo_adapter = MockToolAdapter("roo", 16000)  # Mid-sized context
     cline_adapter = MockToolAdapter("cline", 8000)  # Smaller context
     gemini_adapter = MockToolAdapter("gemini", 200000)  # Massive context
     copilot_adapter = MockToolAdapter("copilot", 5000)  # Small context
@@ -67,10 +66,10 @@ def setup_demo_environment() -> MemorySyncEngine:
     storage = InMemoryStorage()
 
     # Define the tools and their token budgets
-    tools = [ToolType.ROO, ToolType.CLINE, ToolType.GEMINI, ToolType.COPILOT]
+    tools = [ToolType., ToolType.CLINE, ToolType.GEMINI, ToolType.COPILOT]
 
     token_budgets = {
-        ToolType.ROO: 16000,
+        ToolType.: 16000,
         ToolType.CLINE: 8000,
         ToolType.GEMINI: 200000,
         ToolType.COPILOT: 5000,
@@ -80,7 +79,6 @@ def setup_demo_environment() -> MemorySyncEngine:
     sync_engine = MemorySyncEngine(storage, tools, token_budgets)
 
     # Register the tool adapters
-    sync_engine.register_tool_adapter(ToolType.ROO, roo_adapter)
     sync_engine.register_tool_adapter(ToolType.CLINE, cline_adapter)
     sync_engine.register_tool_adapter(ToolType.GEMINI, gemini_adapter)
     sync_engine.register_tool_adapter(ToolType.COPILOT, copilot_adapter)
@@ -91,7 +89,7 @@ def setup_demo_environment() -> MemorySyncEngine:
 def create_demo_memories(sync_engine: MemorySyncEngine) -> None:
     """Create demo memories for testing."""
         content="This is a small shared memory entry that should fit in all tools' context windows.",
-        metadata=MemoryMetadata(source_tool=ToolType.ROO, last_modified=time.time(), context_relevance=0.9),
+        metadata=MemoryMetadata(source_tool=ToolType., last_modified=time.time(), context_relevance=0.9),
     )
 
     # Create a medium shared memory entry (fits in some tools)
@@ -105,7 +103,6 @@ def create_demo_memories(sync_engine: MemorySyncEngine) -> None:
             {"name": "Context Window Optimizer", "status": "Planned"},
         ],
         "dependencies": [
-            # "roo_workflow_manager", # Removed
             "cline_integration",
             "unified_mcp_conductor",
         ],
@@ -131,7 +128,7 @@ def create_demo_memories(sync_engine: MemorySyncEngine) -> None:
     large_content += "## 1. Comparative Analysis of AI Tools\n\n"
 
     # Add content for each tool
-    for tool in ["Roo", "Cline.bot", "Gemini", "Co-pilot"]:
+    for tool in ["", "Cline.bot", "Gemini", "Co-pilot"]:
         large_content += f"### {tool}\n\n"
         large_content += "**Strengths:**\n\n"
         for _ in range(5):
@@ -171,7 +168,6 @@ def create_demo_memories(sync_engine: MemorySyncEngine) -> None:
     )
 
     # Create tool-specific entries
-    roo_entry = MemoryEntry(
         memory_type=MemoryType.TOOL_SPECIFIC,
         scope=MemoryScope.SESSION,
         priority=9,
@@ -186,7 +182,7 @@ def create_demo_memories(sync_engine: MemorySyncEngine) -> None:
             ],
             "mode_history": ["architect", "code", "conductor"],
         },
-        metadata=MemoryMetadata(source_tool=ToolType.ROO, last_modified=time.time(), context_relevance=0.85),
+        metadata=MemoryMetadata(source_tool=ToolType., last_modified=time.time(), context_relevance=0.85),
     )
 
     cline_entry = MemoryEntry(
@@ -208,10 +204,9 @@ def create_demo_memories(sync_engine: MemorySyncEngine) -> None:
     )
 
     # Save the entries to the sync engine
-    sync_engine.create_memory("shared:small", small_entry, ToolType.ROO)
+    sync_engine.create_memory("shared:small", small_entry, ToolType.)
     sync_engine.create_memory("shared:medium", medium_entry, ToolType.CLINE)
     sync_engine.create_memory("shared:large", large_entry, ToolType.GEMINI)
-    sync_engine.create_memory("roo:session:state", roo_entry, ToolType.ROO)
     sync_engine.create_memory("cline:session:state", cline_entry, ToolType.CLINE)
 
     logger.info("Created demo memories")
@@ -248,7 +243,7 @@ def display_memory_stats(sync_engine: MemorySyncEngine) -> None:
 
     # Get stats from each tool adapter
     print("\n=== Tool Adapter Memory Stats ===")
-    for tool_type in [ToolType.ROO, ToolType.CLINE, ToolType.GEMINI, ToolType.COPILOT]:
+    for tool_type in [ToolType., ToolType.CLINE, ToolType.GEMINI, ToolType.COPILOT]:
         adapter = sync_engine.tool_adapters.get(tool_type)
         if adapter:
             stats = adapter.get_memory_stats()
@@ -267,7 +262,7 @@ def demonstrate_memory_retriast.literal_eval(sync_engine: MemorySyncEngine) -> N
     # Get the large memory from each tool's perspective
 key = os.getenv("MCP_DEMO_MEMORY_SYNC_KEY", "")
 
-    for tool_type in [ToolType.ROO, ToolType.CLINE, ToolType.GEMINI, ToolType.COPILOT]:
+    for tool_type in [ToolType., ToolType.CLINE, ToolType.GEMINI, ToolType.COPILOT]:
         entry = sync_engine.get_memory(key, tool_type)
 
         if not entry:

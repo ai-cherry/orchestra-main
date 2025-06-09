@@ -15,13 +15,12 @@ cursor .
 
 ### SSH to Production Server
 ```bash
-ssh root@45.32.69.157
 cd ~/orchestra-main
 ```
 
 ---
 
-## 🦘 Roo Coder Commands
+## 🦘  Coder Commands
 
 ### Mode Switching
 ```
@@ -243,12 +242,11 @@ curl -H "Authorization: Bearer $OPENAI_API_KEY" \
 cd orchestra-main && cursor .
 
 # Remote
-ssh root@45.32.69.157
 cd ~/orchestra-main
 ```
 
 ### 2. AI-Assisted Coding
-- **Roo:** `switch to developer mode`
+- **:** `switch to developer mode`
 - **Cursor:** `Ctrl+K` + performance task
 - **Codex:** `codex "optimize this module"`
 
@@ -268,7 +266,6 @@ cd ~/orchestra-main
 
 ### SSH Issues
 ```bash
-ssh -v root@45.32.69.157  # Verbose connection
 ls -la ~/.ssh/            # Check SSH keys
 ```
 

@@ -3,7 +3,7 @@ import os
 #!/usr/bin/env python3
 """
 """
-CONFIG_DIR = PROJECT_ROOT / "config"
+CONFIG_DIR = PROJECT_T / "config"
 MODE_DEFINITIONS_PATH = CONFIG_DIR / "mode_definitions.yaml"
 WORKFLOW_STATE_PATH = CONFIG_DIR / "workflow_state.yaml"
 BACKUP_DIR = CONFIG_DIR / "backups"
@@ -75,7 +75,6 @@ try:
     def _validate_yaml_config(self, content: str) -> Dict[str, Any]:
         """
         """
-                raise PersistenceError("Invalid configuration format: root must be a dictionary")
 
             if "modes" not in config:
                 raise PersistenceError("Invalid configuration: 'modes' section is required")

@@ -1,6 +1,6 @@
 # TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
-"""Test API connections for Roo integration"""
+"""Test API connections for  integration"""
     """Test OpenRouter API (mock)"""
     api_key = os.getenv("OPENROUTER_API_KEY", "mock-key")
     if api_key and len(api_key) > 10:
@@ -12,7 +12,6 @@
 
 def test_database_connection():
     """Test database connection"""
-    db_path = Path("roo_integration.db")
     if db_path.exists():
         print("✅ Database connection successful")
         return True

@@ -52,7 +52,6 @@
         components = {
             "eigencode": self.validate_eigencode,
             "cursor_ai": self.validate_cursor_ai,
-            "roo_code": self.validate_roo_code,
             "mcp_server": self.validate_mcp_server,
             "postgresql": self.validate_postgresql,
             "conductor": self.validate_conductor
@@ -85,7 +84,6 @@
             "/usr/local/bin/eigencode",
             "/usr/bin/eigencode",
             os.path.expanduser("~/.eigencode/bin/eigencode"),
-            "/root/.eigencode/bin/eigencode"
         ]
         
         found = False
@@ -164,23 +162,21 @@
         
         return result
     
-    async def validate_roo_code(self) -> Dict:
-        """Validate Roo Code integration"""
+        """Validate  Code integration"""
         result = {"status": "healthy", "checks": {}}
         
         # Check API key
-        api_key = os.environ.get('ROO_CODE_API_KEY')
+        api_key = os.environ.get('_CODE_API_KEY')
         result["checks"]["api_key"] = "configured" if api_key else "missing"
         
         # Check module
         try:
 
             pass
-            from ai_components.roo_code.roo_integration import RooCodeClient
             result["checks"]["module"] = "available"
             
             # Test client initialization
-            client = RooCodeClient(api_key)
+            client = CodeClient(api_key)
             result["checks"]["client"] = "initialized"
             
         except Exception:

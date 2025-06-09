@@ -1,6 +1,5 @@
 {
   "content": {
-    "type": "roo_interaction",
     "mode": "code",
     "request": {
       "code": "def test(): return 'Cherry AI is working!'",

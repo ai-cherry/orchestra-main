@@ -5,7 +5,7 @@ alwaysApply: false
 ---
 # AI Assistant Boundaries & Usage Guidelines
 
-## When to Use Cursor vs Roo
+## When to Use Cursor vs 
 
 ### Use Cursor For:
 - **Quick edits and refactoring** (Cmd+K inline edits)
@@ -14,23 +14,18 @@ alwaysApply: false
 - **IDE-integrated development** (while actively coding)
 - **Fast iterations** with immediate feedback
 
-### Use Roo For:
+### Use  For:
 - **Complex multi-step workflows** requiring specialized modes
-- **Architecture and design decisions** (use `roo architect`)
-- **System debugging** with systematic analysis (use `roo debug`)
-- **Research and documentation** tasks (use `roo research/documentation`)
-- **Strategic planning** and technology decisions (use `roo strategy`)
 
 ### Never Do These:
-- **Don't duplicate instructions** between Cursor rules and Roo modes
+- **Don't duplicate instructions** between Cursor rules and  modes
 - **Don't create temporary files** without explicit lifecycle management
 - **Don't override project priorities** (performance > security for this project)
 - **Don't use both tools simultaneously** for the same task
 
 ## Token Optimization Rules
 - **Cursor rules**: Keep concise, focus on immediate coding standards
-- **Roo modes**: Handle complex, multi-step workflows with context retention
+- ** modes**: Handle complex, multi-step workflows with context retention
 - **Shared standards**: Defined once in this file, referenced by both
 
 ## Emergency Override
-If either tool suggests creating files in root directory or changing project architecture without explicit approval, always confirm first.

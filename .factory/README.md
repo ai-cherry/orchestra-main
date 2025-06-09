@@ -1,10 +1,10 @@
 # Factory AI Integration
 
-This directory contains the Factory AI Droid integration for the cherry_ai project, providing seamless integration between Factory AI's specialized droids and the existing Roo/MCP infrastructure.
+This directory contains the Factory AI Droid integration for the cherry_ai project, providing seamless integration between Factory AI's specialized droids and the existing /MCP infrastructure.
 
 ## Overview
 
-The Factory AI integration implements a bridge pattern that allows Factory AI Droids to work alongside Roo's existing capabilities, with automatic fallback mechanisms and unified context management.
+The Factory AI integration implements a bridge pattern that allows Factory AI Droids to work alongside 's existing capabilities, with automatic fallback mechanisms and unified context management.
 
 ## Directory Structure
 

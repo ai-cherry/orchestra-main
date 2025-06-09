@@ -3,7 +3,6 @@
 """
 """
     """Analyze codebase for domain separation readiness"""
-        self.base_dir = Path("/root/cherry_ai-main")
         self.domains = {
             "Personal": {
                 "keywords": ["personal", "user", "profile", "preference", "individual"],
@@ -102,13 +101,11 @@
             if not dir_path.exists():
                 continue
                 
-            for root, dirs, files in os.walk(dir_path):
                 # Skip test and cache directories
                 dirs[:] = [d for d in dirs if d not in ['__pycache__', '.pytest_cache', 'node_modules']]
                 
                 for file in files:
                     if file.endswith(('.py', '.ts', '.js', '.yaml', '.json')):
-                        file_path = Path(root) / file
                         rel_path = file_path.relative_to(self.base_dir)
                         total_files += 1
                         

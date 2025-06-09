@@ -93,7 +93,7 @@ class EnhancedProjectDashboard:
                 "type": "paragraph",
                 "paragraph": {
                     "rich_text": [
-                        {"text": {"content": "Complete AI Orchestration Platform unifying Cursor, Roo, and Continue with intelligent task routing, shared context management, and comprehensive Notion-based project oversight for maximum development velocity."}}
+                        {"text": {"content": "Complete AI Orchestration Platform unifying Cursor, , and Continue with intelligent task routing, shared context management, and comprehensive Notion-based project oversight for maximum development velocity."}}
                     ]
                 }
             },
@@ -188,7 +188,7 @@ class EnhancedProjectDashboard:
                 "type": "paragraph",
                 "paragraph": {
                     "rich_text": [
-                        {"text": {"content": "Intelligent task routing and performance monitoring for Cursor, Roo, and Continue AI tools with real-time coordination metrics."}}
+                        {"text": {"content": "Intelligent task routing and performance monitoring for Cursor, , and Continue AI tools with real-time coordination metrics."}}
                     ]
                 }
             },
@@ -233,7 +233,7 @@ class EnhancedProjectDashboard:
                             "type": "table_row",
                             "table_row": {
                                 "cells": [
-                                    [{"text": {"content": "Roo", "annotations": {"bold": True}}}],
+                                    [{"text": {"content": "", "annotations": {"bold": True}}}],
                                     [{"text": {"content": "Complex workflows, architecture"}}],
                                     [{"text": {"content": "Research, design, multi-step tasks"}}]
                                 ]

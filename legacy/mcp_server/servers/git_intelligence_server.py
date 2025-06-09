@@ -20,7 +20,6 @@ class GitIntelligenceServer:
 
     def __init__(self):
         self.server = Server("git-intelligence")
-        self.project_root = Path.cwd()
         self._setup_handlers()
 
     def _setup_handlers(self):
@@ -156,7 +155,6 @@ class GitIntelligenceServer:
                 ["git"] + args,
                 capture_output=True,
                 text=True,
-                cwd=self.project_root
             )
             if result.returncode == 0:
                 return result.stdout.strip()

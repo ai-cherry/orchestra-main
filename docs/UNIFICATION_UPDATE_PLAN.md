@@ -73,10 +73,8 @@ jobs:
         uses: appleboy/ssh-action@v0.1.5
         with:
           host: 45.32.69.157
-          username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd /root/cherry_ai-main
             git pull origin main
             make validate
             make restart-services

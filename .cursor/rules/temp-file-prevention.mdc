@@ -8,7 +8,6 @@ alwaysApply: false
 ## Forbidden File Creations
 - **No README.md files** unless explicitly requested and they replace existing docs
 - **No CHANGELOG.md, NOTES.md, TODO.md** or similar meta-documentation
-- **No temporary scripts** in root directory or `/tmp/` locations
 - **No .backup, .old, .temp file extensions** 
 - **No standalone utility scripts** without integration into existing modules
 - **No "documentation for documentation's sake"**

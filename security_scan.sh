@@ -122,7 +122,6 @@ class SecurityScanner:
     
     def scan_directory(self, directory: str):
         """Scan all files in directory"""
-        for root, dirs, files in os.walk(directory):
             # Skip certain directories
             dirs[:] = [d for d in dirs if d not in self.skip_dirs]
             
@@ -131,7 +130,6 @@ class SecurityScanner:
                 if Path(file).suffix in self.skip_extensions:
                     continue
                     
-                filepath = os.path.join(root, file)
                 self.stats['files_scanned'] += 1
                 
                 findings = self.scan_file(filepath)

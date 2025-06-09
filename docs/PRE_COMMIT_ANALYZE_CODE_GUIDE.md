@@ -70,7 +70,6 @@ If you encounter issues with the code analysis:
    ```
 
 2. **Verify paths**:
-   The wrapper assumes `analyze_code.sh` is in the project root. If it's elsewhere, update the path in `analyze_code_wrapper.py`.
 
 3. **Debug output**:
    Both scripts have verbose output to help diagnose issues. Look for error messages in the terminal.

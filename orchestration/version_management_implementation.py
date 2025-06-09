@@ -27,7 +27,6 @@ class Version:
     
     async def scan_python_packages(self) -> Dict[str, Component]:
         """Scan Python dependencies"""
-        req_dir = self.root_dir / "requirements"
         if req_dir.exists():
             for req_file in req_dir.glob("*.txt"):
                 with open(req_file) as f:
@@ -44,7 +43,6 @@ class Version:
                                 )
         
         # Scan pyproject.toml
-        pyproject_path = self.root_dir / "pyproject.toml"
         if pyproject_path.exists():
             with open(pyproject_path) as f:
                 data = yaml.safe_load(f)  # toml would be better but using yaml for simplicity
@@ -54,7 +52,6 @@ class Version:
     
     async def scan_npm_packages(self) -> Dict[str, Component]:
         """Scan JavaScript/npm dependencies"""
-        package_json = self.root_dir / "admin-ui" / "package.json"
         if package_json.exists():
             with open(package_json) as f:
                 data = json.load(f)
@@ -72,7 +69,6 @@ class Version:
     
     async def scan_docker_images(self) -> Dict[str, Component]:
         """Scan Docker images from Dockerfiles"""
-        for dockerfile in self.root_dir.glob("**/Dockerfile*"):
             with open(dockerfile) as f:
                 content = f.read()
                 
@@ -98,7 +94,6 @@ class Version:
     
     async def scan_database_schemas(self) -> Dict[str, Component]:
         """Scan database schema versions"""
-        migrations_dir = self.root_dir / "migrations"
         if migrations_dir.exists():
             versions = []
             for migration in migrations_dir.glob("*.sql"):
@@ -119,7 +114,6 @@ class Version:
     
     async def scan_infrastructure(self) -> Dict[str, Component]:
         """Scan infrastructure versions (Pulumi, etc.)"""
-        for pulumi_yaml in self.root_dir.glob("**/Pulumi.yaml"):
             with open(pulumi_yaml) as f:
                 data = yaml.safe_load(f)
                 
@@ -153,8 +147,6 @@ class DependencyGraph:
 
 class VersionManager:
     """Main version management conductor"""
-        self.registry_path = root_dir / ".versions.yaml"
-        self.lock_path = root_dir / ".versions.lock"
         
     async def initialize(self):
         """Initialize version management system"""
@@ -198,13 +190,10 @@ async def main():
     """Main entry point for version management"""
     parser = argparse.ArgumentParser(description="cherry_ai Version Management")
     parser.add_argument('command', choices=['scan', 'report', 'lock', 'update', 'init'])
-    parser.add_argument('--root', default='.', help='Project root directory')
     parser.add_argument('--output', help='Output file for reports')
     
     args = parser.parse_args()
     
-    root_dir = Path(args.root).resolve()
-    manager = VersionManager(root_dir)
     
     if args.command == 'init':
         await manager.initialize()

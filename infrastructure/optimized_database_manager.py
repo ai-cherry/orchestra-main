@@ -510,7 +510,6 @@ class MCPKnowledgePopulator:
         return [
             {
                 "key": "docker_optimization",
-                "content": "Multi-stage Docker builds with Python 3.10 slim base images. Use specific version tags, minimize layers, implement security best practices with non-root users. Configure for optimal AI workload performance.",
                 "metadata": {"tags": ["docker", "optimization", "security"], "quality_score": 0.9},
                 "high_frequency": True
             },

@@ -30,7 +30,6 @@ class LambdaServerComponent(ComponentResource):
 
         conn = command.remote.ConnectionArgs(
             host=self.server.main_ip,
-            user="root",
             private_key=config.get("ssh_private_key"),
         )
 
@@ -48,7 +47,5 @@ VOLUME_ID="{volume_id}"
 SNAP_ID=$(Lambda-cli snapshot create "$VOLUME_ID" | awk '{{print $NF}}')
 echo "Snapshot $SNAP_ID created" >> /var/log/Lambda-snapshot.log
 EOF
-                chmod +x /root/snapshot.sh
-                (crontab -l 2>/dev/null || echo "") | grep -v 'snapshot.sh' | {{ cat; echo '0 3 * * * /root/snapshot.sh'; }} | crontab -
             """
         self.register_outputs({"ip": self.server.main_ip, "volume_id": self.volume.id})

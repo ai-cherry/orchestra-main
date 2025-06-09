@@ -24,7 +24,6 @@ class UnifiedAuthDiscoveryIntegration:
     def __init__(self):
         self.auth_manager = get_auth_manager()
         self.discovery_system = AIAgentDiscoverySystem()
-        self.project_root = Path.cwd()
         self.api_key = os.getenv("cherry_ai_API_KEY", "")
         
     def integrate_systems(self):
@@ -67,7 +66,6 @@ class UnifiedAuthDiscoveryIntegration:
     
     def _update_smart_router_auth(self):
         """Update smart router with single-user authentication."""
-        router_path = self.project_root / "mcp_smart_router.py"
         
         router_content = '''#!/usr/bin/env python3
 """
@@ -231,7 +229,6 @@ if __name__ == "__main__":
         }
         
         # Save updated discovery data
-        discovery_path = self.project_root / "mcp_discovery.json"
         with open(discovery_path, 'w') as f:
             json.dump(discovery_data, f, indent=2)
         
@@ -310,7 +307,6 @@ echo "💡 Test with:"
 echo "  curl -H 'X-API-Key: ${{cherry_ai_API_KEY}}' http://localhost:8010/discover"
 '''
         
-        script_path = self.project_root / "start_unified_cherry_ai.sh"
         with open(script_path, 'w') as f:
             f.write(startup_script)
         script_path.chmod(0o755)

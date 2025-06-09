@@ -30,12 +30,10 @@ jobs:
         uses: appleboy/ssh-action@v1.2.2
         with:
           host: 45.32.69.157
-          username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             set -e
             echo "🚀 Fast Deploy Mode - Single Developer Optimized"
-            cd /root/orchestra-main
             
             # Quick pull and essential checks only
             git pull origin main
@@ -60,12 +58,10 @@ jobs:
         uses: appleboy/ssh-action@v1.2.2
         with:
           host: 45.32.69.157
-          username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             set -e
             echo "🔍 Thorough Deploy Mode - Full Validation"
-            cd /root/orchestra-main
             
             git pull origin main
             
@@ -82,10 +78,8 @@ jobs:
         uses: appleboy/ssh-action@v1.2.2
         with:
           host: 45.32.69.157
-          username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd /root/orchestra-main
             echo "🏥 Post-deploy health check..."
             python3 -c "
             print('✅ Infrastructure: Online')

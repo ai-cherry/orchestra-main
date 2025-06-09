@@ -16,8 +16,7 @@ def load_workflow(workflow_path):
         logger.error(f"Error loading workflow: {e}")
         return None
 
-def execute_roo_workflow(workflow_def):
-    """Execute a workflow using Roo's workflow manager."""
+    """Execute a workflow using 's workflow manager."""
         #     "description", "Execute strategic analysis workflow"
         # )
         # subtasks = workflow_def.get("steps", [])
@@ -42,7 +41,6 @@ def execute_roo_workflow(workflow_def):
 
 
         pass
-        logger.error("Workflow manager not available. Make sure roo_workflow_manager.py is available.")
         return None
     except Exception:
 
@@ -61,7 +59,6 @@ def main():
         sys.exit(1)
 
     # Execute the workflow
-    result = execute_roo_workflow(workflow_def)
     if result:
         print("\n" + "=" * 80)
         print("STRATEGIC ANALYSIS RESULTS")

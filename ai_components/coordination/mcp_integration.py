@@ -12,9 +12,8 @@
     async def execute(self, task: Dict[str, Any]) -> Dict[str, Any]:
         """Execute a task and return results"""
         """Return agent capabilities"""
-    """Roo AI coding assistant integration"""
-        super().__init__("roo_agent", "Roo AI Assistant")
-        self.api_endpoint = os.getenv("ROO_API_ENDPOINT", "http://localhost:8001")
+    """ AI coding assistant integration"""
+        self.api_endpoint = os.getenv("_API_ENDPOINT", "http://localhost:8001")
         
     def get_capabilities(self) -> List[AgentCapability]:
         return [
@@ -39,7 +38,7 @@
         ]
     
     async def execute(self, task: Dict[str, Any]) -> Dict[str, Any]:
-        """Execute Roo agent task"""
+        """Execute  agent task"""
         self.status = "executing"
         self.current_task = task
         
@@ -47,7 +46,7 @@
 
         
             pass
-            # Simulate Roo API call - replace with actual integration
+            # Simulate  API call - replace with actual integration
             async with aiohttp.ClientSession() as session:
                 async with session.post(
                     f"{self.api_endpoint}/execute",
@@ -63,7 +62,7 @@
 
             
             pass
-            logger.error(f"Roo agent execution error: {e}")
+            logger.error(f" agent execution error: {e}")
             self.status = "error"
             raise
 
@@ -163,7 +162,7 @@ class MCPContextManager:
 
 
 class UnifiedContextManager(MCPContextManager):
-    """Extended context manager with Roo integration and Weaviate indexing."""
+    """Extended context manager with  integration and Weaviate indexing."""
         """
         """
         """Initialize Weaviate client for vector indexing."""
@@ -183,10 +182,10 @@ class UnifiedContextManager(MCPContextManager):
                 timeout_config=(5, 15)  # Connect timeout, read timeout
             )
 
-            # Create schema for Roo outputs if not exists
+            # Create schema for  outputs if not exists
             schema = {
-                "class": "RooOutput",
-                "description": "Outputs from Roo AI modes",
+                "class": "Output",
+                "description": "Outputs from  AI modes",
                 "properties": [
                     {
                         "name": "content",
@@ -196,7 +195,7 @@ class UnifiedContextManager(MCPContextManager):
                     {
                         "name": "mode",
                         "dataType": ["string"],
-                        "description": "The Roo mode that generated this",
+                        "description": "The  mode that generated this",
                     },
                     {
                         "name": "task",
@@ -224,9 +223,9 @@ class UnifiedContextManager(MCPContextManager):
                 }
             }
 
-            if not self.weaviate_client.schema.exists("RooOutput"):
+            if not self.weaviate_client.schema.exists("Output"):
                 self.weaviate_client.schema.create_class(schema)
-                logger.info("Created Weaviate schema for RooOutput")
+                logger.info("Created Weaviate schema for Output")
 
         except Exception:
 
@@ -241,26 +240,18 @@ class UnifiedContextManager(MCPContextManager):
     ) -> Dict[str, Any]:
         """
         """
-            if source == "roo":
-                # Transform Roo context to MCP format
-                mcp_context = await self.roo_adapter.transform_context(
-                    "roo", "mcp", context
+                # Transform  context to MCP format
                 )
                 await self.store_context(session_id, mcp_context)
 
                 # Index in Weaviate if available
                 if self.weaviate_client and "result" in context:
-                    await self._index_roo_output(session_id, context)
 
                 return mcp_context
 
             elif source == "conductor":
-                # Transform MCP context to Roo format
-                roo_context = await self.roo_adapter.transform_context(
-                    "mcp", "roo", context
+                # Transform MCP context to  format
                 )
-                self.mode_contexts[session_id] = roo_context
-                return roo_context
 
             else:
                 raise ValueError(f"Unknown context source: {source}")
@@ -272,7 +263,6 @@ class UnifiedContextManager(MCPContextManager):
             logger.error(f"Context sync error: {e}")
             raise
 
-    async def _index_roo_output(
         self, session_id: str, context: Dict[str, Any]
     ) -> None:
         """
@@ -289,7 +279,7 @@ class UnifiedContextManager(MCPContextManager):
             await loop.run_in_executor(
                 None,
                 lambda: self.weaviate_client.data_object.create(
-                    data_object=data_object, class_name="RooOutput"
+                    data_object=data_object, class_name="Output"
                 )
             )
             
@@ -300,7 +290,6 @@ class UnifiedContextManager(MCPContextManager):
             pass
             logger.error(f"Weaviate indexing error: {e}")
 
-    async def search_roo_outputs(
         self, query: str, mode: Optional[str] = None, limit: int = 5
     ) -> List[Dict[str, Any]]:
         """
@@ -311,14 +300,14 @@ class UnifiedContextManager(MCPContextManager):
                 }
 
             result = (
-                self.weaviate_client.query.get("RooOutput", ["content", "mode", "task", "timestamp"])
+                self.weaviate_client.query.get("Output", ["content", "mode", "task", "timestamp"])
                 .with_near_text({"concepts": [query]})
                 .with_where(where_filter)
                 .with_limit(limit)
                 .do()
             )
 
-            return result.get("data", {}).get("Get", {}).get("RooOutput", [])
+            return result.get("data", {}).get("Get", {}).get("Output", [])
 
         except Exception:
 
@@ -330,8 +319,8 @@ class UnifiedContextManager(MCPContextManager):
     async def track_mode_transition(
         self,
         session_id: str,
-        from_mode: RooMode,
-        to_mode: RooMode,
+        from_mode: Mode,
+        to_mode: Mode,
         context: Dict[str, Any],
     ) -> None:
         """

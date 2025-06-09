@@ -3,19 +3,13 @@
 ## 🚀 Quick Start
 ```bash
 # SSH to server
-ssh -i ~/.ssh/Lambda_cherry_ai root@45.32.69.157
 
 # Start development
-cd /root/cherry_ai-main
 source venv/bin/activate
 ./scripts/start_mcp_for_coding.sh
 ```
 
 ## 📁 Key Directories
-- **App**: `/root/cherry_ai-main/agent/`
-- **MCP**: `/root/cherry_ai-main/mcp_server/`
-- **Database**: `/root/cherry_ai-main/shared/database/`
-- **Scripts**: `/root/cherry_ai-main/scripts/`
 
 ## 🔧 Common Commands
 ```bash

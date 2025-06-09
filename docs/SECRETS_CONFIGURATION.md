@@ -178,7 +178,6 @@ API_BASE_URL=https://api.cherry-ai.me
 3. Add each secret with its name and value
 
 ### Local Development
-Create a `.env` file in the project root:
 ```bash
 # Copy from .env.example and fill in your values
 cp .env.example .env

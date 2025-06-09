@@ -22,7 +22,6 @@ def run_command(cmd: str, check: bool = True) -> subprocess.CompletedProcess:
 def check_mcp_optimization() -> Dict[str, bool]:
     """Check if MCP is optimized for single developer"""
     try:
-        with open('.roo/mcp.json', 'r') as f:
             config = json.load(f)
         
         single_dev_config = config.get('single_developer_config', {})

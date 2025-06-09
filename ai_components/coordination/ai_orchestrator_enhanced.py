@@ -15,7 +15,7 @@ class AgentRole(Enum):
     """Agent roles in the coordination"""
     ANALYZER = "analyzer"  # EigenCode or Mock Analyzer
     IMPLEMENTER = "implementer"  # Cursor AI
-    REFINER = "refiner"  # Roo Code
+    REFINER = "refiner"  #  Code
 
 
 class TaskPriority(Enum):
@@ -204,10 +204,10 @@ class CursorAIAgent:
         return result
 
 
-class RooCodeAgent:
-    """Enhanced Roo Code agent for refinement"""
-        """Execute Roo Code refinement"""
-        logger.info(f"Roo Code refining: {task.inputs.get('technology_stack')}")
+class CodeAgent:
+    """Enhanced  Code agent for refinement"""
+        """Execute  Code refinement"""
+        logger.info(f" Code refining: {task.inputs.get('technology_stack')}")
         
         # Simulate refinement with performance tracking
         start_time = time.time()
@@ -493,7 +493,6 @@ class EnhancedWorkflowconductor:
             name="Analyze Codebase with EigenCode/Mock Analyzer",
             agent_role=AgentRole.ANALYZER,
             inputs={
-                "codebase_path": "/root/cherry_ai-main",
                 "options": {
                     "depth": "comprehensive",
                     "include_metrics": True,
@@ -514,7 +513,7 @@ cache_key = os.getenv("ORCHESTRA_AI_ORCHESTRATOR_ENHANCED_KEY", "")
         ),
         TaskDefinition(
             task_id="refine_stack",
-            name="Refine Technology Stack with Roo Code",
+            name="Refine Technology Stack with  Code",
             agent_role=AgentRole.REFINER,
             inputs={"technology_stack": "python_postgres_weaviate"},
             dependencies=["implement_changes"],

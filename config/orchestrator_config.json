@@ -68,12 +68,10 @@
     "notification_webhook": null,
     "enable_notifications": false
   },
-  "roo_integration": {
     "enabled": true,
     "openrouter_api_key_env": "OPENROUTER_API_KEY",
     "mode_mappings": {
       "code": {
-        "agent_id": "roo_code_agent",
         "capabilities": [
           "code_generation",
           "code_review",
@@ -92,7 +90,6 @@
         ]
       },
       "architect": {
-        "agent_id": "roo_architect_agent",
         "capabilities": [
           "system_design",
           "architecture_review",
@@ -110,7 +107,6 @@
         ]
       },
       "ask": {
-        "agent_id": "roo_ask_agent",
         "capabilities": [
           "question_answering",
           "explanation",
@@ -125,10 +121,8 @@
         ]
       },
       "debug": {
-        "agent_id": "roo_debug_agent",
         "capabilities": [
           "error_analysis",
-          "root_cause_analysis",
           "fix_suggestion",
           "testing"
         ],
@@ -143,7 +137,6 @@
         ]
       },
       "conductor": {
-        "agent_id": "roo_conductor_agent",
         "capabilities": [
           "task_decomposition",
           "agent_coordination",
@@ -161,7 +154,6 @@
         ]
       },
       "strategy": {
-        "agent_id": "roo_strategy_agent",
         "capabilities": [
           "technology_selection",
           "optimization_planning",
@@ -178,7 +170,6 @@
         ]
       },
       "research": {
-        "agent_id": "roo_research_agent",
         "capabilities": [
           "best_practices_research",
           "benchmarking",
@@ -195,7 +186,6 @@
         ]
       },
       "analytics": {
-        "agent_id": "roo_analytics_agent",
         "capabilities": [
           "metrics_analysis",
           "performance_monitoring",
@@ -212,7 +202,6 @@
         ]
       },
       "implementation": {
-        "agent_id": "roo_implementation_agent",
         "capabilities": [
           "deployment",
           "process_execution",
@@ -229,7 +218,6 @@
         ]
       },
       "quality": {
-        "agent_id": "roo_quality_agent",
         "capabilities": [
           "validation",
           "performance_verification",
@@ -246,7 +234,6 @@
         ]
       },
       "documentation": {
-        "agent_id": "roo_documentation_agent",
         "capabilities": [
           "documentation_generation",
           "process_documentation",
@@ -298,7 +285,6 @@
     },
     "weaviate_integration": {
       "enabled": true,
-      "index_roo_outputs": true,
       "semantic_search": true,
       "vector_dimensions": 1536
     }

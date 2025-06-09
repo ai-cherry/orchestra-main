@@ -52,7 +52,6 @@ def setup_logging(level: str = "INFO", json_format: bool = True, log_file: Optio
             )
         )
 
-    root_logger.addHandler(console_handler)
 
     # File handler if specified
     if log_file:
@@ -61,7 +60,6 @@ def setup_logging(level: str = "INFO", json_format: bool = True, log_file: Optio
             file_handler.setFormatter(JSONFormatter())
         else:
             file_handler.setFormatter(logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
-        root_logger.addHandler(file_handler)
 
     # Reduce noise from chatty libraries
     logging.getLogger("urllib3").setLevel(logging.WARNING)

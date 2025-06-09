@@ -74,7 +74,6 @@ apt install -y prometheus-node-exporter
 systemctl enable prometheus-node-exporter
 systemctl start prometheus-node-exporter
 
-echo "Database server setup complete" > /root/setup_complete.txt
 """
         
         data = {
@@ -126,9 +125,7 @@ systemctl start prometheus-node-exporter
 
 # Clone orchestra-main repository (placeholder)
 mkdir -p /opt/orchestra-staging
-chown -R root:root /opt/orchestra-staging
 
-echo "Staging server setup complete" > /root/setup_complete.txt
 """
         
         data = {

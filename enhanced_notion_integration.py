@@ -7,7 +7,7 @@ Features:
 - Latest Notion API (2024-12-20) with ntn_ token format
 - Enterprise Search integration
 - AI-powered automation and workflows
-- Cross-tool integration (Roo/Continue/Cursor)
+- Cross-tool integration (/Continue/Cursor)
 - Patrick Instructions automation
 - Real-time project tracking
 - Advanced database schemas
@@ -330,7 +330,7 @@ class EnhancedNotionIntegration:
                 "select": {
                     "options": [
                         {"name": "Cursor", "color": "blue"},
-                        {"name": "Roo Coder", "color": "green"},
+                        {"name": " Coder", "color": "green"},
                         {"name": "Continue", "color": "purple"},
                         {"name": "Manual", "color": "gray"}
                     ]
@@ -385,7 +385,7 @@ class EnhancedNotionIntegration:
                 "select": {
                     "options": [
                         {"name": "Cursor", "color": "blue"},
-                        {"name": "Roo", "color": "green"},
+                        {"name": "", "color": "green"},
                         {"name": "Continue", "color": "purple"},
                         {"name": "Manual", "color": "gray"}
                     ]

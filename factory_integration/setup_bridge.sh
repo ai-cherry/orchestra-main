@@ -15,7 +15,7 @@ NC='\033[0m' # No Color
 
 # Script directory
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+PROJECT_T="$(dirname "$SCRIPT_DIR")"
 
 # Log functions
 log_info() {
@@ -34,10 +34,7 @@ log_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
 
-# Check if running as root
-check_root() {
     if [[ $EUID -eq 0 ]]; then
-        log_error "This script should not be run as root"
         exit 1
     fi
 }
@@ -127,13 +124,13 @@ setup_pulumi() {
     log_info "Setting up Pulumi configuration..."
     
     # Create Pulumi directory if it doesn't exist
-    mkdir -p "${PROJECT_ROOT}/pulumi"
+    mkdir -p "${PROJECT_T}/pulumi"
     
     # Set Pulumi passphrase
     export PULUMI_CONFIG_PASSPHRASE="${PULUMI_CONFIG_PASSPHRASE}"
     
     # Initialize Pulumi stack if not exists
-    cd "${PROJECT_ROOT}/pulumi"
+    cd "${PROJECT_T}/pulumi"
     
     if [[ ! -f "Pulumi.yaml" ]]; then
         log_info "Initializing Pulumi project..."
@@ -154,29 +151,29 @@ setup_pulumi() {
     
     log_success "Pulumi configuration completed"
     
-    cd "${PROJECT_ROOT}"
+    cd "${PROJECT_T}"
 }
 
 # Create Python virtual environment
 setup_python_env() {
     log_info "Setting up Python virtual environment..."
     
-    if [[ ! -d "${PROJECT_ROOT}/venv" ]]; then
-        python3 -m venv "${PROJECT_ROOT}/venv"
+    if [[ ! -d "${PROJECT_T}/venv" ]]; then
+        python3 -m venv "${PROJECT_T}/venv"
         log_success "Virtual environment created"
     else
         log_info "Virtual environment already exists"
     fi
     
     # Activate virtual environment
-    source "${PROJECT_ROOT}/venv/bin/activate"
+    source "${PROJECT_T}/venv/bin/activate"
     
     # Upgrade pip
     pip install --upgrade pip
     
     # Install required packages
     log_info "Installing Python dependencies..."
-    pip install -r "${PROJECT_ROOT}/requirements/factory-bridge.txt" 2>/dev/null || {
+    pip install -r "${PROJECT_T}/requirements/factory-bridge.txt" 2>/dev/null || {
         log_warning "factory-bridge.txt not found, installing base packages..."
         pip install \
             fastapi \
@@ -199,7 +196,7 @@ setup_python_env() {
 create_systemd_services() {
     log_info "Creating systemd service files..."
     
-    local service_dir="${PROJECT_ROOT}/factory_integration/services"
+    local service_dir="${PROJECT_T}/factory_integration/services"
     mkdir -p "$service_dir"
     
     # Factory Bridge API service
@@ -211,11 +208,11 @@ After=network.target
 [Service]
 Type=exec
 User=$USER
-WorkingDirectory=${PROJECT_ROOT}
-Environment="PATH=${PROJECT_ROOT}/venv/bin:/usr/local/bin:/usr/bin:/bin"
-Environment="PYTHONPATH=${PROJECT_ROOT}"
-EnvironmentFile=${PROJECT_ROOT}/.env
-ExecStart=${PROJECT_ROOT}/venv/bin/uvicorn factory_integration.api.gateway:app --host 0.0.0.0 --port 8080
+WorkingDirectory=${PROJECT_T}
+Environment="PATH=${PROJECT_T}/venv/bin:/usr/local/bin:/usr/bin:/bin"
+Environment="PYTHONPATH=${PROJECT_T}"
+EnvironmentFile=${PROJECT_T}/.env
+ExecStart=${PROJECT_T}/venv/bin/uvicorn factory_integration.api.gateway:app --host 0.0.0.0 --port 8080
 Restart=always
 RestartSec=10
 
@@ -232,11 +229,11 @@ After=network.target factory-bridge-api.service
 [Service]
 Type=exec
 User=$USER
-WorkingDirectory=${PROJECT_ROOT}
-Environment="PATH=${PROJECT_ROOT}/venv/bin:/usr/local/bin:/usr/bin:/bin"
-Environment="PYTHONPATH=${PROJECT_ROOT}"
-EnvironmentFile=${PROJECT_ROOT}/.env
-ExecStart=${PROJECT_ROOT}/venv/bin/python -m factory_integration.context_sync
+WorkingDirectory=${PROJECT_T}
+Environment="PATH=${PROJECT_T}/venv/bin:/usr/local/bin:/usr/bin:/bin"
+Environment="PYTHONPATH=${PROJECT_T}"
+EnvironmentFile=${PROJECT_T}/.env
+ExecStart=${PROJECT_T}/venv/bin/python -m factory_integration.context_sync
 Restart=always
 RestartSec=30
 
@@ -312,8 +309,8 @@ create_config_files() {
     log_info "Creating configuration files..."
     
     # Create .env file if it doesn't exist
-    if [[ ! -f "${PROJECT_ROOT}/.env" ]]; then
-        cat > "${PROJECT_ROOT}/.env" << EOF
+    if [[ ! -f "${PROJECT_T}/.env" ]]; then
+        cat > "${PROJECT_T}/.env" << EOF
 # Factory AI Configuration
 FACTORY_AI_API_KEY=${FACTORY_AI_API_KEY}
 FACTORY_AI_BASE_URL=${FACTORY_AI_BASE_URL:-https://api.factoryai.com/v1}
@@ -351,7 +348,6 @@ main() {
     echo ""
     
     # Check prerequisites
-    check_root
     
     # Validate environment
     validate_environment

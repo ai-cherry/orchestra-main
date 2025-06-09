@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   description: "Advanced AI admin interface with sophisticated agent swarm management",
 }
 
-export default function RootLayout({
+export default function tLayout({
   children,
 }: {
   children: React.ReactNode

@@ -11,7 +11,6 @@ echo "▶ Using Lambda Project ID: ${PROJECT_ID}"
 echo "▶ Setting up Lambda platform-admin service account..."
 KEY_TMP="/workspace/credentials.json" # Using /workspace as it's typically available
 
-# Ensure the directory for credentials.json exists if it's not /workspace root
 mkdir -p "$(dirname "$KEY_TMP")"
 
 # 1. Pull platform-admin SA key from Secret Manager

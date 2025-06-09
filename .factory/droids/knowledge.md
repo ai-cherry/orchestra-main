@@ -10,10 +10,10 @@ The Knowledge Droid specializes in documentation, knowledge management, and cont
 - **Learning Extraction**: Captures lessons learned and best practices
 - **Semantic Search**: Enables intelligent knowledge discovery
 
-## Integration with Roo
+## Integration with 
 - Maps to: `memory_server.py`
 - Context sharing: Documentation, code comments, project history
-- Fallback: Roo's memory system handles requests if Factory AI is unavailable
+- Fallback: 's memory system handles requests if Factory AI is unavailable
 
 ## Request Format
 ```json

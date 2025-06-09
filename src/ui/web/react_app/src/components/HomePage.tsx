@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../store/store';
+import { tState } from '../store/store';
 import { setActivePersona, addMessage, clearHistory } from '../store/slices/chatSlice';
 import { PersonaSelector } from './PersonaSelector';
 import { SearchModeSelector } from './SearchModeSelector';
@@ -59,7 +59,7 @@ const PERSONAS: Persona[] = [
 
 export const HomePage: React.FC = () => {
   const dispatch = useDispatch();
-  const { activePersona, messages, isLoading } = useSelector((state: RootState) => state.chat);
+  const { activePersona, messages, isLoading } = useSelector((state: tState) => state.chat);
   const [searchMode, setSearchMode] = useState<string>('normal');
   const [searchInput, setSearchInput] = useState<string>('');
   const [showAdvanced, setShowAdvanced] = useState<boolean>(false);

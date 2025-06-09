@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 """
-CONFIG_DIR = PROJECT_ROOT / "config"
+CONFIG_DIR = PROJECT_T / "config"
 MODE_CONFIG_PATH = CONFIG_DIR / "mode_definitions.yaml"
 WORKFLOW_STATE_PATH = CONFIG_DIR / "workflow_state.yaml"
 

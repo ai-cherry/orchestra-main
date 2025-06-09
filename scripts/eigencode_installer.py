@@ -123,7 +123,6 @@
     
     async def install_from_file(self, file_path: str) -> bool:
         """Attempt to install from downloaded file"""
-            install_dir = "/root/.eigencode/bin"
             os.makedirs(install_dir, exist_ok=True)
             
             if "gzip" in file_type or "tar" in file_type:

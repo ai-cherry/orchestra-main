@@ -16,32 +16,26 @@
         pass
         return False, f"Error: {str(e)}"
 
-def find_python_files(root_dir: Path) -> List[Path]:
     """Find all Python files in the project."""
     skip_dirs = {".venv", "venv", "__pycache__", ".git", "node_modules", ".mypy_cache"}
 
-    for root, dirs, files in os.walk(root_dir):
         # Remove skip directories from the search
         dirs[:] = [d for d in dirs if d not in skip_dirs]
 
         for file in files:
             if file.endswith(".py"):
-                python_files.append(Path(root) / file)
 
     return python_files
 
 def main():
     """Main function to validate all Python files."""
-    print(f"🔍 Validating Python syntax in: {root_dir}")
     print("=" * 60)
 
-    python_files = find_python_files(root_dir)
     print(f"Found {len(python_files)} Python files\n")
 
     errors = []
 
     for file_path in python_files:
-        relative_path = file_path.relative_to(root_dir)
         valid, message = validate_python_file(file_path)
 
         if not valid:

@@ -134,10 +134,9 @@ app.add_middleware(
 # Include routers
 app.include_router(conversation.router, prefix="/api/v1")
 
-# Root endpoint
+# t endpoint
 @app.get("/")
-async def root():
-    """Root endpoint."""
+    """t endpoint."""
     return {"name": "Cherry AI API", "version": "1.0.0", "status": "running"}
 
 # Health check endpoint

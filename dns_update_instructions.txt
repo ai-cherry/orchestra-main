@@ -6,7 +6,6 @@ DELETE the existing A record pointing to: 34.160.252.197
 ADD these new A records:
 
 Type: A
-Name: @ (or leave blank for root domain)
 Value: 45.32.69.157
 TTL: 300
 

@@ -12,7 +12,6 @@ cherry_ai-main/
 │   ├── check_venv.py           # Virtual environment validation
 │   └── check_dependencies.py   # Dependency checking
 │
-├── ai_context_*.py            # AI context files (root level)
 │   ├── ai_context_planner.py  # Planning phase guidance
 │   ├── ai_context_coder.py    # Coding patterns & examples
 │   ├── ai_context_reviewer.py # Review checklist

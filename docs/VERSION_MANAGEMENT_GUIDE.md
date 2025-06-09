@@ -136,7 +136,6 @@ Real-time monitoring with:
 python scripts/version_manager.py init
 
 # Scan dependencies
-python scripts/version_manager.py scan [--root PATH] [--verbose]
 
 # Check vulnerabilities
 python scripts/version_manager.py check [--output FILE]

@@ -25,8 +25,6 @@ class ToolManager:
         self.tools[tool]["config"]
 
         # Execute based on the tool type
-        if tool == "roo":
-            return self._execute_roo(mode, prompt, context)
         elif tool == "cline":
             return self._execute_cline(mode, prompt, context)
         elif tool == "gemini":
@@ -37,13 +35,10 @@ class ToolManager:
         logger.error(f"Unsupported tool: {tool}")
         return None
 
-    def _execute_roo(self, mode: str, prompt: str, context: Optional[str] = None) -> Optional[str]:
         """
         """
-            cmd = ["roo-cli", mode, prompt]
             if context:
                 # Write context to a temporary file
-                context_file = Path("/tmp/roo_context.txt")
                 with open(context_file, "w") as f:
                     f.write(context)
                 cmd.extend(["--context-file", str(context_file)])
@@ -54,12 +49,11 @@ class ToolManager:
         except Exception:
 
             pass
-            logger.error("roo-cli not found in PATH")
             return None
         except Exception:
 
             pass
-            logger.error(f"Error executing Roo: {e}")
+            logger.error(f"Error executing : {e}")
             return None
         except Exception:
 

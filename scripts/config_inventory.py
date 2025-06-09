@@ -1,12 +1,10 @@
 import json
 import os
 
-CONFIG_ROOTS = ["config", "./", "infra", "conductor", "core", "mcp_server"]
+CONFIG_TS = ["config", "./", "infra", "conductor", "core", "mcp_server"]
 config_files = []
 env_files = []
 
-for root in CONFIG_ROOTS:
-    for dirpath, dirnames, filenames in os.walk(root):
         for fname in filenames:
             path = os.path.join(dirpath, fname)
             if fname.endswith((".yaml", ".yml", ".json")):

@@ -6,8 +6,6 @@
     """Unified CLI for Cherry AI platform with real agents."""
         self.api_url = "http://localhost:8000"
         self.os.getenv("API_KEY")
-        self.project_root = Path(__file__).parent.parent
-        self.venv_path = self.project_root / "venv"
         self.python_cmd = str(self.venv_path / "bin" / "python")
 
     def check_python_version(self) -> bool:
@@ -105,7 +103,6 @@
 
         # Start API server
         print("Starting API server...")
-        os.chdir(self.project_root)
         subprocess.Popen(
             [self.python_cmd, "-m", "uvicorn", "agent.app.main:app", "--host", "0.0.0.0", "--port", "8000"],
             stdout=open("api.log", "w"),

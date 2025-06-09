@@ -161,7 +161,6 @@ Multiple LLM configuration files:
 - `config/litellm_config.yaml`
 - `core/business/llm/provider.py`
 - `core/conductor/src/services/llm/providers.py`
-- `.roo/scripts/portkey-router.js`
 
 ### Recommended Action
 Single source of truth in `admin-ui/src/config/ai.config.ts`:

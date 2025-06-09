@@ -10,10 +10,10 @@ The Code Droid specializes in code generation, refactoring, and optimization. It
 - **Pattern Implementation**: Applies design patterns appropriately
 - **Standards Compliance**: Ensures code follows project conventions
 
-## Integration with Roo
+## Integration with 
 - Maps to: `tools_server.py`
 - Context sharing: Code style, project structure, dependencies
-- Fallback: Roo's code mode handles requests if Factory AI is unavailable
+- Fallback: 's code mode handles requests if Factory AI is unavailable
 
 ## Request Format
 ```json

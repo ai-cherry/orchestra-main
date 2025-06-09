@@ -2,7 +2,6 @@
 """
 """
     """cherry_aites next phase of AI system development"""
-        self.base_dir = Path("/root/cherry_ai-main")
         self.phases = {
             "agent_management": {
                 "priority": 1,

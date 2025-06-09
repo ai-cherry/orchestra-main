@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 AI Coding Helpers MCP Integration Verification Script
-Ensures all AI services (Roo, Cursor, Factory AI, Claude, OpenAI) are properly configured 
+Ensures all AI services (, Cursor, Factory AI, Claude, OpenAI) are properly configured 
 to leverage MCP server setup for optimal contextualization.
 """
 
@@ -34,7 +34,6 @@ class AIServiceConfig:
 
 class MCPIntegrationVerifier:
     def __init__(self):
-        self.workspace_root = Path.cwd()
         self.mcp_servers: List[MCPServerConfig] = []
         self.ai_services: List[AIServiceConfig] = []
         self.issues: List[str] = []
@@ -45,7 +44,6 @@ class MCPIntegrationVerifier:
         print("🔍 Loading configurations...")
         
         # Load main MCP configuration
-        main_mcp_config = self.workspace_root / ".mcp.json"
         if main_mcp_config.exists():
             with open(main_mcp_config) as f:
                 config = json.load(f)
@@ -94,12 +92,10 @@ class MCPIntegrationVerifier:
             ("Claude", "claude_mcp_config.json"),
             ("OpenAI", "openai_mcp_config.json"), 
             ("Cursor", ".cursor/mcp.json"),
-            ("Roo", ".roo/mcp.json"),
             ("Factory AI", ".factory-ai-config")
         ]
         
         for service_name, config_file in ai_configs:
-            config_path = self.workspace_root / config_file
             if config_path.exists():
                 try:
                     with open(config_path) as f:
@@ -169,7 +165,7 @@ class MCPIntegrationVerifier:
                 status_checks.append("memory" in servers)
                 status_checks.append("tools" in servers)
                 
-            elif service.name == "Roo":
+            elif service.name == "":
                 servers = config.get("mcpServers", {})
                 status_checks.append(len(servers) > 0)
                 status_checks.append("memory" in servers)
@@ -266,13 +262,11 @@ echo "AI Services configured:"
 echo "  - Claude (via claude_mcp_config.json)"
 echo "  - OpenAI (via openai_mcp_config.json)"
 echo "  - Cursor (via .cursor/mcp.json)"
-echo "  - Roo (via .roo/mcp.json)"
 echo "  - Factory AI (via .factory-ai-config)"
 echo ""
 echo "Ready for enhanced AI coding with full contextualization! 🤖✨"
 """
         
-        script_path = self.workspace_root / "start_comprehensive_ai_system.sh"
         with open(script_path, 'w') as f:
             f.write(startup_script)
         os.chmod(script_path, 0o755)

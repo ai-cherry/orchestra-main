@@ -62,16 +62,12 @@ def check_configurations():
     configs = {
         "Cursor Rules": Path(".cursorrules").exists(),
         "Continue.dev Config": Path(".continue/config.json").exists(), 
-        "Roo Main Config": Path(".roo/config.json").exists(),
-        "Roo MCP Config": Path(".roo/mcp.json").exists(),
-        "Roo Modes Directory": Path(".roo/modes").exists(),
         "Patrick Instructions": Path("PATRICK_INSTRUCTIONS.md").exists(),
         "AI Coding Instructions": Path("AI_CODING_INSTRUCTIONS.md").exists(),
         "Notion AI Notes": Path("NOTION_AI_NOTES.md").exists()
     }
     
-    # Check Roo mode files have custom instructions
-    mode_files = list(Path(".roo/modes").glob("*.json")) if Path(".roo/modes").exists() else []
+    # Check  mode files have custom instructions
     detailed_modes = 0
     for mode_file in mode_files:
         try:
@@ -111,7 +107,7 @@ def main():
         status = "✅" if exists else "❌"
         print(f"   {status} {name}")
     
-    print(f"\n🤖 ROO MODES:")
+    print(f"\n🤖  MODES:")
     print(f"   ✅ Total modes: {total_modes}")
     print(f"   ✅ Detailed modes with custom instructions: {detailed_modes}")
     
@@ -125,7 +121,7 @@ def main():
         print("🎉 ALL SYSTEMS READY!")
         print("🚀 Ready for AI-accelerated development with:")
         print("   - Continue.dev UI-GPT-4O (OpenAI)")
-        print("   - Roo specialized modes (OpenRouter)")
+        print("   -  specialized modes (OpenRouter)")
         print("   - Cross-tool integration")
         print("   - Comprehensive documentation")
     else:
@@ -133,7 +129,6 @@ def main():
     
     print("\n🎯 NEXT: Test the systems!")
     print("   Continue.dev: Try /ui command in VS Code")
-    print("   Roo: Run 'roo code' or 'roo architect'")
     print("   MCP: Deploy servers with ./start_mcp_system_enhanced.sh")
 
 if __name__ == "__main__":

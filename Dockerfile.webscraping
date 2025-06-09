@@ -74,7 +74,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libvulkan1 \
     && rm -rf /var/lib/apt/lists/*
 
-# Create non-root user
 RUN groupadd --system webscraper && useradd --system --gid webscraper webscraper
 
 # Copy built wheels from builder stage
@@ -102,7 +101,6 @@ COPY enhanced_vector_memory_system.py ${APP_HOME}/
 # Set proper permissions
 RUN chown -R webscraper:webscraper ${APP_HOME}
 
-# Switch to non-root user
 USER webscraper
 
 # Expose the port

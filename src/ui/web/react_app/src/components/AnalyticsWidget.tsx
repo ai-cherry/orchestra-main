@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { RootState } from '../store/store';
+import { tState } from '../store/store';
 import { ChartBarIcon, ClockIcon, UserIcon, CpuChipIcon, BoltIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 
 export const AnalyticsWidget: React.FC = () => {
-  const { analytics, totalMessages } = useSelector((state: RootState) => state.chat);
-  const { metrics, services, isConnected } = useSelector((state: RootState) => state.system);
-  const { metrics: agentMetrics } = useSelector((state: RootState) => state.agent);
+  const { analytics, totalMessages } = useSelector((state: tState) => state.chat);
+  const { metrics, services, isConnected } = useSelector((state: tState) => state.system);
+  const { metrics: agentMetrics } = useSelector((state: tState) => state.agent);
   
   const [currentTime, setCurrentTime] = useState(new Date());
 
