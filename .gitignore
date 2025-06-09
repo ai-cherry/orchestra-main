@@ -105,3 +105,5 @@ yarn-error.log*
 .yarn-integrity
 .env
 # API Keys and secrets
+# Pulumi stack files (contain secrets/state)
+**/Pulumi.*.yaml

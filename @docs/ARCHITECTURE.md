@@ -59,8 +59,7 @@ Secrets live **only** in Secret Manager; Cloud Run mounts them as env vars.
 - `infra/`
   - `__main__.py` (Pulumi main program)
   - `Pulumi.yaml` (Project definition)
-  - `Pulumi.dev.yaml` (Dev stack configuration)
-  - `Pulumi.prod.yaml` (Prod stack configuration)
+  - `Pulumi.<stack>.yaml` (Stack configs; contain secrets/state and should not be version controlled. Use `pulumi stack export` and `pulumi stack import` to back up or restore.)
   - `requirements.txt` (Python dependencies for Pulumi)
   - `config.py` (Optional: shared configuration logic for Pulumi programs)
   - `modules/` (Optional: reusable Pulumi components, e.g., `cloud_run_service.py`)
