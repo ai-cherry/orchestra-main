@@ -3,7 +3,7 @@
   "setup_version": "2.0 - Live Execution",
   "root_page_id": "20bdba04940280ca9ba7f9bce721f547",
   "root_page_url": "https://www.notion.so/Orchestra-AI-Workspace-20bdba04940280ca9ba7f9bce721f547",
-  "api_token": "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",
+  "api_token": "SET_NOTION_API_TOKEN_ENV_VAR",
   "databases": {
     "\ud83c\udfaf Epic & Feature Tracking": "20bdba04-9402-8114-b57b-df7f1d4b2712",
     "\ud83d\udccb Task Management": "20bdba04-9402-81a2-99f3-e69dc37b73d6",

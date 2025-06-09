@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-🎯 Unified MCP Server for Orchestra AI Ecosystem
+🎯 Unified MCP Server for Orchestra AI - Clean & Simple Implementation
 Provides shared context and capabilities across Cursor, Roo, and Continue
 Integrated with Notion workspace for centralized project management
 """
@@ -8,109 +8,130 @@ Integrated with Notion workspace for centralized project management
 import asyncio
 import json
 import logging
+import os
 from typing import Dict, List, Any, Optional
 from dataclasses import dataclass
-from pathlib import Path
-import requests
 from datetime import datetime
+import requests
 
 # MCP imports
 from mcp.server import Server
 from mcp import types
-from mcp.server.models import InitializationOptions
 from mcp.server.stdio import stdio_server
+
+# Local imports
+try:
+    from config.notion_config import get_config, NotionConfig
+except ImportError:
+    # Fallback for simple setup
+    @dataclass
+    class NotionConfig:
+        api_token: str
+        workspace_id: str
+        databases: Dict[str, str]
+    
+    def get_config():
+        from dataclasses import dataclass
+        
+        @dataclass
+        class SimpleDatabases:
+            mcp_connections: str = "20bdba04940281aea36af6144ec68df2"
+            code_reflection: str = "20bdba049402814d8e53fbec166ef030"
+            ai_tool_metrics: str = "20bdba049402813f8404fa8d5f615b02"
+            task_management: str = "20bdba04940281a299f3e69dc37b73d6"
+        
+        # Simple environment-based config with development fallbacks
+        api_token = os.getenv("NOTION_API_TOKEN")
+        if not api_token:
+            api_token = "ntn_development_fallback"
+            print("⚠️  MCP Server using development fallback for NOTION_API_TOKEN")
+        
+        return NotionConfig(
+            api_token=api_token,
+            workspace_id=os.getenv("NOTION_WORKSPACE_ID", "20bdba04940280ca9ba7f9bce721f547"),
+            databases=SimpleDatabases()
+        )
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-@dataclass
-class ToolContext:
-    """Context information for different tools"""
-    tool_name: str
-    active_files: List[str]
-    current_task: Optional[str]
-    context_data: Dict[str, Any]
-    last_updated: datetime
-
-class NotionIntegration:
-    """Notion API integration for MCP server"""
+class SimpleNotionIntegration:
+    """Simple Notion API integration for MCP server logging"""
     
-    def __init__(self):
-        self.api_key = "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"
+    def __init__(self, config: NotionConfig):
+        self.config = config
         self.headers = {
-            "Authorization": f"Bearer {self.api_key}",
+            "Authorization": f"Bearer {config.api_token}",
             "Content-Type": "application/json",
             "Notion-Version": "2022-06-28"
         }
-        self.databases = {
-            "mcp_connections": "20bdba04940281aea36af6144ec68df2",
-            "code_reflection": "20bdba049402814d8e53fbec166ef030",
-            "ai_tool_metrics": "20bdba049402813f8404fa8d5f615b02",
-            "task_management": "20bdba04940281a299f3e69dc37b73d6"
-        }
     
-    async def log_mcp_activity(self, tool_name: str, activity: str, context: Dict[str, Any]):
-        """Log MCP activity to Notion"""
+    async def log_activity(self, tool_name: str, activity: str, context: Dict[str, Any] = None):
+        """Log MCP activity to Notion - simple implementation"""
+        if not context:
+            context = {}
+            
         try:
-            url = f"https://api.notion.com/v1/pages"
+            url = "https://api.notion.com/v1/pages"
             data = {
-                "parent": {"database_id": self.databases["mcp_connections"]},
+                "parent": {"database_id": self.config.databases.mcp_connections},
                 "properties": {
                     "Tool": {"title": [{"text": {"content": tool_name}}]},
                     "Activity": {"rich_text": [{"text": {"content": activity}}]},
                     "Status": {"select": {"name": "Active"}},
-                    "Context": {"rich_text": [{"text": {"content": json.dumps(context, indent=2)[:2000]}}]}
+                    "Context": {"rich_text": [{"text": {"content": json.dumps(context, indent=2)[:2000]}}]},
+                    "Timestamp": {"date": {"start": datetime.now().isoformat()}}
                 }
             }
             
-            response = requests.post(url, headers=self.headers, json=data)
+            response = requests.post(url, headers=self.headers, json=data, timeout=10)
             return response.status_code == 200
         except Exception as e:
-            logger.error(f"Failed to log MCP activity: {e}")
+            logger.error(f"Failed to log to Notion: {e}")
             return False
     
-    async def update_tool_metrics(self, tool_name: str, metrics: Dict[str, Any]):
+    async def update_metrics(self, tool_name: str, metrics: Dict[str, Any]):
         """Update tool performance metrics in Notion"""
         try:
-            url = f"https://api.notion.com/v1/pages"
+            url = "https://api.notion.com/v1/pages"
             data = {
-                "parent": {"database_id": self.databases["ai_tool_metrics"]},
+                "parent": {"database_id": self.config.databases.ai_tool_metrics},
                 "properties": {
                     "Tool": {"title": [{"text": {"content": tool_name}}]},
                     "Metric Type": {"select": {"name": "Performance"}},
                     "Value": {"number": metrics.get("response_time", 0)},
-                    "Details": {"rich_text": [{"text": {"content": json.dumps(metrics, indent=2)[:2000]}}]}
+                    "Status": {"select": {"name": "Good"}},
+                    "Details": {"rich_text": [{"text": {"content": json.dumps(metrics, indent=2)[:2000]}}]},
+                    "Timestamp": {"date": {"start": datetime.now().isoformat()}}
                 }
             }
             
-            response = requests.post(url, headers=self.headers, json=data)
+            response = requests.post(url, headers=self.headers, json=data, timeout=10)
             return response.status_code == 200
         except Exception as e:
-            logger.error(f"Failed to update tool metrics: {e}")
+            logger.error(f"Failed to update metrics: {e}")
             return False
 
-class UnifiedContextManager:
-    """Manages shared context between Cursor, Roo, and Continue with Notion integration"""
+class ContextManager:
+    """Simple context management for tool coordination"""
     
-    def __init__(self):
-        self.contexts: Dict[str, ToolContext] = {}
+    def __init__(self, notion: SimpleNotionIntegration):
+        self.tool_contexts: Dict[str, Dict[str, Any]] = {}
         self.shared_memory: Dict[str, Any] = {}
-        self.notion = NotionIntegration()
+        self.notion = notion
         
     async def register_tool(self, tool_name: str) -> bool:
-        """Register a new tool for context sharing"""
-        if tool_name not in self.contexts:
-            self.contexts[tool_name] = ToolContext(
-                tool_name=tool_name,
-                active_files=[],
-                current_task=None,
-                context_data={},
-                last_updated=datetime.now()
-            )
+        """Register a tool for context sharing"""
+        if tool_name not in self.tool_contexts:
+            self.tool_contexts[tool_name] = {
+                "active_files": [],
+                "current_task": None,
+                "context_data": {},
+                "last_updated": datetime.now().isoformat()
+            }
             
-            # Log registration to Notion
-            await self.notion.log_mcp_activity(
+            await self.notion.log_activity(
                 tool_name, 
                 "Tool Registration", 
                 {"registered_at": datetime.now().isoformat()}
@@ -121,85 +142,70 @@ class UnifiedContextManager:
         return False
     
     async def update_context(self, tool_name: str, context: Dict[str, Any]) -> bool:
-        """Update context for a specific tool"""
-        if tool_name in self.contexts:
-            self.contexts[tool_name].context_data.update(context)
-            self.contexts[tool_name].last_updated = datetime.now()
+        """Update context for a tool"""
+        if tool_name in self.tool_contexts:
+            self.tool_contexts[tool_name]["context_data"].update(context)
+            self.tool_contexts[tool_name]["last_updated"] = datetime.now().isoformat()
             
             # Sync important context to shared memory
-            await self._sync_to_shared_memory(tool_name, context)
+            if tool_name == "cursor" and "file_changes" in context:
+                self.shared_memory["recent_changes"] = context["file_changes"]
+            elif tool_name == "roo" and "architecture" in context:
+                self.shared_memory["architecture"] = context["architecture"]
+            elif tool_name == "continue" and "ui_components" in context:
+                self.shared_memory["components"] = context["ui_components"]
             
-            # Log context update to Notion
-            await self.notion.log_mcp_activity(
+            await self.notion.log_activity(
                 tool_name,
                 "Context Update",
-                {"updated_keys": list(context.keys()), "timestamp": datetime.now().isoformat()}
+                {"updated_keys": list(context.keys())}
             )
             
             return True
         return False
     
-    async def get_shared_context(self, requesting_tool: str) -> Dict[str, Any]:
-        """Get shared context for a requesting tool"""
-        # Filter context based on requesting tool's needs
+    def get_context_for_tool(self, requesting_tool: str) -> Dict[str, Any]:
+        """Get relevant context for a requesting tool"""
+        base_context = {
+            "workspace_url": f"https://www.notion.so/Orchestra-AI-Workspace-{self.notion.config.workspace_id}",
+            "last_sync": datetime.now().isoformat()
+        }
+        
         if requesting_tool == "cursor":
-            context = {
+            base_context.update({
                 "active_files": self._get_all_active_files(),
                 "recent_changes": self.shared_memory.get("recent_changes", []),
-                "current_architecture": self.shared_memory.get("architecture", {}),
-                "notion_workspace": "https://www.notion.so/Orchestra-AI-Workspace-20bdba04940280ca9ba7f9bce721f547"
-            }
+                "architecture": self.shared_memory.get("architecture", {})
+            })
         elif requesting_tool == "roo":
-            context = {
+            base_context.update({
                 "project_context": self.shared_memory.get("project_context", {}),
-                "active_workflows": self.shared_memory.get("workflows", []),
-                "mcp_servers": self.shared_memory.get("mcp_servers", {}),
-                "notion_databases": self.notion.databases
-            }
+                "workflows": self.shared_memory.get("workflows", []),
+                "mcp_servers": {"status": "active", "tools": list(self.tool_contexts.keys())}
+            })
         elif requesting_tool == "continue":
-            context = {
+            base_context.update({
                 "ui_context": self.shared_memory.get("ui_context", {}),
-                "component_library": self.shared_memory.get("components", {}),
-                "design_system": self.shared_memory.get("design_system", {}),
-                "admin_interface": "/orchestra-admin-mvp/"
-            }
-        else:
-            context = self.shared_memory
+                "components": self.shared_memory.get("components", {}),
+                "design_system": self.shared_memory.get("design_system", {})
+            })
         
-        # Log context access
-        await self.notion.log_mcp_activity(
-            requesting_tool,
-            "Context Access",
-            {"context_keys": list(context.keys()), "timestamp": datetime.now().isoformat()}
-        )
-        
-        return context
+        return base_context
     
     def _get_all_active_files(self) -> List[str]:
-        """Get all active files across all tools"""
+        """Get all active files across tools"""
         all_files = []
-        for context in self.contexts.values():
-            all_files.extend(context.active_files)
-        return list(set(all_files))  # Remove duplicates
-    
-    async def _sync_to_shared_memory(self, tool_name: str, context: Dict[str, Any]):
-        """Sync important context to shared memory"""
-        # Sync based on tool type and context importance
-        if tool_name == "cursor" and "file_changes" in context:
-            self.shared_memory["recent_changes"] = context["file_changes"]
-        elif tool_name == "roo" and "architecture" in context:
-            self.shared_memory["architecture"] = context["architecture"]
-        elif tool_name == "continue" and "ui_components" in context:
-            self.shared_memory["components"] = context["ui_components"]
-        
-        # Always update last sync time
-        self.shared_memory["last_sync"] = datetime.now().isoformat()
+        for context in self.tool_contexts.values():
+            all_files.extend(context.get("active_files", []))
+        return list(set(all_files))
 
 class OrchestralMCPServer:
-    """Unified MCP Server for Orchestra AI Ecosystem with Notion Integration"""
+    """Unified MCP Server - Clean & Simple Implementation"""
     
     def __init__(self):
-        self.context_manager = UnifiedContextManager()
+        self.config = get_config()
+        self.notion = SimpleNotionIntegration(self.config)
+        self.context_manager = ContextManager(self.notion)
         self.server = Server("orchestra-unified")
         self._setup_tools()
     
@@ -222,18 +228,6 @@ class OrchestralMCPServer:
                     }
                 ),
                 types.Tool(
-                    name="update_context",
-                    description="Update context for a specific tool",
-                    inputSchema={
-                        "type": "object",
-                        "properties": {
-                            "tool_name": {"type": "string"},
-                            "context": {"type": "object"},
-                        },
-                        "required": ["tool_name", "context"]
-                    }
-                ),
-                types.Tool(
                     name="get_shared_context",
                     description="Get shared context for optimal tool coordination",
                     inputSchema={
@@ -246,7 +240,7 @@ class OrchestralMCPServer:
                 ),
                 types.Tool(
                     name="route_task",
-                    description="Route a task to the optimal tool (cursor, roo, or continue)",
+                    description="Route a task to the optimal tool",
                     inputSchema={
                         "type": "object",
                         "properties": {
@@ -258,29 +252,18 @@ class OrchestralMCPServer:
                     }
                 ),
                 types.Tool(
-                    name="sync_project_state",
-                    description="Synchronize project state across all tools and Notion",
-                    inputSchema={
-                        "type": "object",
-                        "properties": {
-                            "force_sync": {"type": "boolean", "default": False},
-                            "include_notion": {"type": "boolean", "default": True},
-                        }
-                    }
-                ),
-                types.Tool(
                     name="get_notion_workspace",
-                    description="Get Notion workspace information and database links",
+                    description="Get Notion workspace information",
                     inputSchema={
                         "type": "object",
                         "properties": {
-                            "database_type": {"type": "string", "enum": ["all", "project", "ai_coding", "personas", "operations"]},
+                            "info_type": {"type": "string", "enum": ["workspace", "databases", "all"]},
                         }
                     }
                 ),
                 types.Tool(
-                    name="log_reflection",
-                    description="Log insights and reflections to Notion for continuous improvement",
+                    name="log_insight",
+                    description="Log insights and reflections to Notion",
                     inputSchema={
                         "type": "object",
                         "properties": {
@@ -305,18 +288,9 @@ class OrchestralMCPServer:
                     text=f"Tool {tool_name} {'registered successfully' if success else 'already registered'}"
                 )]
             
-            elif name == "update_context":
-                tool_name = arguments["tool_name"]
-                context = arguments["context"]
-                success = await self.context_manager.update_context(tool_name, context)
-                return [types.TextContent(
-                    type="text",
-                    text=f"Context {'updated' if success else 'update failed'} for {tool_name}"
-                )]
-            
             elif name == "get_shared_context":
                 requesting_tool = arguments["requesting_tool"]
-                context = await self.context_manager.get_shared_context(requesting_tool)
+                context = self.context_manager.get_context_for_tool(requesting_tool)
                 return [types.TextContent(
                     type="text",
                     text=json.dumps(context, indent=2)
@@ -327,228 +301,141 @@ class OrchestralMCPServer:
                 task_type = arguments["task_type"]
                 complexity = arguments.get("complexity", "medium")
                 
-                # Intelligent task routing with Notion integration
-                optimal_tool = self._route_task_to_tool(task_type, complexity, task_description)
+                optimal_tool = self._route_task(task_type, complexity, task_description)
+                reason = self._get_routing_reason(optimal_tool, task_type, complexity)
                 
-                # Log routing decision to Notion
-                await self.context_manager.notion.log_mcp_activity(
+                await self.notion.log_activity(
                     "task_router",
                     "Task Routing",
                     {
                         "task": task_description,
                         "type": task_type,
                         "complexity": complexity,
-                        "routed_to": optimal_tool,
-                        "timestamp": datetime.now().isoformat()
+                        "routed_to": optimal_tool
                     }
                 )
                 
                 return [types.TextContent(
                     type="text",
-                    text=f"Optimal tool for task: {optimal_tool}\nReason: {self._get_routing_reason(optimal_tool, task_type, complexity)}"
-                )]
-            
-            elif name == "sync_project_state":
-                force_sync = arguments.get("force_sync", False)
-                include_notion = arguments.get("include_notion", True)
-                await self._sync_project_state(force_sync, include_notion)
-                return [types.TextContent(
-                    type="text",
-                    text="Project state synchronized across all tools and Notion"
+                    text=f"Optimal tool: {optimal_tool}\nReason: {reason}"
                 )]
             
             elif name == "get_notion_workspace":
-                database_type = arguments.get("database_type", "all")
-                workspace_info = self._get_notion_workspace_info(database_type)
+                info_type = arguments.get("info_type", "all")
+                workspace_info = self._get_workspace_info(info_type)
                 return [types.TextContent(
                     type="text",
                     text=json.dumps(workspace_info, indent=2)
                 )]
             
-            elif name == "log_reflection":
+            elif name == "log_insight":
                 tool_name = arguments["tool_name"]
                 insight = arguments["insight"]
                 category = arguments["category"]
                 
-                # Log reflection to Notion
-                success = await self._log_reflection_to_notion(tool_name, insight, category)
-                
+                success = await self._log_insight(tool_name, insight, category)
                 return [types.TextContent(
                     type="text",
-                    text=f"Reflection {'logged successfully' if success else 'logging failed'} for {tool_name}"
+                    text=f"Insight {'logged successfully' if success else 'logging failed'}"
                 )]
             
             else:
                 raise ValueError(f"Unknown tool: {name}")
     
-    def _route_task_to_tool(self, task_type: str, complexity: str, description: str) -> str:
-        """Route task to optimal tool based on type and complexity"""
+    def _route_task(self, task_type: str, complexity: str, description: str) -> str:
+        """Simple task routing logic"""
+        description_lower = description.lower()
         
-        # Notion-related tasks
-        if task_type == "notion" or "notion" in description.lower():
-            return "roo"  # Roo handles Notion integration best
+        # Notion tasks go to Roo
+        if task_type == "notion" or "notion" in description_lower:
+            return "roo"
         
-        # UI-related tasks go to Continue (UI-GPT-4o)
-        if task_type == "ui" or "component" in description.lower() or "interface" in description.lower():
+        # UI tasks go to Continue
+        if task_type == "ui" or any(word in description_lower for word in ["component", "interface", "react", "ui"]):
             return "continue"
         
-        # Complex workflows and orchestration go to Roo
-        if task_type == "workflow" or complexity == "complex" or "boomerang" in description.lower():
+        # Complex workflows go to Roo
+        if task_type == "workflow" or complexity == "complex" or "research" in description_lower:
             return "roo"
         
-        # Research tasks go to Roo (specialized research mode)
-        if task_type == "research" or "research" in description.lower():
-            return "roo"
-        
-        # Simple coding and debugging go to Cursor
+        # Simple coding goes to Cursor
         if task_type in ["coding", "debug"] and complexity in ["simple", "medium"]:
             return "cursor"
         
-        # Complex coding goes to Roo (specialized modes)
-        if task_type == "coding" and complexity == "complex":
-            return "roo"
-        
-        # Default to Cursor for general tasks
+        # Default to Cursor
         return "cursor"
     
     def _get_routing_reason(self, tool: str, task_type: str, complexity: str) -> str:
-        """Get explanation for routing decision"""
+        """Get routing explanation"""
         reasons = {
-            "continue": "UI-GPT-4o excels at React/TypeScript component generation and UI tasks",
-            "roo": "Specialized modes and boomerang tasks handle complex workflows and Notion integration optimally",
-            "cursor": "Native AI integration provides best experience for general coding tasks"
+            "continue": "UI-GPT-4o excels at React/TypeScript and UI development",
+            "roo": "Specialized modes handle complex workflows and research optimally", 
+            "cursor": "Native AI integration provides best experience for general coding"
         }
         return reasons.get(tool, "General purpose tool selection")
     
-    def _get_notion_workspace_info(self, database_type: str) -> Dict[str, Any]:
-        """Get Notion workspace information"""
-        base_url = "https://www.notion.so/Orchestra-AI-Workspace-20bdba04940280ca9ba7f9bce721f547"
+    def _get_workspace_info(self, info_type: str) -> Dict[str, Any]:
+        """Get workspace information"""
+        base_url = f"https://www.notion.so/Orchestra-AI-Workspace-{self.config.workspace_id}"
         
-        all_databases = {
-            "project": {
-                "epic_tracking": "https://notion.so/20bdba0494028114b57bdf7f1d4b2712",
-                "task_management": "https://notion.so/20bdba04940281a299f3e69dc37b73d6",
-                "development_log": "https://notion.so/20bdba04940281fd9558d66c07d9576c"
-            },
-            "ai_coding": {
-                "coding_rules": "https://notion.so/20bdba04940281bdadf1e78f4e0989e8",
-                "mcp_connections": "https://notion.so/20bdba04940281aea36af6144ec68df2",
-                "code_reflection": "https://notion.so/20bdba049402814d8e53fbec166ef030",
-                "tool_metrics": "https://notion.so/20bdba049402813f8404fa8d5f615b02"
-            },
-            "personas": {
-                "cherry_features": "https://notion.so/20bdba04940281629e3cfa8c8e41fd16",
-                "sophia_features": "https://notion.so/20bdba049402811d83b4cdc1a2505623",
-                "karen_features": "https://notion.so/20bdba049402819cb2cad3d3828691e6"
-            },
-            "operations": {
-                "patrick_instructions": "https://notion.so/20bdba04940281b49890e663db2b50a3",
-                "knowledge_base": "https://notion.so/20bdba04940281a4bc27e06d160e3378"
+        workspace_info = {
+            "workspace_url": base_url,
+            "databases": {
+                "mcp_connections": f"{base_url}?v=mcp",
+                "ai_tool_metrics": f"{base_url}?v=metrics", 
+                "task_management": f"{base_url}?v=tasks",
+                "code_reflection": f"{base_url}?v=reflection"
             }
         }
         
-        if database_type == "all":
-            return {"workspace_url": base_url, "databases": all_databases}
-        elif database_type in all_databases:
-            return {"workspace_url": base_url, "databases": {database_type: all_databases[database_type]}}
+        if info_type == "workspace":
+            return {"workspace_url": base_url}
+        elif info_type == "databases":
+            return {"databases": workspace_info["databases"]}
         else:
-            return {"workspace_url": base_url, "databases": {}}
+            return workspace_info
     
-    async def _log_reflection_to_notion(self, tool_name: str, insight: str, category: str) -> bool:
-        """Log reflection to Notion code reflection database"""
+    async def _log_insight(self, tool_name: str, insight: str, category: str) -> bool:
+        """Log insight to Notion code reflection database"""
         try:
-            url = f"https://api.notion.com/v1/pages"
+            url = "https://api.notion.com/v1/pages"
             data = {
-                "parent": {"database_id": self.context_manager.notion.databases["code_reflection"]},
+                "parent": {"database_id": self.config.databases.code_reflection},
                 "properties": {
                     "Tool": {"title": [{"text": {"content": tool_name}}]},
                     "Category": {"select": {"name": category.title()}},
                     "Insight": {"rich_text": [{"text": {"content": insight}}]},
                     "Status": {"select": {"name": "New"}},
-                    "Priority": {"select": {"name": "Medium"}}
+                    "Priority": {"select": {"name": "Medium"}},
+                    "Date": {"date": {"start": datetime.now().isoformat()}}
                 }
             }
             
-            response = requests.post(url, headers=self.context_manager.notion.headers, json=data)
+            response = requests.post(url, headers=self.notion.headers, json=data, timeout=10)
             return response.status_code == 200
         except Exception as e:
-            logger.error(f"Failed to log reflection: {e}")
+            logger.error(f"Failed to log insight: {e}")
             return False
-    
-    async def _sync_project_state(self, force_sync: bool = False, include_notion: bool = True):
-        """Synchronize project state across all tools and Notion"""
-        logger.info(f"Synchronizing project state (force: {force_sync}, notion: {include_notion})")
-        
-        # Read current project files
-        project_files = self._scan_project_files()
-        
-        # Update shared memory with current state
-        self.context_manager.shared_memory.update({
-            "project_files": project_files,
-            "last_sync": datetime.now().isoformat(),
-            "sync_forced": force_sync,
-            "notion_included": include_notion
-        })
-        
-        # Log sync to Notion if enabled
-        if include_notion:
-            await self.context_manager.notion.log_mcp_activity(
-                "sync_manager",
-                "Project State Sync",
-                {
-                    "files_scanned": len(project_files.get("source_files", [])),
-                    "force_sync": force_sync,
-                    "timestamp": datetime.now().isoformat()
-                }
-            )
-    
-    def _scan_project_files(self) -> Dict[str, Any]:
-        """Scan project files for current state"""
-        project_root = Path.cwd()
-        important_files = {
-            "config_files": [],
-            "source_files": [],
-            "documentation": [],
-            "notion_integration": []
-        }
-        
-        # Scan for important file types
-        for file_path in project_root.rglob("*"):
-            if file_path.is_file() and not any(part.startswith('.') for part in file_path.parts[1:]):
-                if file_path.suffix in [".py", ".ts", ".tsx", ".js", ".jsx"]:
-                    important_files["source_files"].append(str(file_path))
-                elif file_path.suffix in [".md", ".txt", ".rst"]:
-                    important_files["documentation"].append(str(file_path))
-                elif file_path.name in [".roomodes", ".continue", "package.json", "requirements.txt"]:
-                    important_files["config_files"].append(str(file_path))
-                elif "notion" in file_path.name.lower():
-                    important_files["notion_integration"].append(str(file_path))
-        
-        return important_files
 
 async def main():
-    """Main entry point for the unified MCP server"""
-    server_instance = OrchestralMCPServer()
+    """Main server execution"""
+    logger.info("🚀 Starting Orchestra AI Unified MCP Server")
     
-    # Initialize context for known tools
-    await server_instance.context_manager.register_tool("cursor")
-    await server_instance.context_manager.register_tool("roo")
-    await server_instance.context_manager.register_tool("continue")
+    # Test Notion connection
+    config = get_config()
+    notion = SimpleNotionIntegration(config)
     
-    logger.info("Starting Orchestra Unified MCP Server with Notion Integration...")
+    # Log server startup
+    await notion.log_activity("mcp_server", "Server Startup", {"version": "2.0", "clean_rewrite": True})
+    
+    # Start MCP server
+    server = OrchestralMCPServer()
     
     async with stdio_server() as (read_stream, write_stream):
-        await server_instance.server.run(
+        await server.server.run(
             read_stream,
             write_stream,
-            InitializationOptions(
-                server_name="orchestra-unified",
-                server_version="2.0.0",
-                            capabilities=server_instance.server.get_capabilities(
-                notification_options=types.NotificationParams(),
-                experimental_capabilities={}
-            )
-            )
+            None  # Initialize options
         )
 
 if __name__ == "__main__":
