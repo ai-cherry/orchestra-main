@@ -264,4 +264,6 @@ Some services aren't available through Portkey and require direct API keys:
 ## Notes
 - The `ROOT_API_KEY` should be a strong, randomly generated key and managed with extreme care.
 - For PostgreSQL, ensure the `DATABASE_URL` includes credentials with appropriate, limited permissions for the application.
-- Weaviate Cloud API keys are managed through the Weaviate Cloud console. 
+- Weaviate Cloud API keys are managed through the Weaviate Cloud console.
+
+# All secrets now pertain to Lambda Labs, Vercel, PostgreSQL, Redis, Pinecone, Weaviate, and Airbyte. No AWS secrets are required or supported. 

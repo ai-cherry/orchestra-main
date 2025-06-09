@@ -9,7 +9,6 @@ asyncpg>=0.27.0
 
 # ETL and Orchestration
 prefect>=2.14.0,<3.0.0
-prefect-aws>=0.4.0  # For S3 result storage if needed
 prefect-slack>=0.2.0  # For Slack notifications
 
 # Entity Resolution

@@ -332,7 +332,7 @@ if __name__ == "__main__":
         experiment_config = {
             "tracking_server": {
                 "backend_store_uri": "postgresql://user:pass@localhost/mlflow",
-                "artifact_store_uri": "s3://bucket/mlflow-artifacts",
+                "artifact_store_uri": "http://minio:9000/mlflow-artifacts",
                 "host": "0.0.0.0",
                 "port": 5000
             },
