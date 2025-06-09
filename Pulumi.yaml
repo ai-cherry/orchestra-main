@@ -1,7 +1,0 @@
-name: orchestra-ai-production
-runtime:
-  name: typescript
-  options:
-    packagemanager: pnpm
-description: Orchestra AI Production Infrastructure for cherry-ai.me
-

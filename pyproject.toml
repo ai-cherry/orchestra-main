@@ -7,6 +7,9 @@ packages = [{include = "orchestra_core", from = "src"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
+requests = "^2.32.0"
+redis = "^5.0.4"
+psycopg2-binary = "^2.9.9"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^4.2.0"
