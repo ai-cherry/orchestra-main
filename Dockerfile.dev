@@ -1,7 +1,7 @@
-FROM python:3.10-bullseye
+FROM python:3.10.13-bullseye
 
 # Install system dependencies
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     vim \
     curl \
@@ -12,7 +12,8 @@ RUN apt-get update && apt-get install -y \
 
 # Install Node.js 18
 RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
-    && apt-get install -y nodejs
+    && apt-get update && apt-get install -y --no-install-recommends nodejs \
+    && rm -rf /var/lib/apt/lists/*
 
 # Install Poetry
 RUN pip install --upgrade pip \

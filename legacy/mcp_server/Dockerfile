@@ -1,4 +1,4 @@
-FROM python:3.10-slim
+FROM python:3.10.13-slim
 
 WORKDIR /app
 
@@ -14,6 +14,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
 COPY mcp_server/ .
+
+# Create non-root user
+RUN useradd -m -u 1000 mcp && chown -R mcp:mcp /app
+USER mcp
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1

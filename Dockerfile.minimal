@@ -1,4 +1,4 @@
-FROM python:3.10-slim
+FROM python:3.10.13-slim
 
 WORKDIR /app
 
@@ -10,6 +10,10 @@ RUN pip install --no-cache-dir -r requirements-minimal.txt
 COPY core/ ./core/
 COPY agent/ ./agent/
 COPY packages/ ./packages/
+
+# Create non-root user
+RUN useradd -m -u 1000 orchestra && chown -R orchestra:orchestra /app
+USER orchestra
 
 # Run the app
 CMD ["gunicorn", "core.orchestrator.src.api.app:app", "-k", "uvicorn.workers.UvicornWorker", "-w", "4", "-b", "0.0.0.0:8000"]

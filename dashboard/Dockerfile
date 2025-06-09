@@ -2,7 +2,7 @@
 # Optimized for production deployment with minimal image size
 
 # Stage 1: Dependencies
-FROM node:18-alpine AS deps
+FROM node:18.19.0-alpine AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
@@ -13,7 +13,7 @@ COPY package.json package-lock.json* ./
 RUN npm ci --only=production
 
 # Stage 2: Builder
-FROM node:18-alpine AS builder
+FROM node:18.19.0-alpine AS builder
 WORKDIR /app
 
 # Copy dependencies from deps stage
@@ -28,7 +28,7 @@ ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 RUN npm run build
 
 # Stage 3: Runner
-FROM node:18-alpine AS runner
+FROM node:18.19.0-alpine AS runner
 WORKDIR /app
 
 # Set production environment

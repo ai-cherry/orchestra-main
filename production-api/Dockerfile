@@ -1,12 +1,12 @@
 # Cherry-AI Production Deployment Configuration
 
 ## Docker Configuration
-FROM python:3.11-slim
+FROM python:3.10.13-slim
 
 WORKDIR /app
 
 # Install system dependencies
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     postgresql-client \
     redis-tools \
     curl \
