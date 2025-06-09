@@ -32,7 +32,7 @@ PGPASSWORD=orch3str4_2024 psql -h localhost -U conductor -d conductor -c "SELECT
 
 **API Server:**
 - URL: `http://localhost:8080`
-- API Key: `4010007a9aa5443fc717b54e1fd7a463260965ec9e2fce297280cf86f1b3a4bd`
+ - API Key: `<api-key>`
 
 ## MCP Server Ports
 

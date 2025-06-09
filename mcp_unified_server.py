@@ -43,12 +43,12 @@ except ImportError:
         # Simple environment-based config with development fallbacks
         api_token = os.getenv("NOTION_API_TOKEN")
         if not api_token:
-            api_token = "ntn_development_fallback"
-            print("⚠️  MCP Server using development fallback for NOTION_API_TOKEN")
+            print("⚠️  NOTION_API_TOKEN not set; using empty token")
+            api_token = ""
         
         return NotionConfig(
             api_token=api_token,
-            workspace_id=os.getenv("NOTION_WORKSPACE_ID", "20bdba04940280ca9ba7f9bce721f547"),
+            workspace_id=os.getenv("NOTION_WORKSPACE_ID", ""),
             databases=SimpleDatabases()
         )
 

@@ -8,13 +8,14 @@ import requests
 import json
 import sys
 from datetime import datetime
+from legacy.core.env_config import settings
 
 def setup_workspace_live():
     """Setup workspace with exact credentials from screenshots"""
     
-    # Exact credentials from user screenshots
-    page_id = "20bdba04940280ca9ba7f9bce721f547"
-    api_key = "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"
+    # Use centralized credentials
+    page_id = settings.notion_workspace_id
+    api_key = settings.notion_api_token
     
     headers = {
         "Authorization": f"Bearer {api_key}",

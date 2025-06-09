@@ -109,7 +109,7 @@ export WEAVIATE_PORT="${WEAVIATE_PORT:-8080}"
 export WEAVIATE_API_KEY="${WEAVIATE_API_KEY:-}"
 
 export API_URL="${API_URL:-http://localhost:8080}"
-export API_KEY="${API_KEY:-4010007a9aa5443fc717b54e1fd7a463260965ec9e2fce297280cf86f1b3a4bd}"
+export API_KEY="${API_KEY}" # Set in environment
 
 # Only start the MCP servers that use PostgreSQL + Weaviate
 # 1. Start Memory Server (uses PostgreSQL + Weaviate)

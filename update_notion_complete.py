@@ -11,11 +11,13 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Any
 
+from legacy.core.env_config import settings
+
 class NotionUpdater:
     """Comprehensive Notion updater for Orchestra AI ecosystem"""
     
     def __init__(self):
-        self.api_key = "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"
+        self.api_key = settings.notion_api_token
         self.headers = {
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json",

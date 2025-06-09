@@ -3,7 +3,7 @@
 # Source this file to set up your Orchestra development environment
 
 # Pulumi Cloud authentication (no passphrase ever)
-export PULUMI_ACCESS_TOKEN="pul-1b1a580210be93c4d2d1d7b271ca5f7f153d51c1"
+export PULUMI_ACCESS_TOKEN="${PULUMI_ACCESS_TOKEN}"
 export PULUMI_SKIP_UPDATE_CHECK=true # Optional: skips "new version available" messages
 
 # Attempt to log in to Pulumi Cloud if not already. Errors are suppressed.
@@ -66,9 +66,9 @@ if [[ "$PWD" == *"/orchestra-main"* ]]; then
     fi
     
     # Quick connection test (silent)
-    if ! PGPASSWORD=orch3str4_2024 psql -h localhost -U orchestrator -d orchestrator -c "SELECT 1;" >/dev/null 2>&1; then
+    if ! PGPASSWORD="$POSTGRES_PASSWORD" psql -h localhost -U orchestrator -d orchestrator -c "SELECT 1;" >/dev/null 2>&1; then
         echo "🔧 Fixing PostgreSQL permissions..."
-        sudo -u postgres psql -c "ALTER USER orchestrator WITH PASSWORD 'orch3str4_2024';" >/dev/null 2>&1
+        sudo -u postgres psql -c "ALTER USER orchestrator WITH PASSWORD '$POSTGRES_PASSWORD';" >/dev/null 2>&1
     fi
 fi
 

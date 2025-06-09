@@ -51,9 +51,14 @@
     # Recraft API Key for Recraft integrations (set via Pulumi Secret Manager)
     recraft_api_key: str = Field(default=None, env="RECRAFT_API_KEY")
 
+
     # Deployment Environment
     environment: str = Field(default="dev", env="ENVIRONMENT")
     paperspace_env: str = Field(default=None, env="PAPERSPACE_ENV")
+
+    # Notion Integration
+    notion_api_token: Optional[str] = Field(default=None, env="NOTION_API_TOKEN")
+    notion_workspace_id: Optional[str] = Field(default=None, env="NOTION_WORKSPACE_ID")
 
     # Add all other environment variables used in the project here, with clear comments.
 

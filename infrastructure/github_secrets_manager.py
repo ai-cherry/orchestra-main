@@ -101,37 +101,37 @@ class GitHubSecretsManager:
         # Infrastructure secrets to create
         secrets = {
             # Lambda API
-            "LAMBDA_API_KEY": "7L34HOKF25HYDT7WHETR7QZTHQX6M5YP36MQ",
+            "LAMBDA_API_KEY": os.getenv("LAMBDA_API_KEY"),
             
             # Database connections
-            "DATABASE_URL": "postgresql://orchestra:OrchAI_DB_2024!@45.77.87.106:5432/orchestra_main",
-            "REDIS_URL": "redis://45.77.87.106:6379",
-            "WEAVIATE_URL": "http://45.77.87.106:8080",
+            "DATABASE_URL": os.getenv("DATABASE_URL"),
+            "REDIS_URL": os.getenv("REDIS_URL"),
+            "WEAVIATE_URL": os.getenv("WEAVIATE_URL"),
             
             # Server access
-            "PRODUCTION_HOST": "45.32.69.157",
-            "DATABASE_HOST": "45.77.87.106",
-            "STAGING_HOST": "207.246.108.201",
-            "LOAD_BALANCER_HOST": "45.63.58.63",
+            "PRODUCTION_HOST": os.getenv("PRODUCTION_HOST"),
+            "DATABASE_HOST": os.getenv("DATABASE_HOST"),
+            "STAGING_HOST": os.getenv("STAGING_HOST"),
+            "LOAD_BALANCER_HOST": os.getenv("LOAD_BALANCER_HOST"),
             
             # Monitoring
-            "GRAFANA_URL": "http://207.246.108.201:3000",
-            "GRAFANA_USERNAME": "admin",
-            "GRAFANA_PASSWORD": "OrchAI_Grafana_2024!",
-            "PROMETHEUS_URL": "http://207.246.108.201:9090",
-            "KIBANA_URL": "http://207.246.108.201:5601",
+            "GRAFANA_URL": os.getenv("GRAFANA_URL"),
+            "GRAFANA_USERNAME": os.getenv("GRAFANA_USERNAME"),
+            "GRAFANA_PASSWORD": os.getenv("GRAFANA_PASSWORD"),
+            "PROMETHEUS_URL": os.getenv("PROMETHEUS_URL"),
+            "KIBANA_URL": os.getenv("KIBANA_URL"),
             
             # Application secrets
-            "JWT_SECRET": "OrchAI_JWT_Secret_2024_Ultra_Secure_Key_For_Authentication",
-            "API_SECRET_KEY": "OrchAI_API_Secret_2024_For_Internal_Services",
-            "ENCRYPTION_KEY": "OrchAI_Encryption_2024_For_Sensitive_Data_Storage",
+            "JWT_SECRET": os.getenv("JWT_SECRET"),
+            "API_SECRET_KEY": os.getenv("API_SECRET_KEY"),
+            "ENCRYPTION_KEY": os.getenv("ENCRYPTION_KEY"),
             
             # Kubernetes
-            "KUBERNETES_CLUSTER_ID": "bd2cab79-0db3-4317-8b0f-52368f99c577",
-            "KUBERNETES_NAMESPACE": "orchestra-main",
+            "KUBERNETES_CLUSTER_ID": os.getenv("KUBERNETES_CLUSTER_ID"),
+            "KUBERNETES_NAMESPACE": os.getenv("KUBERNETES_NAMESPACE"),
             
             # Backup
-            "BACKUP_ENCRYPTION_KEY": "OrchAI_Backup_2024_Encryption_Key_For_Secure_Storage"
+            "BACKUP_ENCRYPTION_KEY": os.getenv("BACKUP_ENCRYPTION_KEY")
         }
         
         success_count = 0
@@ -220,11 +220,11 @@ API_SECRET_KEY=OrchAI_API_Secret_2024_For_Internal_Services
 ENCRYPTION_KEY=OrchAI_Encryption_2024_For_Sensitive_Data_Storage
 
 # Infrastructure
-LAMBDA_API_KEY=7L34HOKF25HYDT7WHETR7QZTHQX6M5YP36MQ
-PRODUCTION_HOST=45.32.69.157
-DATABASE_HOST=45.77.87.106
-STAGING_HOST=207.246.108.201
-LOAD_BALANCER_HOST=45.63.58.63
+LAMBDA_API_KEY=<lambda-api-key>
+PRODUCTION_HOST=<production-host>
+DATABASE_HOST=<database-host>
+STAGING_HOST=<staging-host>
+LOAD_BALANCER_HOST=<load-balancer-host>
 
 # Kubernetes
 KUBERNETES_CLUSTER_ID=bd2cab79-0db3-4317-8b0f-52368f99c577

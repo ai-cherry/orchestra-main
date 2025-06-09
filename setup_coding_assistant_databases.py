@@ -8,13 +8,14 @@ import requests
 import json
 from datetime import datetime
 from typing import Dict, List, Any
+from legacy.core.env_config import settings
 
 def setup_coding_assistant_databases():
     """Create additional databases for coding assistant and MCP integration"""
     
-    # Configuration from previous setup
-    api_key = "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"
-    page_id = "20bdba04940280ca9ba7f9bce721f547"
+    # Configuration from environment
+    api_key = settings.notion_api_token
+    page_id = settings.notion_workspace_id
     
     headers = {
         "Authorization": f"Bearer {api_key}",

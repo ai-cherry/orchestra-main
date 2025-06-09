@@ -51,6 +51,9 @@ python3 notion_integration_api.py
 - **`.github/workflows/deploy-optimized.yml`**: Performance-optimized CI/CD
 - **Shell Aliases**: `infra-status`, `deploy-quick`, `ghs`, `ghc`, `ghl`, `mcp-status`
 
+### **🔐 Secret Management & Environment Setup**
+Orchestra AI centralizes all secrets using **Pulumi**. Run `scripts/generate_env_from_pulumi.py` to create your `.env` file, then `source .env` before starting services. Cursor IDE and automation scripts read credentials from this environment so API keys remain outside the codebase.
+
 ### **📊 Performance Metrics**
 - **Resource Usage**: 60-70% reduction in background processes
 - **Operation Speed**: 3-5x faster GitHub operations

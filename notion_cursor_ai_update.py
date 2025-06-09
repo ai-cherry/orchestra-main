@@ -9,19 +9,21 @@ import json
 from datetime import datetime
 import os
 
+from legacy.core.env_config import settings
+
 class SimpleNotionUpdater:
     """Simplified Notion updater for Orchestra AI ecosystem"""
     
     def __init__(self):
-        # Prefer environment variable, fallback to provided token
-        self.api_key = os.environ.get("NOTION_API_TOKEN", "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")
+        # Load API token from centralized settings
+        self.api_key = settings.notion_api_token
         self.headers = {
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json",
             "Notion-Version": "2022-06-28"
         }
-        # Use the main workspace page ID
-        self.workspace_id = "20bdba04940280ca9ba7f9bce721f547"
+        # Use configured workspace ID
+        self.workspace_id = settings.notion_workspace_id
     
     def create_comprehensive_status_page(self) -> bool:
         """Create a comprehensive status page with all current information"""
