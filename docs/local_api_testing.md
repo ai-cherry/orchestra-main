@@ -23,17 +23,11 @@ pip install -r requirements.txt
 
 ## Step 2: Set Up Environment Variables
 
-Create or update your `.env` file with necessary configuration:
+Create or update your `.env` file using Pulumi configuration:
 
 ```bash
-# Copy the example env file if needed
-cp .env.example .env
-
-# Edit the .env file with appropriate settings
-# Typically you'll need to set:
-# - API keys (OpenRouter, etc.)
-# - Database connection strings
-# - Other configuration specific to local development
+python scripts/generate_env_from_pulumi.py
+# Edit the generated .env if needed
 ```
 
 ## Step 3: Run the FastAPI Server

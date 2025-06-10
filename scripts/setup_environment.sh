@@ -54,12 +54,11 @@ else
     echo -e "${GREEN}✓ All required tools found${NC}"
 fi
 
-# 2. Create .env file if it doesn't exist
+# 2. Generate .env from Pulumi if it doesn't exist
 if [ ! -f ".env" ]; then
-    echo -e "\n${YELLOW}Creating .env file from template...${NC}"
-    cp scripts/env.template .env
-    echo -e "${GREEN}✓ Created .env file${NC}"
-    echo -e "${YELLOW}⚠️  Please edit .env and add your API keys${NC}"
+    echo -e "\n${YELLOW}Generating .env from Pulumi config...${NC}"
+    python3 scripts/generate_env_from_pulumi.py
+    echo -e "${GREEN}✓ Generated .env file${NC}"
 else
     echo -e "\n${GREEN}✓ .env file already exists${NC}"
 fi

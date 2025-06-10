@@ -34,7 +34,7 @@ Successfully unified all documentation, tools, and workflows to match the single
 - `ADMIN_UI_DEPLOYMENT_GUIDE.md` - Simplified for single server
 - `specs/admin-ui-executive-summary.md` - Updated deployment section
 - `.github/workflows/README_CANONICAL_WORKFLOWS.md` - New workflow docs
-- `env.example` - Single unified environment
+- `env.master` - Single unified environment
 
 **Archived:**
 - `specs/admin-ui-promotion-process.md` - No longer needed
