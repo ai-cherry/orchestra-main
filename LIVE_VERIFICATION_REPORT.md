@@ -25,10 +25,11 @@
 - **Features**: 5-tier memory, cross-domain routing, 20x compression
 
 ### **✅ Frontend (Vercel)**
-- **URL**: https://orchestra-admin-interface-gya08fwgl-lynn-musils-projects.vercel.app
+- **URL**: https://orchestra-admin-interface-idqnqpj6r-lynn-musils-projects.vercel.app
 - **Status**: ✅ LIVE (Vercel SSO authentication active)
 - **Build**: React + TypeScript + Vite
 - **Performance**: CDN optimized
+- **Note**: Updated deployment - previous URLs may show 404
 
 ### **✅ Database Infrastructure**
 - **PostgreSQL**: ✅ Up 41 hours (healthy)
@@ -176,7 +177,7 @@ curl -X POST http://localhost:8000/chat_with_persona \
 ### **Access Points**
 - **API Documentation**: http://localhost:8010/docs
 - **Personas Health**: http://localhost:8000/health  
-- **Frontend**: https://orchestra-admin-interface-gya08fwgl-lynn-musils-projects.vercel.app
+- **Frontend**: https://orchestra-admin-interface-idqnqpj6r-lynn-musils-projects.vercel.app
 - **Memory Status**: http://localhost:8000/memory_status
 
 ---
