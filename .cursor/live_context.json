@@ -1,28 +1,27 @@
 {
-  "last_update": "2025-06-10T19:20:01.282712",
+  "last_update": "2025-06-10T19:55:01.166922",
   "production_status": {
-    "timestamp": "2025-06-10T19:20:01.282717",
+    "timestamp": "2025-06-10T19:55:01.166933",
     "services": {
       "Zapier MCP": {
-        "status": "healthy",
-        "response_time_ms": 2.901,
-        "url": "http://192.9.142.8/health"
+        "status": "unreachable",
+        "error": "HTTPConnectionPool(host='192.9.142.8', port=80): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x711a2f014df0>: Failed to establish a new connection: [Errno 111] Connection refused'))"
       },
       "Personas API": {
         "status": "healthy",
-        "response_time_ms": 2.406,
+        "response_time_ms": 5.092,
         "url": "http://192.9.142.8:8000/health"
       },
       "Main API": {
         "status": "unreachable",
-        "error": "HTTPConnectionPool(host='192.9.142.8', port=8010): Max retries exceeded with url: /health (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x70b959d14190>, 'Connection to 192.9.142.8 timed out. (connect timeout=5)'))"
+        "error": "HTTPConnectionPool(host='192.9.142.8', port=8010): Max retries exceeded with url: /health (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x711a2f015840>, 'Connection to 192.9.142.8 timed out. (connect timeout=5)'))"
       },
       "Infrastructure": {
         "status": "unreachable",
-        "error": "HTTPConnectionPool(host='192.9.142.8', port=8080): Max retries exceeded with url: /health (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x70b959d15ba0>, 'Connection to 192.9.142.8 timed out. (connect timeout=5)'))"
+        "error": "HTTPConnectionPool(host='192.9.142.8', port=8080): Max retries exceeded with url: /health (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x711a2f015ba0>, 'Connection to 192.9.142.8 timed out. (connect timeout=5)'))"
       }
     },
-    "overall_health": "degraded"
+    "overall_health": "critical"
   },
   "notion_workspace": {
     "workspace_accessible": true,

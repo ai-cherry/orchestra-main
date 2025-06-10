@@ -1,0 +1,84 @@
+{
+  "payready_ceo_workflows": {
+    "salesforce_pipeline_alerts": {
+      "trigger": "salesforce.opportunity.updated",
+      "conditions": {
+        "stage_changed": true,
+        "amount_threshold": 10000
+      },
+      "actions": [
+        {
+          "type": "sophia_analysis",
+          "endpoint": "/api/v1/sophia/analyze-deal",
+          "data": {
+            "opportunity_id": "{{trigger.id}}",
+            "stage": "{{trigger.stage}}",
+            "amount": "{{trigger.amount}}",
+            "analysis_type": "pipeline_health"
+          }
+        },
+        {
+          "type": "slack_notification", 
+          "channel": "#ceo-alerts",
+          "message": "🎯 Deal Update: {{trigger.name}} moved to {{trigger.stage}} - ${{trigger.amount}}"
+        }
+      ]
+    },
+    "gong_coaching_insights": {
+      "trigger": "gong.call.completed",
+      "conditions": {
+        "has_transcript": true,
+        "duration_minutes": ">= 15"
+      },
+      "actions": [
+        {
+          "type": "direct_api_call",
+          "service": "pay_ready_etl",
+          "endpoint": "/process-gong-call-detailed",
+          "data": {
+            "call_id": "{{trigger.id}}",
+            "analysis_focus": ["sales_coaching", "client_sentiment", "competitive_intel"]
+          }
+        }
+      ]
+    },
+    "hubspot_engagement_summary": {
+      "trigger": "schedule.daily",
+      "time": "08:00",
+      "actions": [
+        {
+          "type": "sophia_report",
+          "endpoint": "/api/v1/sophia/daily-engagement-summary",
+          "delivery": {
+            "method": "email",
+            "recipient": "ceo@payready.com",
+            "format": "executive_summary"
+          }
+        }
+      ]
+    },
+    "linear_velocity_tracking": {
+      "trigger": "linear.issue.completed",
+      "conditions": {
+        "team": "PayReady Development"
+      },
+      "actions": [
+        {
+          "type": "sophia_analysis",
+          "endpoint": "/api/v1/sophia/update-velocity-metrics",
+          "data": {
+            "issue_id": "{{trigger.id}}",
+            "completion_time": "{{trigger.completed_at}}",
+            "estimate": "{{trigger.estimate}}"
+          }
+        }
+      ]
+    }
+  },
+  "sophia_integration": {
+    "base_url": "http://192.9.142.8:8014",
+    "auth_header": "X-Sophia-API-Key",
+    "timeout": 30000,
+    "retry_attempts": 3
+  }
+} 
