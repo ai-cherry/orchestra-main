@@ -179,8 +179,8 @@ API_BASE_URL=https://api.cherry-ai.me
 
 ### Local Development
 ```bash
-# Copy from .env.example and fill in your values
-cp .env.example .env
+# Generate from Pulumi configuration
+python scripts/generate_env_from_pulumi.py
 ```
 
 ### Vercel Environment Variables

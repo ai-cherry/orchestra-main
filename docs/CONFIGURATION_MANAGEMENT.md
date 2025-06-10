@@ -13,26 +13,22 @@ The AI cherry_ai project uses a consistent approach to configuration management 
 
 ## Configuration Files
 
-### `.env.template`
+### `env.master`
 
-The `.env.template` file serves as a template for creating environment-specific configuration files. It includes all available configuration options with default values.
+The `env.master` file contains the full list of environment variables with default values. Use Pulumi to generate your local `.env` from this master configuration.
 
 To create a new environment configuration:
 
 ```bash
-cp .env.template .env.development  # For development environment
-cp .env.template .env.staging      # For staging environment
-cp .env.template .env.production   # For production environment
+python scripts/generate_env_from_pulumi.py
 ```
-
-Then edit the file to set environment-specific values.
 
 ### `.env`
 
-The `.env` file is the default configuration file used by scripts when no specific environment is specified. It should be created from `.env.template`:
+The `.env` file is the default configuration file used by scripts when no specific environment is specified. Generate it automatically from Pulumi:
 
 ```bash
-cp .env.template .env
+python scripts/generate_env_from_pulumi.py
 ```
 
 This file should not be committed to the repository, as it may contain sensitive information or developer-specific settings.
@@ -125,7 +121,7 @@ Example workflow step:
 
 If you have existing scripts that use hardcoded values:
 
-1. Add the configuration options to `.env.template`
+1. Add the configuration options to `env.master`
 2. Update the script to use `load_env.sh` and `get_config`
 3. Test the script with different configuration values
 4. Update any GitHub Actions workflows to create a `.env` file

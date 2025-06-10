@@ -34,38 +34,10 @@ print(f'✓ MCP version: {mcp.__version__}')
 
 # Set up environment variables
 echo -e "\n🔐 Setting up environment variables..."
-cat > .env.example << 'EOF'
-# API Keys
-OPENROUTER_API_KEY=your-openrouter-api-key
-API_KEY=your-api-key
-
-# Database Configuration
-POSTGRES_HOST=localhost
-POSTGRES_PORT=5432
-POSTGRES_DB=cherry_ai
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=your-postgres-password
-
-# Weaviate Configuration
-WEAVIATE_HOST=localhost
-WEAVIATE_PORT=8080
-WEAVIATE_API_KEY=your-weaviate-api-key
-
-# API Configuration
-API_URL=http://localhost:8080
-
-# MCP Server Ports
-CHERRY_AI_CONDUCTOR_PORT=8002
-MCP_MEMORY_PORT=8003
-MCP_WEAVIATE_DIRECT_PORT=8001
-MCP_DEPLOYMENT_PORT=8005
-MCP_TOOLS_PORT=8006
-EOF
 
 if [ ! -f ".env" ]; then
-    cp .env.example .env
-    echo "✓ Created .env file from template"
-    echo "⚠️  Please update .env with your actual credentials"
+    python3 scripts/generate_env_from_pulumi.py
+    echo "✓ Generated .env from Pulumi configuration"
 else
     echo "✓ .env file already exists"
 fi
