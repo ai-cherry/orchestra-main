@@ -394,11 +394,10 @@ def create_notion_config() -> NotionConfig:
     # Get API token from environment (practical security for solo dev)
     api_token = os.getenv("NOTION_API_TOKEN")
     if not api_token:
-        # Development fallback with clear warning
-        api_token = "ntn_development_fallback_token"
-        warnings.warn("⚠️  Using development fallback for NOTION_API_TOKEN. Set environment variable for production.")
+        warnings.warn("NOTION_API_TOKEN not set; Notion operations will be skipped")
+        api_token = ""
     
-    workspace_id = os.getenv("NOTION_WORKSPACE_ID", "20bdba04940280ca9ba7f9bce721f547")
+    workspace_id = os.getenv("NOTION_WORKSPACE_ID", "")
     
     return NotionConfig(
         api_token=api_token,

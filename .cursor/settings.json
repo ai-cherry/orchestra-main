@@ -4,7 +4,7 @@
   "cherry-ai.websocket-url": "wss://150.136.94.139:8765",
   "cherry-ai.api-endpoint": "https://150.136.94.139/api",
   "cherry-ai.personas": ["cherry", "sophia", "karen"],
-  "cherry-ai.lambda-api-key": "secret_manus_5305c377b1e94aaa8352f2efc72f5ae3.cA4GcSKfAAhTtT2XsNDmC3CpRPvvupIk",
+  "cherry-ai.lambda-api-key": "<lambda-api-key>",
   "cherry-ai.environment": "lambda-production",
   "cherry-ai.auto-deploy": true,
   "cherry-ai.fast-sync": true,
