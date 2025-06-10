@@ -455,13 +455,14 @@ app.use('*', (req, res) => {
 });
 
 // 🚀 Server Startup
-const server = app.listen(PORT, () => {
+const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`
 🚀 Cursor AI Zapier MCP Server Started!
 ===========================================
-🌐 Server: http://localhost:${PORT}
-📋 Health: http://localhost:${PORT}/health
-🔐 Auth: http://localhost:${PORT}${BASE_PATH}/auth/verify
+🌐 Local: http://localhost:${PORT}
+🌍 External: http://192.9.142.8:${PORT}
+📋 Health: http://192.9.142.8:${PORT}/health
+🔐 Auth: http://192.9.142.8:${PORT}${BASE_PATH}/auth/verify
 📊 API Version: ${API_VERSION}
 🔧 Environment: ${process.env.NODE_ENV || 'development'}
 ⚡ Ready for Zapier integration!

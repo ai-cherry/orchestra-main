@@ -98,6 +98,15 @@ verify_deployment() {
     echo -e "${BLUE}${CHECK} Running deployment verification...${NC}"
     echo ""
     
+    # Zapier MCP Health
+    echo -e "${BLUE}🔗 Testing Zapier MCP Server:${NC}"
+    if curl -s http://localhost:80/health | jq -e '.status == "healthy"' >/dev/null 2>&1; then
+        echo -e "${GREEN}${CHECK} Zapier MCP Server: HEALTHY${NC}"
+    else
+        echo -e "${RED}❌ Zapier MCP Server: UNHEALTHY${NC}"
+        return 1
+    fi
+    
     # API Health
     echo -e "${BLUE}${ROCKET} Testing API Server:${NC}"
     if curl -s http://localhost:8010/api/system/health | jq -e '.status == "healthy"' >/dev/null 2>&1; then
@@ -214,6 +223,23 @@ docker-compose -f docker-compose.production.yml up -d cherry_ai_api_hybrid
 # Wait for API to be ready
 wait_for_service "http://localhost:8010/api/system/health" "API Server"
 
+# Zapier MCP Server deployment (NEW)
+echo -e "${BLUE}🔗 Deploying Zapier MCP Server...${NC}"
+cd zapier-mcp
+
+# Stop existing Zapier MCP process
+sudo pkill -f "node.*server.js" 2>/dev/null || true
+sleep 3
+
+# Start Zapier MCP server on port 80
+sudo MCP_SERVER_PORT=80 node server.js &
+sleep 5
+
+# Wait for Zapier MCP to be ready
+wait_for_service "http://localhost:80/health" "Zapier MCP Server"
+
+cd ..
+
 # Personas deployment
 if [ "$SKIP_PERSONAS" = false ]; then
     echo -e "${BLUE}${PERSONAS} Deploying personas system...${NC}"
@@ -274,11 +300,14 @@ if [ $? -eq 0 ]; then
     echo -e "${GREEN}================================${NC}"
     echo ""
     echo -e "${CYAN}📊 System Status:${NC}"
+    echo -e "${GREEN}${CHECK} Zapier MCP Server: http://localhost:80${NC}"
     echo -e "${GREEN}${CHECK} API Server: http://localhost:8010${NC}"
     echo -e "${GREEN}${CHECK} Personas: http://localhost:8000${NC}"
     echo -e "${GREEN}${CHECK} Database Cluster: Operational${NC}"
     echo ""
     echo -e "${CYAN}🔗 Quick Links:${NC}"
+    echo -e "${BLUE}• Zapier MCP Health: http://localhost:80/health${NC}"
+    echo -e "${BLUE}• Zapier API Docs: http://localhost:80/api/v1/docs${NC}"
     echo -e "${BLUE}• API Documentation: http://localhost:8010/docs${NC}"
     echo -e "${BLUE}• Personas Health: http://localhost:8000/health${NC}"
     echo -e "${BLUE}• System Health: http://localhost:8010/api/system/health${NC}"

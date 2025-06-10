@@ -72,6 +72,26 @@ echo ""
 total_checks=0
 failed_checks=0
 
+# Zapier MCP Server Health (NEW - Port 80)
+echo -e "${CYAN}🔗 Zapier MCP Server Health:${NC}"
+((total_checks++))
+if ! check_service "http://localhost:80/health" "Zapier MCP Server" "healthy"; then
+    ((failed_checks++))
+fi
+measure_response_time "http://localhost:80/health" "Zapier MCP Server"
+
+# Test Zapier authentication
+echo -n "  Zapier authentication... "
+auth_response=$(curl -s -H "X-Zapier-API-Key: zap_dev_12345_abcdef_orchestra_ai_cursor" http://localhost:80/api/v1/auth/verify 2>/dev/null)
+if [ $? -eq 0 ] && echo "$auth_response" | jq -e '.authenticated == true' >/dev/null 2>&1; then
+    echo -e "${GREEN}✅ Authenticated${NC}"
+else
+    echo -e "${RED}❌ Auth Failed${NC}"
+    ((failed_checks++))
+fi
+((total_checks++))
+echo ""
+
 # API Server Health
 echo -e "${CYAN}🚀 API Server Health:${NC}"
 ((total_checks++))

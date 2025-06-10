@@ -34,7 +34,7 @@
 ```
 
 ### **Authentication Test Endpoint**:
-- **URL**: `http://localhost:8001/api/v1/auth/verify`
+- **URL**: `http://192.9.142.8/api/v1/auth/verify`
 - **Method**: GET
 - **Headers**: 
   - `X-Zapier-API-Key: {{bundle.authData.api_key}}`
@@ -311,7 +311,7 @@
 
 ## 🌐 **API ENDPOINTS SUMMARY**
 
-### **Base URL**: `http://localhost:8001`
+### **Base URL**: `http://192.9.142.8`
 ### **API Version**: `v1`
 
 | Endpoint | Method | Purpose | Auth Required |
@@ -358,13 +358,13 @@ node server.js
 ### **4. Test Integration**
 ```bash
 # Health check
-curl http://localhost:8001/health
+curl http://192.9.142.8/health
 
-# Test authentication
-zapier-mcp test-auth --api-key your_api_key
+# Test authentication (external)
+curl -H "X-Zapier-API-Key: zap_dev_12345_abcdef_orchestra_ai_cursor" http://192.9.142.8/api/v1/auth/verify
 
-# Test trigger
-zapier-mcp test-trigger --type code-updated
+# Test authentication (local CLI)
+zapier-mcp test-auth --api-key zap_dev_12345_abcdef_orchestra_ai_cursor
 ```
 
 ---
@@ -396,7 +396,7 @@ zapier-mcp test-trigger --type code-updated
 ## 📚 **ADDITIONAL RESOURCES**
 
 ### **Documentation**:
-- **API Docs**: `http://localhost:8001/api/v1/docs`
+- **API Docs**: `http://192.9.142.8/api/v1/docs`
 - **GitHub**: https://github.com/ai-cherry/orchestra-main
 - **CLI Help**: `zapier-mcp --help`
 

@@ -13,5 +13,24 @@
   "editor.insertSpaces": true,
   "python.defaultInterpreterPath": "/opt/cherry-ai/venv/bin/python",
   "git.autofetch": true,
-  "git.enableSmartCommit": true
+  "git.enableSmartCommit": true,
+  "ai.assistant.allowGlobalIgnoreOverride": true,
+  "ai.assistant.allowEnvFileAccess": true,
+  "ai.assistant.allowMarkdownAccess": true,
+  "ai.assistant.allowConfigFileAccess": true,
+  "cursor.ai.respectGitignore": false,
+  "cursor.ai.allowBlockedFiles": true,
+  "files.exclude": {},
+  "search.exclude": {},
+  "ai.fileAccessPermissions": {
+    "*.env": true,
+    "*.env.*": true,
+    ".env": true,
+    ".env.*": true,
+    "*.md": true,
+    "*.key": false,
+    "*.pem": false
+  },
+  "ai.globalIgnoreOverride": true,
+  "ai.sensitiveFileOverride": "development"
 }
