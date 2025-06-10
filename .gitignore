@@ -106,3 +106,4 @@ yarn-error.log*
 # API Keys and secrets
 # Pulumi stack files (contain secrets/state)
 **/Pulumi.*.yaml
+.vercel

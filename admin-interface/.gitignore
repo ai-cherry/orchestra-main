@@ -48,3 +48,4 @@ lerna-debug.log*
 *.tmp
 *.temp
 create_env_files.sh 
+.vercel
