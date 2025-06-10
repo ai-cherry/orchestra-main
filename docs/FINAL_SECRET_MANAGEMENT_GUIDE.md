@@ -60,7 +60,7 @@ Cherry AI now uses **Pulumi as the single source of truth** for all secrets. Thi
 1. **Initial Setup** (one time):
 ```bash
 # Set Pulumi passphrase
-export PULUMI_CONFIG_PASSPHRASE="cherry_ai-dev-123"
+export PULUMI_CONFIG_PASSPHRASE="<pulumi-passphrase>"
 
 # Generate .env from Pulumi
 python scripts/generate_env_from_pulumi.py
@@ -126,7 +126,7 @@ source .env
 - Git history cleanup script available: `scripts/clean_git_history.sh`
 
 ### Access Control
-- Pulumi passphrase: `cherry_ai-dev-123` (for dev)
+ - Pulumi passphrase: `<pulumi-passphrase>` (for dev)
 - Pulumi cloud RBAC for team access
 - Service-specific API key permissions
 
@@ -198,7 +198,7 @@ Then in workflows:
 
 ### "Wrong passphrase" error
 ```bash
-export PULUMI_CONFIG_PASSPHRASE="cherry_ai-dev-123"
+export PULUMI_CONFIG_PASSPHRASE="<pulumi-passphrase>"
 ```
 
 ### Missing secret in .env

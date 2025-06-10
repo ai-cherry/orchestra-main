@@ -39,7 +39,7 @@ class NotionWorkflowService {
 
   constructor() {
     this.notion = new Client({
-      auth: process.env.NOTION_TOKEN || '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'
+      auth: process.env.NOTION_TOKEN
     });
   }
 

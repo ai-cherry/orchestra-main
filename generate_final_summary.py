@@ -19,7 +19,7 @@ def generate_final_summary():
         "key_findings": {
             "api_connectivity": {
                 "status": "✅ WORKING",
-                "details": "API connection successful with provided token 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",
+                "details": "API connection successful with provided token <NOTION_TOKEN>",
                 "user_type": "bot",
                 "permissions": "Confirmed search and read access"
             },
@@ -143,7 +143,7 @@ def save_summary_and_recommendations():
 
 **Analysis Date**: {summary['analysis_date']}  
 **Status**: {summary['status']}  
-**API Token**: `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`
+**API Token**: `<NOTION_TOKEN>`
 
 ---
 

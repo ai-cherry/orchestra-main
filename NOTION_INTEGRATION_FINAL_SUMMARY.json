@@ -5,7 +5,7 @@
   "key_findings": {
     "api_connectivity": {
       "status": "\u2705 WORKING",
-      "details": "API connection successful with provided token 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",
+      "details": "API connection successful with provided token <NOTION_TOKEN>",
       "user_type": "bot",
       "permissions": "Confirmed search and read access"
     },

@@ -11,14 +11,16 @@ from datetime import datetime
 from typing import Dict, List, Any
 import logging
 
+from legacy.core.env_config import settings
+
 logger = logging.getLogger(__name__)
 
 class NotionDashboardCreator:
     """Simple dashboard creator for Orchestra AI overview"""
     
     def __init__(self):
-        self.api_token = os.getenv("NOTION_API_TOKEN", "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")
-        self.workspace_id = os.getenv("NOTION_WORKSPACE_ID", "20bdba04940280ca9ba7f9bce721f547")
+        self.api_token = settings.notion_api_token
+        self.workspace_id = settings.notion_workspace_id
         self.headers = {
             "Authorization": f"Bearer {self.api_token}",
             "Content-Type": "application/json",

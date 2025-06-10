@@ -8,6 +8,8 @@ import os
 from dataclasses import dataclass, field
 from typing import Dict, Optional, Any
 from enum import Enum
+
+from legacy.core.env_config import settings
 import logging
 
 logger = logging.getLogger(__name__)
@@ -112,19 +114,14 @@ def load_notion_config() -> NotionConfig:
     - NOTION_DEBUG: true/false
     """
     
-    # Core configuration
-    api_token = os.getenv("NOTION_API_TOKEN", "")
-    workspace_id = os.getenv("NOTION_WORKSPACE_ID", "")
+    # Core configuration via centralized settings
+    api_token = settings.notion_api_token or ""
+    workspace_id = settings.notion_workspace_id or ""
     workspace_url = os.getenv("NOTION_WORKSPACE_URL", "")
     
     # Fallback to hardcoded values if environment variables not set (development only)
-    if not api_token and os.getenv("NOTION_ENVIRONMENT", "development") == "development":
-        logger.warning("Using fallback API token - set NOTION_API_TOKEN environment variable for production")
-        api_token = "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"
-    
-    if not workspace_id and os.getenv("NOTION_ENVIRONMENT", "development") == "development":
-        logger.warning("Using fallback workspace ID - set NOTION_WORKSPACE_ID environment variable for production")
-        workspace_id = "20bdba04940280ca9ba7f9bce721f547"
+    if not api_token or not workspace_id:
+        logger.warning("NOTION_API_TOKEN or NOTION_WORKSPACE_ID not set; functionality may be limited")
     
     if not workspace_url and workspace_id:
         workspace_url = f"https://www.notion.so/Orchestra-AI-Workspace-{workspace_id}"

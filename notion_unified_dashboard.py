@@ -10,6 +10,8 @@ import requests
 from datetime import datetime, timedelta
 from typing import Dict, List, Any, Optional
 from dataclasses import dataclass
+
+from legacy.core.env_config import settings
 import logging
 
 # Local imports
@@ -24,8 +26,8 @@ except ImportError:
     
     def get_config():
         return NotionConfig(
-            api_token=os.getenv("NOTION_API_TOKEN", "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"),
-            workspace_id=os.getenv("NOTION_WORKSPACE_ID", "20bdba04940280ca9ba7f9bce721f547")
+            api_token=settings.notion_api_token,
+            workspace_id=settings.notion_workspace_id,
         )
 
 logger = logging.getLogger(__name__)
