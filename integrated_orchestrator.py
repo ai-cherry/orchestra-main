@@ -10,11 +10,11 @@ import json
 from datetime import datetime, timedelta
 from dataclasses import asdict
 
-from .memory_architecture import (
+from memory_architecture import (
     LayeredMemoryManager, MemoryTier, PersonaDomain, 
     PERSONA_CONFIGS, HybridSearchEngine, TokenCompressionEngine
 )
-from .persona_profiles import (
+from persona_profiles import (
     PersonaManager, PersonaProfile, create_persona,
     CommunicationStyle, EmotionalTone
 )
