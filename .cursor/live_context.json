@@ -1,0 +1,87 @@
+{
+  "last_update": "2025-06-10T19:13:15.414584",
+  "production_status": {
+    "timestamp": "2025-06-10T19:13:15.414590",
+    "services": {
+      "Zapier MCP": {
+        "status": "healthy",
+        "response_time_ms": 3.225,
+        "url": "http://192.9.142.8/health"
+      },
+      "Personas API": {
+        "status": "healthy",
+        "response_time_ms": 2.29,
+        "url": "http://192.9.142.8:8000/health"
+      },
+      "Main API": {
+        "status": "unreachable",
+        "error": "HTTPConnectionPool(host='192.9.142.8', port=8010): Max retries exceeded with url: /health (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x7d498d19c850>, 'Connection to 192.9.142.8 timed out. (connect timeout=5)'))"
+      },
+      "Infrastructure": {
+        "status": "unreachable",
+        "error": "HTTPConnectionPool(host='192.9.142.8', port=8080): Max retries exceeded with url: /health (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x7d498d19e260>, 'Connection to 192.9.142.8 timed out. (connect timeout=5)'))"
+      }
+    },
+    "overall_health": "degraded"
+  },
+  "notion_workspace": {
+    "workspace_accessible": true,
+    "api_key_valid": true,
+    "workspace_id": "20bdba04940280ca9ba7f9bce721f547",
+    "databases": {
+      "Epic & Feature Tracking": "20bdba0494028114b57bdf7f1d4b2712",
+      "Task Management": "20bdba04940281a299f3e69dc37b73d6",
+      "Development Log": "20bdba04940281fd9558d66c07d9576c",
+      "Cherry Features": "20bdba04940281629e3cfa8c8e41fd16",
+      "Sophia Features": "20bdba049402811d83b4cdc1a2505623",
+      "Karen Features": "20bdba049402819cb2cad3d3828691e6",
+      "Patrick Instructions": "20bdba04940281b49890e663db2b50a3",
+      "Knowledge Base": "20bdba04940281a4bc27e06d160e3378"
+    }
+  },
+  "ai_personas": {
+    "Cherry": {
+      "domain": "Cross-domain coordination",
+      "context_window": 4000,
+      "specialties": [
+        "Project management",
+        "Persona synthesis",
+        "Workflow optimization"
+      ]
+    },
+    "Sophia": {
+      "domain": "Financial services & compliance",
+      "context_window": 6000,
+      "specialties": [
+        "PCI DSS",
+        "Regulatory compliance",
+        "Payment systems"
+      ]
+    },
+    "Karen": {
+      "domain": "Medical coding & healthcare",
+      "context_window": 8000,
+      "specialties": [
+        "ICD-10",
+        "HIPAA compliance",
+        "Clinical protocols"
+      ]
+    }
+  },
+  "mcp_servers": {
+    "orchestra_notion": {
+      "status": "configured",
+      "priority": 1,
+      "capabilities": [
+        "notion_workspace_access",
+        "ai_persona_routing",
+        "memory_architecture_status"
+      ]
+    },
+    "zapier_integration": {
+      "status": "configured",
+      "priority": 2,
+      "port": 80
+    }
+  }
+}
