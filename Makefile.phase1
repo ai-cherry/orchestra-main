@@ -1,0 +1,126 @@
+# Phase 1: Developer Makefile
+# Provides consistent commands for common development tasks
+
+.PHONY: help install lint test format clean docker-up docker-down pre-commit
+
+# Default target
+help:
+	@echo "Orchestra AI - Developer Commands"
+	@echo "================================"
+	@echo "make install      - Install all dependencies (Python + Node)"
+	@echo "make lint         - Run all linters"
+	@echo "make test         - Run all tests"
+	@echo "make format       - Auto-format all code"
+	@echo "make clean        - Clean build artifacts"
+	@echo "make docker-up    - Start development stack"
+	@echo "make docker-down  - Stop development stack"
+	@echo "make pre-commit   - Install pre-commit hooks"
+
+# Python commands
+install-python:
+	@echo "Installing Python dependencies with Poetry..."
+	poetry install
+
+lint-python:
+	@echo "Linting Python code..."
+	poetry run black --check .
+	poetry run isort --check-only .
+	poetry run ruff .
+
+format-python:
+	@echo "Formatting Python code..."
+	poetry run black .
+	poetry run isort .
+	poetry run ruff --fix .
+
+test-python:
+	@echo "Running Python tests..."
+	poetry run pytest
+
+# Node.js commands
+install-node:
+	@echo "Installing Node.js dependencies with pnpm..."
+	pnpm install
+
+lint-node:
+	@echo "Linting JavaScript/TypeScript code..."
+	pnpm -r lint
+
+format-node:
+	@echo "Formatting JavaScript/TypeScript code..."
+	pnpm -r format
+
+test-node:
+	@echo "Running Node.js tests..."
+	pnpm -r test
+
+# Combined commands
+install: install-python install-node
+	@echo "All dependencies installed!"
+
+lint: lint-python lint-node
+	@echo "All linting complete!"
+
+format: format-python format-node
+	@echo "All formatting complete!"
+
+test: test-python test-node
+	@echo "All tests complete!"
+
+# Docker commands
+docker-up:
+	@echo "Starting development stack..."
+	@if [ ! -f .env ]; then cp env.dev.example .env; fi
+	docker-compose -f dev-compose.yml up -d
+	@echo "Services available at:"
+	@echo "  - Traefik: http://traefik.localhost:9080"
+	@echo "  - MCP API: http://mcp.localhost:9000"
+	@echo "  - Prometheus: http://prometheus.localhost:9000"
+
+docker-down:
+	@echo "Stopping development stack..."
+	docker-compose -f dev-compose.yml down
+
+docker-logs:
+	docker-compose -f dev-compose.yml logs -f
+
+# Pre-commit setup
+pre-commit:
+	@echo "Installing pre-commit hooks..."
+	poetry run pre-commit install
+	poetry run pre-commit install --hook-type commit-msg
+	@echo "Pre-commit hooks installed!"
+
+# Cleanup
+clean:
+	@echo "Cleaning build artifacts..."
+	find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
+	find . -type d -name ".pytest_cache" -exec rm -rf {} + 2>/dev/null || true
+	find . -type d -name ".mypy_cache" -exec rm -rf {} + 2>/dev/null || true
+	find . -type d -name ".ruff_cache" -exec rm -rf {} + 2>/dev/null || true
+	find . -type d -name "node_modules" -exec rm -rf {} + 2>/dev/null || true
+	find . -type d -name ".next" -exec rm -rf {} + 2>/dev/null || true
+	find . -type d -name "dist" -exec rm -rf {} + 2>/dev/null || true
+	find . -type d -name "build" -exec rm -rf {} + 2>/dev/null || true
+	@echo "Cleanup complete!"
+
+# Phase 1 specific targets
+phase1-import-deps:
+	@echo "Importing all requirements.txt files into Poetry..."
+	python scripts/import_reqs_to_poetry.py
+
+phase1-archive-legacy:
+	@echo "Archiving legacy code..."
+	git checkout --orphan legacy-archive
+	git rm -rf .
+	git checkout phase-1/repo-foundations -- legacy archive
+	git commit -m "chore: archive legacy directories"
+	git push origin legacy-archive
+	git checkout phase-1/repo-foundations
+	git rm -rf legacy archive
+	git commit -m "chore: remove legacy directories from main branch"
+
+phase1-report:
+	@echo "Generating Phase 1 reports..."
+	cloc --csv --out=reports/phase-1/cloc-updated.csv .
+	@echo "Reports generated in reports/phase-1/" 

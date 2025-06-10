@@ -1,0 +1,18 @@
+# Phase 1: pnpm workspace configuration
+packages:
+  # Admin interfaces
+  - 'admin-interface'
+  - 'dashboard'
+  
+  # Mobile apps
+  - 'mobile-app'
+  - 'android'
+  
+  # Web apps
+  - 'apps/web'
+  
+  # Legacy packages (to be migrated)
+  - 'legacy/packages/*'
+  
+  # Shared packages
+  - 'packages/*' 

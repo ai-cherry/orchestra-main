@@ -1,0 +1,1 @@
+-r--r--r-- 1 ubuntu ubuntu 228M Jun 10 22:02 ./.git/objects/pack/pack-3eeb26ed1a224730aba9203f65c8fde06137918e.pack

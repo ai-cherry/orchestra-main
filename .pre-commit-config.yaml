@@ -1,65 +1,136 @@
-# .pre-commit-config.yaml
-# Enforces Python 3.10+ and pip-managed virtualenv for all hooks.
-# All hooks use python3.10 within the standard virtual environment.
+# Phase 1: Pre-commit hooks for code quality
+# See https://pre-commit.com for more information
+
+default_language_version:
+  python: python3.10
+  node: 20.11.0
 
 repos:
+  # General file checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-toml
+      - id: check-added-large-files
+        args: ['--maxkb=5000']
+      - id: check-merge-conflict
+      - id: detect-private-key
+      - id: mixed-line-ending
+        args: ['--fix=lf']
+
+  # Python formatting
+  - repo: https://github.com/psf/black
+    rev: 23.12.1
+    hooks:
+      - id: black
+        language_version: python3.10
+        args: ['--line-length=120']
+
+  # Python imports sorting
   - repo: https://github.com/pycqa/isort
     rev: 5.13.2
     hooks:
       - id: isort
-        name: isort (python3.10, profile=black)
-        language_version: python3.10
-        args: [--profile=black]
-  - repo: https://github.com/psf/black
-    rev: 24.4.2
-    hooks:
-      - id: black
-        language_version: python3.10
+        args: ['--profile', 'black', '--line-length', '120']
 
-  - repo: https://github.com/PyCQA/autoflake
-    rev: v2.3.1
+  # Python linting
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: v0.1.11
     hooks:
-      - id: autoflake
-        args: [--remove-all-unused-imports, --remove-unused-variables, --expand-star-imports]
-        language_version: python3.10
+      - id: ruff
+        args: ['--fix', '--exit-non-zero-on-fix']
 
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.8.0
+  # Python type checking (optional, can be slow)
+  # - repo: https://github.com/pre-commit/mirrors-mypy
+  #   rev: v1.8.0
+  #   hooks:
+  #     - id: mypy
+  #       additional_dependencies: [types-all]
+
+  # JavaScript/TypeScript formatting
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v3.1.0
     hooks:
-      - id: mypy
-        language_version: python3.10
-        exclude: ^(services/|secret-management/|test_.*\\.py|main_app\\.py|venv/|\\.venv/)
-        args: [--ignore-missing-imports, --no-strict-optional, --allow-untyped-defs]
+      - id: prettier
+        types_or: [javascript, jsx, ts, tsx, json, css, scss, md, yaml]
+        exclude: '^(package-lock\.json|pnpm-lock\.yaml)$'
 
-  - repo: https://github.com/PyCQA/flake8
-    rev: 7.0.0
+  # JavaScript/TypeScript linting
+  - repo: https://github.com/pre-commit/mirrors-eslint
+    rev: v8.56.0
     hooks:
-      - id: flake8
-        language_version: python3.10
+      - id: eslint
+        types_or: [javascript, jsx, ts, tsx]
+        additional_dependencies:
+          - eslint@8.56.0
+          - '@typescript-eslint/parser@6.19.0'
+          - '@typescript-eslint/eslint-plugin@6.19.0'
 
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+  # Commit message linting
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v3.13.0
     hooks:
-      - id: check-yaml
-      - id: end-of-file-fixer
-      - id: trailing-whitespace
+      - id: commitizen
+        stages: [commit-msg]
 
-# Validate Python environment before commit
-  - repo: local
+  # Security checks
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
     hooks:
-      - id: validate-python-env
-        name: Validate Python 3.10+ environment
-        entry: scripts/validate_python_env.sh
-        language: script
-        pass_filenames: false
-        always_run: true
+      - id: detect-secrets
+        args: ['--baseline', '.secrets.baseline']
+        exclude: '^(poetry\.lock|package-lock\.json|pnpm-lock\.yaml)$'
 
-# Temporarily disabled due to GitHub Actions issues
-# - repo: https://github.com/pre-commit/mirrors-eslint
-#   rev: v8.57.0
-#   hooks:
-#     - id: eslint
-#       name: eslint (admin-ui)
-#       entry: npx eslint admin-ui --ext .ts,.tsx --fix
-#       language: node
-#       always_run: true
+  # Dockerfile linting
+  - repo: https://github.com/hadolint/hadolint
+    rev: v2.12.0
+    hooks:
+      - id: hadolint-docker
+        entry: hadolint/hadolint hadolint
+
+  # YAML linting
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.33.0
+    hooks:
+      - id: yamllint
+        args: ['-c', '.yamllint.yml']
+
+# Configuration for specific hooks
+files: |
+  (?x)^(
+    .*\.py|
+    .*\.js|
+    .*\.jsx|
+    .*\.ts|
+    .*\.tsx|
+    .*\.json|
+    .*\.yaml|
+    .*\.yml|
+    .*\.md|
+    Dockerfile.*|
+    .*\.dockerfile
+  )$
+
+exclude: |
+  (?x)^(
+    \.git/|
+    \.venv/|
+    venv/|
+    __pycache__/|
+    node_modules/|
+    build/|
+    dist/|
+    \.next/|
+    \.pytest_cache/|
+    \.mypy_cache/|
+    \.tox/|
+    \.eggs/|
+    legacy/|
+    archive/|
+    .*\.min\.js|
+    .*\.min\.css
+  )$ 
