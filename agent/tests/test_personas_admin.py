@@ -49,7 +49,7 @@ def test_client(mock_persona_manager: MagicMock) -> TestClient:
 @pytest.fixture
 def valid_api_key() -> str:
     """Return the valid API key for testing."""
-    return "4010007a9aa5443fc717b54e1fd7a463260965ec9e2fce297280cf86f1b3a4bd"
+    return "test-api-key-for-testing"
 
 class TestPersonasAdminRouter:
     """Test cases for the personas admin router."""

@@ -13,15 +13,19 @@ else
 fi
 
 # Test PostgreSQL connection
-if PGPASSWORD=orch3str4_2024 psql -h localhost -U conductor -d conductor -c "SELECT 1;" >/dev/null 2>&1; then
+if [ -n "$POSTGRES_PASSWORD" ] && PGPASSWORD=${POSTGRES_PASSWORD} psql -h localhost -U conductor -d conductor -c "SELECT 1;" >/dev/null 2>&1; then
     echo "✅ PostgreSQL connection working"
 else
     echo "🔧 Fixing PostgreSQL permissions..."
-    sudo -u postgres psql << EOF >/dev/null 2>&1
-ALTER USER conductor WITH PASSWORD 'orch3str4_2024';
+    if [ -n "$POSTGRES_PASSWORD" ]; then
+        sudo -u postgres psql << EOF >/dev/null 2>&1
+ALTER USER conductor WITH PASSWORD '${POSTGRES_PASSWORD}';
 GRANT ALL PRIVILEGES ON DATABASE conductor TO conductor;
 EOF
-    echo "✅ PostgreSQL permissions fixed"
+        echo "✅ PostgreSQL permissions fixed"
+    else
+        echo "⚠️ POSTGRES_PASSWORD not set. Please configure environment variables."
+    fi
 fi
 
 # Check if Weaviate is running (Docker)

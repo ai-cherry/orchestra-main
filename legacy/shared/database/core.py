@@ -17,7 +17,7 @@ except Exception:
     pass
     # Fallback if agent.app.core.config is not available (e.g. running script standalone)
     PG_USER = os.getenv("POSTGRES_USER", "conductor")
-    PG_PASSWORD = os.getenv("POSTGRES_PASSWORD", "orch3str4_2024")
+    PG_PASSWORD = os.getenv("POSTGRES_PASSWORD")
     PG_HOST = os.getenv("POSTGRES_HOST", "localhost")
     PG_PORT = os.getenv("POSTGRES_PORT", "5432")
     PG_DB = os.getenv("POSTGRES_DB", "conductor")

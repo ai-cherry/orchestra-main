@@ -1,6 +1,10 @@
 # TODO: Consider adding connection pooling configuration
 """
+Configuration settings for Orchestra AI Agent
 """
+import os
+from typing import Optional
+
 API_PORT = int(os.getenv("API_PORT", "8000"))
 API_URL = os.getenv("API_URL", "http://localhost:3000")
 SERVER_HOST = os.getenv("SERVER_HOST", "45.32.69.157")
@@ -12,7 +16,7 @@ POSTGRES_HOST = os.getenv("POSTGRES_HOST", "localhost")
 POSTGRES_PORT = int(os.getenv("POSTGRES_PORT", "5432"))
 POSTGRES_DB = os.getenv("POSTGRES_DB", "conductor")
 POSTGRES_USER = os.getenv("POSTGRES_USER", "conductor")
-POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD", "orch3str4_2024")
+POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
 
 # Weaviate Configuration
 WEAVIATE_URL = os.getenv("WEAVIATE_URL", "http://localhost:8080")
@@ -64,8 +68,8 @@ POSTGRES_SCHEMA_SOPHIA = os.getenv("POSTGRES_SCHEMA_SOPHIA", "sophia")
 POSTGRES_SCHEMA_KAREN = os.getenv("POSTGRES_SCHEMA_KAREN", "karen")
 
 def get_database_url(schema: Optional[str] = None) -> str:
-    """
-    """
+    """Get database URL with optional schema specification"""
+    if schema:
         return f"{DATABASE_URL}?options=-csearch_path%3D{schema}"
     return DATABASE_URL
 

@@ -2,7 +2,7 @@
 """
 """
 API_URL = os.getenv("API_URL", "http://localhost:8000")
-API_KEY = os.getenv("cherry_ai_API_KEY", "4010007a9aa5443fc717b54e1fd7a463260965ec9e2fce297280cf86f1b3a4bd")
+API_KEY = os.getenv("cherry_ai_API_KEY", "")
 
 # Test commands
 TEST_COMMANDS = [
