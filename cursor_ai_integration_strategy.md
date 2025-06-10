@@ -93,3 +93,5 @@ Instead of a separate AI tools dashboard, integrate directly into Cursor IDE usi
 
 **This approach eliminates the need for external dashboards while providing more powerful AI tool integration than any standalone solution.**
 
+> **Note:** This project is optimized for solo, performance-focused development. All config is loaded from a single .env file. Security and cost controls are relaxed for speed and iteration.
+

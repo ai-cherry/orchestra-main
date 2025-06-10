@@ -5,6 +5,8 @@
 ### 🏷️ **VERSION**: 4.0 - Complete AI Assistant Integration
 ### 🔑 **STATUS**: ✅ All Systems Operational
 
+> **Note:** This project is optimized for solo, performance-focused development. All config is loaded from a single .env file. Security and cost controls are relaxed for speed and iteration.
+
 ---
 
 ## 🎯 **EXECUTIVE SUMMARY**

@@ -179,6 +179,15 @@ Orchestra AI centralizes all secrets using **Pulumi**. Run `scripts/generate_env
 - **MCP Documentation**: Tool integration guides and examples
 - **Reflection System**: Automated insights and optimization recommendations
 
+## Quick Environment Setup (Solo/Performance Mode)
+
+1. Copy `env.example` to `.env` in the project root.
+2. Fill in your real values for all required variables in `.env`.
+3. `.env` is .gitignored and should never be committed.
+4. All services, scripts, and AI tools will load config from `.env`.
+
+**Note:** This project is optimized for solo development. Security and cost controls are relaxed in favor of performance and rapid iteration. If you later need to harden security, migrate secrets to a managed vault and update this workflow.
+
 ---
 
 **🎉 Orchestra AI is production-ready with comprehensive Notion integration, simplified admin interface, and automated improvement systems. All components are tested, documented, and operational.**
