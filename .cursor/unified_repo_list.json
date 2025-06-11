@@ -3,7 +3,7 @@
     "path": "/home/ubuntu/orchestra-main",
     "name": "Orchestra AI",
     "status": "critical",
-    "last_update": "2025-06-11T07:40:11.772570",
+    "last_update": "2025-06-11T07:50:12.096056",
     "notion_integrated": true,
     "personas_active": true,
     "microservices_count": 4
