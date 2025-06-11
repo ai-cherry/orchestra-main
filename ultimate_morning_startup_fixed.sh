@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# 🌅 Orchestra AI - ULTIMATE Morning Startup Script (FIXED)
-# Complete Cursor integration: Models, MAX Mode, Beta Features, Full API Access
+# 🌅 Orchestra AI - ULTIMATE Morning Startup Script (PRODUCTION-ALIGNED)
+# Cursor AI: Pure Development Assistant + Personas: Production Business System
 
 set -euo pipefail  # Strict error handling
 
@@ -34,7 +34,8 @@ log_warning() { echo -e "${YELLOW}⚠️ $1${NC}"; }
 log_error() { echo -e "${RED}❌ $1${NC}"; }
 log_header() { echo -e "${PURPLE}$1${NC}"; }
 log_cursor() { echo -e "${CYAN}🎯 $1${NC}"; }
-log_max() { echo -e "${MAGENTA}🚀 $1${NC}"; }
+log_dev() { echo -e "${MAGENTA}💻 $1${NC}"; }
+log_production() { echo -e "${GREEN}🚀 $1${NC}"; }
 
 # Error handler
 error_handler() {
@@ -46,15 +47,15 @@ error_handler() {
 }
 trap 'error_handler ${LINENO} $?' ERR
 
-setup_cursor_ultimate_config() {
-    log_max "🚀 Setting up Cursor with ALL models and ULTIMATE features..."
+setup_cursor_development_config() {
+    log_dev "💻 Setting up Cursor AI as DEVELOPMENT ASSISTANT..."
     
     # Ensure directories exist
     mkdir -p "$HOME/Library/Application Support/Cursor/User"
     mkdir -p "$PROJECT_DIR/.vscode"
     mkdir -p "$PROJECT_DIR/.cursor"
     
-    # Create ULTIMATE Cursor settings
+    # Create Cursor settings for DEVELOPMENT FOCUS
     cat > "$CURSOR_SETTINGS" << 'EOF'
 {
   "cursor.modelSettings": {
@@ -89,32 +90,24 @@ setup_cursor_ultimate_config() {
   },
   "cursor.permissions": {
     "fileSystemAccess": "full",
-    "networkAccess": "full",
+    "networkAccess": "development",
     "terminalAccess": "full",
-    "apiAccess": "full",
-    "allowExternalConnections": true,
+    "apiAccess": "development",
+    "allowExternalConnections": false,
     "allowCodeExecution": true,
     "allowFileModification": true,
     "allowDirectoryTraversal": true,
-    "allowInfrastructureControl": true
+    "allowInfrastructureControl": "development-only"
   },
-  "cursor.api": {
-    "enableApiAccess": true,
-    "allowExternalApis": true,
-    "trustedDomains": [
-      "localhost",
-      "127.0.0.1",
-      "192.9.142.8",
-      "lambdalabs.com",
-      "*.lambdalabs.com",
-      "notion.so",
-      "*.notion.so"
-    ]
+  "cursor.development": {
+    "focus": "coding-assistant",
+    "personaIntegration": "domain-aware-comments-only",
+    "productionAccess": "read-only-for-context"
   }
 }
 EOF
 
-    # Create workspace-specific settings
+    # Create workspace-specific settings for DEVELOPMENT
     cat > "$CURSOR_WORKSPACE_SETTINGS" << 'EOF'
 {
   "cursor.rules": [
@@ -125,70 +118,87 @@ EOF
     "writingStyle": "concise",
     "includeMinimap": true,
     "enableMultiFileEdit": true,
-    "maxMode": true
+    "maxMode": true,
+    "focus": "development"
   },
-  "cursor.orchestra": {
-    "personas": {
-      "cherry": "http://127.0.0.1:8081/cherry",
-      "sophia": "http://127.0.0.1:8081/sophia", 
-      "karen": "http://127.0.0.1:8081/karen"
+  "cursor.domainAwareness": {
+    "payReadyCode": {
+      "note": "Financial/Payment code - Business logic managed by Sophia persona in production",
+      "context": "PCI DSS compliance required, payment processing patterns"
     },
-    "infrastructure": {
-      "lambdaLabs": "127.0.0.1:8080-8083",
-      "mainApi": "127.0.0.1:8082",
-      "personasApi": "127.0.0.1:8081"
+    "paragonRxCode": {
+      "note": "Medical/Healthcare code - Business logic managed by Karen persona in production", 
+      "context": "HIPAA compliance required, medical coding standards"
+    },
+    "infrastructureCode": {
+      "note": "Infrastructure/Coordination code - Managed by Cherry persona in production",
+      "context": "Multi-domain coordination, system integration patterns"
     }
+  },
+  "cursor.production": {
+    "personasApi": "http://127.0.0.1:8081",
+    "accessLevel": "development-context-only",
+    "note": "Personas handle live business operations, Cursor handles development"
   }
 }
 EOF
 
-    # Create comprehensive MCP configuration
+    # Create DEVELOPMENT-FOCUSED MCP configuration
     cat > "$CURSOR_MCP_CONFIG" << 'EOF'
 {
   "mcpServers": {
+    "code-intelligence": {
+      "command": "python3", 
+      "args": ["/Users/lynnmusil/orchestra-dev/code_intelligence_server_enhanced.py"],
+      "description": "Real-time Code Analysis with Domain Awareness",
+      "features": ["complexity analysis", "domain-aware insights", "refactoring suggestions"]
+    },
+    "infrastructure-deployment": {
+      "command": "python3",
+      "args": ["/Users/lynnmusil/orchestra-dev/infrastructure_deployment_server.py"],
+      "description": "Development Infrastructure Control (Vercel, Lambda Labs)",
+      "features": ["vercel deployment", "lambda labs management", "development environments"]
+    },
     "sequential-thinking": {
       "command": "npx",
-      "args": ["@mcp-server/sequential-thinking"],
-      "disabled": false,
-      "alwaysAllow": ["sequentialthinking"]
+      "args": ["@modelcontextprotocol/server-sequential-thinking"],
+      "description": "Advanced Problem Solving for Development",
+      "features": ["multi-step analysis", "development planning", "architecture decisions"]
     },
     "pulumi": {
-      "command": "npm",
-      "args": ["exec", "@pulumi/mcp-server"],
-      "disabled": false,
-      "alwaysAllow": [
-        "pulumi-registry-get-resource",
-        "pulumi-registry-list-resources", 
-        "pulumi-cli-preview",
-        "pulumi-cli-up",
-        "pulumi-cli-stack-output"
-      ]
+      "command": "npx",
+      "args": ["@modelcontextprotocol/server-pulumi"],
+      "description": "Infrastructure as Code for Development",
+      "features": ["cloud resources", "development deployment", "staging environments"]
     },
     "filesystem": {
-      "command": "npx",
+      "command": "npx", 
       "args": ["@modelcontextprotocol/server-filesystem", "/Users/lynnmusil/orchestra-dev"],
-      "disabled": false,
-      "alwaysAllow": [
-        "read_file",
-        "write_file", 
-        "create_directory",
-        "list_directory"
-      ]
+      "description": "Complete Development Filesystem Access",
+      "features": ["file operations", "directory management", "code search"]
+    }
+  },
+  "global": {
+    "timeout": 30,
+    "retries": 3,
+    "features": {
+      "development_focus": true,
+      "domain_awareness": true,
+      "production_separation": true,
+      "code_intelligence": true
     },
-    "brave-search": {
-      "command": "npx",
-      "args": ["@modelcontextprotocol/server-brave-search"],
-      "disabled": false,
-      "alwaysAllow": ["brave_web_search"]
+    "performance": {
+      "target_response_time": "2ms",
+      "development_optimized": true
     }
   }
 }
 EOF
 
-    # Create API access configuration
-    cat > "$PROJECT_DIR/.cursor/api_config.json" << 'EOF'
+    # Create development API access configuration
+    cat > "$PROJECT_DIR/.cursor/development_config.json" << 'EOF'
 {
-  "orchestraServices": {
+  "developmentServices": {
     "lambdaLabs": {
       "baseUrl": "http://127.0.0.1",
       "ports": {
@@ -196,30 +206,108 @@ EOF
         "personas": 8081,
         "mainApi": 8082,
         "frontend": 8083
-      }
+      },
+      "accessLevel": "development"
     },
-    "notion": {
-      "workspaceId": "20bdba04940280ca9ba7f9bce721f547"
+    "vercel": {
+      "deployment": "development-only",
+      "production": "personas-controlled"
+    }
+  },
+  "domainSeparation": {
+    "cursorAI": {
+      "role": "Development assistant, code analysis, deployment tools",
+      "scope": "Development environment only",
+      "personaInteraction": "Domain-aware code comments only"
+    },
+    "personas": {
+      "role": "Live business operations, database interactions, customer service",
+      "scope": "Production environment",
+      "cursorInteraction": "Separate system, no direct integration"
     }
   },
   "permissions": {
-    "allowInfrastructureChanges": true,
-    "allowDatabaseOperations": true,
-    "allowFileSystemAccess": true,
-    "allowNetworkAccess": true
+    "allowDevelopmentDeployment": true,
+    "allowProductionAccess": false,
+    "allowPersonaDataAccess": false,
+    "allowCodeAnalysis": true
   }
 }
 EOF
     
-    log_success "ULTIMATE Cursor configuration created"
-    log_success "✅ ALL models enabled (Claude-4-Sonnet, Claude-4-Opus, Gemini-2.5-Pro, GPT-4.1, O3-Pro, DeepSeek)"
-    log_success "✅ MAX Mode ENABLED"
-    log_success "✅ ALL Beta features ENABLED"
-    log_success "✅ Full API access configured"
-    log_success "✅ Infrastructure control enabled"
+    log_success "Development-focused Cursor configuration created"
+    log_success "✅ ALL models enabled for development assistance"
+    log_success "✅ MAX Mode ENABLED for coding productivity"
+    log_success "✅ Domain-aware code intelligence (not persona integration)"
+    log_success "✅ Development infrastructure control only"
+    log_success "✅ Production personas remain separate system"
 }
 
-# Include the rest of the enhanced startup functionality
+start_production_personas() {
+    log_production "🚀 Starting Production Persona System..."
+    
+    # Check if personas are already running
+    if curl -s http://127.0.0.1:8081/health >/dev/null 2>&1; then
+        log_success "Production personas already running"
+        
+        # Get persona status
+        persona_status=$(curl -s http://127.0.0.1:8081/health 2>/dev/null || echo '{"status": "unknown"}')
+        log_success "Cherry (Personal Overseer): Cross-domain coordination"
+        log_success "Sophia (Pay Ready Guru): PRIMARY ASSISTANT (12K context)"  
+        log_success "Karen (ParagonRX): Medical specialist (6K context)"
+        
+        return 0
+    fi
+    
+    # Start personas if not running
+    log_info "Starting production persona system..."
+    
+    if check_ssh_connection; then
+        log_info "Starting personas via SSH tunnel..."
+        ssh -p "$SSH_PORT" -i "$SSH_KEY" "$SSH_USER@$SSH_HOST" \
+            "cd $REMOTE_PROJECT_DIR && python3 personas_server.py > personas_api.log 2>&1 & echo \$! > personas_api.pid && echo 'Personas API started on port 8000 with PID: \$(cat personas_api.pid)'"
+        
+        sleep 5
+        
+        if wait_for_service "http://127.0.0.1:8081/health" "Production Personas"; then
+            log_success "Production persona system started successfully"
+        else
+            log_warning "Personas may be starting up, check manually"
+        fi
+    else
+        log_warning "No SSH connection - personas may need manual start"
+    fi
+}
+
+start_development_mcp_servers() {
+    log_dev "💻 Starting Development MCP Servers..."
+    
+    # Start only development-focused MCP servers
+    local servers_started=0
+    
+    # Code Intelligence Server for development
+    if ! pgrep -f "code_intelligence_server_enhanced.py" >/dev/null; then
+        log_info "Starting Code Intelligence Server..."
+        python3 "$PROJECT_DIR/code_intelligence_server_enhanced.py" &
+        ((servers_started++))
+        sleep 2
+    fi
+    
+    # Infrastructure Deployment for development environments
+    if ! pgrep -f "infrastructure_deployment_server.py" >/dev/null; then
+        log_info "Starting Infrastructure Deployment Server..."
+        python3 "$PROJECT_DIR/infrastructure_deployment_server.py" &
+        ((servers_started++))
+        sleep 2
+    fi
+    
+    if [ $servers_started -gt 0 ]; then
+        log_success "Started $servers_started development MCP servers"
+    else
+        log_success "Development MCP servers already running"
+    fi
+}
+
 wait_for_service() {
     local url=$1
     local service_name=$2
@@ -249,54 +337,85 @@ check_ssh_connection() {
     fi
 }
 
-open_cursor_properly() {
-    log_max "💻 Opening Cursor with ULTIMATE configuration..."
+open_cursor_development() {
+    log_dev "💻 Opening Cursor AI as Development Assistant..."
     
     echo
-    log_max "🚀 CURSOR ULTIMATE FEATURES ENABLED:"
-    echo -e "${MAGENTA}✅ ALL Premium Models: Claude-4-Sonnet/Opus, Gemini-2.5-Pro, GPT-4.1, O3-Pro, DeepSeek${NC}"
-    echo -e "${MAGENTA}✅ MAX Mode: ENABLED for maximum capabilities${NC}"
-    echo -e "${MAGENTA}✅ Beta Features: ALL activated${NC}"
-    echo -e "${MAGENTA}✅ API Access: Full infrastructure control${NC}"
-    echo -e "${MAGENTA}✅ MCP Servers: Sequential Thinking, Pulumi, Filesystem, Search${NC}"
-    echo -e "${MAGENTA}✅ Workspace Rules: Architecture & Standards loaded${NC}"
+    log_dev "💻 CURSOR AI DEVELOPMENT FEATURES:"
+    echo -e "${MAGENTA}✅ Code Analysis: Real-time complexity, quality, refactoring${NC}"
+    echo -e "${MAGENTA}✅ Domain Awareness: Pay Ready, ParagonRX, Infrastructure context${NC}"
+    echo -e "${MAGENTA}✅ Infrastructure Control: Vercel deployment, Lambda Labs management${NC}"
+    echo -e "${MAGENTA}✅ ALL Models: Claude-4-Sonnet/Opus, Gemini-2.5-Pro, GPT-4.1, O3-Pro${NC}"
+    echo -e "${MAGENTA}✅ MAX Mode: Maximum development productivity${NC}"
+    echo -e "${MAGENTA}✅ MCP Servers: Code intelligence, infrastructure, problem solving${NC}"
+    echo
+    log_dev "📝 DOMAIN-AWARE DEVELOPMENT:"
+    echo -e "${CYAN}• Pay Ready code → Cursor adds context: 'Sophia handles business logic'${NC}"
+    echo -e "${CYAN}• ParagonRX code → Cursor adds context: 'Karen handles medical compliance'${NC}" 
+    echo -e "${CYAN}• Infrastructure → Cursor adds context: 'Cherry coordinates in production'${NC}"
     echo
     
-    log_info "🚀 Opening Cursor with project directory..."
+    log_info "🚀 Opening Cursor with development focus..."
     
-    # FIXED: Use the most reliable method to open Cursor
+    # Open Cursor for development
     if [ -d "/Applications/Cursor.app" ]; then
         open -a Cursor "$PROJECT_DIR"
-        log_success "Cursor opened via Application bundle"
+        log_success "Cursor opened as development assistant"
         
         # Give Cursor time to start
         sleep 3
         
         # Verify Cursor opened
         if ps aux | grep -q "[C]ursor.app"; then
-            log_success "✅ Cursor is running and ready!"
+            log_success "✅ Cursor AI development assistant ready!"
         else
             log_warning "⚠️ Cursor may not have opened properly"
         fi
-    elif command -v cursor >/dev/null 2>&1; then
-        cursor "$PROJECT_DIR" &
-        log_success "Cursor opened via command line"
-    elif command -v code >/dev/null 2>&1; then
-        code "$PROJECT_DIR" &
-        log_warning "VS Code opened (Cursor not found) - some features may not work"
     else
-        log_error "❌ Could not find Cursor! Please manually open Cursor with: $PROJECT_DIR"
-        log_info "💡 Install Cursor from: https://cursor.sh"
+        log_error "❌ Could not find Cursor! Please install from: https://cursor.sh"
         return 1
     fi
     
     return 0
 }
 
+check_system_separation() {
+    log_header "🔍 Checking Development/Production Separation..."
+    
+    # Check Cursor (Development)
+    if ps aux | grep -q "[C]ursor.app"; then
+        log_dev "💻 Cursor AI: Development assistant ACTIVE"
+    else
+        log_warning "💻 Cursor AI: Not running"
+    fi
+    
+    # Check Personas (Production)  
+    if curl -s http://127.0.0.1:8081/health >/dev/null 2>&1; then
+        log_production "🚀 Production Personas: ACTIVE and handling business operations"
+    else
+        log_warning "🚀 Production Personas: Not responding"
+    fi
+    
+    # Check MCP Servers (Development Tools)
+    local mcp_count=$(ps aux | grep -E "(code_intelligence|infrastructure_deployment|enhanced_memory)" | grep -v grep | wc -l)
+    if [ "$mcp_count" -gt 0 ]; then
+        log_dev "💻 Development MCP Servers: $mcp_count active"
+    else
+        log_warning "💻 Development MCP Servers: None running"
+    fi
+    
+    echo
+    log_header "🎯 SYSTEM ARCHITECTURE CONFIRMED:"
+    echo -e "${CYAN}📍 Cursor AI: Pure development assistant with domain awareness${NC}"
+    echo -e "${GREEN}📍 Personas: Live production system handling business operations${NC}"
+    echo -e "${YELLOW}📍 Connection: Domain-aware code comments only (no direct integration)${NC}"
+}
+
 # Main script
 main() {
-    log_header "🌅 Good Morning! Starting your ULTIMATE Orchestra AI environment..."
-    log_max "🚀 MAX Mode + All Models + Full API Access + Beta Features!"
+    log_header "🌅 Good Morning! Starting Orchestra AI Development Environment..."
+    log_dev "💻 Cursor AI: Development Assistant + Domain Awareness"
+    log_production "🚀 Personas: Production Business System (Separate)"
     log_header "=================================================================="
 
     log_info "📍 Starting from: $(pwd)"
@@ -310,74 +429,65 @@ main() {
     cd "$PROJECT_DIR"
     log_success "In project directory: $(pwd)"
 
-    # Setup ULTIMATE Cursor configuration
-    log_max "🚀 Step 1: ULTIMATE Cursor Configuration..."
-    setup_cursor_ultimate_config
+    # Setup Development-focused Cursor configuration
+    log_dev "💻 Step 1: Development-Focused Cursor Configuration..."
+    setup_cursor_development_config
 
-    # Check SSH tunnels
-    log_info "🔗 Step 2: Managing SSH tunnels..."
-    if [ -f "./start_persistent_tunnels.sh" ]; then
-        if ./start_persistent_tunnels.sh status >/dev/null 2>&1; then
-            log_success "SSH tunnels already active"
-        else
-            log_info "Starting SSH tunnels..."
-            if ./start_persistent_tunnels.sh start; then
-                sleep 3
-                log_success "SSH tunnels started"
-            else
-                log_warning "SSH tunnel start had issues"
-            fi
-        fi
+    # Check/Start Production Personas (separate system)
+    log_production "🚀 Step 2: Production Persona System..."
+    start_production_personas
+
+    # Start Development MCP Servers
+    log_dev "💻 Step 3: Development MCP Servers..."
+    start_development_mcp_servers
+
+    # Check SSH tunnels for production access
+    log_info "🔗 Step 4: Production Access (SSH Tunnels)..."
+    if check_ssh_connection; then
+        log_success "SSH connection to production available"
     else
-        if check_ssh_connection; then
-            log_success "SSH connection verified (manually configured)"
-        else
-            log_warning "SSH connection not available"
-        fi
+        log_warning "SSH connection not available - production access limited"
     fi
 
-    # Validate services
-    log_info "🔍 Step 3: Validating service health..."
-    
-    if wait_for_service "http://127.0.0.1:8081/health" "Personas API"; then
-        personas_response=$(curl -s http://127.0.0.1:8081/health 2>/dev/null || echo "{}")
-        log_success "Personas API: Active with Cherry, Sophia, Karen"
-    fi
-    
-    # Check MCP servers
-    local_mcp_count=$(ps aux | grep -E "mcp.*server|sequential-thinking|pulumi.*mcp" | grep -v grep | wc -l)
-    if [ "$local_mcp_count" -gt 0 ]; then
-        log_success "MCP servers running: $local_mcp_count processes"
-    fi
-
-    # FIXED: Open Cursor properly
-    log_max "💻 Step 4: Opening Cursor with ULTIMATE configuration..."
-    if open_cursor_properly; then
-        log_success "🎉 Cursor opened successfully!"
+    # Open Cursor as Development Assistant
+    log_dev "💻 Step 5: Opening Cursor AI Development Assistant..."
+    if open_cursor_development; then
+        log_success "🎉 Cursor AI development assistant ready!"
     else
         log_error "❌ Failed to open Cursor"
         exit 1
     fi
 
+    # Check system separation
+    sleep 2
+    check_system_separation
+
     # Final status
     echo
-    log_header "🎉 ULTIMATE startup complete! Cursor is MAXED OUT and ready!"
+    log_header "🎉 Orchestra AI Development Environment Ready!"
     echo
-    log_max "🚀 ULTIMATE CURSOR STATUS:"
-    echo -e "${MAGENTA}📍 Global Config: $CURSOR_SETTINGS${NC}"
-    echo -e "${MAGENTA}🎯 Workspace Config: $CURSOR_WORKSPACE_SETTINGS${NC}"
-    echo -e "${MAGENTA}🤖 MCP Config: $CURSOR_MCP_CONFIG${NC}"
-    echo -e "${MAGENTA}🏗️ API Config: $PROJECT_DIR/.cursor/api_config.json${NC}"
-    echo
-    
-    log_max "🎯 WHAT TO CHECK IN CURSOR:"
-    echo -e "${CYAN}1. Model dropdown: Look for ALL premium models${NC}"
-    echo -e "${CYAN}2. Settings: MAX Mode toggle should be ON (purple)${NC}"
-    echo -e "${CYAN}3. Status bar: Check for MCP server connections${NC}"
-    echo -e "${CYAN}4. Try Sequential Thinking tool in chat${NC}"
+    log_dev "💻 CURSOR AI READY FOR:"
+    echo -e "${CYAN}• Code analysis with domain awareness${NC}"
+    echo -e "${CYAN}• Real-time development assistance${NC}"
+    echo -e "${CYAN}• Infrastructure deployment (dev environments)${NC}"
+    echo -e "${CYAN}• Domain-specific code context (Pay Ready, ParagonRX)${NC}"
     echo
     
-    log_max "💡 You now have the most powerful AI development environment possible! 🚀"
+    log_production "🚀 PRODUCTION PERSONAS HANDLING:"
+    echo -e "${GREEN}• Live customer interactions${NC}"
+    echo -e "${GREEN}• Database operations${NC}"
+    echo -e "${GREEN}• Business logic execution${NC}"
+    echo -e "${GREEN}• Cross-domain coordination${NC}"
+    echo
+    
+    log_header "📋 WHAT TO CHECK:"
+    echo -e "${CYAN}1. Cursor: Domain-aware code suggestions${NC}"
+    echo -e "${CYAN}2. MCP Tools: Code intelligence, infrastructure tools${NC}"
+    echo -e "${GREEN}3. Personas API: http://127.0.0.1:8081/health${NC}"
+    echo -e "${YELLOW}4. Separation: Development ↔ Production systems independent${NC}"
+    echo
+    
+    log_header "💡 Perfect separation: Cursor handles CODE, Personas handle BUSINESS! 🚀"
 }
 
 # Run main function
