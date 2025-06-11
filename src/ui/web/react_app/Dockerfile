@@ -32,4 +32,6 @@ EXPOSE 80
 
 CMD ["nginx", "-g", "daemon off;"]
 
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 CMD wget --spider -q http://localhost:80 || exit 1
+
 

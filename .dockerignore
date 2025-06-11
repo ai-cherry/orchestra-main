@@ -49,10 +49,16 @@ node_modules/
 .env
 .env.*
 !.env.example
+docs/
 docs/archive/
 scripts/archive/
 *.tar.gz
 *.zip
+*.md
+README.md
+CHANGELOG.md
+NOTES.md
+TODO.md
 
 # Build artifacts
 dist/
