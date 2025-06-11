@@ -12,6 +12,7 @@ venv/
 .vscode/
 .idea/
 *.swp
+*.swo
 
 # OS files
 .DS_Store
@@ -60,9 +61,9 @@ yarn-error.log*
 .secrets/orchestra-service-key.json
 
 # Environment files - COMMENTED OUT FOR AI ACCESS
-# .env
-# *.env
-# .env.*
+.env
+.env.*
+!.env.example
 
 # Pulumi passphrase file
 .pulumi-passphrase
@@ -78,8 +79,6 @@ nohup.out
 # API Keys
 api_keys.txt
 config/secrets.json
-!.env.example
-!.env.prod.example
 
 # Auto-generated scripts
 auto_setup.sh
@@ -113,3 +112,11 @@ yarn-error.log*
 # Pulumi stack files (contain secrets/state)
 **/Pulumi.*.yaml
 .vercel
+
+# Dependencies
+.pnpm-store/
+
+# Backups
+*.bak
+*.backup
+*.tmp

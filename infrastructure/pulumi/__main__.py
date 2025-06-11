@@ -5,23 +5,31 @@ Pulumi configuration optimized for single-developer performance
 
 import pulumi
 import pulumi_lambda as Lambda
-import pulumi_random as random
-from pulumi import Config, Output
+from pulumi import Config, Output, get_organization, get_stack, get_project
 
-# Configuration (Performance Optimized)
-config = Config()
-LAMBDA_API_KEY = config.require_secret("LAMBDA_API_KEY")
+# Load the Pulumi ESC environment for the current stack.
+# This securely provides all configuration and secrets.
+esc_env_name = f"{get_organization()}/{get_project()}/{get_stack()}"
+pulumi.log.info(f"🚀 Loading configuration from Pulumi ESC environment: {esc_env_name}")
+esc_config = Config("pulumi:environment")
+config = esc_config.require_object("values")
 
-# Performance mode detection
-performance_mode = config.get("performance:mode") or "standard"
-resource_limits = config.get_bool("performance:resource_limits") or False
+# Get secrets from the loaded config
+secrets = config.require_object("secrets")
+LAMBDA_API_KEY = secrets.require_secret("lambda_api_key")
+
+# Performance mode detection from ESC
+performance_config = config.require_object("performance")
+performance_mode = performance_config.get("mode") or "standard"
+resource_limits = performance_config.get_bool("resource_limits") or False
 
 print(f"🚀 Deploying in {performance_mode} mode with resource_limits={resource_limits}")
 
-# Create SSH key for server access
+# Create SSH key for server access (public key still comes from stack config)
+ssh_key_name = config.get("ssh_key_name") or "cherry-ai-orchestrator"
 ssh_key = Lambda.SshKey("cherry-ai-ssh-key",
-    name="cherry-ai-orchestrator",
-    ssh_key=config.require("ssh_public_key")
+    name=ssh_key_name,
+    ssh_key=Config().require("ssh_public_key") # Local config for public key
 )
 
 # Production server
@@ -122,7 +130,7 @@ echo "✅ Staging server setup completed"
 )
 
 # Load balancer
-load_balancer = lambda.LoadBalancer("cherry-ai-lb",
+load_balancer = Lambda.LoadBalancer("cherry-ai-lb",
     region="lax",
     label="cherry-ai-load-balancer",
     balancing_algorithm="roundrobin",
@@ -154,7 +162,7 @@ load_balancer = lambda.LoadBalancer("cherry-ai-lb",
 )
 
 # Kubernetes cluster for scaling
-k8s_cluster = lambda.KubernetesCluster("cherry-ai-k8s",
+k8s_cluster = Lambda.KubernetesCluster("cherry-ai-k8s",
     region="lax",
     version="v1.28.0+1",
     label="cherry-ai-k8s",

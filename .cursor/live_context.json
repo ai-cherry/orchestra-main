@@ -1,23 +1,23 @@
 {
-  "last_update": "2025-06-11T05:35:01.518928",
+  "last_update": "2025-06-11T06:10:01.687785",
   "production_status": {
-    "timestamp": "2025-06-11T05:35:01.518936",
+    "timestamp": "2025-06-11T06:10:01.687791",
     "services": {
       "Zapier MCP": {
         "status": "unreachable",
-        "error": "HTTPConnectionPool(host='192.9.142.8', port=80): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7653964abb20>: Failed to establish a new connection: [Errno 111] Connection refused'))"
+        "error": "HTTPConnectionPool(host='192.9.142.8', port=80): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7794608b3b20>: Failed to establish a new connection: [Errno 111] Connection refused'))"
       },
       "Personas API": {
         "status": "unreachable",
-        "error": "HTTPConnectionPool(host='192.9.142.8', port=8000): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x765396518400>: Failed to establish a new connection: [Errno 111] Connection refused'))"
+        "error": "HTTPConnectionPool(host='192.9.142.8', port=8000): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x779460920400>: Failed to establish a new connection: [Errno 111] Connection refused'))"
       },
       "Main API": {
         "status": "unreachable",
-        "error": "HTTPConnectionPool(host='192.9.142.8', port=8010): Max retries exceeded with url: /health (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x765396518b50>, 'Connection to 192.9.142.8 timed out. (connect timeout=5)'))"
+        "error": "HTTPConnectionPool(host='192.9.142.8', port=8010): Max retries exceeded with url: /health (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x779460920b50>, 'Connection to 192.9.142.8 timed out. (connect timeout=5)'))"
       },
       "Infrastructure": {
         "status": "unreachable",
-        "error": "HTTPConnectionPool(host='192.9.142.8', port=8080): Max retries exceeded with url: /health (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x7653964abeb0>, 'Connection to 192.9.142.8 timed out. (connect timeout=5)'))"
+        "error": "HTTPConnectionPool(host='192.9.142.8', port=8080): Max retries exceeded with url: /health (Caused by ConnectTimeoutError(<urllib3.connection.HTTPConnection object at 0x7794608b3eb0>, 'Connection to 192.9.142.8 timed out. (connect timeout=5)'))"
       }
     },
     "overall_health": "critical"
