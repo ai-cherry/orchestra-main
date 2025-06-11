@@ -14,7 +14,7 @@ python-multipart==0.0.20  # Updated: Security fix
 # Database & Storage
 sqlalchemy==2.0.30
 asyncpg==0.29.0
-pgvector==0.2.5
+pgvector==0.4.1
 weaviate-client==4.14.4
 redis==6.2.0  # Updated: Security fix for PYSEC-2023-312
 psycopg==3.1.18

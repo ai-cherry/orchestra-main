@@ -168,7 +168,7 @@ pandas==2.2.0
 parver==0.5
 passlib==1.7.4
 pathspec==0.12.1
-pgvector==0.2.5
+pgvector==0.4.1
 phidata==2.7.10
 pillow==11.2.1
 pip==24.0
