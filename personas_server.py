@@ -122,8 +122,12 @@ def system_info():
 
 if __name__ == '__main__':
     print("🎭 Starting Orchestra AI Personas Server...")
-    print("🍒 Cherry: Personal overseer (4K context)")
-    print("💼 Sophia: Financial expert (6K context)")  
-    print("⚕️ Karen: Medical specialist (8K context)")
+    print("🍒 Cherry: Personal Overseer with Broader Access (8K context)")
+    print("💼 Sophia: Pay Ready Guru - PRIMARY ASSISTANT (12K context)")  
+    print("⚕️ Karen: ParagonRX Specialist (6K context)")
     print("🚀 Server starting on port 8000...")
+    print("📊 Updated Context Allocation:")
+    print("   - Sophia (Pay Ready): 12,000 tokens (most comprehensive)")
+    print("   - Cherry (Coordinator): 8,000 tokens (cross-domain access)")
+    print("   - Karen (ParagonRX): 6,000 tokens (focused, scalable)")
     uvicorn.run(app, host='0.0.0.0', port=8000, log_level='info') 

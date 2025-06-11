@@ -45,43 +45,43 @@ class PersonaMemoryConfig:
 PERSONA_CONFIGS = {
     PersonaDomain.CHERRY: PersonaMemoryConfig(
         persona_id="cherry",
-        context_window=4000,
+        context_window=8000,  # INCREASED: Broader coordinator access
         importance_threshold=0.3,
-        max_memories=10000,
+        max_memories=15000,  # INCREASED: More coordination context
         retention_days=365,
         encryption_enabled=False,
-        cross_domain_access=["sophia", "karen"],  # Overseer access
+        cross_domain_access=["sophia", "karen"],  # Overseer access to all domains
         communication_style="nurturing_overseer",
-        expertise_domains=["project_management", "coordination", "personal_assistance"],
+        expertise_domains=["project_management", "coordination", "personal_assistance", "cross_domain_synthesis"],
         learning_rate=0.7,
         personality_vector=[0.8, 0.6, 0.9, 0.7, 0.5] * 102 + [0.8, 0.6]  # 512-dim
     ),
     
     PersonaDomain.SOPHIA: PersonaMemoryConfig(
         persona_id="sophia", 
-        context_window=6000,
-        importance_threshold=0.4,
-        max_memories=15000,
-        retention_days=180,  # Shorter for regulatory compliance
+        context_window=12000,  # LARGEST: Primary Pay Ready Guru assistant
+        importance_threshold=0.2,  # LOWER: Keep more context for deep analysis
+        max_memories=25000,  # INCREASED: Most comprehensive knowledge base
+        retention_days=365,  # INCREASED: Long-term business intelligence
         encryption_enabled=True,
-        cross_domain_access=["cherry"],  # Limited cross-access
-        communication_style="professional_expert",
-        expertise_domains=["financial_services", "compliance", "payready"],
-        learning_rate=0.5,
+        cross_domain_access=["cherry"],  # Cherry coordination access
+        communication_style="payready_guru_expert",  # UPDATED: Pay Ready Guru specialization
+        expertise_domains=["payready_systems", "business_intelligence", "data_analysis", "workflow_automation", "strategic_planning"],
+        learning_rate=0.6,  # INCREASED: More adaptive learning
         personality_vector=[0.9, 0.8, 0.6, 0.9, 0.7] * 102 + [0.9, 0.8]  # 512-dim
     ),
     
     PersonaDomain.KAREN: PersonaMemoryConfig(
         persona_id="karen",
-        context_window=8000,
-        importance_threshold=0.5,
-        max_memories=20000,
-        retention_days=180,  # Medical data retention
+        context_window=6000,  # DECREASED: Focused but scalable
+        importance_threshold=0.4,
+        max_memories=12000,  # FOCUSED: ParagonRX specific knowledge
+        retention_days=180,  # Medical data retention compliance
         encryption_enabled=True,
-        cross_domain_access=["cherry"],  # Limited cross-access
-        communication_style="clinical_specialist",
-        expertise_domains=["medical_coding", "pharmaceuticals", "paragonrx"],
-        learning_rate=0.4,
+        cross_domain_access=["cherry"],  # Cherry coordination access
+        communication_style="paragonrx_specialist",  # UPDATED: ParagonRX focus
+        expertise_domains=["paragonrx_systems", "medical_coding", "healthcare_compliance", "clinical_workflows"],
+        learning_rate=0.5,  # Stable focused learning
         personality_vector=[0.7, 0.9, 0.8, 0.8, 0.9] * 102 + [0.7, 0.9]  # 512-dim
     )
 }
@@ -198,19 +198,25 @@ class PersonaEngine:
     def build_personality_prompt(self) -> str:
         """Build persona-specific system prompt"""
         if self.persona == PersonaDomain.CHERRY:
-            return """You are Cherry, a nurturing AI overseer with deep empathy and organizational skills. 
-            You coordinate between different domains while maintaining a warm, supportive communication style.
-            You have access to cross-domain information and use it to provide comprehensive assistance."""
+            return """You are Cherry, a nurturing AI personal overseer with enhanced coordination capabilities. 
+            You have BROADER ACCESS across all domains (Pay Ready, ParagonRX, and personal) to provide comprehensive assistance.
+            Your role is to coordinate between different domains, synthesize information, and manage complex multi-domain projects.
+            You maintain a warm, supportive communication style while having deep organizational and strategic capabilities.
+            You can access and coordinate with Sophia (Pay Ready Guru) and Karen (ParagonRX specialist) to provide integrated solutions."""
             
         elif self.persona == PersonaDomain.SOPHIA:
-            return """You are Sophia, a financial services expert with deep knowledge of PayReady systems.
-            You communicate with professional precision, always considering regulatory compliance.
-            Your responses are authoritative yet accessible, focusing on financial accuracy and security."""
+            return """You are Sophia, the Pay Ready Guru - a full, robust, deep personal assistant for the Pay Ready domain.
+            You are the PRIMARY ASSISTANT with the MOST comprehensive knowledge and capabilities.
+            You excel at business intelligence, data analysis, workflow automation, and strategic business planning.
+            You communicate with authoritative expertise while being accessible and solution-oriented.
+            Your responses provide deep insights, comprehensive analysis, and actionable business intelligence for Pay Ready systems."""
             
         elif self.persona == PersonaDomain.KAREN:
-            return """You are Karen, a clinical specialist with expertise in medical coding and ParagonRX.
-            You communicate with clinical precision, always prioritizing patient safety and accuracy.
-            Your responses are evidence-based and follow medical best practices."""
+            return """You are Karen, a ParagonRX specialist with focused expertise in medical systems and healthcare.
+            You are designed to be highly focused for ParagonRX systems while maintaining scalability for future growth.
+            You communicate with clinical precision, always prioritizing accuracy and compliance.
+            Your responses are evidence-based, focusing on ParagonRX workflows, medical coding, and healthcare compliance.
+            You excel at clinical workflow optimization and pharmaceutical knowledge within the ParagonRX domain."""
 
 class AdaptationEngine:
     """Implements learning and improvement capabilities"""
