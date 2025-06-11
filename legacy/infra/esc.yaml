@@ -1,0 +1,44 @@
+# Pulumi ESC Environment Configuration
+# This template should be populated with actual secrets using:
+# pulumi env set cherry_ai-ai/dev-app-config --file esc.yaml
+
+environments:
+  # DigitalOcean environments
+  cherry_ai-ai/dev-app-config:
+    values:
+      OPENAI_API_KEY:
+        fn::secret: "your-dev-openai-key"
+      MONGO_URI:
+        fn::secret: "mongodb://user:pass@dev-mongo-host:27017/db"
+      WEAVIATE_URL: "http://dev-weaviate-host"
+      WEAVIATE_API_KEY:
+        fn::secret: "your-dev-weaviate-key"
+      DRAGONFLY_URI:
+        fn::secret: "redis://dev-dragonfly-host:6379"
+      DIGITALOCEAN_TOKEN:
+        fn::secret: "your-do-token"
+
+  cherry_ai-ai/prod-app-config:
+    values:
+      OPENAI_API_KEY:
+        fn::secret: "your-prod-openai-key"
+      MONGO_URI:
+        fn::secret: "mongodb://user:pass@prod-mongo-host:27017/db"
+      WEAVIATE_URL: "http://prod-weaviate-host"
+      WEAVIATE_API_KEY:
+        fn::secret: "your-prod-weaviate-key"
+      DRAGONFLY_URI:
+        fn::secret: "redis://prod-dragonfly-host:6379"
+      DIGITALOCEAN_TOKEN:
+        fn::secret: "your-do-token"
+
+  # Paperspace environments
+  cherry_ai-ai/dev-paperspace:
+    values:
+      PAPERSACE_WEAVIATE_URL: "http://localhost:8080"
+      PAPERSACE_WEAVIATE_API_KEY:
+        fn::secret: "your-weaviate-key"
+      MCP_WEAVIATE_SERVER_HOST: "localhost"
+      MCP_WEAVIATE_SERVER_PORT: "8081"
+      PAPERSACE_DRAGONFLYDB_URL: "redis://localhost:6379"
+      MCP_REDIS_SERVER_PORT: "8082"

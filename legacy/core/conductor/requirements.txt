@@ -1,0 +1,12 @@
+# Core orchestrator requirements - SECURITY UPDATED
+fastapi>=0.108.0  # Updated for security fixes  # SECURITY UPDATED
+uvicorn[standard]>=0.25.0  # Updated for security fixes  # SECURITY UPDATED
+pydantic>=2.5.2  # Updated for security fixes  # SECURITY UPDATED
+asyncpg>=0.29.0  # SECURITY UPDATED
+redis>=5.0.1  # SECURITY UPDATED
+python-dotenv>=1.0.0  # SECURITY UPDATED
+structlog>=23.2.0  # SECURITY UPDATED
+cryptography>=41.0.8  # Added for security  # SECURITY UPDATED
+certifi>=2023.11.17  # Added for security  # SECURITY UPDATED
+setuptools>=69.0.0  # Added for security  # SECURITY UPDATED
+

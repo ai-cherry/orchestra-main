@@ -1,0 +1,9 @@
+config:
+  Lambda:region: ewr
+  environment: production
+description: Infrastructure as Code for Cherry-AI.me on Lambda
+name: cherry-ai-infrastructure
+runtime:
+  name: python
+  options:
+    virtualenv: venv

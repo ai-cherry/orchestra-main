@@ -1,0 +1,5 @@
+*.pyc
+venv/
+
+# Secret files - NEVER commit these!
+set_secrets.sh
