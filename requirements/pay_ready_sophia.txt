@@ -14,7 +14,7 @@ psycopg2-binary==2.9.9  # PostgreSQL
 weaviate-client==3.25.3  # Vector database
 
 # Pinecone for specialized embeddings (if needed)
-pinecone-client==2.2.4
+pinecone-client==5.0.1
 
 # Data processing and validation
 pydantic==2.5.2
