@@ -143,50 +143,70 @@ EOF
 }
 EOF
 
-    # Create DEVELOPMENT-FOCUSED MCP configuration
+    # Create DEVELOPMENT-FOCUSED MCP configuration with domain awareness
     cat > "$CURSOR_MCP_CONFIG" << 'EOF'
 {
   "mcpServers": {
     "code-intelligence": {
       "command": "python3", 
       "args": ["/Users/lynnmusil/orchestra-dev/code_intelligence_server_enhanced.py"],
-      "description": "Real-time Code Analysis with Domain Awareness",
-      "features": ["complexity analysis", "domain-aware insights", "refactoring suggestions"]
+      "description": "Development Code Analysis with 3-Domain Awareness",
+      "domains": {
+        "payready": "Financial/Payment processing - PCI DSS patterns",
+        "paragonrx": "Medical/Healthcare - HIPAA compliance patterns", 
+        "infrastructure": "System coordination - Multi-service patterns"
+      },
+      "capabilities": ["complexity analysis", "domain context", "refactoring", "database schema awareness"]
     },
     "infrastructure-deployment": {
       "command": "python3",
       "args": ["/Users/lynnmusil/orchestra-dev/infrastructure_deployment_server.py"],
-      "description": "Development Infrastructure Control (Vercel, Lambda Labs)",
-      "features": ["vercel deployment", "lambda labs management", "development environments"]
+      "description": "Development Infrastructure Control (IaC)",
+      "providers": ["vercel", "lambda-labs"],
+      "capabilities": ["staging deployment", "dev environments", "IaC management", "contextualized deployment"]
     },
     "sequential-thinking": {
       "command": "npx",
       "args": ["@modelcontextprotocol/server-sequential-thinking"],
-      "description": "Advanced Problem Solving for Development",
-      "features": ["multi-step analysis", "development planning", "architecture decisions"]
+      "description": "Development Problem Solving",
+      "focus": "Architecture decisions, development planning, technical problem solving",
+      "capabilities": ["multi-step analysis", "development planning", "architecture decisions"]
     },
     "pulumi": {
       "command": "npx",
       "args": ["@modelcontextprotocol/server-pulumi"],
       "description": "Infrastructure as Code for Development",
-      "features": ["cloud resources", "development deployment", "staging environments"]
+      "scope": "Development and staging environments only",
+      "capabilities": ["cloud resources", "development deployment", "staging environments"]
     },
     "filesystem": {
       "command": "npx", 
       "args": ["@modelcontextprotocol/server-filesystem", "/Users/lynnmusil/orchestra-dev"],
-      "description": "Complete Development Filesystem Access",
-      "features": ["file operations", "directory management", "code search"]
+      "description": "Development Filesystem Access",
+      "scope": "Development codebase only - no production access",
+      "capabilities": ["file operations", "directory management", "code search", "development context"]
     }
+  },
+  "domainAwareness": {
+    "enabled": true,
+    "businessLogicHandling": "comment-only",
+    "productionAccess": "none",
+    "databaseSchemas": {
+      "pay_ready_financial_db": "Payment processing, PCI DSS compliance",
+      "paragon_medical_db": "Medical records, HIPAA compliance", 
+      "orchestra_coordination_db": "Multi-domain system integration"
+    }
+  },
+  "developmentFocus": {
+    "codeIntelligence": true,
+    "infrastructureControl": true,
+    "personaIntegration": "domain-comments-only",
+    "productionSeparation": true
   },
   "global": {
     "timeout": 30,
     "retries": 3,
-    "features": {
-      "development_focus": true,
-      "domain_awareness": true,
-      "production_separation": true,
-      "code_intelligence": true
-    },
+    "role": "development-assistant",
     "performance": {
       "target_response_time": "2ms",
       "development_optimized": true
