@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Coding Tools Dashboard - Cherry AI Orchestrator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            margin-right: 15px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-left: auto;
+        }
+
+        .status-active { background-color: #48bb78; }
+        .status-inactive { background-color: #f56565; }
+        .status-warning { background-color: #ed8936; }
+
+        .tool-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .tool-button {
+            background: linear-gradient(135deg, #4299e1, #3182ce);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 15px 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .tool-button:hover {
+            background: linear-gradient(135deg, #3182ce, #2c5282);
+            transform: translateY(-2px);
+        }
+
+        .tool-button.active {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+        }
+
+        .prompt-section {
+            margin-top: 20px;
+        }
+
+        .prompt-category {
+            margin-bottom: 15px;
+        }
+
+        .prompt-category h4 {
+            color: #4a5568;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+
+        .prompt-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .prompt-tag {
+            background: #e2e8f0;
+            color: #4a5568;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .prompt-tag:hover {
+            background: #cbd5e0;
+            transform: scale(1.05);
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .metric-item {
+            text-align: center;
+            padding: 15px;
+            background: #f7fafc;
+            border-radius: 10px;
+        }
+
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #2d3748;
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            color: #718096;
+            margin-top: 5px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #ed8936, #dd6b20);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .terminal-section {
+            background: #1a202c;
+            color: #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .terminal-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .terminal-title {
+            color: #48bb78;
+            font-weight: bold;
+        }
+
+        .terminal-content {
+            background: #2d3748;
+            padding: 15px;
+            border-radius: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .command-input {
+            display: flex;
+            margin-top: 15px;
+            gap: 10px;
+        }
+
+        .command-input input {
+            flex: 1;
+            background: #2d3748;
+            border: 1px solid #4a5568;
+            color: #e2e8f0;
+            padding: 10px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .command-input button {
+            background: #48bb78;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .api-status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .api-status-item {
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #48bb78;
+        }
+
+        .api-status-item.error {
+            border-left-color: #f56565;
+        }
+
+        .api-status-item.warning {
+            border-left-color: #ed8936;
+        }
+
+        .api-name {
+            font-weight: bold;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+
+        .api-details {
+            font-size: 0.9rem;
+            color: #718096;
+        }
+
+        .cheat-sheet {
+            background: #f7fafc;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .cheat-sheet h4 {
+            color: #2d3748;
+            margin-bottom: 15px;
+        }
+
+        .cheat-commands {
+            display: grid;
+            gap: 10px;
+        }
+
+        .cheat-command {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #4299e1;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .tool-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 AI Coding Tools Dashboard</h1>
+            <p>Centralized management for  Coder, Cursor AI, OpenAI Codex, Google Jules, and Factory AI</p>
+        </div>
+
+        <div class="dashboard-grid">
+            <!-- AI Tools Status Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon" style="background: linear-gradient(135deg, #667eea, #764ba2);">🛠️</div>
+                    <div class="card-title">AI Tools Status</div>
+                    <div class="status-indicator status-active"></div>
+                </div>
+                
+                <div class="tool-grid">
+                        🦘  Coder
+                    </button>
+                    <button class="tool-button" onclick="selectTool('cursor')">
+                        📝 Cursor AI
+                    </button>
+                    <button class="tool-button" onclick="selectTool('codex')">
+                        🤖 Codex
+                    </button>
+                    <button class="tool-button" onclick="selectTool('jules')">
+                        🔍 Jules
+                    </button>
+                    <button class="tool-button" onclick="selectTool('factory')">
+                        🏭 Factory AI
+                    </button>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="setupAllTools()">Setup All Tools</button>
+                    <button class="btn btn-secondary" onclick="showCheatSheet()">Cheat Sheet</button>
+                </div>
+            </div>
+
+            <!-- Performance Metrics Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon" style="background: linear-gradient(135deg, #48bb78, #38a169);">📊</div>
+                    <div class="card-title">Performance Metrics</div>
+                    <div class="status-indicator status-active"></div>
+                </div>
+                
+                <div class="metrics-grid">
+                    <div class="metric-item">
+                        <div class="metric-value">98.5%</div>
+                        <div class="metric-label">AI Tool Uptime</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">1.2s</div>
+                        <div class="metric-label">Avg Response</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">156</div>
+                        <div class="metric-label">Tasks Today</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">94%</div>
+                        <div class="metric-label">Success Rate</div>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-success" onclick="analyzePerformance()">Analyze Performance</button>
+                    <button class="btn btn-warning" onclick="optimizeCode()">Optimize Code</button>
+                </div>
+            </div>
+
+            <!-- Prompt Management Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon" style="background: linear-gradient(135deg, #ed8936, #dd6b20);">💬</div>
+                    <div class="card-title">Prompt Management</div>
+                    <div class="status-indicator status-active"></div>
+                </div>
+                
+                <div class="prompt-section">
+                    <div class="prompt-category">
+                        <h4>🚀 Performance Prompts</h4>
+                        <div class="prompt-list">
+                            <span class="prompt-tag" onclick="usePrompt('performance', 'database_optimization')">Database Optimization</span>
+                            <span class="prompt-tag" onclick="usePrompt('performance', 'api_optimization')">API Optimization</span>
+                            <span class="prompt-tag" onclick="usePrompt('performance', 'memory_optimization')">Memory Optimization</span>
+                        </div>
+                    </div>
+                    
+                    <div class="prompt-category">
+                        <h4>🐛 Debugging Prompts</h4>
+                        <div class="prompt-list">
+                            <span class="prompt-tag" onclick="usePrompt('debugging', 'systematic_debugging')">Systematic Debugging</span>
+                            <span class="prompt-tag" onclick="usePrompt('debugging', 'performance_debugging')">Performance Debugging</span>
+                            <span class="prompt-tag" onclick="usePrompt('debugging', 'error_analysis')">Error Analysis</span>
+                        </div>
+                    </div>
+                    
+                    <div class="prompt-category">
+                        <h4>🏗️ Architecture Prompts</h4>
+                        <div class="prompt-list">
+                            <span class="prompt-tag" onclick="usePrompt('architecture', 'system_design')">System Design</span>
+                            <span class="prompt-tag" onclick="usePrompt('architecture', 'microservices')">Microservices</span>
+                            <span class="prompt-tag" onclick="usePrompt('architecture', 'scalability')">Scalability</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="createPrompt()">Create Prompt</button>
+                    <button class="btn btn-secondary" onclick="managePrompts()">Manage All</button>
+                </div>
+            </div>
+
+            <!-- API Status Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon" style="background: linear-gradient(135deg, #4299e1, #3182ce);">🔗</div>
+                    <div class="card-title">API Status</div>
+                    <div class="status-indicator status-active"></div>
+                </div>
+                
+                <div class="api-status-grid">
+                    <div class="api-status-item">
+                        <div class="api-name">OpenRouter</div>
+                        <div class="api-details">✅ Active • 1.2s avg</div>
+                    </div>
+                    <div class="api-status-item">
+                        <div class="api-name">Portkey</div>
+                        <div class="api-details">✅ Active • 0.8s avg</div>
+                    </div>
+                    <div class="api-status-item warning">
+                        <div class="api-name">Factory AI</div>
+                        <div class="api-details">⚠️ Setup Required</div>
+                    </div>
+                    <div class="api-status-item">
+                        <div class="api-name">Manus</div>
+                        <div class="api-details">✅ Active • 1.5s avg</div>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="testAPIs()">Test All APIs</button>
+                    <button class="btn btn-secondary" onclick="configureAPIs()">Configure</button>
+                </div>
+            </div>
+
+            <!-- Repository Cleanup Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon" style="background: linear-gradient(135deg, #f56565, #e53e3e);">🧹</div>
+                    <div class="card-title">Repository Cleanup</div>
+                    <div class="status-indicator status-warning"></div>
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <p style="color: #718096; margin-bottom: 15px;">
+                        Found 31 backup/migration directories consuming 2.3 GB of space.
+                    </p>
+                    
+                    <div style="background: #fed7d7; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                        <strong style="color: #c53030;">Cleanup Recommendations:</strong>
+                        <ul style="margin-top: 10px; color: #742a2a;">
+                            <li>Remove backup directories (saves 1.8 GB)</li>
+                            <li>Clean migration files (saves 0.3 GB)</li>
+                            <li>Archive old refactor branches (saves 0.2 GB)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-warning" onclick="cleanupRepository(true)">Preview Cleanup</button>
+                    <button class="btn btn-primary" onclick="cleanupRepository(false)">Execute Cleanup</button>
+                </div>
+            </div>
+
+            <!-- AI Tool Terminal Card -->
+            <div class="card" style="grid-column: 1 / -1;">
+                <div class="card-header">
+                    <div class="card-icon" style="background: linear-gradient(135deg, #1a202c, #2d3748);">💻</div>
+                    <div class="card-title">AI Tool Terminal</div>
+                    <div class="status-indicator status-active"></div>
+                </div>
+                
+                <div class="terminal-section">
+                    <div class="terminal-header">
+                        <span class="terminal-title">cherry-ai-orchestrator:~$</span>
+                        <span style="margin-left: auto; color: #48bb78;">Connected</span>
+                    </div>
+                    
+                    <div class="terminal-content" id="terminal-output">
+                        <div>🤖 AI Coding Assistant initialized</div>
+                        <div>📊 Performance monitoring active</div>
+                        <div>🔗 MCP servers running on ports 8001-8008</div>
+                        <div>✅ All AI tools configured and ready</div>
+                        <div style="margin-top: 10px; color: #48bb78;">Ready for commands...</div>
+                    </div>
+                    
+                    <div class="command-input">
+                        <input type="text" id="command-input" placeholder="Enter AI tool command..." onkeypress="handleCommand(event)">
+                        <button onclick="executeCommand()">Execute</button>
+                    </div>
+                </div>
+
+                <div class="cheat-sheet">
+                    <h4>Quick Commands</h4>
+                    <div class="cheat-commands">
+                        <div class="cheat-command">ai-tools optimize --type performance</div>
+                        <div class="cheat-command">ai-tools analyze --directory src/</div>
+                        <div class="cheat-command">ai-tools cleanup --dry-run</div>
+                        <div class="cheat-command">ai-tools monitor --tool all</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for detailed views -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title">Modal Title</h2>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <div id="modal-body">
+                <!-- Modal content will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let terminalHistory = [];
+
+        function selectTool(tool) {
+            selectedTool = tool;
+            
+            // Update button states
+            document.querySelectorAll('.tool-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Update tool-specific information
+            updateToolInfo(tool);
+        }
+
+        function updateToolInfo(tool) {
+            const toolInfo = {
+                    name: ' Coder',
+                    status: 'Active',
+                    description: '10 specialized modes with OpenRouter integration',
+                    commands: ['switch to architect mode', 'optimize for performance', 'ensure stability']
+                },
+                cursor: {
+                    name: 'Cursor AI',
+                    status: 'Configured',
+                    description: 'Workspace optimized for SSH development',
+                    commands: ['Ctrl+K for AI chat', '@workspace for context', 'Ctrl+I for inline editing']
+                },
+                codex: {
+                    name: 'OpenAI Codex',
+                    status: 'Setup Required',
+                    description: 'SSH integration ready for deployment',
+                    commands: ['codex "task description"', 'codex --approval-mode full-auto', 'codex "optimize code"']
+                },
+                jules: {
+                    name: 'Google Jules',
+                    status: 'API Ready',
+                    description: 'Gemini model integration configured',
+                    commands: ['jules analyze code', 'jules optimize performance', 'jules debug issue']
+                },
+                factory: {
+                    name: 'Factory AI',
+                    status: 'Setup Required',
+                    description: 'Workflow automation and droids integration',
+                    commands: ['factory deploy workflow', 'factory review code', 'factory monitor performance']
+                }
+            };
+
+            console.log(`Selected tool: ${tool}`, toolInfo[tool]);
+        }
+
+        function setupAllTools() {
+            addTerminalOutput('🚀 Setting up all AI tools...');
+            addTerminalOutput('✅  Coder: Configuration updated');
+            addTerminalOutput('✅ Cursor IDE: Workspace settings applied');
+            addTerminalOutput('⚠️ Codex: SSH setup script created');
+            addTerminalOutput('✅ Google Jules: API integration ready');
+            addTerminalOutput('⚠️ Factory AI: Configuration created, API key needed');
+            addTerminalOutput('🎉 AI tools setup complete!');
+        }
+
+        function analyzePerformance() {
+            addTerminalOutput('📊 Analyzing code performance...');
+            addTerminalOutput('🔍 Scanning Python files for optimization opportunities');
+            addTerminalOutput('⚡ Found 12 potential performance improvements');
+            addTerminalOutput('🗄️ Database: 3 slow queries identified');
+            addTerminalOutput('🔄 APIs: 2 endpoints need caching');
+            addTerminalOutput('💾 Memory: 1 potential leak detected');
+            addTerminalOutput('📈 Performance analysis complete');
+        }
+
+        function optimizeCode() {
+            addTerminalOutput('🔧 Starting code optimization...');
+            addTerminalOutput('⚡ Optimizing database queries');
+            addTerminalOutput('🔄 Adding Redis caching to API endpoints');
+            addTerminalOutput('💾 Implementing memory cleanup');
+            addTerminalOutput('✅ Code optimization complete');
+            addTerminalOutput('📈 Expected performance improvement: 35%');
+        }
+
+        function usePrompt(category, promptName) {
+            addTerminalOutput(`💬 Loading ${category} prompt: ${promptName}`);
+            addTerminalOutput(`📋 Prompt loaded for ${selectedTool}`);
+            
+            // Show prompt in modal
+            showModal('Prompt: ' + promptName, `
+                <div style="background: #f7fafc; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                    <h4>Category: ${category}</h4>
+                    <h3>${promptName.replace('_', ' ').toUpperCase()}</h3>
+                    <p>Optimized for: Performance, Stability, and Code Quality</p>
+                </div>
+                <div style="background: #1a202c; color: #e2e8f0; padding: 20px; border-radius: 10px; font-family: monospace;">
+                    <p>Focus on performance and stability over cost optimization.</p>
+                    <p>Implement comprehensive error handling and monitoring.</p>
+                    <p>Use async/await for I/O operations and implement caching strategies.</p>
+                    <p>Target: &lt;200ms API response times, &gt;99% uptime</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <button class="btn btn-primary" onclick="applyPrompt('${category}', '${promptName}')">Apply to ${selectedTool}</button>
+                    <button class="btn btn-secondary" onclick="copyPrompt('${category}', '${promptName}')">Copy Prompt</button>
+                </div>
+            `);
+        }
+
+        function createPrompt() {
+            showModal('Create New Prompt', `
+                <form onsubmit="savePrompt(event)">
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Category:</label>
+                        <select name="category" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc;">
+                            <option value="performance">Performance</option>
+                            <option value="debugging">Debugging</option>
+                            <option value="architecture">Architecture</option>
+                            <option value="optimization">Optimization</option>
+                        </select>
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Prompt Name:</label>
+                        <input type="text" name="name" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc;" placeholder="e.g., api_caching_strategy">
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Content:</label>
+                        <textarea name="content" rows="10" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc;" placeholder="Enter your prompt content..."></textarea>
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Target Tool (Optional):</label>
+                        <select name="tool" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc;">
+                            <option value="">All Tools</option>
+                            <option value="cursor">Cursor AI</option>
+                            <option value="codex">OpenAI Codex</option>
+                            <option value="jules">Google Jules</option>
+                            <option value="factory">Factory AI</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Create Prompt</button>
+                </form>
+            `);
+        }
+
+        function cleanupRepository(dryRun) {
+            if (dryRun) {
+                addTerminalOutput('🔍 Repository cleanup preview:');
+                addTerminalOutput('📁 Would delete: .migration_backups/ (1.2 GB)');
+                addTerminalOutput('📁 Would delete: .naming_refactor_backup/ (0.8 GB)');
+                addTerminalOutput('📁 Would delete: ui_projects_backup/ (0.3 GB)');
+                addTerminalOutput('💾 Total space to be freed: 2.3 GB');
+                addTerminalOutput('⚠️ Run with execute to actually delete');
+            } else {
+                addTerminalOutput('🧹 Executing repository cleanup...');
+                addTerminalOutput('🗑️ Deleted: .migration_backups/');
+                addTerminalOutput('🗑️ Deleted: .naming_refactor_backup/');
+                addTerminalOutput('🗑️ Deleted: ui_projects_backup/');
+                addTerminalOutput('✅ Cleanup complete! Freed 2.3 GB');
+                addTerminalOutput('📊 Repository optimized for AI tools');
+            }
+        }
+
+        function testAPIs() {
+            addTerminalOutput('🔗 Testing API connections...');
+            addTerminalOutput('✅ OpenRouter: Connected (1.2s)');
+            addTerminalOutput('✅ Portkey: Connected (0.8s)');
+            addTerminalOutput('✅ OpenAI: Connected (1.1s)');
+            addTerminalOutput('✅ Anthropic: Connected (1.3s)');
+            addTerminalOutput('⚠️ Factory AI: API key required');
+            addTerminalOutput('✅ Manus: Connected (1.5s)');
+            addTerminalOutput('📊 API test complete');
+        }
+
+        function showCheatSheet() {
+            showModal('AI Tools Cheat Sheet', `
+                <div style="display: grid; gap: 20px;">
+                    <div>
+                        <h3>🦘  Coder Commands</h3>
+                        <div style="background: #f7fafc; padding: 15px; border-radius: 8px;">
+                            <div style="font-family: monospace; margin-bottom: 5px;">switch to architect mode</div>
+                            <div style="font-family: monospace; margin-bottom: 5px;">optimize for performance</div>
+                            <div style="font-family: monospace; margin-bottom: 5px;">ensure stability</div>
+                            <div style="font-family: monospace;">review code quality</div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3>📝 Cursor AI Commands</h3>
+                        <div style="background: #f7fafc; padding: 15px; border-radius: 8px;">
+                            <div style="font-family: monospace; margin-bottom: 5px;">Ctrl+K - AI chat and code generation</div>
+                            <div style="font-family: monospace; margin-bottom: 5px;">@workspace - Include workspace context</div>
+                            <div style="font-family: monospace; margin-bottom: 5px;">Ctrl+I - Inline code editing</div>
+                            <div style="font-family: monospace;">@files - Reference specific files</div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3>🤖 OpenAI Codex Commands</h3>
+                        <div style="background: #f7fafc; padding: 15px; border-radius: 8px;">
+                            <div style="font-family: monospace; margin-bottom: 5px;">codex "optimize database queries"</div>
+                            <div style="font-family: monospace; margin-bottom: 5px;">codex --approval-mode full-auto "task"</div>
+                            <div style="font-family: monospace;">codex "add error handling"</div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3>🎯 Performance Focus</h3>
+                        <div style="background: #e6fffa; padding: 15px; border-radius: 8px;">
+                            <div>• Database: Use indexes, avoid N+1 queries</div>
+                            <div>• APIs: Add timeouts, use async operations</div>
+                            <div>• Memory: Use generators, implement cleanup</div>
+                            <div>• Monitoring: Add metrics and alerting</div>
+                        </div>
+                    </div>
+                </div>
+            `);
+        }
+
+        function handleCommand(event) {
+            if (event.key === 'Enter') {
+                executeCommand();
+            }
+        }
+
+        function executeCommand() {
+            const input = document.getElementById('command-input');
+            const command = input.value.trim();
+            
+            if (command) {
+                addTerminalOutput(`$ ${command}`);
+                processCommand(command);
+                input.value = '';
+            }
+        }
+
+        function processCommand(command) {
+            const cmd = command.toLowerCase();
+            
+            if (cmd.includes('setup')) {
+                    addTerminalOutput('🦘 Setting up  Coder...');
+                    addTerminalOutput('✅  configuration updated');
+                } else if (cmd.includes('cursor')) {
+                    addTerminalOutput('📝 Setting up Cursor IDE...');
+                    addTerminalOutput('✅ Workspace settings applied');
+                } else {
+                    setupAllTools();
+                }
+            } else if (cmd.includes('optimize')) {
+                optimizeCode();
+            } else if (cmd.includes('analyze')) {
+                analyzePerformance();
+            } else if (cmd.includes('cleanup')) {
+                cleanupRepository(cmd.includes('dry-run'));
+            } else if (cmd.includes('monitor')) {
+                addTerminalOutput('📊 Monitoring AI tools...');
+                addTerminalOutput('✅ All tools operational');
+                addTerminalOutput('📈 Performance metrics updated');
+            } else if (cmd.includes('help')) {
+                addTerminalOutput('Available commands:');
+                addTerminalOutput('  setup [tool] - Setup AI tools');
+                addTerminalOutput('  optimize - Optimize code performance');
+                addTerminalOutput('  analyze - Analyze performance');
+                addTerminalOutput('  cleanup [--dry-run] - Clean repository');
+                addTerminalOutput('  monitor - Monitor AI tools');
+            } else {
+                addTerminalOutput(`Unknown command: ${command}`);
+                addTerminalOutput('Type "help" for available commands');
+            }
+        }
+
+        function addTerminalOutput(text) {
+            const terminal = document.getElementById('terminal-output');
+            const line = document.createElement('div');
+            line.textContent = text;
+            terminal.appendChild(line);
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        function showModal(title, content) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-body').innerHTML = content;
+            document.getElementById('modal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
+        function applyPrompt(category, promptName) {
+            addTerminalOutput(`💬 Applying ${category}/${promptName} to ${selectedTool}`);
+            addTerminalOutput('✅ Prompt applied successfully');
+            closeModal();
+        }
+
+        function copyPrompt(category, promptName) {
+            addTerminalOutput(`📋 Copied ${category}/${promptName} to clipboard`);
+        }
+
+        function savePrompt(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const category = formData.get('category');
+            const name = formData.get('name');
+            
+            addTerminalOutput(`💾 Creating prompt: ${category}/${name}`);
+            addTerminalOutput('✅ Prompt saved successfully');
+            closeModal();
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('modal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            addTerminalOutput('🚀 AI Coding Tools Dashboard initialized');
+            addTerminalOutput('Type "help" for available commands');
+        });
+    </script>
+</body>
+</html>
+

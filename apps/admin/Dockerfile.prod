@@ -1,0 +1,40 @@
+# Production Dockerfile for Admin Interface
+FROM node:18.20.1-alpine AS builder
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+COPY pnpm-lock.yaml ./
+
+# Install pnpm and dependencies
+RUN npm install -g pnpm
+RUN pnpm install --frozen-lockfile
+
+# Copy source code
+COPY . .
+
+# Build for production
+RUN pnpm run build
+
+# Production stage
+FROM nginx:1.25.5-alpine
+
+RUN addgroup -S nginx && adduser -S -G nginx nginx
+
+# Copy built files
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+# Copy nginx configuration
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Set user for nginx
+USER nginx
+
+# Expose port
+EXPOSE 3000
+
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]
+
+

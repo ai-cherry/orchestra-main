@@ -1,0 +1,1 @@
+{\n  "name": "@repo/eslint-config",\n  "version": "0.0.0",\n  "private": true,\n  "files": ["library.js", "react-internal.js"],\n  "devDependencies": {\n    "@vercel/style-guide": "^5.2.0",\n    "eslint-config-turbo": "^1.12.4",\n    "typescript": "^5.3.3"\n  }\n}
