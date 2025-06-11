@@ -27,31 +27,6 @@ services:
     networks:
       - orchestra-network
 
-  # FastAPI MCP Server example
-  mcp-server:
-    build:
-      context: ./legacy/mcp_server
-      dockerfile: Dockerfile
-    container_name: orchestra-mcp-server
-    restart: unless-stopped
-    environment:
-      - PORT=8000
-      - ENV=${ENV:-development}
-      - DATABASE_URL=postgresql://orchestra:orchestrapass@postgres:5432/orchestra
-      - REDIS_URL=redis://redis:6379
-    volumes:
-      - ./legacy/mcp_server:/app
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.mcp.rule=Host(`mcp.localhost`) || PathPrefix(`/api`)"
-      - "traefik.http.routers.mcp.entrypoints=web"
-      - "traefik.http.services.mcp.loadbalancer.server.port=8000"
-    depends_on:
-      - postgres
-      - redis
-    networks:
-      - orchestra-network
-
   # PostgreSQL database
   postgres:
     image: postgres:15-alpine

@@ -1,0 +1,7 @@
+name: orchestra-ai
+description: AI-driven IaC agent for Orchestra AI
+runtime: python
+config:
+  pulumi:tags:
+    value:
+      pulumi:template: python

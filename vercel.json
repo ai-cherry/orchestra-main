@@ -1,0 +1,28 @@
+{
+  "version": 2,
+  "name": "orchestra-admin-interface",
+  "builds": [
+    {
+      "src": "admin-interface/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "buildCommand": "cd admin-interface && npm run build",
+        "outputDirectory": "admin-interface/dist"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/assets/(.*)",
+      "dest": "/assets/$1"
+    },
+    {
+      "src": "/vite.svg",
+      "dest": "/vite.svg"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ]
+} 

@@ -1,6 +1,37 @@
 {
+  "name": "orchestra-main",
+  "version": "1.0.0",
+  "description": "AI Orchestra Platform - Admin Interface & Frontend",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "npm run build:admin && npm run build:frontend",
+    "build:admin": "cd admin-interface && npm run build",
+    "build:frontend": "cd src/ui/web/react_app && npm run build",
+    "dev": "npm run dev:admin",
+    "dev:admin": "cd admin-interface && npm run dev",
+    "dev:frontend": "cd src/ui/web/react_app && npm run dev",
+    "dev:all": "concurrently \"npm run dev:admin\" \"npm run dev:frontend\"",
+    "install:all": "npm install && cd admin-interface && npm install && cd ../src/ui/web/react_app && npm install",
+    "lint": "npm run lint:admin && npm run lint:frontend",
+    "lint:admin": "cd admin-interface && npm run lint",
+    "lint:frontend": "cd src/ui/web/react_app && npm run lint",
+    "clean": "rm -rf node_modules admin-interface/node_modules src/ui/web/react_app/node_modules",
+    "clean:build": "rm -rf admin-interface/dist src/ui/web/react_app/build"
+  },
+  "workspaces": [
+    "admin-interface",
+    "src/ui/web/react_app"
+  ],
+  "engines": {
+    "node": "18.x",
+    "npm": ">=8.0.0"
+  },
   "dependencies": {
     "crypto-js": "^4.2.0",
     "dexie": "^4.0.11"
+  },
+  "devDependencies": {
+    "@types/node": "^18.0.0"
   }
 }
