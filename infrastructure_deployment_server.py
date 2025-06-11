@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 🚀 Infrastructure Deployment Server with Pulumi IaC Integration
-Full infrastructure control for Cursor AI: Vercel, Lambda Labs, AWS, and more
+Full infrastructure control for Cursor AI: Vercel and Lambda Labs
 """
 
 import asyncio
@@ -40,10 +40,7 @@ class PulumiInfrastructureManager:
     def __init__(self):
         self.supported_providers = {
             'vercel': 'vercel',
-            'aws': 'aws',
-            'lambda_labs': 'lambda-labs-cloud',
-            'gcp': 'gcp',
-            'digital_ocean': 'digitalocean'
+            'lambda_labs': 'lambda-labs-cloud'
         }
         self.project_root = "/Users/lynnmusil/orchestra-dev"
         self.pulumi_dir = os.path.join(self.project_root, "infrastructure", "pulumi")
@@ -152,41 +149,7 @@ class PulumiInfrastructureManager:
                 resources_affected=[]
             )
     
-    async def deploy_aws_resources(self, resource_type: str, config: Dict[str, Any]) -> DeploymentResult:
-        """Deploy AWS resources using Pulumi"""
-        try:
-            logs = []
-            
-            pulumi_code = self._generate_aws_pulumi_code(resource_type, config)
-            
-            with tempfile.TemporaryDirectory() as temp_dir:
-                program_file = os.path.join(temp_dir, "__main__.py")
-                with open(program_file, 'w') as f:
-                    f.write(pulumi_code)
-                
-                result = await self._run_pulumi_command(['up', '--yes'], temp_dir)
-                logs.extend(result['logs'])
-                
-                return DeploymentResult(
-                    success=result['success'],
-                    target='aws',
-                    operation=f'deploy_{resource_type}',
-                    details=config,
-                    logs=logs,
-                    timestamp=datetime.now(),
-                    resources_affected=[f'aws:{resource_type}']
-                )
-                
-        except Exception as e:
-            return DeploymentResult(
-                success=False,
-                target='aws',
-                operation=f'deploy_{resource_type}',
-                details={'error': str(e)},
-                logs=[f"Error: {str(e)}"],
-                timestamp=datetime.now(),
-                resources_affected=[]
-            )
+
     
     async def get_infrastructure_status(self) -> Dict[str, Any]:
         """Get current infrastructure status across all providers"""
@@ -194,7 +157,6 @@ class PulumiInfrastructureManager:
             status = {
                 'vercel': await self._get_vercel_status(),
                 'lambda_labs': await self._get_lambda_labs_status(),
-                'aws': await self._get_aws_status(),
                 'last_updated': datetime.now().isoformat()
             }
             return status
@@ -261,50 +223,7 @@ pulumi.export("instance_ip", instance.ip)
 pulumi.export("ssh_command", pulumi.Output.concat("ssh ubuntu@", instance.ip))
 """
     
-    def _generate_aws_pulumi_code(self, resource_type: str, config: Dict[str, Any]) -> str:
-        """Generate Pulumi code for AWS resources"""
-        if resource_type == 's3':
-            return f"""
-import pulumi
-import pulumi_aws as aws
 
-# Create S3 bucket
-bucket = aws.s3.Bucket(
-    "{config.get('name', 'orchestra-bucket')}",
-    bucket="{config.get('name', 'orchestra-bucket')}",
-    acl="private",
-    versioning=aws.s3.BucketVersioningArgs(enabled=True)
-)
-
-# Export bucket details
-pulumi.export("bucket_name", bucket.bucket)
-pulumi.export("bucket_arn", bucket.arn)
-"""
-        elif resource_type == 'rds':
-            return f"""
-import pulumi
-import pulumi_aws as aws
-
-# Create RDS instance
-db_instance = aws.rds.Instance(
-    "{config.get('name', 'orchestra-db')}",
-    identifier="{config.get('name', 'orchestra-db')}",
-    engine="postgres",
-    engine_version="{config.get('engine_version', '13.7')}",
-    instance_class="{config.get('instance_class', 'db.t3.micro')}",
-    allocated_storage={config.get('storage', 20)},
-    db_name="{config.get('db_name', 'orchestra')}",
-    username="{config.get('username', 'postgres')}",
-    password="{config.get('password', 'changeme')}",
-    skip_final_snapshot=True
-)
-
-# Export database details
-pulumi.export("db_endpoint", db_instance.endpoint)
-pulumi.export("db_arn", db_instance.arn)
-"""
-        else:
-            raise ValueError(f"Unsupported AWS resource type: {resource_type}")
     
     async def _run_pulumi_command(self, command: List[str], working_dir: str) -> Dict[str, Any]:
         """Run Pulumi command and capture output"""
@@ -382,16 +301,7 @@ pulumi.export("db_arn", db_instance.arn)
         except:
             return {'status': 'unknown'}
     
-    async def _get_aws_status(self) -> Dict[str, Any]:
-        """Get AWS resources status"""
-        try:
-            # This would integrate with AWS CLI or SDK
-            return {
-                'regions': ['us-east-1', 'us-west-2'],
-                'resources': []
-            }
-        except:
-            return {'status': 'unknown'}
+
 
 class InfrastructureDeploymentServer:
     """MCP server for infrastructure deployment and management"""
@@ -438,26 +348,14 @@ class InfrastructureDeploymentServer:
                         "required": ["action", "instance_name"]
                     }
                 ),
-                types.Tool(
-                    name="deploy_aws_resource",
-                    description="Deploy AWS resources (S3, RDS, Lambda, etc.) using Pulumi",
-                    inputSchema={
-                        "type": "object",
-                        "properties": {
-                            "resource_type": {"type": "string", "enum": ["s3", "rds", "lambda", "api_gateway"]},
-                            "configuration": {"type": "object"},
-                            "region": {"type": "string"}
-                        },
-                        "required": ["resource_type", "configuration"]
-                    }
-                ),
+
                 types.Tool(
                     name="get_infrastructure_status",
                     description="Get comprehensive infrastructure status across all providers",
                     inputSchema={
                         "type": "object",
                         "properties": {
-                            "provider": {"type": "string", "enum": ["all", "vercel", "lambda_labs", "aws"]},
+                            "provider": {"type": "string", "enum": ["all", "vercel", "lambda_labs"]},
                             "include_details": {"type": "boolean"}
                         }
                     }
@@ -468,7 +366,7 @@ class InfrastructureDeploymentServer:
                     inputSchema={
                         "type": "object",
                         "properties": {
-                            "target": {"type": "string", "enum": ["vercel", "lambda_labs", "aws"]},
+                            "target": {"type": "string", "enum": ["vercel", "lambda_labs"]},
                             "deployment_id": {"type": "string"},
                             "confirm": {"type": "boolean"}
                         },
@@ -481,7 +379,7 @@ class InfrastructureDeploymentServer:
                     inputSchema={
                         "type": "object",
                         "properties": {
-                            "provider": {"type": "string", "enum": ["all", "vercel", "lambda_labs", "aws"]},
+                            "provider": {"type": "string", "enum": ["all", "vercel", "lambda_labs"]},
                             "time_period": {"type": "string", "enum": ["daily", "weekly", "monthly"]},
                             "include_recommendations": {"type": "boolean"}
                         }
@@ -497,8 +395,7 @@ class InfrastructureDeploymentServer:
                 return await self._handle_deploy_vercel(arguments)
             elif name == "manage_lambda_labs_instance":
                 return await self._handle_lambda_labs(arguments)
-            elif name == "deploy_aws_resource":
-                return await self._handle_deploy_aws(arguments)
+
             elif name == "get_infrastructure_status":
                 return await self._handle_infrastructure_status(arguments)
             elif name == "rollback_deployment":
@@ -614,41 +511,7 @@ class InfrastructureDeploymentServer:
                 text=f"❌ Error managing Lambda Labs instance: {str(e)}"
             )]
     
-    async def _handle_deploy_aws(self, args: dict) -> List[types.TextContent]:
-        """Handle AWS resource deployment"""
-        try:
-            resource_type = args['resource_type']
-            config = args['configuration']
-            
-            result = await self.infra_manager.deploy_aws_resources(resource_type, config)
-            
-            if result.success:
-                response = f"☁️ AWS {resource_type.upper()} Deployment Successful!\n"
-                response += "=" * 50 + "\n\n"
-                response += f"📦 **Resource Type**: {resource_type}\n"
-                response += f"🌍 **Region**: {config.get('region', 'us-east-1')}\n"
-                response += f"⏰ **Deployed**: {result.timestamp.strftime('%Y-%m-%d %H:%M:%S')}\n\n"
-                
-                response += "🔧 **Configuration**:\n"
-                for key, value in config.items():
-                    response += f"• {key}: {value}\n"
-                response += "\n"
-                
-                response += "📋 **Deployment Logs**:\n"
-                for log in result.logs[-5:]:
-                    if log.strip():
-                        response += f"  {log}\n"
-            else:
-                response = f"❌ AWS {resource_type.upper()} Deployment Failed\n"
-                response += f"Error: {result.details.get('error', 'Unknown error')}\n"
-            
-            return [types.TextContent(type="text", text=response)]
-            
-        except Exception as e:
-            return [types.TextContent(
-                type="text",
-                text=f"❌ Error deploying AWS resource: {str(e)}"
-            )]
+
     
     async def _handle_infrastructure_status(self, args: dict) -> List[types.TextContent]:
         """Handle infrastructure status requests"""
@@ -679,11 +542,7 @@ class InfrastructureDeploymentServer:
                     response += "  No instances found\n"
                 response += "\n"
             
-            if provider == 'all' or provider == 'aws':
-                aws_status = status.get('aws', {})
-                response += "☁️ **AWS**:\n"
-                response += f"  Regions: {', '.join(aws_status.get('regions', []))}\n"
-                response += f"  Resources: {len(aws_status.get('resources', []))}\n"
+
             
             return [types.TextContent(type="text", text=response)]
             
@@ -709,7 +568,6 @@ class InfrastructureDeploymentServer:
             response += "⚠️ This feature is under development\n"
             response += "For immediate rollback, use provider-specific tools:\n"
             response += f"• Vercel: `vercel rollback`\n"
-            response += f"• AWS: Use AWS Console or CLI\n"
             response += f"• Lambda Labs: Recreate instance from snapshot\n"
             
             return [types.TextContent(type="text", text=response)]
@@ -732,8 +590,7 @@ class InfrastructureDeploymentServer:
             # Mock cost data (would integrate with real billing APIs)
             response += "📊 **Current Estimates**:\n"
             response += "• Vercel: $0-20/month (hobby/pro plan)\n"
-            response += "• Lambda Labs: $0.50-2.00/hour per GPU\n"
-            response += "• AWS: Variable based on usage\n\n"
+            response += "• Lambda Labs: $0.50-2.00/hour per GPU\n\n"
             
             response += "💡 **Optimization Recommendations**:\n"
             response += "• Use spot instances for development\n"
@@ -752,7 +609,7 @@ class InfrastructureDeploymentServer:
 async def main():
     """Main server execution"""
     logger.info("🚀 Starting Infrastructure Deployment Server")
-    logger.info("🔧 Features: Pulumi IaC, Vercel, Lambda Labs, AWS integration")
+    logger.info("🔧 Features: Pulumi IaC, Vercel, Lambda Labs integration")
     logger.info("🎯 Integration: Full infrastructure control for Cursor AI")
     
     server = InfrastructureDeploymentServer()

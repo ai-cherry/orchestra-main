@@ -131,16 +131,7 @@ class ToolRegistry:
                 persona_affinity=['cherry']
             ),
             
-            # AWS (via CLI/SDK)
-            'aws': APIEndpoint(
-                name='AWS Services',
-                base_url='https://aws.amazon.com',
-                auth_type='none',  # Uses AWS credentials
-                auth_header='',
-                rate_limit=200,
-                timeout=30,
-                persona_affinity=['cherry', 'sophia']
-            )
+
         }
     
     def get_persona_tools(self, persona: str) -> List[str]:
@@ -786,8 +777,8 @@ class ToolsCoordinationServer:
             if any(word in task_description for word in ['lambda', 'gpu', 'compute', 'instance']):
                 suggestions.append(('lambda_labs', 'Manage GPU compute instances'))
             
-            if any(word in task_description for word in ['aws', 'cloud', 's3', 'rds']):
-                suggestions.append(('aws', 'Manage AWS cloud resources'))
+            if any(word in task_description for word in ['cloud', 'hosting', 'server']):
+                suggestions.append(('lambda_labs', 'Manage cloud compute and hosting'))
             
             # Filter by persona affinity if specified
             if persona:
