@@ -30,7 +30,7 @@ httpx>=0.25.0,<1.0.0  # Alternative async HTTP client
 
 # Monitoring and Logging
 prometheus-client>=0.19.0,<1.0.0
-structlog>=23.2.0,<24.0.0  # Structured logging
+structlog>=23.2.0,<26.0.0  # Structured logging
 
 # Testing (optional, for development)
 pytest>=7.4.0,<8.0.0
