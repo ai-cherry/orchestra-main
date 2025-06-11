@@ -96,13 +96,19 @@
 
 ## 🚀 **How to Use:**
 
-### **From Anywhere (Including Home Directory):**
+### **🔥 RECOMMENDED: Use the FIXED version for reliable Cursor opening**
 ```bash
-# From home directory:
-lynnmusil@Lynns-MacBook-Pro ~ % ./orchestra-dev/ultimate_morning_startup.sh
+# From anywhere (including home directory):
+./orchestra-dev/ultimate_morning_startup_fixed.sh
 
 # From project directory:
-lynnmusil@Lynns-MacBook-Pro ~/orchestra-dev % ./ultimate_morning_startup.sh
+./ultimate_morning_startup_fixed.sh
+```
+
+### **⚠️ Alternative: Original version (may not open Cursor properly)**
+```bash
+# Original version (Cursor opening issues)
+./ultimate_morning_startup.sh
 ```
 
 ## 🎯 **What You'll See in Cursor After Running:**
@@ -144,6 +150,24 @@ lynnmusil@Lynns-MacBook-Pro ~/orchestra-dev % ./ultimate_morning_startup.sh
 - ✅ **Architecture rules** auto-loaded
 - ✅ **Coding standards** enforced
 
+## 🛠️ **Troubleshooting:**
+
+### **If Cursor Doesn't Open:**
+1. **Use the FIXED version**: `./ultimate_morning_startup_fixed.sh`
+2. **Manual open**: `open -a Cursor /Users/lynnmusil/orchestra-dev`
+3. **Check if Cursor is installed**: `ls -la /Applications/Cursor.app`
+4. **Install Cursor**: Download from https://cursor.sh
+
+### **If Models Don't Show:**
+1. **Restart Cursor** after running the script
+2. **Check settings file**: `cat ~/Library/Application\ Support/Cursor/User/settings.json`
+3. **Look for MAX Mode toggle** in Cursor settings
+
+### **If MCP Servers Don't Connect:**
+1. **Check MCP config**: `cat ~/.cursor/mcp.json`
+2. **Restart Cursor** to reload MCP configuration
+3. **Check status bar** for MCP connection indicators
+
 ## 🎉 **Result:**
 
 **One command creates the most powerful AI development environment possible:**
@@ -156,7 +180,8 @@ lynnmusil@Lynns-MacBook-Pro ~/orchestra-dev % ./ultimate_morning_startup.sh
 
 ### **Ready to Rock! 🚀**
 ```bash
-~/orchestra-dev/ultimate_morning_startup.sh
+# RECOMMENDED: Use the FIXED version
+./ultimate_morning_startup_fixed.sh
 ```
 
 **Cursor opens with EVERYTHING you showed in your screenshots + full Orchestra AI integration!** 

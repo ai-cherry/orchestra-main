@@ -1,0 +1,22 @@
+{
+  "orchestraServices": {
+    "lambdaLabs": {
+      "baseUrl": "http://127.0.0.1",
+      "ports": {
+        "ssh": 8080,
+        "personas": 8081,
+        "mainApi": 8082,
+        "frontend": 8083
+      }
+    },
+    "notion": {
+      "workspaceId": "20bdba04940280ca9ba7f9bce721f547"
+    }
+  },
+  "permissions": {
+    "allowInfrastructureChanges": true,
+    "allowDatabaseOperations": true,
+    "allowFileSystemAccess": true,
+    "allowNetworkAccess": true
+  }
+}

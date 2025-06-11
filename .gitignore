@@ -113,3 +113,4 @@ yarn-error.log*
 # Pulumi stack files (contain secrets/state)
 **/Pulumi.*.yaml
 .vercel
+*.pid
