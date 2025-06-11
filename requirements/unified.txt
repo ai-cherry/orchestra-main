@@ -17,7 +17,7 @@ asyncpg==0.29.0
 pgvector==0.2.5
 weaviate-client==4.14.4
 redis==6.2.0  # Updated: Security fix for PYSEC-2023-312
-psycopg==3.1.18
+psycopg==3.2.9
 psycopg-pool>=3.1.0
 
 # LLM & AI
