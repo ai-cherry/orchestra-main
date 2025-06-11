@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 """
-    print(f"Error importing MCP components: {e}")
+print(f"Error importing MCP components: {e}")
     print("Make sure unified_mcp_conductor.py, workflow manager, and cline_integration.py are available.")
     sys.exit(1)
 
