@@ -159,7 +159,7 @@ opentelemetry-instrumentation-asgi==0.54b1
 opentelemetry-instrumentation-fastapi==0.54b1
 opentelemetry-proto==1.11.1
 opentelemetry-sdk==1.33.1
-opentelemetry-semantic-conventions==0.54b1
+opentelemetry-semantic-conventions==0.55b0
 opentelemetry-util-http==0.54b1
 overrides==7.7.0
 package_name==0.1
