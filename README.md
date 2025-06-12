@@ -458,11 +458,17 @@ pulumi up
 docker-compose -f docker-compose.prod.yml up -d
 ```
 
-## 🔐 Unified Secrets Management
+## 🔐 Secrets & API Key Management (Pulumi Cloud)
+All secrets and API keys are managed in Pulumi Cloud config. Never hardcode or use .env for production. Use:
 
-All API keys and secrets are managed via `core/secrets_manager.py`.
-- One source of truth for all workflows (Cursor AI, Cherry, Sophia, Karen, backend, infra)
-- Loads from environment variables, `.env`, or (optionally) encrypted file
-- Use `secrets.get_secret(KEY)` in Python, or the CLI for shell/Node.js
-- See `API_KEYS_SETUP_GUIDE.md` for details and onboarding
+```bash
+pulumi config set --secret API_KEY your-key-here
+```
+
+In code:
+```python
+import pulumi
+config = pulumi.Config()
+api_key = config.require_secret("API_KEY")
+```
 

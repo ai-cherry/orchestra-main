@@ -17,6 +17,7 @@ from enum import Enum
 import httpx
 import redis.asyncio as redis
 from pydantic import BaseModel
+import pulumi
 
 # Import base MCP server (assuming it's been moved to src)
 from legacy.mcp_server.servers.base_mcp_server import BaseMCPServer, MCPServerConfig
@@ -301,11 +302,12 @@ class PayReadySophiaMCPServer(BaseMCPServer):
             self.redis_client = redis.from_url(redis_url, decode_responses=True)
             
             # Initialize integration connectors
-            self.hubspot = HubspotConnector(os.getenv("HUBSPOT_API_KEY"))
-            self.gong = GongConnector(os.getenv("GONG_API_KEY"))
-            self.slack = SlackConnector(os.getenv("SLACK_BOT_TOKEN"))
-            self.apollo = ApolloConnector(os.getenv("APOLLO_API_KEY"))
-            self.phantom_buster = PhantomBusterConnector(os.getenv("PHANTOMBUSTER_API_KEY"))
+            config = pulumi.Config()
+            self.hubspot = HubspotConnector(config.require_secret("HUBSPOT_API_KEY"))
+            self.gong = GongConnector(config.require_secret("GONG_API_KEY"))
+            self.slack = SlackConnector(config.require_secret("SLACK_BOT_TOKEN"))
+            self.apollo = ApolloConnector(config.require_secret("APOLLO_API_KEY"))
+            self.phantom_buster = PhantomBusterConnector(config.require_secret("PHANTOMBUSTER_API_KEY"))
             
             print("✅ Pay Ready/Sophia MCP Server initialized successfully")
             

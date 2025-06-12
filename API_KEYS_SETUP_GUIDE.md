@@ -82,3 +82,27 @@ python3 core/secrets_manager.py --dump
 - All workflows (Cursor AI, Cherry, Sophia, Karen, backend, infra) use a single, stable, and secure secrets hub.
 - Easy to maintain, rotate, and audit.
 - Ready for future scale and cloud integration.
+
+# API Key Setup Guide (Pulumi Cloud)
+
+All secrets and API keys are managed in Pulumi Cloud config. Never use .env for production.
+
+## Add a Secret
+```bash
+pulumi config set --secret API_KEY your-key-here
+```
+
+## Rotate a Secret
+```bash
+pulumi config set --secret API_KEY new-key-here
+```
+
+## Validate Secrets (CI/CD)
+Add a script to check for all required secrets before deploy.
+
+## Access in Code
+```python
+import pulumi
+config = pulumi.Config()
+api_key = config.require_secret("API_KEY")
+```

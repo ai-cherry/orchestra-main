@@ -4,6 +4,7 @@ import os
 import logging
 from typing import Dict, Any, Optional
 from typing_extensions import Optional, List
+import pulumi
 
 logger = logging.getLogger(__name__)
 
@@ -14,7 +15,8 @@ class LLMClient:
     def __init__(self, model: str = "gpt-3.5-turbo", temperature: float = 0.7):
         self.model = model
         self.temperature = temperature
-        self.api_key = os.getenv("OPENAI_API_KEY")
+        config = pulumi.Config()
+        self.api_key = config.require_secret("OPENAI_API_KEY")
     
     async def complete(self, prompt: str, max_tokens: int = 1000) -> str:
         """Get completion from LLM"""

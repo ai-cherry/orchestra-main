@@ -7,6 +7,7 @@ from jose import JWTError, jwt
 from datetime import datetime, timedelta
 from typing import Optional
 from typing_extensions import Optional, Dict, Any
+import pulumi
 
 logger = logging.getLogger(__name__)
 
@@ -14,9 +15,10 @@ logger = logging.getLogger(__name__)
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # JWT settings
-SECRET_KEY = os.getenv("JWT_SECRET", "your-secret-key")
-ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
-ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("JWT_EXPIRATION_MINUTES", "10080"))
+config = pulumi.Config()
+SECRET_KEY = config.require_secret("JWT_SECRET")
+ALGORITHM = config.get("JWT_ALGORITHM") or "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = int(config.get("JWT_EXPIRATION_MINUTES") or "10080")
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
