@@ -18,8 +18,9 @@ RUN pip install --no-cache-dir \
 # Copy monitoring script
 COPY services/health_monitor.py .
 
+# Create user but don't switch to it - run as root for Docker socket access
 RUN useradd -m -u 1000 monitoruser && chown -R monitoruser:monitoruser /app
-USER monitoruser
+# USER monitoruser  # Commented out to allow Docker socket access
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
