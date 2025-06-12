@@ -830,9 +830,10 @@ async def get_active_sessions(current_user: dict = Depends(get_current_user)):
             detail="Failed to retrieve active sessions"
         )
 
-# t endpoint
+# Root endpoint
 @app.get("/")
-    """t endpoint with API information"""
+async def root():
+    """Root endpoint with API information"""
     return {
         "name": "Cherry AI Admin Interface API",
         "version": "1.0.0",
