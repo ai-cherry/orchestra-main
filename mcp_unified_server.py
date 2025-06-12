@@ -250,6 +250,20 @@ class AdvancedOrchestralMCPServer:
                         },
                         "required": ["persona", "insight", "category"]
                     }
+                ),
+                types.Tool(
+                    name="process_voice_command",
+                    description="Process voice input and convert to actions",
+                    inputSchema={
+                        "type": "object",
+                        "properties": {
+                            "transcript": {"type": "string"},
+                            "persona": {"type": "string", "enum": ["cherry", "sophia", "karen"]},
+                            "context": {"type": "object"},
+                            "confidence": {"type": "number", "minimum": 0, "maximum": 1}
+                        },
+                        "required": ["transcript"]
+                    }
                 )
             ]
         
@@ -473,6 +487,31 @@ class AdvancedOrchestralMCPServer:
                 
                 return [types.TextContent(type="text", text=response_text)]
             
+            elif name == "process_voice_command":
+                transcript = arguments["transcript"]
+                persona = arguments["persona"]
+                context = arguments["context"]
+                confidence = arguments["confidence"]
+                
+                # Process voice command
+                processed_command = self._process_voice_command(transcript, persona, context, confidence)
+                
+                # Log to Notion
+                await self.notion.log_persona_activity(
+                    persona,
+                    "Voice Command Processing",
+                    {
+                        "transcript": transcript[:100] + "..." if len(transcript) > 100 else transcript,
+                        "confidence": confidence,
+                        "context": context
+                    }
+                )
+                
+                response_text = f"🎤 **Processed Voice Command:**\n\n"
+                response_text += f"{processed_command}\n\n"
+                
+                return [types.TextContent(type="text", text=response_text)]
+            
             else:
                 raise ValueError(f"Unknown tool: {name}")
     
@@ -511,6 +550,74 @@ class AdvancedOrchestralMCPServer:
             "karen": f"Karen is the medical coding specialist with ParagonRX expertise and clinical precision. {f'Technical complexity: {complexity}' if complexity == 'complex' else 'Evidence-based medical guidance.'}"
         }
         return reasons.get(persona, "General purpose selection")
+    
+    def _process_voice_command(self, transcript: str, persona: str, context: Dict[str, Any], confidence: float) -> str:
+        """Process voice command and return structured response"""
+        import re
+        
+        # Basic voice command patterns
+        command_patterns = {
+            "navigate": [
+                r"(?:go to|open|show|navigate to) (?:the )?(.*?)(?:\s|$)",
+                r"take me to (?:the )?(.*?)(?:\s|$)"
+            ],
+            "search": [
+                r"(?:search for|find|look up) (.*)",
+                r"(?:show me|get|retrieve) (?:information about|data on|results for) (.*)"
+            ],
+            "create": [
+                r"(?:create|make|add) (?:a |new )?(.*)",
+                r"(?:start|begin) (?:a |new )?(.*)"
+            ],
+            "persona_switch": [
+                r"(?:switch to|change to|use) (?:persona )?(cherry|sophia|karen)",
+                r"(?:talk to|speak with) (cherry|sophia|karen)"
+            ]
+        }
+        
+        transcript_lower = transcript.lower().strip()
+        
+        # Try to match command patterns
+        for intent, patterns in command_patterns.items():
+            for pattern in patterns:
+                match = re.search(pattern, transcript_lower)
+                if match:
+                    entity = match.group(1).strip()
+                    
+                    if intent == "navigate":
+                        route_mapping = {
+                            "home": "/",
+                            "dashboard": "/search", 
+                            "search": "/search",
+                            "agents": "/agents",
+                            "supervisors": "/supervisors",
+                            "projects": "/projects",
+                            "health": "/health",
+                            "personas": "/personas"
+                        }
+                        route = route_mapping.get(entity.lower(), f"/search?q={entity}")
+                        return f"Navigate to: {route}"
+                    
+                    elif intent == "search":
+                        return f"Search for: {entity}"
+                    
+                    elif intent == "create":
+                        if "agent" in entity:
+                            return "Navigate to /agents and create new agent"
+                        elif "project" in entity:
+                            return "Navigate to /projects and create new project"
+                        else:
+                            return f"Create: {entity}"
+                    
+                    elif intent == "persona_switch":
+                        target_persona = entity.lower()
+                        if target_persona in ["cherry", "sophia", "karen"]:
+                            return f"Switch to {target_persona.title()} persona"
+                        else:
+                            return f"Unknown persona: {entity}"
+        
+        # If no pattern matches, treat as general query
+        return f"General query for {persona.title()}: {transcript}"
     
     def _get_enhanced_workspace_info(self, info_type: str) -> Dict[str, Any]:
         """Get enhanced workspace information with persona integration"""

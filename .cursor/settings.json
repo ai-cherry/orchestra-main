@@ -1,36 +1,37 @@
 {
-  "cherry-ai.production-server": "150.136.94.139",
-  "cherry-ai.domain": "cherry-ai.me",
-  "cherry-ai.websocket-url": "wss://150.136.94.139:8765",
-  "cherry-ai.api-endpoint": "https://150.136.94.139/api",
-  "cherry-ai.personas": ["cherry", "sophia", "karen"],
-  "cherry-ai.lambda-api-key": "<lambda-api-key>",
-  "cherry-ai.environment": "lambda-production",
-  "cherry-ai.auto-deploy": true,
-  "cherry-ai.fast-sync": true,
-  "editor.fontSize": 14,
-  "editor.tabSize": 4,
-  "editor.insertSpaces": true,
-  "python.defaultInterpreterPath": "/opt/cherry-ai/venv/bin/python",
-  "git.autofetch": true,
-  "git.enableSmartCommit": true,
-  "ai.assistant.allowGlobalIgnoreOverride": true,
-  "ai.assistant.allowEnvFileAccess": true,
-  "ai.assistant.allowMarkdownAccess": true,
-  "ai.assistant.allowConfigFileAccess": true,
-  "cursor.ai.respectGitignore": false,
-  "cursor.ai.allowBlockedFiles": true,
-  "files.exclude": {},
-  "search.exclude": {},
-  "ai.fileAccessPermissions": {
-    "*.env": true,
-    "*.env.*": true,
-    ".env": true,
-    ".env.*": true,
-    "*.md": true,
-    "*.key": false,
-    "*.pem": false
+  "orchestra_ai": {
+    "project_type": "ai_orchestration_platform",
+    "architecture": "microservices",
+    "primary_languages": [
+      "python",
+      "typescript"
+    ],
+    "frameworks": [
+      "fastapi",
+      "react",
+      "vite"
+    ],
+    "infrastructure": [
+      "vercel",
+      "lambda_labs"
+    ],
+    "ai_services": [
+      "openai",
+      "anthropic",
+      "openrouter"
+    ],
+    "personas": {
+      "cherry": "cross_domain_coordination",
+      "sophia": "financial_services_expert",
+      "karen": "medical_coding_specialist"
+    }
   },
-  "ai.globalIgnoreOverride": true,
-  "ai.sensitiveFileOverride": "development"
+  "automation": {
+    "mcp_servers": [
+      "orchestra-unified",
+      "infrastructure-deployment"
+    ],
+    "auto_approval_enabled": true,
+    "context_awareness_enabled": true
+  }
 }

@@ -1,14 +1,14 @@
 {
-  "verification_timestamp": "2025-06-12T10:30:53.083344",
+  "verification_timestamp": "2025-06-12T10:35:56.273050",
   "performance_metrics": {
     "total_tests": 11,
     "successful_tests": 10,
     "failed_tests": 1,
     "success_rate": 90.9090909090909,
-    "average_response_time_ms": 2.85,
-    "max_response_time_ms": 8.2,
+    "average_response_time_ms": 2.89,
+    "max_response_time_ms": 7.99,
     "min_response_time_ms": 1.37,
-    "total_duration_seconds": 0.125646
+    "total_duration_seconds": 0.118715
   },
   "test_results": [
     {
@@ -16,77 +16,77 @@
       "success": true,
       "details": "uvicorn server",
       "response_time_ms": 0,
-      "timestamp": "2025-06-12T10:30:53.183088"
+      "timestamp": "2025-06-12T10:35:56.366842"
     },
     {
       "test": "Frontend Process",
       "success": true,
       "details": "Vite dev server",
       "response_time_ms": 0,
-      "timestamp": "2025-06-12T10:30:53.183132"
+      "timestamp": "2025-06-12T10:35:56.366885"
     },
     {
       "test": "Backend Health Check",
       "success": true,
       "details": "Status: healthy",
-      "response_time_ms": 8.2,
-      "timestamp": "2025-06-12T10:30:53.191369"
+      "response_time_ms": 7.99,
+      "timestamp": "2025-06-12T10:35:56.374914"
     },
     {
       "test": "Persona Response - Cherry",
       "success": true,
-      "details": "Response length: 114 chars",
-      "response_time_ms": 1.6,
-      "timestamp": "2025-06-12T10:30:53.193028"
+      "details": "Response length: 133 chars",
+      "response_time_ms": 1.81,
+      "timestamp": "2025-06-12T10:35:56.376786"
     },
     {
       "test": "Persona Response - Sophia",
       "success": true,
       "details": "Response length: 128 chars",
-      "response_time_ms": 1.5,
-      "timestamp": "2025-06-12T10:30:53.194556"
+      "response_time_ms": 1.59,
+      "timestamp": "2025-06-12T10:35:56.378404"
     },
     {
       "test": "Persona Response - Karen",
       "success": true,
-      "details": "Response length: 104 chars",
-      "response_time_ms": 1.63,
-      "timestamp": "2025-06-12T10:30:53.196213"
+      "details": "Response length: 103 chars",
+      "response_time_ms": 1.8,
+      "timestamp": "2025-06-12T10:35:56.380231"
     },
     {
       "test": "Persona Status",
       "success": true,
       "details": "Found 3 personas",
-      "response_time_ms": 3.26,
-      "timestamp": "2025-06-12T10:30:53.199522"
+      "response_time_ms": 1.42,
+      "timestamp": "2025-06-12T10:35:56.381700"
     },
     {
       "test": "Command Processing",
       "success": true,
       "details": "Success: True",
-      "response_time_ms": 1.83,
-      "timestamp": "2025-06-12T10:30:53.201414"
+      "response_time_ms": 1.56,
+      "timestamp": "2025-06-12T10:35:56.383298"
     },
     {
       "test": "Conversation History",
       "success": true,
-      "details": "Retrieved 5 messages",
+      "details": "Retrieved 9 messages",
       "response_time_ms": 1.37,
-      "timestamp": "2025-06-12T10:30:53.202828"
+      "timestamp": "2025-06-12T10:35:56.384709"
     },
     {
       "test": "Persona Switching",
       "success": false,
       "details": "HTTP 422",
-      "response_time_ms": 2.58,
-      "timestamp": "2025-06-12T10:30:53.205446"
+      "response_time_ms": 1.26,
+      "timestamp": "2025-06-12T10:35:56.386001"
     },
     {
       "test": "Frontend Accessibility",
       "success": true,
       "details": "React app loaded",
-      "response_time_ms": 3.4,
-      "timestamp": "2025-06-12T10:30:53.208908"
+      "response_time_ms": 5.58,
+      "timestamp": "2025-06-12T10:35:56.391638"
     }
   ],
   "overall_success": true

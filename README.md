@@ -458,3 +458,11 @@ pulumi up
 docker-compose -f docker-compose.prod.yml up -d
 ```
 
+## 🔐 Unified Secrets Management
+
+All API keys and secrets are managed via `core/secrets_manager.py`.
+- One source of truth for all workflows (Cursor AI, Cherry, Sophia, Karen, backend, infra)
+- Loads from environment variables, `.env`, or (optionally) encrypted file
+- Use `secrets.get_secret(KEY)` in Python, or the CLI for shell/Node.js
+- See `API_KEYS_SETUP_GUIDE.md` for details and onboarding
+

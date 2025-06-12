@@ -10,6 +10,7 @@ import AgentFactory from './components/pages/AgentFactory'
 import SupervisorFactory from './components/pages/SupervisorFactory'
 import ProjectManagement from './components/pages/ProjectManagement'
 import SystemHealth from './components/pages/SystemHealth'
+import { FeatureDemo } from './components/pages/FeatureDemo'
 
 function App() {
   const [selectedPersona, setSelectedPersona] = useState(null)
@@ -105,6 +106,16 @@ function App() {
                 <SystemHealth 
                   systemStatus={systemStatus}
                   onStatusUpdate={setSystemStatus}
+                />
+              } 
+            />
+            
+            {/* Feature demonstration */}
+            <Route 
+              path="/features" 
+              element={
+                <FeatureDemo 
+                  persona={selectedPersona || 'cherry'}
                 />
               } 
             />

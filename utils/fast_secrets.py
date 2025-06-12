@@ -12,6 +12,11 @@ import logging
 from functools import lru_cache
 from typing import Dict, Optional, Any
 from pathlib import Path
+import warnings
+try:
+    from core.secrets_manager import secrets as unified_secrets
+except ImportError:
+    unified_secrets = None
 
 logger = logging.getLogger(__name__)
 
@@ -25,6 +30,9 @@ def get_secret(key: str) -> str:
     2. .env file (if exists)
     3. Empty string (with warning)
     """
+    warnings.warn("[DEPRECATED] Use core/secrets_manager.py for all secret access.", DeprecationWarning)
+    if unified_secrets:
+        return unified_secrets.get_secret(key)
     value = os.getenv(key)
     if value:
         return value
