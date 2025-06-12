@@ -11,6 +11,19 @@ vendor/
 *.cache
 tmp/
 .env*
+*.env
+.env.local
+.env.production
+.env.staging
+
+# Secrets and sensitive files
+**/secrets/
+**/*secret*
+**/*key*
+**/*token*
+**/api_keys/
+production_readiness_status.json
+deployment_status.json
 
 # Project-specific large files
 data/
