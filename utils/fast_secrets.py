@@ -49,7 +49,7 @@ def get_api_config(service: str) -> Dict[str, Any]:
     Fast cached API configuration for common services
     
     Args:
-        service: Service name (notion, openai, anthropic, etc.)
+        service: Service name (notion, openai, anthropic, openrouter, etc.)
         
     Returns:
         Dictionary with API configuration
@@ -71,6 +71,16 @@ def get_api_config(service: str) -> Dict[str, Any]:
             'base_url': 'https://api.anthropic.com',
             'version': '2023-06-01'
         },
+        'openrouter': {
+            'api_key': get_secret('OPENROUTER_API_KEY'),
+            'base_url': 'https://openrouter.ai/api/v1',
+            'site_url': get_secret('OPENROUTER_SITE_URL') or 'https://orchestra-ai.dev',
+            'app_name': get_secret('OPENROUTER_APP_NAME') or 'Orchestra AI'
+        },
+        'perplexity': {
+            'api_key': get_secret('PERPLEXITY_API_KEY'),
+            'base_url': 'https://api.perplexity.ai'
+        },
         'phantombuster': {
             'api_key': get_secret('PHANTOMBUSTER_API_KEY'),
             'base_url': 'https://api.phantombuster.com/api/v2'
@@ -82,6 +92,10 @@ def get_api_config(service: str) -> Dict[str, Any]:
         'zenrows': {
             'api_key': get_secret('ZENROWS_API_KEY'),
             'base_url': 'https://api.zenrows.com/v1'
+        },
+        'lambda_labs': {
+            'api_key': get_secret('LAMBDA_LABS_API_KEY'),
+            'base_url': 'https://cloud.lambdalabs.com/api/v1'
         },
         'database': {
             'url': get_secret('DATABASE_URL'),
@@ -154,6 +168,20 @@ class StreamlinedSecretsManager:
                     'anthropic-version': '2023-06-01'
                 })
         
+        elif service == 'openrouter':
+            key = self.get('openrouter', 'api_key')
+            if key:
+                headers.update({
+                    'Authorization': f'Bearer {key}',
+                    'HTTP-Referer': self.get('openrouter', 'site_url'),
+                    'X-Title': self.get('openrouter', 'app_name')
+                })
+        
+        elif service == 'perplexity':
+            key = self.get('perplexity', 'api_key')
+            if key:
+                headers['Authorization'] = f'Bearer {key}'
+        
         elif service == 'phantombuster':
             key = self.get('phantombuster', 'api_key')
             if key:
@@ -167,6 +195,11 @@ class StreamlinedSecretsManager:
         elif service == 'zenrows':
             # ZenRows uses query parameters, not headers
             pass
+        
+        elif service == 'lambda_labs':
+            key = self.get('lambda_labs', 'api_key')
+            if key:
+                headers['Authorization'] = f'Bearer {key}'
         
         return headers
     
@@ -201,7 +234,7 @@ class StreamlinedSecretsManager:
         Returns:
             Dictionary with service status information
         """
-        services = ['notion', 'openai', 'anthropic', 'phantombuster', 'apify', 'zenrows']
+        services = ['notion', 'openai', 'anthropic', 'openrouter', 'perplexity', 'phantombuster', 'apify', 'zenrows', 'lambda_labs']
         status = {}
         
         for service in services:
@@ -209,7 +242,7 @@ class StreamlinedSecretsManager:
             has_key = bool(config.get('api_key') or config.get('api_token'))
             status[service] = {
                 'configured': has_key,
-                'config': {k: bool(v) for k, v in config.items() if k != 'base_url'}
+                'config': {k: bool(v) for k, v in config.items() if k not in ['base_url', 'version']}
             }
         
         return status
@@ -236,6 +269,18 @@ def openai_headers() -> Dict[str, str]:
 def anthropic_headers() -> Dict[str, str]:
     """Get Anthropic API headers"""
     return secrets.get_headers('anthropic')
+
+def openrouter_headers() -> Dict[str, str]:
+    """Get OpenRouter API headers"""
+    return secrets.get_headers('openrouter')
+
+def perplexity_headers() -> Dict[str, str]:
+    """Get Perplexity API headers"""
+    return secrets.get_headers('perplexity')
+
+def lambda_labs_headers() -> Dict[str, str]:
+    """Get Lambda Labs API headers"""
+    return secrets.get_headers('lambda_labs')
 
 def validate_setup() -> bool:
     """Quick validation of basic setup"""
@@ -276,4 +321,8 @@ if __name__ == "__main__":
     
     # Test specific service
     notion_config = get_api_config('notion')
-    print(f"Notion Config: {notion_config}") 
+    print(f"Notion Config: {notion_config}")
+    
+    # Test OpenRouter
+    openrouter_config = get_api_config('openrouter')
+    print(f"OpenRouter Config: {openrouter_config}") 
