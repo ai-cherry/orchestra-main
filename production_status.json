@@ -1,0 +1,35 @@
+{
+  "timestamp": "2025-06-12T15:26:07.481455",
+  "services": {
+    "docker": {
+      "status": "healthy",
+      "count": 7,
+      "containers": [
+        "cherry_ai_monitor_prod",
+        "cherry_ai_nginx_prod",
+        "cherry_ai_api_prod",
+        "cherry_ai_postgres_prod",
+        "cherry_ai_redis_prod",
+        "cherry_ai_logs_prod",
+        "cherry_ai_weaviate_prod"
+      ]
+    },
+    "api": {
+      "status": "healthy",
+      "data": {
+        "status": "healthy",
+        "service": "cherry-ai-admin-api",
+        "database": "connected",
+        "timestamp": "2025-06-12T22:26:07.537179"
+      }
+    },
+    "mcp": {
+      "status": "healthy",
+      "count": 5
+    },
+    "pulumi": {
+      "status": "unknown",
+      "resources": 0
+    }
+  }
+}

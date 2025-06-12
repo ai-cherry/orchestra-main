@@ -9,8 +9,9 @@ from enum import Enum
 import asyncio
 import redis
 import weaviate
-import pinecone
+# import pinecone  # Commented out - not needed for current implementation
 from sqlalchemy import create_engine
+from datetime import datetime
 
 class MemoryTier(Enum):
     L0_CPU_CACHE = "cpu_cache"      # ~1ns
@@ -255,4 +256,25 @@ class MemoryPerformanceMonitor:
     async def optimize_memory_allocation(self):
         """Dynamic memory allocation based on usage patterns"""
         # Implement preference-guided cascading cache management
-        pass 
+        pass
+
+# Placeholder classes for missing implementations
+class CPUCache:
+    def __init__(self, max_size: int):
+        self.max_size = max_size
+
+class ProcessMemory:
+    def __init__(self, config: Dict[str, Any]):
+        self.config = config
+
+class BM25Retriever:
+    async def search(self, query: str):
+        return []
+
+class SemanticRetriever:
+    async def search(self, query: str, personality_vector: List[float]):
+        return []
+
+class QueryClassifier:
+    async def classify(self, query: str, expertise_domains: List[str]):
+        return "hybrid" 
