@@ -75,6 +75,7 @@ class HealthMonitor:
                 "max_restarts": 5,
                 "restart_count": 0
             },
+            "cherry_ai_mcp_weaviate_bridge_prod": {
                 "type": "bridge",
                 "health_check": self._check_bridge,
                 "restart_policy": "immediate",
@@ -237,7 +238,9 @@ class HealthMonitor:
             return False
     
     def _check_bridge(self) -> bool:
+        """Check MCP Weaviate Bridge health"""
         try:
+            response = requests.get("http://mcp-weaviate-bridge:8001/health", timeout=5)
             return response.status_code == 200
         except:
             return False
