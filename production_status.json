@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-06-12T15:27:08.056072",
+  "timestamp": "2025-06-12T15:32:41.351647",
   "services": {
     "docker": {
       "status": "healthy",
@@ -20,7 +20,7 @@
         "status": "healthy",
         "service": "cherry-ai-admin-api",
         "database": "connected",
-        "timestamp": "2025-06-12T22:27:08.114295"
+        "timestamp": "2025-06-12T22:32:41.401950"
       }
     },
     "mcp": {
