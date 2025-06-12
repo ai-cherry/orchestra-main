@@ -3,7 +3,14 @@ runtime:
   name: python
   options:
     virtualenv: venv
-description: Orchestra AI - Complete Infrastructure and Secrets Management
+description: Orchestra AI Infrastructure - Complete production deployment with secrets management
+config:
+  pulumi:tags:
+    value:
+      pulumi:template: orchestra-ai-infrastructure
+      project: orchestra-ai
+      environment: production
+      managed-by: pulumi
 template:
   config:
     aws:region:

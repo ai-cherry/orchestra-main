@@ -11,6 +11,7 @@ from datetime import datetime, timedelta
 import json
 import re
 from dataclasses import dataclass
+import pulumi
 
 from shared.logger.logging_config import logger
 from shared.llm.custom_llm import CustomLLM, get_llm_factory
@@ -55,7 +56,8 @@ class GongCEOAnalyzer:
     """Advanced Gong analysis for CEO business intelligence"""
     
     def __init__(self):
-        self.gong_api_key = os.getenv("GONG_API_KEY")
+        config = pulumi.Config()
+        self.gong_api_key = config.require_secret("GONG_API_KEY")
         self.gong_base_url = "https://api.gong.io/v2"
         self.llm = get_llm_factory().get_llm("gpt-4")
         self.session = None

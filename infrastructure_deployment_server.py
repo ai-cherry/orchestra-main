@@ -13,6 +13,7 @@ from typing import Dict, List, Any, Optional
 from datetime import datetime
 from dataclasses import dataclass
 import tempfile
+import pulumi
 
 # MCP imports
 from mcp.server import Server
@@ -44,6 +45,9 @@ class PulumiInfrastructureManager:
         }
         self.project_root = "/Users/lynnmusil/orchestra-dev"
         self.pulumi_dir = os.path.join(self.project_root, "infrastructure", "pulumi")
+        config = pulumi.Config()
+        self.lambda_api_key = config.require_secret("LAMBDA_LABS_API_KEY")
+        self.lambda_ssh_key = config.require_secret("LAMBDA_SSH_KEY")
     
     async def deploy_vercel_frontend(self, project_name: str, source_dir: str, 
                                    env_vars: Dict[str, str] = None) -> DeploymentResult:

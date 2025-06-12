@@ -4,6 +4,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from typing import Optional
 import litellm
+import pulumi
 
 try:
     from core.logging_config import get_logger, setup_logging
@@ -35,7 +36,7 @@ async def home():
         "status": "success",
         "message": "Orchestra AI deployment successful!",
         "environment": "Development",
-        "project": os.environ.get("LAMBDA_PROJECT_ID", "local"),
+        "project": lambda_project_id,
         "service_account": os.environ.get("GOOGLE_SERVICE_ACCOUNT", "none"),
     }
 
@@ -86,7 +87,7 @@ async def health_detailed():
         "status": "healthy",
         "services": {
             "app": "running",
-            "gcp_project": os.environ.get("LAMBDA_PROJECT_ID", "not_set"),
+            "gcp_project": lambda_project_id,
             "api_keys_loaded": {
                 "openai": bool(os.environ.get("OPENAI_API_KEY")),
                 "anthropic": bool(os.environ.get("ANTHROPIC_API_KEY")),
@@ -129,4 +130,6 @@ async def handle_exception(request, exc):
 if __name__ == "__main__":
     import uvicorn
     port = int(os.environ.get("PORT", 8000))
+    config = pulumi.Config()
+    lambda_project_id = config.get("LAMBDA_PROJECT_ID") or "local"
     uvicorn.run(app, host="0.0.0.0", port=port)
