@@ -13,6 +13,9 @@ from typing import Dict, Any, List
 import os
 import logging
 
+# Import the new secrets manager
+from utils.fast_secrets import get_secret, notion_headers
+
 # Setup logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -21,13 +24,14 @@ class CursorContextAutomation:
     """Automated context updates for Cursor AI with live Notion integration"""
     
     def __init__(self):
-        self.notion_api_key = "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"
-        self.workspace_id = "20bdba04940280ca9ba7f9bce721f547"
-        self.headers = {
-            "Authorization": f"Bearer {self.notion_api_key}",
-            "Content-Type": "application/json",
-            "Notion-Version": "2022-06-28"
-        }
+        # Use environment variable instead of hardcoded key
+        self.notion_api_key = get_secret('NOTION_API_TOKEN')
+        if not self.notion_api_key:
+            raise ValueError("NOTION_API_TOKEN environment variable not set")
+        
+        self.workspace_id = get_secret('NOTION_WORKSPACE_ID') or "20bdba04940280ca9ba7f9bce721f547"
+        self.base_url = "https://api.notion.com/v1"
+        self.headers = notion_headers()
         self.context_file = ".cursor/live_context.json"
         self.repo_list_file = ".cursor/unified_repo_list.json"
         

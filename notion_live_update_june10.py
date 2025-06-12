@@ -8,27 +8,28 @@ import requests
 import json
 from datetime import datetime
 import os
+from typing import Dict, List, Any
 
 from legacy.core.env_config import settings
+from utils.fast_secrets import get_secret, notion_headers
 
 class LiveNotionUpdater:
     """Live Notion updater for Orchestra AI production status"""
     
     def __init__(self):
-        # Use the working API token
-        self.api_key = "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"
-        self.headers = {
-            "Authorization": f"Bearer {self.api_key}",
-            "Content-Type": "application/json",
-            "Notion-Version": "2022-06-28"
-        }
-        # Use the confirmed workspace ID
-        self.workspace_id = "20bdba04940280ca9ba7f9bce721f547"
+        # Use environment variable instead of hardcoded key
+        self.api_key = get_secret('NOTION_API_TOKEN')
+        if not self.api_key:
+            raise ValueError("NOTION_API_TOKEN environment variable not set")
+        
+        self.workspace_id = get_secret('NOTION_WORKSPACE_ID') or "20bdba04940280ca9ba7f9bce721f547"
+        self.base_url = "https://api.notion.com/v1"
+        self.headers = notion_headers()
     
     def create_production_status_page(self) -> bool:
         """Create comprehensive production status page with latest updates"""
         try:
-            url = "https://api.notion.com/v1/pages"
+            url = f"{self.base_url}/pages"
             
             data = {
                 "parent": {"page_id": self.workspace_id},

@@ -1,0 +1,359 @@
+#!/bin/bash
+
+# 🚀 Orchestra AI - Lambda Labs Development Shortcuts
+# Quick access to Lambda Labs development tools and monitoring
+
+set -euo pipefail
+
+# Colors
+
+# Check for required environment variables
+if [ -z "${PULUMI_ACCESS_TOKEN:-}" ]; then
+    echo "❌ Error: PULUMI_ACCESS_TOKEN environment variable not set"
+    echo "💡 Set it with: export PULUMI_ACCESS_TOKEN=your_token_here"
+    exit 1
+fi
+
+readonly YELLOW='\033[1;33m'
+readonly RED='\033[0;31m'
+readonly CYAN='\033[0;36m'
+readonly MAGENTA='\033[0;95m'
+readonly NC='\033[0m'
+
+# Configuration
+readonly LOCAL_DIR="/Users/lynnmusil/orchestra-dev"
+readonly REMOTE_DIR="/home/ubuntu/orchestra-main"
+readonly LAMBDA_IP_FILE="/tmp/lambda_ip.txt"
+
+# Logging functions
+log_info() { echo -e "${BLUE}$1${NC}"; }
+log_success() { echo -e "${GREEN}✅ $1${NC}"; }
+log_warning() { echo -e "${YELLOW}⚠️ $1${NC}"; }
+log_error() { echo -e "${RED}❌ $1${NC}"; }
+log_lambda() { echo -e "${MAGENTA}🚀 $1${NC}"; }
+log_gpu() { echo -e "${CYAN}🎮 $1${NC}"; }
+
+# Get Lambda Labs IP
+get_lambda_ip() {
+    if [ -f "$LAMBDA_IP_FILE" ]; then
+        cat "$LAMBDA_IP_FILE"
+    else
+        # Try to get from Pulumi
+        cd "$LOCAL_DIR/infrastructure/pulumi"
+        export PATH=$PATH:$HOME/.pulumi/bin
+        export PULUMI_ACCESS_TOKEN="${PULUMI_ACCESS_TOKEN}"
+        pulumi stack output ip_address 2>/dev/null || echo ""
+    fi
+}
+
+# Check SSH connectivity
+check_ssh() {
+    local lambda_ip="$1"
+    if ssh -o ConnectTimeout=5 -o StrictHostKeyChecking=no ubuntu@$lambda_ip "echo 'SSH test'" >/dev/null 2>&1; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+# SSH into Lambda Labs instance
+ssh_to_lambda() {
+    local lambda_ip="$1"
+    log_lambda "🔗 Connecting to Lambda Labs instance..."
+    log_info "IP: $lambda_ip"
+    log_info "Directory: $REMOTE_DIR"
+    echo
+    ssh -t ubuntu@$lambda_ip "cd $REMOTE_DIR && exec bash -l"
+}
+
+# Open VS Code on Lambda Labs (via SSH)
+code_on_lambda() {
+    local lambda_ip="$1"
+    log_lambda "💻 Opening VS Code on Lambda Labs..."
+    
+    # Check if code-server is installed
+    if ssh ubuntu@$lambda_ip "command -v code-server" >/dev/null 2>&1; then
+        log_success "code-server found, starting..."
+        ssh -t ubuntu@$lambda_ip "cd $REMOTE_DIR && code-server --bind-addr 0.0.0.0:8080 --auth none ."
+    else
+        log_warning "code-server not installed, installing..."
+        ssh ubuntu@$lambda_ip "curl -fsSL https://code-server.dev/install.sh | sh"
+        log_success "code-server installed, starting..."
+        ssh -t ubuntu@$lambda_ip "cd $REMOTE_DIR && code-server --bind-addr 0.0.0.0:8080 --auth none ."
+    fi
+}
+
+# Check Lambda Labs health
+check_health() {
+    local lambda_ip="$1"
+    log_lambda "🏥 Lambda Labs Health Check"
+    echo "=========================="
+    
+    # Basic connectivity
+    if check_ssh "$lambda_ip"; then
+        log_success "SSH connectivity: OK"
+    else
+        log_error "SSH connectivity: FAILED"
+        return 1
+    fi
+    
+    # System info
+    log_info "📊 System Information:"
+    ssh ubuntu@$lambda_ip "
+        echo '  OS: '$(lsb_release -d | cut -f2)
+        echo '  Uptime: '$(uptime | cut -d',' -f1 | cut -d' ' -f4-)
+        echo '  Load: '$(uptime | cut -d',' -f3- | sed 's/^ *//')
+        echo '  Memory: '$(free -h | grep Mem | awk '{print \$3\"/\"\$2}')
+        echo '  Disk: '$(df -h / | tail -1 | awk '{print \$3\"/\"\$2\" (\"\$5\" used)\"}')
+    "
+    
+    # GPU status
+    log_gpu "🎮 GPU Information:"
+    ssh ubuntu@$lambda_ip "
+        if command -v nvidia-smi >/dev/null 2>&1; then
+            nvidia-smi --query-gpu=name,memory.total,memory.used,utilization.gpu --format=csv,noheader,nounits | while IFS=',' read name memory_total memory_used gpu_util; do
+                echo \"  GPU: \$name\"
+                echo \"  Memory: \${memory_used}MB/\${memory_total}MB\"
+                echo \"  Utilization: \${gpu_util}%\"
+            done
+        else
+            echo '  No NVIDIA GPU detected'
+        fi
+    "
+    
+    # Python environment
+    log_info "🐍 Python Environment:"
+    ssh ubuntu@$lambda_ip "
+        echo '  Python: '$(python3 --version 2>/dev/null || echo 'Not installed')
+        echo '  Pip: '$(pip3 --version 2>/dev/null | cut -d' ' -f1-2 || echo 'Not installed')
+        if command -v conda >/dev/null 2>&1; then
+            echo '  Conda: '$(conda --version)
+        fi
+        if [ -d '$REMOTE_DIR/venv' ]; then
+            echo '  Virtual env: Active'
+        else
+            echo '  Virtual env: Not found'
+        fi
+    "
+    
+    # Docker status
+    log_info "🐳 Docker Status:"
+    ssh ubuntu@$lambda_ip "
+        if command -v docker >/dev/null 2>&1; then
+            echo '  Docker: '$(docker --version | cut -d' ' -f1-3)
+            echo '  Containers: '$(docker ps -q | wc -l)' running'
+        else
+            echo '  Docker: Not installed'
+        fi
+    "
+    
+    # Orchestra services
+    log_info "🎼 Orchestra Services:"
+    ssh ubuntu@$lambda_ip "
+        if [ -d '$REMOTE_DIR' ]; then
+            echo '  Workspace: Available'
+            echo '  Files: '$(find $REMOTE_DIR -type f | wc -l)' files'
+        else
+            echo '  Workspace: Not found'
+        fi
+    "
+}
+
+# Monitor GPU usage
+monitor_gpu() {
+    local lambda_ip="$1"
+    log_gpu "🎮 GPU Monitoring (Press Ctrl+C to stop)"
+    echo "========================================"
+    
+    ssh -t ubuntu@$lambda_ip "
+        if command -v nvidia-smi >/dev/null 2>&1; then
+            watch -n 1 'nvidia-smi'
+        else
+            echo 'NVIDIA GPU not available'
+            exit 1
+        fi
+    "
+}
+
+# Show Lambda Labs logs
+show_logs() {
+    local lambda_ip="$1"
+    local service="${2:-system}"
+    
+    log_lambda "📋 Lambda Labs Logs ($service)"
+    echo "=========================="
+    
+    case "$service" in
+        "system")
+            ssh ubuntu@$lambda_ip "sudo journalctl -f --since '1 hour ago'"
+            ;;
+        "gpu")
+            ssh ubuntu@$lambda_ip "sudo dmesg | grep -i nvidia | tail -20"
+            ;;
+        "docker")
+            ssh ubuntu@$lambda_ip "sudo docker logs \$(sudo docker ps -q) 2>/dev/null || echo 'No running containers'"
+            ;;
+        "orchestra")
+            ssh ubuntu@$lambda_ip "find $REMOTE_DIR -name '*.log' -exec tail -20 {} \; 2>/dev/null || echo 'No Orchestra logs found'"
+            ;;
+        *)
+            log_error "Unknown log type: $service"
+            log_info "Available types: system, gpu, docker, orchestra"
+            return 1
+            ;;
+    esac
+}
+
+# Run a command on Lambda Labs
+run_command() {
+    local lambda_ip="$1"
+    shift
+    local command="$*"
+    
+    log_lambda "🔧 Running command on Lambda Labs:"
+    log_info "Command: $command"
+    echo
+    
+    ssh -t ubuntu@$lambda_ip "cd $REMOTE_DIR && $command"
+}
+
+# Setup Lambda Labs environment
+setup_environment() {
+    local lambda_ip="$1"
+    log_lambda "🛠️ Setting up Lambda Labs environment..."
+    
+    ssh ubuntu@$lambda_ip "
+        # Update system
+        sudo apt update && sudo apt upgrade -y
+        
+        # Install essential tools
+        sudo apt install -y htop tree git curl wget vim tmux
+        
+        # Install Python development tools
+        sudo apt install -y python3-pip python3-venv python3-dev
+        
+        # Install Node.js
+        curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+        sudo apt install -y nodejs
+        
+        # Install Docker
+        if ! command -v docker >/dev/null 2>&1; then
+            curl -fsSL https://get.docker.com -o get-docker.sh
+            sudo sh get-docker.sh
+            sudo usermod -aG docker ubuntu
+        fi
+        
+        # Create workspace directory
+        mkdir -p $REMOTE_DIR
+        
+        # Install code-server
+        if ! command -v code-server >/dev/null 2>&1; then
+            curl -fsSL https://code-server.dev/install.sh | sh
+        fi
+        
+        echo 'Lambda Labs environment setup complete!'
+    "
+    
+    log_success "Environment setup completed"
+}
+
+# Show usage information
+show_help() {
+    echo "🚀 Orchestra AI - Lambda Labs Development Shortcuts"
+    echo "=================================================="
+    echo
+    echo "Usage: $0 <command> [options]"
+    echo
+    echo "Commands:"
+    echo "  ssh                    - SSH into Lambda Labs instance"
+    echo "  code                   - Open VS Code on Lambda Labs"
+    echo "  health                 - Check Lambda Labs health status"
+    echo "  gpu                    - Monitor GPU usage"
+    echo "  logs [type]            - Show logs (system|gpu|docker|orchestra)"
+    echo "  run <command>          - Run command on Lambda Labs"
+    echo "  setup                  - Setup Lambda Labs environment"
+    echo "  sync                   - Quick sync (calls sync_to_lambda.sh)"
+    echo "  help                   - Show this help message"
+    echo
+    echo "Examples:"
+    echo "  $0 ssh                 # SSH into Lambda Labs"
+    echo "  $0 health              # Check system health"
+    echo "  $0 gpu                 # Monitor GPU usage"
+    echo "  $0 logs gpu            # Show GPU logs"
+    echo "  $0 run 'nvidia-smi'    # Run nvidia-smi command"
+    echo "  $0 setup               # Setup development environment"
+    echo
+    echo "Quick Development Workflow:"
+    echo "  1. $0 sync             # Sync code to Lambda Labs"
+    echo "  2. $0 ssh              # SSH into instance"
+    echo "  3. $0 gpu              # Monitor GPU during training"
+    echo "  4. $0 health           # Check system status"
+}
+
+# Main function
+main() {
+    local command="${1:-help}"
+    
+    # Get Lambda Labs IP
+    local lambda_ip=$(get_lambda_ip)
+    if [ -z "$lambda_ip" ] || [ "$lambda_ip" = "null" ]; then
+        log_error "Lambda Labs IP not found"
+        log_info "Make sure Lambda Labs infrastructure is deployed:"
+        log_info "  cd infrastructure/pulumi && pulumi up"
+        exit 1
+    fi
+    
+    # Check SSH connectivity for most commands
+    if [ "$command" != "help" ] && [ "$command" != "sync" ]; then
+        if ! check_ssh "$lambda_ip"; then
+            log_error "Cannot connect to Lambda Labs instance: $lambda_ip"
+            log_info "Check if the instance is running and SSH is configured"
+            exit 1
+        fi
+    fi
+    
+    # Execute command
+    case "$command" in
+        "ssh")
+            ssh_to_lambda "$lambda_ip"
+            ;;
+        "code")
+            code_on_lambda "$lambda_ip"
+            ;;
+        "health")
+            check_health "$lambda_ip"
+            ;;
+        "gpu")
+            monitor_gpu "$lambda_ip"
+            ;;
+        "logs")
+            show_logs "$lambda_ip" "${2:-system}"
+            ;;
+        "run")
+            shift
+            run_command "$lambda_ip" "$@"
+            ;;
+        "setup")
+            setup_environment "$lambda_ip"
+            ;;
+        "sync")
+            if [ -f "$LOCAL_DIR/sync_to_lambda.sh" ]; then
+                "$LOCAL_DIR/sync_to_lambda.sh" sync
+            else
+                log_error "Sync script not found: $LOCAL_DIR/sync_to_lambda.sh"
+                exit 1
+            fi
+            ;;
+        "help"|"-h"|"--help")
+            show_help
+            ;;
+        *)
+            log_error "Unknown command: $command"
+            log_info "Use '$0 help' for usage information"
+            exit 1
+            ;;
+    esac
+}
+
+# Run main function
+main "$@" 

@@ -6,17 +6,21 @@ Updates Notion with high-level PayReady CEO BI integration status
 
 import requests
 import json
+import os
 from datetime import datetime
+from typing import Dict, List, Any
 
-# Notion Configuration
-NOTION_API_KEY = "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"
-NOTION_VERSION = "2022-06-28"
+# Import the new secrets manager
+from utils.fast_secrets import get_secret, notion_headers
 
-headers = {
-    "Authorization": f"Bearer {NOTION_API_KEY}",
-    "Content-Type": "application/json",
-    "Notion-Version": NOTION_VERSION
-}
+# Use environment variable instead of hardcoded key
+NOTION_API_KEY = get_secret('NOTION_API_TOKEN')
+if not NOTION_API_KEY:
+    raise ValueError("NOTION_API_TOKEN environment variable not set")
+
+WORKSPACE_ID = get_secret('NOTION_WORKSPACE_ID') or "20bdba04940280ca9ba7f9bce721f547"
+BASE_URL = "https://api.notion.com/v1"
+HEADERS = notion_headers()
 
 def update_notion_ceo_progress():
     """Update Notion with CEO BI integration progress"""
@@ -368,7 +372,7 @@ def update_notion_ceo_progress():
     try:
         response = requests.post(
             "https://api.notion.com/v1/pages",
-            headers=headers,
+            headers=HEADERS,
             json=page_data
         )
         
@@ -432,7 +436,7 @@ def update_existing_sophia_page():
     try:
         response = requests.patch(
             f"https://api.notion.com/v1/blocks/{sophia_page_id}/children",
-            headers=headers,
+            headers=HEADERS,
             json={"children": new_blocks}
         )
         
