@@ -1,0 +1,16 @@
+name: orchestra-ai
+runtime:
+  name: python
+  options:
+    virtualenv: venv
+description: Orchestra AI - Complete Infrastructure and Secrets Management
+template:
+  config:
+    aws:region:
+      description: The AWS region to deploy into
+      default: us-west-2
+    gcp:project:
+      description: The GCP project to deploy into
+    gcp:region:
+      description: The GCP region to deploy into
+      default: us-west2 
