@@ -1,0 +1,1 @@
+import React from "react"; export default function VoiceInput({ onTranscript, onCommand, isActive, onActiveChange, className = "" }) { return <button className={className} onClick={() => onActiveChange(!isActive)}>🎤</button>; }

@@ -47,7 +47,7 @@
     "date-fns": "^3.6.0",
     "elevenlabs": "^0.8.2",
     "embla-carousel-react": "^8.6.0",
-    "framer-motion": "^12.16.0",
+    "framer-motion": "^12.17.3",
     "input-otp": "^1.4.2",
     "lodash": "^4.17.21",
     "lucide-react": "^0.510.0",
@@ -84,7 +84,6 @@
     "tw-animate-css": "^1.3.4",
     "vite": "^6.3.5"
   },
-
   "engines": {
     "node": "20.x",
     "npm": ">=10.0.0"
