@@ -114,3 +114,4 @@ yarn-error.log*
 **/Pulumi.*.yaml
 .vercel
 *.pid
+.notion_update_hash
