@@ -39,7 +39,8 @@ search_router = SearchRouter()
 ingestion_controller = IngestionController()
 
 @app.get("/")
-    """t endpoint"""
+async def root():
+    """Root endpoint"""
     return {
         "name": "Cherry AI",
         "version": "1.0.0",
