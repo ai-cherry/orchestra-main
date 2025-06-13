@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Orchestra AI - Admin Dashboard</title>
+    <title>Orchestra AI - Admin Control Center</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -28,7 +28,7 @@
         /* Sidebar */
         .sidebar {
             width: 280px;
-            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
             border-right: 1px solid #334155;
             position: fixed;
             height: 100vh;
@@ -47,11 +47,14 @@
             gap: 0.75rem;
             font-size: 1.5rem;
             font-weight: 700;
-            color: #3b82f6;
+            color: #f1f5f9;
         }
 
         .logo i {
-            font-size: 2rem;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .nav-menu {
@@ -80,6 +83,7 @@
             text-decoration: none;
             transition: all 0.3s ease;
             border-left: 3px solid transparent;
+            cursor: pointer;
         }
 
         .nav-item:hover,
@@ -92,28 +96,6 @@
         .nav-item i {
             width: 20px;
             text-align: center;
-        }
-
-        .status-indicator {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            margin-left: auto;
-        }
-
-        .status-online {
-            background: #10b981;
-            box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
-        }
-
-        .status-warning {
-            background: #f59e0b;
-            box-shadow: 0 0 8px rgba(245, 158, 11, 0.5);
-        }
-
-        .status-offline {
-            background: #ef4444;
-            box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
         }
 
         /* Main Content */
@@ -171,7 +153,7 @@
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
         }
 
         .btn-danger {
@@ -181,20 +163,30 @@
 
         .btn-danger:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+            box-shadow: 0 10px 25px rgba(239, 68, 68, 0.3);
         }
 
-        /* System Status Grid */
-        .system-status {
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+        }
+
+        /* System Status Cards */
+        .status-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 1.5rem;
             margin-bottom: 2rem;
         }
 
         .status-card {
             background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-            border: 1px solid #475569;
+            border: 1px solid #334155;
             border-radius: 1rem;
             padding: 1.5rem;
             transition: all 0.3s ease;
@@ -202,7 +194,7 @@
 
         .status-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
 
         .status-header {
@@ -219,6 +211,16 @@
             letter-spacing: 0.05em;
         }
 
+        .status-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
         .status-value {
             font-size: 2rem;
             font-weight: 700;
@@ -227,7 +229,7 @@
         }
 
         .status-change {
-            font-size: 0.875rem;
+            font-size: 0.75rem;
             display: flex;
             align-items: center;
             gap: 0.25rem;
@@ -241,10 +243,10 @@
             color: #ef4444;
         }
 
-        /* AI Agents Section */
-        .agents-section {
+        /* Agents Section */
+        .section {
             background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-            border: 1px solid #475569;
+            border: 1px solid #334155;
             border-radius: 1rem;
             padding: 1.5rem;
             margin-bottom: 2rem;
@@ -265,7 +267,7 @@
 
         .agents-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 1rem;
         }
 
@@ -278,8 +280,8 @@
         }
 
         .agent-card:hover {
-            background: rgba(15, 23, 42, 0.8);
             border-color: #3b82f6;
+            transform: translateY(-1px);
         }
 
         .agent-header {
@@ -303,58 +305,66 @@
             letter-spacing: 0.05em;
         }
 
-        .status-active {
+        .agent-status.active {
             background: rgba(16, 185, 129, 0.2);
             color: #10b981;
-            border: 1px solid rgba(16, 185, 129, 0.3);
+            border: 1px solid #10b981;
         }
 
-        .status-idle {
-            background: rgba(245, 158, 11, 0.2);
-            color: #f59e0b;
-            border: 1px solid rgba(245, 158, 11, 0.3);
+        .agent-status.idle {
+            background: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+            border: 1px solid #fbbf24;
         }
 
-        .status-error {
+        .agent-status.error {
             background: rgba(239, 68, 68, 0.2);
             color: #ef4444;
-            border: 1px solid rgba(239, 68, 68, 0.3);
+            border: 1px solid #ef4444;
+        }
+
+        .agent-status.stopped {
+            background: rgba(100, 116, 139, 0.2);
+            color: #64748b;
+            border: 1px solid #64748b;
         }
 
         .agent-metrics {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
-            margin-top: 1rem;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
         }
 
-        .metric {
+        .agent-metric {
             text-align: center;
         }
 
-        .metric-value {
+        .agent-metric-value {
             font-size: 1.25rem;
             font-weight: 600;
             color: #f1f5f9;
         }
 
-        .metric-label {
+        .agent-metric-label {
             font-size: 0.75rem;
-            color: #94a3b8;
+            color: #64748b;
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
 
-        /* Recent Activity */
-        .activity-section {
-            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-            border: 1px solid #475569;
-            border-radius: 1rem;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
+        .agent-actions {
+            display: flex;
+            gap: 0.5rem;
         }
 
-        .activity-list {
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.75rem;
+        }
+
+        /* Activity Feed */
+        .activity-feed {
             max-height: 400px;
             overflow-y: auto;
         }
@@ -377,25 +387,28 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1rem;
-            color: white;
+            font-size: 0.875rem;
             flex-shrink: 0;
         }
 
         .activity-icon.success {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
         }
 
         .activity-icon.warning {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            background: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
         }
 
         .activity-icon.error {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
         }
 
         .activity-icon.info {
-            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
         }
 
         .activity-content {
@@ -411,49 +424,27 @@
         .activity-description {
             font-size: 0.875rem;
             color: #94a3b8;
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.5rem;
         }
 
-        .activity-time {
+        .activity-meta {
             font-size: 0.75rem;
             color: #64748b;
         }
 
-        /* System Controls */
-        .controls-section {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
+        /* Loading States */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #334155;
+            border-radius: 50%;
+            border-top-color: #3b82f6;
+            animation: spin 1s ease-in-out infinite;
         }
 
-        .control-card {
-            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-            border: 1px solid #475569;
-            border-radius: 1rem;
-            padding: 1.5rem;
-            text-align: center;
-        }
-
-        .control-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .control-title {
-            font-size: 1.125rem;
-            font-weight: 600;
-            color: #f1f5f9;
-            margin-bottom: 0.5rem;
-        }
-
-        .control-description {
-            font-size: 0.875rem;
-            color: #94a3b8;
-            margin-bottom: 1.5rem;
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
         /* Responsive Design */
@@ -470,15 +461,19 @@
             .main-content {
                 margin-left: 0;
             }
+            
+            .status-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .agents-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         @media (max-width: 768px) {
             .main-content {
                 padding: 1rem;
-            }
-            
-            .system-status {
-                grid-template-columns: 1fr;
             }
             
             .admin-header {
@@ -488,95 +483,83 @@
             }
         }
 
-        /* Loading Animation */
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            color: white;
+            font-weight: 500;
+            z-index: 2000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
         }
 
-        .loading {
-            animation: pulse 2s infinite;
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .notification.error {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        .notification.warning {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
         }
     </style>
 </head>
 <body>
     <div class="admin-container">
         <!-- Sidebar -->
-        <aside class="sidebar">
+        <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <div class="logo">
                     <i class="fas fa-music"></i>
-                    Orchestra AI Admin
+                    Orchestra AI
                 </div>
             </div>
             
             <nav class="nav-menu">
                 <div class="nav-section">
-                    <div class="nav-section-title">System</div>
-                    <a href="#" class="nav-item active">
+                    <div class="nav-section-title">Control Center</div>
+                    <div class="nav-item active" data-section="dashboard">
                         <i class="fas fa-tachometer-alt"></i>
-                        Dashboard
-                        <div class="status-indicator status-online"></div>
-                    </a>
-                    <a href="#" class="nav-item">
+                        System Dashboard
+                    </div>
+                    <div class="nav-item" data-section="agents">
                         <i class="fas fa-robot"></i>
                         AI Agents
-                        <div class="status-indicator status-online"></div>
-                    </a>
-                    <a href="#" class="nav-item">
+                    </div>
+                    <div class="nav-item" data-section="workflows">
                         <i class="fas fa-project-diagram"></i>
                         Workflows
-                        <div class="status-indicator status-warning"></div>
-                    </a>
-                    <a href="#" class="nav-item">
-                        <i class="fas fa-database"></i>
-                        Data Sources
-                        <div class="status-indicator status-online"></div>
-                    </a>
-                </div>
-                
-                <div class="nav-section">
-                    <div class="nav-section-title">Infrastructure</div>
-                    <a href="#" class="nav-item">
-                        <i class="fas fa-server"></i>
-                        Servers
-                        <div class="status-indicator status-online"></div>
-                    </a>
-                    <a href="#" class="nav-item">
-                        <i class="fas fa-memory"></i>
-                        Memory Store
-                        <div class="status-indicator status-online"></div>
-                    </a>
-                    <a href="#" class="nav-item">
-                        <i class="fas fa-network-wired"></i>
-                        API Gateway
-                        <div class="status-indicator status-online"></div>
-                    </a>
-                    <a href="#" class="nav-item">
-                        <i class="fas fa-shield-alt"></i>
-                        Security
-                        <div class="status-indicator status-warning"></div>
-                    </a>
+                    </div>
+                    <div class="nav-item" data-section="activity">
+                        <i class="fas fa-list"></i>
+                        Activity Logs
+                    </div>
                 </div>
                 
                 <div class="nav-section">
                     <div class="nav-section-title">Management</div>
-                    <a href="#" class="nav-item">
-                        <i class="fas fa-users"></i>
-                        Users
-                    </a>
-                    <a href="#" class="nav-item">
-                        <i class="fas fa-key"></i>
-                        API Keys
-                    </a>
-                    <a href="#" class="nav-item">
-                        <i class="fas fa-chart-bar"></i>
-                        Analytics
-                    </a>
-                    <a href="#" class="nav-item">
+                    <div class="nav-item" data-section="deploy">
+                        <i class="fas fa-rocket"></i>
+                        Deploy Agent
+                    </div>
+                    <div class="nav-item" data-section="backup">
+                        <i class="fas fa-database"></i>
+                        System Backup
+                    </div>
+                    <div class="nav-item" data-section="settings">
                         <i class="fas fa-cog"></i>
                         Settings
-                    </a>
+                    </div>
                 </div>
             </nav>
         </aside>
@@ -586,320 +569,410 @@
             <div class="admin-header">
                 <div>
                     <h1 class="admin-title">Orchestra AI Control Center</h1>
-                    <p class="admin-subtitle">System Status: All services operational</p>
+                    <p class="admin-subtitle">Real-time system monitoring and management</p>
                 </div>
                 <div class="header-actions">
-                    <button class="btn btn-danger">
-                        <i class="fas fa-power-off"></i>
+                    <button class="btn btn-danger" onclick="emergencyStop()">
+                        <i class="fas fa-stop"></i>
                         Emergency Stop
                     </button>
-                    <button class="btn btn-primary">
-                        <i class="fas fa-sync"></i>
-                        Refresh All
+                    <button class="btn btn-success" onclick="restartSystem()">
+                        <i class="fas fa-redo"></i>
+                        Restart System
+                    </button>
+                    <button class="btn btn-primary" onclick="refreshData()">
+                        <i class="fas fa-sync-alt"></i>
+                        Refresh
                     </button>
                 </div>
             </div>
 
             <!-- System Status -->
-            <div class="system-status">
+            <div class="status-grid" id="systemStatus">
+                <!-- Status cards will be populated by JavaScript -->
+            </div>
+
+            <!-- AI Agents Section -->
+            <div class="section" id="agentsSection">
+                <div class="section-header">
+                    <h2 class="section-title">AI Agents</h2>
+                    <button class="btn btn-primary" onclick="showDeployAgent()">
+                        <i class="fas fa-plus"></i>
+                        Deploy New Agent
+                    </button>
+                </div>
+                <div class="agents-grid" id="agentsGrid">
+                    <!-- Agent cards will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Activity Feed -->
+            <div class="section" id="activitySection">
+                <div class="section-header">
+                    <h2 class="section-title">Recent Activity</h2>
+                </div>
+                <div class="activity-feed" id="activityFeed">
+                    <!-- Activity items will be populated by JavaScript -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification"></div>
+
+    <script>
+        // API Configuration
+        const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:8000' : '/api';
+        
+        // Global state
+        let systemData = {};
+        let agents = [];
+        let workflows = [];
+        let activities = [];
+        let refreshInterval;
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+            startAutoRefresh();
+        });
+
+        async function initializeApp() {
+            try {
+                await loadSystemStatus();
+                await loadAgents();
+                await loadActivities();
+                renderSystemStatus();
+                renderAgents();
+                renderActivities();
+            } catch (error) {
+                console.error('Failed to initialize app:', error);
+                showNotification('Failed to load system data', 'error');
+            }
+        }
+
+        // API Functions
+        async function apiCall(endpoint, options = {}) {
+            try {
+                const response = await fetch(`${API_BASE}${endpoint}`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    },
+                    ...options
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                return await response.json();
+            } catch (error) {
+                console.error(`API call failed for ${endpoint}:`, error);
+                throw error;
+            }
+        }
+
+        async function loadSystemStatus() {
+            systemData = await apiCall('/api/system/status');
+        }
+
+        async function loadAgents() {
+            agents = await apiCall('/api/agents');
+        }
+
+        async function loadWorkflows() {
+            workflows = await apiCall('/api/workflows');
+        }
+
+        async function loadActivities() {
+            activities = await apiCall('/api/activity');
+        }
+
+        // Render Functions
+        function renderSystemStatus() {
+            const container = document.getElementById('systemStatus');
+            container.innerHTML = `
                 <div class="status-card">
                     <div class="status-header">
-                        <div class="status-title">Active AI Agents</div>
-                        <i class="fas fa-robot" style="color: #10b981; font-size: 1.5rem;"></i>
+                        <div class="status-title">Active Agents</div>
+                        <div class="status-icon" style="background: linear-gradient(135deg, #3b82f6 20%, #1d4ed8 100%); color: white;">
+                            <i class="fas fa-robot"></i>
+                        </div>
                     </div>
-                    <div class="status-value">12</div>
+                    <div class="status-value">${systemData.active_agents || 0}</div>
                     <div class="status-change positive">
                         <i class="fas fa-arrow-up"></i>
-                        +3 since last hour
+                        System operational
                     </div>
                 </div>
 
                 <div class="status-card">
                     <div class="status-header">
                         <div class="status-title">API Requests/min</div>
-                        <i class="fas fa-exchange-alt" style="color: #3b82f6; font-size: 1.5rem;"></i>
+                        <div class="status-icon" style="background: linear-gradient(135deg, #10b981 20%, #059669 100%); color: white;">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
                     </div>
-                    <div class="status-value">1,247</div>
+                    <div class="status-value">${systemData.api_requests_per_minute || 0}</div>
                     <div class="status-change positive">
                         <i class="fas fa-arrow-up"></i>
-                        +15% from yesterday
+                        Processing requests
                     </div>
                 </div>
 
                 <div class="status-card">
                     <div class="status-header">
                         <div class="status-title">Memory Usage</div>
-                        <i class="fas fa-memory" style="color: #f59e0b; font-size: 1.5rem;"></i>
+                        <div class="status-icon" style="background: linear-gradient(135deg, #8b5cf6 20%, #7c3aed 100%); color: white;">
+                            <i class="fas fa-memory"></i>
+                        </div>
                     </div>
-                    <div class="status-value">68%</div>
-                    <div class="status-change negative">
-                        <i class="fas fa-arrow-up"></i>
-                        +5% from last check
+                    <div class="status-value">${Math.round(systemData.memory_usage_percent || 0)}%</div>
+                    <div class="status-change ${systemData.memory_usage_percent > 80 ? 'negative' : 'positive'}">
+                        <i class="fas fa-${systemData.memory_usage_percent > 80 ? 'exclamation-triangle' : 'check'}"></i>
+                        ${systemData.memory_usage_percent > 80 ? 'High usage' : 'Normal'}
                     </div>
                 </div>
 
                 <div class="status-card">
                     <div class="status-header">
                         <div class="status-title">Success Rate</div>
-                        <i class="fas fa-check-circle" style="color: #10b981; font-size: 1.5rem;"></i>
+                        <div class="status-icon" style="background: linear-gradient(135deg, #f59e0b 20%, #d97706 100%); color: white;">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
                     </div>
-                    <div class="status-value">99.2%</div>
+                    <div class="status-value">${Math.round(systemData.success_rate || 0)}%</div>
                     <div class="status-change positive">
                         <i class="fas fa-arrow-up"></i>
-                        +0.3% improvement
+                        Excellent performance
                     </div>
                 </div>
-            </div>
+            `;
+        }
 
-            <!-- AI Agents Section -->
-            <div class="agents-section">
-                <div class="section-header">
-                    <h2 class="section-title">AI Agents Status</h2>
-                    <button class="btn btn-primary">
-                        <i class="fas fa-plus"></i>
-                        Deploy New Agent
-                    </button>
-                </div>
-                
-                <div class="agents-grid">
-                    <div class="agent-card">
-                        <div class="agent-header">
-                            <div class="agent-name">Customer Support Agent</div>
-                            <div class="agent-status status-active">Active</div>
+        function renderAgents() {
+            const container = document.getElementById('agentsGrid');
+            container.innerHTML = agents.map(agent => `
+                <div class="agent-card">
+                    <div class="agent-header">
+                        <div class="agent-name">${agent.name}</div>
+                        <div class="agent-status ${agent.status}">${agent.status}</div>
+                    </div>
+                    <div class="agent-metrics">
+                        <div class="agent-metric">
+                            <div class="agent-metric-value">${agent.requests_count}</div>
+                            <div class="agent-metric-label">Requests</div>
                         </div>
-                        <div class="agent-metrics">
-                            <div class="metric">
-                                <div class="metric-value">247</div>
-                                <div class="metric-label">Requests</div>
-                            </div>
-                            <div class="metric">
-                                <div class="metric-value">98%</div>
-                                <div class="metric-label">Success</div>
-                            </div>
-                            <div class="metric">
-                                <div class="metric-value">1.2s</div>
-                                <div class="metric-label">Avg Time</div>
-                            </div>
+                        <div class="agent-metric">
+                            <div class="agent-metric-value">${Math.round(agent.success_rate)}%</div>
+                            <div class="agent-metric-label">Success</div>
+                        </div>
+                        <div class="agent-metric">
+                            <div class="agent-metric-value">${agent.avg_response_time}s</div>
+                            <div class="agent-metric-label">Avg Time</div>
+                        </div>
+                        <div class="agent-metric">
+                            <div class="agent-metric-value">${Math.round(agent.memory_usage)}%</div>
+                            <div class="agent-metric-label">Memory</div>
                         </div>
                     </div>
+                    <div class="agent-actions">
+                        ${agent.status === 'active' ? 
+                            `<button class="btn btn-danger btn-sm" onclick="stopAgent('${agent.id}')">
+                                <i class="fas fa-stop"></i> Stop
+                            </button>` :
+                            `<button class="btn btn-success btn-sm" onclick="startAgent('${agent.id}')">
+                                <i class="fas fa-play"></i> Start
+                            </button>`
+                        }
+                        <button class="btn btn-primary btn-sm" onclick="viewAgentDetails('${agent.id}')">
+                            <i class="fas fa-info"></i> Details
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
 
-                    <div class="agent-card">
-                        <div class="agent-header">
-                            <div class="agent-name">Data Analysis Agent</div>
-                            <div class="agent-status status-active">Active</div>
-                        </div>
-                        <div class="agent-metrics">
-                            <div class="metric">
-                                <div class="metric-value">89</div>
-                                <div class="metric-label">Requests</div>
-                            </div>
-                            <div class="metric">
-                                <div class="metric-value">94%</div>
-                                <div class="metric-label">Success</div>
-                            </div>
-                            <div class="metric">
-                                <div class="metric-value">3.7s</div>
-                                <div class="metric-label">Avg Time</div>
-                            </div>
+        function renderActivities() {
+            const container = document.getElementById('activityFeed');
+            container.innerHTML = activities.slice(0, 10).map(activity => `
+                <div class="activity-item">
+                    <div class="activity-icon ${activity.type}">
+                        <i class="fas fa-${getActivityIcon(activity.type)}"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">${activity.title}</div>
+                        <div class="activity-description">${activity.description}</div>
+                        <div class="activity-meta">
+                            ${activity.component} • ${formatTime(activity.timestamp)} ${activity.user ? `• ${activity.user}` : ''}
                         </div>
                     </div>
+                </div>
+            `).join('');
+        }
 
-                    <div class="agent-card">
-                        <div class="agent-header">
-                            <div class="agent-name">Content Generator</div>
-                            <div class="agent-status status-idle">Idle</div>
-                        </div>
-                        <div class="agent-metrics">
-                            <div class="metric">
-                                <div class="metric-value">12</div>
-                                <div class="metric-label">Requests</div>
-                            </div>
-                            <div class="metric">
-                                <div class="metric-value">100%</div>
-                                <div class="metric-label">Success</div>
-                            </div>
-                            <div class="metric">
-                                <div class="metric-value">5.1s</div>
-                                <div class="metric-label">Avg Time</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="agent-card">
-                        <div class="agent-header">
-                            <div class="agent-name">Code Review Agent</div>
-                            <div class="agent-status status-error">Error</div>
-                        </div>
-                        <div class="agent-metrics">
-                            <div class="metric">
-                                <div class="metric-value">0</div>
-                                <div class="metric-label">Requests</div>
-                            </div>
-                            <div class="metric">
-                                <div class="metric-value">--</div>
-                                <div class="metric-label">Success</div>
-                            </div>
-                            <div class="metric">
-                                <div class="metric-value">--</div>
-                                <div class="metric-label">Avg Time</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Recent Activity -->
-            <div class="activity-section">
-                <div class="section-header">
-                    <h2 class="section-title">Recent Activity</h2>
-                    <button class="btn btn-primary">
-                        <i class="fas fa-eye"></i>
-                        View All Logs
-                    </button>
-                </div>
-                
-                <div class="activity-list">
-                    <div class="activity-item">
-                        <div class="activity-icon success">
-                            <i class="fas fa-check"></i>
-                        </div>
-                        <div class="activity-content">
-                            <div class="activity-title">Customer Support Agent deployed successfully</div>
-                            <div class="activity-description">New agent instance started and handling requests</div>
-                            <div class="activity-time">2 minutes ago</div>
-                        </div>
-                    </div>
-                    
-                    <div class="activity-item">
-                        <div class="activity-icon warning">
-                            <i class="fas fa-exclamation-triangle"></i>
-                        </div>
-                        <div class="activity-content">
-                            <div class="activity-title">High memory usage detected</div>
-                            <div class="activity-description">Memory usage reached 68% - consider scaling</div>
-                            <div class="activity-time">5 minutes ago</div>
-                        </div>
-                    </div>
-                    
-                    <div class="activity-item">
-                        <div class="activity-icon error">
-                            <i class="fas fa-times"></i>
-                        </div>
-                        <div class="activity-content">
-                            <div class="activity-title">Code Review Agent failed to start</div>
-                            <div class="activity-description">Connection timeout to external API service</div>
-                            <div class="activity-time">12 minutes ago</div>
-                        </div>
-                    </div>
-                    
-                    <div class="activity-item">
-                        <div class="activity-icon info">
-                            <i class="fas fa-info"></i>
-                        </div>
-                        <div class="activity-content">
-                            <div class="activity-title">System backup completed</div>
-                            <div class="activity-description">Daily backup of agent configurations and data</div>
-                            <div class="activity-time">1 hour ago</div>
-                        </div>
-                    </div>
-                    
-                    <div class="activity-item">
-                        <div class="activity-icon success">
-                            <i class="fas fa-sync"></i>
-                        </div>
-                        <div class="activity-content">
-                            <div class="activity-title">API Gateway updated</div>
-                            <div class="activity-description">Rate limiting rules updated for better performance</div>
-                            <div class="activity-time">2 hours ago</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- System Controls -->
-            <div class="controls-section">
-                <div class="control-card">
-                    <div class="control-icon">
-                        <i class="fas fa-rocket"></i>
-                    </div>
-                    <div class="control-title">Deploy Agent</div>
-                    <div class="control-description">Launch a new AI agent instance</div>
-                    <button class="btn btn-primary">Deploy</button>
-                </div>
-                
-                <div class="control-card">
-                    <div class="control-icon">
-                        <i class="fas fa-database"></i>
-                    </div>
-                    <div class="control-title">Backup System</div>
-                    <div class="control-description">Create system backup</div>
-                    <button class="btn btn-primary">Backup</button>
-                </div>
-                
-                <div class="control-card">
-                    <div class="control-icon">
-                        <i class="fas fa-chart-line"></i>
-                    </div>
-                    <div class="control-title">Performance Report</div>
-                    <div class="control-description">Generate detailed analytics</div>
-                    <button class="btn btn-primary">Generate</button>
-                </div>
-                
-                <div class="control-card">
-                    <div class="control-icon">
-                        <i class="fas fa-shield-alt"></i>
-                    </div>
-                    <div class="control-title">Security Scan</div>
-                    <div class="control-description">Run security audit</div>
-                    <button class="btn btn-primary">Scan</button>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <script>
-        // Real-time updates simulation
-        function updateMetrics() {
-            const apiRequests = document.querySelector('.status-value');
-            if (apiRequests) {
-                const current = parseInt(apiRequests.textContent.replace(',', ''));
-                const change = Math.floor(Math.random() * 20) - 10;
-                apiRequests.textContent = (current + change).toLocaleString();
+        // Agent Actions
+        async function startAgent(agentId) {
+            try {
+                await apiCall(`/api/agents/${agentId}/start`, { method: 'POST' });
+                showNotification('Agent started successfully', 'success');
+                await refreshData();
+            } catch (error) {
+                showNotification('Failed to start agent', 'error');
             }
         }
 
-        // Update every 5 seconds
-        setInterval(updateMetrics, 5000);
+        async function stopAgent(agentId) {
+            try {
+                await apiCall(`/api/agents/${agentId}/stop`, { method: 'POST' });
+                showNotification('Agent stopped successfully', 'success');
+                await refreshData();
+            } catch (error) {
+                showNotification('Failed to stop agent', 'error');
+            }
+        }
 
-        // Add click handlers for buttons
-        document.querySelectorAll('.btn').forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                e.preventDefault();
+        async function deployAgent() {
+            const agentName = prompt('Enter agent name:');
+            const agentType = prompt('Enter agent type (e.g., customer-support, data-analysis):');
+            
+            if (agentName && agentType) {
+                try {
+                    await apiCall('/api/agents/deploy', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            name: agentName,
+                            agent_type: agentType,
+                            config: {}
+                        })
+                    });
+                    showNotification('Agent deployed successfully', 'success');
+                    await refreshData();
+                } catch (error) {
+                    showNotification('Failed to deploy agent', 'error');
+                }
+            }
+        }
+
+        // System Actions
+        async function emergencyStop() {
+            if (confirm('Are you sure you want to stop all agents and workflows? This action cannot be undone.')) {
+                try {
+                    await apiCall('/api/system/emergency-stop', { method: 'POST' });
+                    showNotification('Emergency stop completed', 'warning');
+                    await refreshData();
+                } catch (error) {
+                    showNotification('Failed to execute emergency stop', 'error');
+                }
+            }
+        }
+
+        async function restartSystem() {
+            if (confirm('Are you sure you want to restart all system components?')) {
+                try {
+                    await apiCall('/api/system/restart', { method: 'POST' });
+                    showNotification('System restart completed', 'success');
+                    await refreshData();
+                } catch (error) {
+                    showNotification('Failed to restart system', 'error');
+                }
+            }
+        }
+
+        async function createBackup() {
+            try {
+                await apiCall('/api/system/backup', { method: 'POST' });
+                showNotification('Backup initiated', 'success');
+                await refreshData();
+            } catch (error) {
+                showNotification('Failed to create backup', 'error');
+            }
+        }
+
+        // Utility Functions
+        function getActivityIcon(type) {
+            const icons = {
+                success: 'check',
+                warning: 'exclamation-triangle',
+                error: 'times',
+                info: 'info'
+            };
+            return icons[type] || 'info';
+        }
+
+        function formatTime(timestamp) {
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diff = now - date;
+            
+            if (diff < 60000) return 'Just now';
+            if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
+            if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+            return date.toLocaleDateString();
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        async function refreshData() {
+            try {
+                await Promise.all([
+                    loadSystemStatus(),
+                    loadAgents(),
+                    loadActivities()
+                ]);
                 
-                // Add loading state
-                const originalText = this.innerHTML;
-                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-                this.disabled = true;
+                renderSystemStatus();
+                renderAgents();
+                renderActivities();
                 
-                // Simulate API call
-                setTimeout(() => {
-                    this.innerHTML = originalText;
-                    this.disabled = false;
-                    
-                    // Show success message
-                    const action = this.textContent.trim();
-                    console.log(`${action} completed successfully`);
-                }, 2000);
+                console.log('Data refreshed successfully');
+            } catch (error) {
+                console.error('Failed to refresh data:', error);
+                showNotification('Failed to refresh data', 'error');
+            }
+        }
+
+        function startAutoRefresh() {
+            refreshInterval = setInterval(refreshData, 10000); // Refresh every 10 seconds
+        }
+
+        function stopAutoRefresh() {
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+            }
+        }
+
+        // Navigation
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+                
+                const section = this.dataset.section;
+                if (section === 'deploy') {
+                    deployAgent();
+                } else if (section === 'backup') {
+                    createBackup();
+                }
             });
         });
 
         // Mobile sidebar toggle
         function toggleSidebar() {
-            const sidebar = document.querySelector('.sidebar');
-            sidebar.classList.toggle('open');
+            document.getElementById('sidebar').classList.toggle('open');
         }
 
-        // Add mobile menu button if needed
+        // Add mobile menu button for small screens
         if (window.innerWidth <= 1024) {
             const header = document.querySelector('.admin-header');
             const menuButton = document.createElement('button');
@@ -909,40 +982,17 @@
             header.querySelector('.header-actions').prepend(menuButton);
         }
 
-        // Auto-refresh status indicators
-        setInterval(() => {
-            document.querySelectorAll('.status-indicator').forEach(indicator => {
-                if (Math.random() > 0.95) { // 5% chance to change
-                    const statuses = ['status-online', 'status-warning', 'status-offline'];
-                    const currentStatus = statuses.find(s => indicator.classList.contains(s));
-                    const newStatus = statuses[Math.floor(Math.random() * statuses.length)];
-                    
-                    if (currentStatus) {
-                        indicator.classList.remove(currentStatus);
-                    }
-                    indicator.classList.add(newStatus);
-                }
-            });
-        }, 10000);
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 1024) {
+                document.getElementById('sidebar').classList.remove('open');
+            }
+        });
 
-        // Add timestamp updates
-        function updateTimestamps() {
-            const timeElements = document.querySelectorAll('.activity-time');
-            timeElements.forEach((element, index) => {
-                const minutes = [2, 5, 12, 60, 120][index] || 2;
-                const now = new Date();
-                const past = new Date(now.getTime() - minutes * 60000);
-                
-                if (minutes < 60) {
-                    element.textContent = `${minutes} minutes ago`;
-                } else {
-                    element.textContent = `${Math.floor(minutes / 60)} hour${Math.floor(minutes / 60) > 1 ? 's' : ''} ago`;
-                }
-            });
-        }
-
-        updateTimestamps();
-        setInterval(updateTimestamps, 60000); // Update every minute
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', function() {
+            stopAutoRefresh();
+        });
     </script>
 </body>
 </html> 
