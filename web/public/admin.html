@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orchestra AI - Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            overflow-x: hidden;
+        }
+
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+            border-right: 1px solid #334155;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 2rem;
+            border-bottom: 1px solid #334155;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #3b82f6;
+        }
+
+        .logo i {
+            font-size: 2rem;
+        }
+
+        .nav-menu {
+            padding: 1.5rem 0;
+        }
+
+        .nav-section {
+            margin-bottom: 2rem;
+        }
+
+        .nav-section-title {
+            padding: 0 2rem;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #64748b;
+            margin-bottom: 1rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 2rem;
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+            border-left-color: #3b82f6;
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-left: auto;
+        }
+
+        .status-online {
+            background: #10b981;
+            box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+        }
+
+        .status-warning {
+            background: #f59e0b;
+            box-shadow: 0 0 8px rgba(245, 158, 11, 0.5);
+        }
+
+        .status-offline {
+            background: #ef4444;
+            box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 2rem;
+            background: #0f172a;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #334155;
+        }
+
+        .admin-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+
+        .admin-subtitle {
+            color: #64748b;
+            margin-top: 0.25rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+        }
+
+        /* System Status Grid */
+        .system-status {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .status-card {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            border: 1px solid #475569;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .status-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .status-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .status-title {
+            font-size: 0.875rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .status-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-bottom: 0.5rem;
+        }
+
+        .status-change {
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .status-change.positive {
+            color: #10b981;
+        }
+
+        .status-change.negative {
+            color: #ef4444;
+        }
+
+        /* AI Agents Section */
+        .agents-section {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            border: 1px solid #475569;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #f1f5f9;
+        }
+
+        .agents-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1rem;
+        }
+
+        .agent-card {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid #475569;
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            transition: all 0.3s ease;
+        }
+
+        .agent-card:hover {
+            background: rgba(15, 23, 42, 0.8);
+            border-color: #3b82f6;
+        }
+
+        .agent-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .agent-name {
+            font-weight: 600;
+            color: #f1f5f9;
+        }
+
+        .agent-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .status-active {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .status-idle {
+            background: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .status-error {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .agent-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .metric {
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #f1f5f9;
+        }
+
+        .metric-label {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Recent Activity */
+        .activity-section {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            border: 1px solid #475569;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .activity-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .activity-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid #334155;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .activity-icon.success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .activity-icon.warning {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+
+        .activity-icon.error {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        .activity-icon.info {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-weight: 500;
+            color: #f1f5f9;
+            margin-bottom: 0.25rem;
+        }
+
+        .activity-description {
+            font-size: 0.875rem;
+            color: #94a3b8;
+            margin-bottom: 0.25rem;
+        }
+
+        .activity-time {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+
+        /* System Controls */
+        .controls-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .control-card {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            border: 1px solid #475569;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .control-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .control-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #f1f5f9;
+            margin-bottom: 0.5rem;
+        }
+
+        .control-description {
+            font-size: 0.875rem;
+            color: #94a3b8;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+            
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 1rem;
+            }
+            
+            .system-status {
+                grid-template-columns: 1fr;
+            }
+            
+            .admin-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+        }
+
+        /* Loading Animation */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .loading {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-music"></i>
+                    Orchestra AI Admin
+                </div>
+            </div>
+            
+            <nav class="nav-menu">
+                <div class="nav-section">
+                    <div class="nav-section-title">System</div>
+                    <a href="#" class="nav-item active">
+                        <i class="fas fa-tachometer-alt"></i>
+                        Dashboard
+                        <div class="status-indicator status-online"></div>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-robot"></i>
+                        AI Agents
+                        <div class="status-indicator status-online"></div>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-project-diagram"></i>
+                        Workflows
+                        <div class="status-indicator status-warning"></div>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-database"></i>
+                        Data Sources
+                        <div class="status-indicator status-online"></div>
+                    </a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Infrastructure</div>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-server"></i>
+                        Servers
+                        <div class="status-indicator status-online"></div>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-memory"></i>
+                        Memory Store
+                        <div class="status-indicator status-online"></div>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-network-wired"></i>
+                        API Gateway
+                        <div class="status-indicator status-online"></div>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-shield-alt"></i>
+                        Security
+                        <div class="status-indicator status-warning"></div>
+                    </a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Management</div>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-users"></i>
+                        Users
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-key"></i>
+                        API Keys
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-chart-bar"></i>
+                        Analytics
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-cog"></i>
+                        Settings
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="admin-header">
+                <div>
+                    <h1 class="admin-title">Orchestra AI Control Center</h1>
+                    <p class="admin-subtitle">System Status: All services operational</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-danger">
+                        <i class="fas fa-power-off"></i>
+                        Emergency Stop
+                    </button>
+                    <button class="btn btn-primary">
+                        <i class="fas fa-sync"></i>
+                        Refresh All
+                    </button>
+                </div>
+            </div>
+
+            <!-- System Status -->
+            <div class="system-status">
+                <div class="status-card">
+                    <div class="status-header">
+                        <div class="status-title">Active AI Agents</div>
+                        <i class="fas fa-robot" style="color: #10b981; font-size: 1.5rem;"></i>
+                    </div>
+                    <div class="status-value">12</div>
+                    <div class="status-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        +3 since last hour
+                    </div>
+                </div>
+
+                <div class="status-card">
+                    <div class="status-header">
+                        <div class="status-title">API Requests/min</div>
+                        <i class="fas fa-exchange-alt" style="color: #3b82f6; font-size: 1.5rem;"></i>
+                    </div>
+                    <div class="status-value">1,247</div>
+                    <div class="status-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        +15% from yesterday
+                    </div>
+                </div>
+
+                <div class="status-card">
+                    <div class="status-header">
+                        <div class="status-title">Memory Usage</div>
+                        <i class="fas fa-memory" style="color: #f59e0b; font-size: 1.5rem;"></i>
+                    </div>
+                    <div class="status-value">68%</div>
+                    <div class="status-change negative">
+                        <i class="fas fa-arrow-up"></i>
+                        +5% from last check
+                    </div>
+                </div>
+
+                <div class="status-card">
+                    <div class="status-header">
+                        <div class="status-title">Success Rate</div>
+                        <i class="fas fa-check-circle" style="color: #10b981; font-size: 1.5rem;"></i>
+                    </div>
+                    <div class="status-value">99.2%</div>
+                    <div class="status-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        +0.3% improvement
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Agents Section -->
+            <div class="agents-section">
+                <div class="section-header">
+                    <h2 class="section-title">AI Agents Status</h2>
+                    <button class="btn btn-primary">
+                        <i class="fas fa-plus"></i>
+                        Deploy New Agent
+                    </button>
+                </div>
+                
+                <div class="agents-grid">
+                    <div class="agent-card">
+                        <div class="agent-header">
+                            <div class="agent-name">Customer Support Agent</div>
+                            <div class="agent-status status-active">Active</div>
+                        </div>
+                        <div class="agent-metrics">
+                            <div class="metric">
+                                <div class="metric-value">247</div>
+                                <div class="metric-label">Requests</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-value">98%</div>
+                                <div class="metric-label">Success</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-value">1.2s</div>
+                                <div class="metric-label">Avg Time</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="agent-card">
+                        <div class="agent-header">
+                            <div class="agent-name">Data Analysis Agent</div>
+                            <div class="agent-status status-active">Active</div>
+                        </div>
+                        <div class="agent-metrics">
+                            <div class="metric">
+                                <div class="metric-value">89</div>
+                                <div class="metric-label">Requests</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-value">94%</div>
+                                <div class="metric-label">Success</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-value">3.7s</div>
+                                <div class="metric-label">Avg Time</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="agent-card">
+                        <div class="agent-header">
+                            <div class="agent-name">Content Generator</div>
+                            <div class="agent-status status-idle">Idle</div>
+                        </div>
+                        <div class="agent-metrics">
+                            <div class="metric">
+                                <div class="metric-value">12</div>
+                                <div class="metric-label">Requests</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-value">100%</div>
+                                <div class="metric-label">Success</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-value">5.1s</div>
+                                <div class="metric-label">Avg Time</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="agent-card">
+                        <div class="agent-header">
+                            <div class="agent-name">Code Review Agent</div>
+                            <div class="agent-status status-error">Error</div>
+                        </div>
+                        <div class="agent-metrics">
+                            <div class="metric">
+                                <div class="metric-value">0</div>
+                                <div class="metric-label">Requests</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-value">--</div>
+                                <div class="metric-label">Success</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-value">--</div>
+                                <div class="metric-label">Avg Time</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="activity-section">
+                <div class="section-header">
+                    <h2 class="section-title">Recent Activity</h2>
+                    <button class="btn btn-primary">
+                        <i class="fas fa-eye"></i>
+                        View All Logs
+                    </button>
+                </div>
+                
+                <div class="activity-list">
+                    <div class="activity-item">
+                        <div class="activity-icon success">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">Customer Support Agent deployed successfully</div>
+                            <div class="activity-description">New agent instance started and handling requests</div>
+                            <div class="activity-time">2 minutes ago</div>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">High memory usage detected</div>
+                            <div class="activity-description">Memory usage reached 68% - consider scaling</div>
+                            <div class="activity-time">5 minutes ago</div>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon error">
+                            <i class="fas fa-times"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">Code Review Agent failed to start</div>
+                            <div class="activity-description">Connection timeout to external API service</div>
+                            <div class="activity-time">12 minutes ago</div>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon info">
+                            <i class="fas fa-info"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">System backup completed</div>
+                            <div class="activity-description">Daily backup of agent configurations and data</div>
+                            <div class="activity-time">1 hour ago</div>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-item">
+                        <div class="activity-icon success">
+                            <i class="fas fa-sync"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">API Gateway updated</div>
+                            <div class="activity-description">Rate limiting rules updated for better performance</div>
+                            <div class="activity-time">2 hours ago</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Controls -->
+            <div class="controls-section">
+                <div class="control-card">
+                    <div class="control-icon">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <div class="control-title">Deploy Agent</div>
+                    <div class="control-description">Launch a new AI agent instance</div>
+                    <button class="btn btn-primary">Deploy</button>
+                </div>
+                
+                <div class="control-card">
+                    <div class="control-icon">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <div class="control-title">Backup System</div>
+                    <div class="control-description">Create system backup</div>
+                    <button class="btn btn-primary">Backup</button>
+                </div>
+                
+                <div class="control-card">
+                    <div class="control-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="control-title">Performance Report</div>
+                    <div class="control-description">Generate detailed analytics</div>
+                    <button class="btn btn-primary">Generate</button>
+                </div>
+                
+                <div class="control-card">
+                    <div class="control-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="control-title">Security Scan</div>
+                    <div class="control-description">Run security audit</div>
+                    <button class="btn btn-primary">Scan</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Real-time updates simulation
+        function updateMetrics() {
+            const apiRequests = document.querySelector('.status-value');
+            if (apiRequests) {
+                const current = parseInt(apiRequests.textContent.replace(',', ''));
+                const change = Math.floor(Math.random() * 20) - 10;
+                apiRequests.textContent = (current + change).toLocaleString();
+            }
+        }
+
+        // Update every 5 seconds
+        setInterval(updateMetrics, 5000);
+
+        // Add click handlers for buttons
+        document.querySelectorAll('.btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Add loading state
+                const originalText = this.innerHTML;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                this.disabled = true;
+                
+                // Simulate API call
+                setTimeout(() => {
+                    this.innerHTML = originalText;
+                    this.disabled = false;
+                    
+                    // Show success message
+                    const action = this.textContent.trim();
+                    console.log(`${action} completed successfully`);
+                }, 2000);
+            });
+        });
+
+        // Mobile sidebar toggle
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('open');
+        }
+
+        // Add mobile menu button if needed
+        if (window.innerWidth <= 1024) {
+            const header = document.querySelector('.admin-header');
+            const menuButton = document.createElement('button');
+            menuButton.innerHTML = '<i class="fas fa-bars"></i>';
+            menuButton.className = 'btn btn-primary';
+            menuButton.onclick = toggleSidebar;
+            header.querySelector('.header-actions').prepend(menuButton);
+        }
+
+        // Auto-refresh status indicators
+        setInterval(() => {
+            document.querySelectorAll('.status-indicator').forEach(indicator => {
+                if (Math.random() > 0.95) { // 5% chance to change
+                    const statuses = ['status-online', 'status-warning', 'status-offline'];
+                    const currentStatus = statuses.find(s => indicator.classList.contains(s));
+                    const newStatus = statuses[Math.floor(Math.random() * statuses.length)];
+                    
+                    if (currentStatus) {
+                        indicator.classList.remove(currentStatus);
+                    }
+                    indicator.classList.add(newStatus);
+                }
+            });
+        }, 10000);
+
+        // Add timestamp updates
+        function updateTimestamps() {
+            const timeElements = document.querySelectorAll('.activity-time');
+            timeElements.forEach((element, index) => {
+                const minutes = [2, 5, 12, 60, 120][index] || 2;
+                const now = new Date();
+                const past = new Date(now.getTime() - minutes * 60000);
+                
+                if (minutes < 60) {
+                    element.textContent = `${minutes} minutes ago`;
+                } else {
+                    element.textContent = `${Math.floor(minutes / 60)} hour${Math.floor(minutes / 60) > 1 ? 's' : ''} ago`;
+                }
+            });
+        }
+
+        updateTimestamps();
+        setInterval(updateTimestamps, 60000); // Update every minute
+    </script>
+</body>
+</html> 

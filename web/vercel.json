@@ -13,7 +13,11 @@
   "rewrites": [
     {
       "source": "/",
-      "destination": "/public/index.html"
+      "destination": "/public/admin.html"
+    },
+    {
+      "source": "/admin",
+      "destination": "/public/admin.html"
     },
     {
       "source": "/dashboard",
@@ -22,6 +26,10 @@
     {
       "source": "/workflow-builder",
       "destination": "/mockups/workflow-builder.html"
+    },
+    {
+      "source": "/home",
+      "destination": "/public/index.html"
     }
   ],
   "headers": [
