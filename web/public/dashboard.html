@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orchestra AI Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+            color: #334155;
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            color: white;
+            padding: 2rem 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 0 2rem 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .nav-menu {
+            padding: 2rem 0;
+        }
+
+        .nav-section {
+            margin-bottom: 2rem;
+        }
+
+        .nav-section-title {
+            padding: 0 2rem;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            opacity: 0.6;
+            margin-bottom: 1rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 2rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left-color: #3b82f6;
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 2rem;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .dashboard-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .dashboard-subtitle {
+            color: #64748b;
+            margin-top: 0.25rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #64748b;
+            border: 1px solid #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            background: #f8fafc;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .stat-title {
+            font-size: 0.875rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-change {
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .stat-change.positive {
+            color: #10b981;
+        }
+
+        .stat-change.negative {
+            color: #ef4444;
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .card-content {
+            padding: 1.5rem;
+        }
+
+        /* Chart Container */
+        .chart-container {
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border-radius: 0.5rem;
+            position: relative;
+        }
+
+        .chart-placeholder {
+            text-align: center;
+            color: #64748b;
+        }
+
+        /* Activity Feed */
+        .activity-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-weight: 500;
+            color: #1e293b;
+            margin-bottom: 0.25rem;
+        }
+
+        .activity-description {
+            font-size: 0.875rem;
+            color: #64748b;
+            margin-bottom: 0.25rem;
+        }
+
+        .activity-time {
+            font-size: 0.75rem;
+            color: #94a3b8;
+        }
+
+        /* Workflow Cards */
+        .workflow-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .workflow-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .workflow-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .workflow-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+
+        .workflow-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .status-active {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-paused {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .workflow-title {
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        .workflow-description {
+            color: #64748b;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .workflow-metrics {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.875rem;
+        }
+
+        .workflow-metric {
+            text-align: center;
+        }
+
+        .workflow-metric-value {
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .workflow-metric-label {
+            color: #64748b;
+            font-size: 0.75rem;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .quick-action {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .quick-action:hover {
+            background: #f8fafc;
+            transform: translateY(-2px);
+        }
+
+        .quick-action-icon {
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .quick-action-title {
+            font-weight: 500;
+            color: #1e293b;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+            
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 1rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-music"></i>
+                    Orchestra AI
+                </div>
+            </div>
+            
+            <nav class="nav-menu">
+                <div class="nav-section">
+                    <div class="nav-section-title">Main</div>
+                    <a href="#" class="nav-item active">
+                        <i class="fas fa-home"></i>
+                        Dashboard
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-project-diagram"></i>
+                        Workflows
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-robot"></i>
+                        AI Agents
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-chart-bar"></i>
+                        Analytics
+                    </a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Management</div>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-plug"></i>
+                        Integrations
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-database"></i>
+                        Data Sources
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-users"></i>
+                        Team
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-cog"></i>
+                        Settings
+                    </a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Support</div>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-book"></i>
+                        Documentation
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-life-ring"></i>
+                        Help Center
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="dashboard-header">
+                <div>
+                    <h1 class="dashboard-title">Welcome back, Alex!</h1>
+                    <p class="dashboard-subtitle">Here's what's happening with your AI orchestra today</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-secondary">
+                        <i class="fas fa-download"></i>
+                        Export
+                    </button>
+                    <button class="btn btn-primary">
+                        <i class="fas fa-plus"></i>
+                        New Workflow
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">Active Workflows</div>
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #3b82f6 20%, #1d4ed8 100%); color: white;">
+                            <i class="fas fa-play"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value">24</div>
+                    <div class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        12% from last month
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">Tasks Completed</div>
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #10b981 20%, #059669 100%); color: white;">
+                            <i class="fas fa-check"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value">1,429</div>
+                    <div class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        8% from last week
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">AI Agents</div>
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #8b5cf6 20%, #7c3aed 100%); color: white;">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value">12</div>
+                    <div class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        2 new this week
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">Success Rate</div>
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #f59e0b 20%, #d97706 100%); color: white;">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value">98.5%</div>
+                    <div class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        0.5% improvement
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Grid -->
+            <div class="dashboard-grid">
+                <!-- Performance Chart -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Performance Overview</h3>
+                        <select class="btn btn-secondary" style="padding: 0.5rem;">
+                            <option>Last 7 days</option>
+                            <option>Last 30 days</option>
+                            <option>Last 90 days</option>
+                        </select>
+                    </div>
+                    <div class="card-content">
+                        <div class="chart-container">
+                            <div class="chart-placeholder">
+                                <i class="fas fa-chart-area" style="font-size: 3rem; margin-bottom: 1rem; color: #94a3b8;"></i>
+                                <p>Interactive performance chart will appear here</p>
+                                <p style="font-size: 0.875rem; color: #94a3b8;">Real-time data visualization</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Recent Activity</h3>
+                        <a href="#" class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.875rem;">View All</a>
+                    </div>
+                    <div class="card-content">
+                        <div class="activity-item">
+                            <div class="activity-avatar">AI</div>
+                            <div class="activity-content">
+                                <div class="activity-title">Data Pipeline Completed</div>
+                                <div class="activity-description">Customer data sync workflow finished successfully</div>
+                                <div class="activity-time">2 minutes ago</div>
+                            </div>
+                        </div>
+                        
+                        <div class="activity-item">
+                            <div class="activity-avatar">WF</div>
+                            <div class="activity-content">
+                                <div class="activity-title">New Workflow Created</div>
+                                <div class="activity-description">Email automation workflow has been deployed</div>
+                                <div class="activity-time">15 minutes ago</div>
+                            </div>
+                        </div>
+                        
+                        <div class="activity-item">
+                            <div class="activity-avatar">AG</div>
+                            <div class="activity-content">
+                                <div class="activity-title">Agent Performance Update</div>
+                                <div class="activity-description">Customer support agent improved response time</div>
+                                <div class="activity-time">1 hour ago</div>
+                            </div>
+                        </div>
+                        
+                        <div class="activity-item">
+                            <div class="activity-avatar">SY</div>
+                            <div class="activity-content">
+                                <div class="activity-title">System Optimization</div>
+                                <div class="activity-description">Auto-scaling improved overall performance</div>
+                                <div class="activity-time">3 hours ago</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Workflows -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Active Workflows</h3>
+                    <button class="btn btn-primary">
+                        <i class="fas fa-plus"></i>
+                        Create Workflow
+                    </button>
+                </div>
+                <div class="card-content">
+                    <div class="workflow-grid">
+                        <div class="workflow-card">
+                            <div class="workflow-header">
+                                <span class="workflow-status status-active">Active</span>
+                                <i class="fas fa-ellipsis-v" style="color: #94a3b8; cursor: pointer;"></i>
+                            </div>
+                            <div class="workflow-title">Customer Onboarding</div>
+                            <div class="workflow-description">Automated welcome emails, account setup, and initial training delivery</div>
+                            <div class="workflow-metrics">
+                                <div class="workflow-metric">
+                                    <div class="workflow-metric-value">142</div>
+                                    <div class="workflow-metric-label">Executed</div>
+                                </div>
+                                <div class="workflow-metric">
+                                    <div class="workflow-metric-value">98%</div>
+                                    <div class="workflow-metric-label">Success</div>
+                                </div>
+                                <div class="workflow-metric">
+                                    <div class="workflow-metric-value">2.3s</div>
+                                    <div class="workflow-metric-label">Avg Time</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="workflow-card">
+                            <div class="workflow-header">
+                                <span class="workflow-status status-active">Active</span>
+                                <i class="fas fa-ellipsis-v" style="color: #94a3b8; cursor: pointer;"></i>
+                            </div>
+                            <div class="workflow-title">Lead Qualification</div>
+                            <div class="workflow-description">AI-powered lead scoring and automatic routing to sales team</div>
+                            <div class="workflow-metrics">
+                                <div class="workflow-metric">
+                                    <div class="workflow-metric-value">89</div>
+                                    <div class="workflow-metric-label">Executed</div>
+                                </div>
+                                <div class="workflow-metric">
+                                    <div class="workflow-metric-value">94%</div>
+                                    <div class="workflow-metric-label">Success</div>
+                                </div>
+                                <div class="workflow-metric">
+                                    <div class="workflow-metric-value">1.8s</div>
+                                    <div class="workflow-metric-label">Avg Time</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="workflow-card">
+                            <div class="workflow-header">
+                                <span class="workflow-status status-paused">Paused</span>
+                                <i class="fas fa-ellipsis-v" style="color: #94a3b8; cursor: pointer;"></i>
+                            </div>
+                            <div class="workflow-title">Social Media Monitoring</div>
+                            <div class="workflow-description">Track brand mentions and automatically respond to customer inquiries</div>
+                            <div class="workflow-metrics">
+                                <div class="workflow-metric">
+                                    <div class="workflow-metric-value">0</div>
+                                    <div class="workflow-metric-label">Executed</div>
+                                </div>
+                                <div class="workflow-metric">
+                                    <div class="workflow-metric-value">--</div>
+                                    <div class="workflow-metric-label">Success</div>
+                                </div>
+                                <div class="workflow-metric">
+                                    <div class="workflow-metric-value">--</div>
+                                    <div class="workflow-metric-label">Avg Time</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <a href="#" class="quick-action">
+                    <div class="quick-action-icon">
+                        <i class="fas fa-plus"></i>
+                    </div>
+                    <div class="quick-action-title">Create Workflow</div>
+                </a>
+                
+                <a href="#" class="quick-action">
+                    <div class="quick-action-icon">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="quick-action-title">Deploy Agent</div>
+                </a>
+                
+                <a href="#" class="quick-action">
+                    <div class="quick-action-icon">
+                        <i class="fas fa-plug"></i>
+                    </div>
+                    <div class="quick-action-title">Add Integration</div>
+                </a>
+                
+                <a href="#" class="quick-action">
+                    <div class="quick-action-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <div class="quick-action-title">View Reports</div>
+                </a>
+                
+                <a href="#" class="quick-action">
+                    <div class="quick-action-icon">
+                        <i class="fas fa-cog"></i>
+                    </div>
+                    <div class="quick-action-title">Settings</div>
+                </a>
+                
+                <a href="#" class="quick-action">
+                    <div class="quick-action-icon">
+                        <i class="fas fa-life-ring"></i>
+                    </div>
+                    <div class="quick-action-title">Get Help</div>
+                </a>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Mobile sidebar toggle
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('open');
+        }
+
+        // Add mobile menu button if needed
+        if (window.innerWidth <= 1024) {
+            const header = document.querySelector('.dashboard-header');
+            const menuButton = document.createElement('button');
+            menuButton.innerHTML = '<i class="fas fa-bars"></i>';
+            menuButton.className = 'btn btn-secondary';
+            menuButton.onclick = toggleSidebar;
+            header.querySelector('.header-actions').prepend(menuButton);
+        }
+
+        // Simulate real-time updates
+        setInterval(() => {
+            const statValues = document.querySelectorAll('.stat-value');
+            statValues.forEach(stat => {
+                if (Math.random() > 0.9) { // 10% chance to update
+                    const currentValue = parseInt(stat.textContent.replace(/[^\d]/g, ''));
+                    const change = Math.floor(Math.random() * 3) - 1; // -1, 0, or 1
+                    if (change !== 0 && currentValue > 0) {
+                        stat.textContent = stat.textContent.replace(currentValue, currentValue + change);
+                    }
+                }
+            });
+        }, 5000);
+
+        // Add smooth transitions to cards
+        document.querySelectorAll('.stat-card, .workflow-card, .quick-action').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-2px)';
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0)';
+            });
+        });
+    </script>
+</body>
+</html> 

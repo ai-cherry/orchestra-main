@@ -1,9 +1,0 @@
-"""
-"""
-    "ParserInterface",
-    "ParsedData",
-    "StorageInterface", 
-    "StorageResult",
-    "ProcessorInterface",
-    "ProcessingResult",
-]

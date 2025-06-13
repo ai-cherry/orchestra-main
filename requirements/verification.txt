@@ -1,4 +1,0 @@
-# Requirements for SuperAGI deployment verification
-requests>=2.32.0
-kubernetes==28.1.0
-redis==5.0.1

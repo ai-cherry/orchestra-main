@@ -1,1 +1,0 @@
-/workspaces/orchestra-main/PROJECT_PRIORITIES.md

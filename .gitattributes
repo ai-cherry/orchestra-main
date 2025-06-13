@@ -1,6 +1,0 @@
-# Git attributes for AI Orchestra project
-# Prevent secret scanning for specific files
-track_migration_progress.sh linguist-generated=true
-# Treat these files as generated to avoid secret scanning
-*.sh linguist-language=shell
-orchestra-api-minimal.tar.gz filter=lfs diff=lfs merge=lfs -text

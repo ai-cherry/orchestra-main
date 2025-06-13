@@ -1,1 +1,0 @@
-import React from "react"; export default function ContextPanel({ isOpen, onClose, activePersona, messages, className = "" }) { return isOpen ? <div className={className}>Context Panel for {activePersona} <button onClick={onClose}>×</button></div> : null; }

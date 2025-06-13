@@ -1,6 +1,0 @@
-"""
-"""
-    """Create a new LLM router instance."""
-    """Get or create the global router instance."""
-    """Context manager for router lifecycle."""
-    """Reset the global router instance."""
