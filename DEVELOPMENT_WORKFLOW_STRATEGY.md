@@ -9,279 +9,218 @@
 
 This document establishes comprehensive best practices for Orchestra AI development to prevent environment confusion, maintain clean workflows, and ensure safe integration of complex infrastructure components like the discovered MCP server ecosystem.
 
-## 🚨 Current Environment Status
+## 🚀 **Infrastructure Consistency Complete - Pulumi Migration**
 
-### **✅ WORKING SERVICES**
-```yaml
-Frontend (React + Vite): http://localhost:3000 ✅ OPERATIONAL
-API Server (FastAPI): http://localhost:8000/api/health ✅ OPERATIONAL
-Development Environment: ✅ STABLE
-Documentation: ✅ COMPREHENSIVE
-```
+Orchestra AI has successfully **migrated from Terraform to Pulumi** for all Infrastructure as Code (IaC) management. This provides better alignment with our Python/TypeScript stack and more developer-friendly infrastructure automation.
 
-### **⚠️ PENDING INTEGRATION**
-```yaml
-MCP Server Ecosystem: 🔄 DISCOVERED IN IaC BRANCH
-Lambda Labs Infrastructure: 🔄 REQUIRES INTEGRATION  
-Advanced Development Tools: 🔄 STAGING FOR DEPLOYMENT
-Production Pipelines: 🔄 READY FOR ACTIVATION
-```
+## 🎯 **Current Infrastructure Status**
 
-## 🌿 Branch Management Strategy
+### ✅ **Operational Services:**
+- **Frontend**: React + Vite running on `localhost:3000`
+- **API**: FastAPI running on `localhost:8000` (via `main_simple.py`)
+- **Database**: SQLite for development (automatic fallback from PostgreSQL)
+- **Health Checks**: All systems responding correctly
+- **Import Resolution**: Fixed frontend `@/` path imports
 
-### **Primary Branch Structure**
-```
-main (production-ready)
-├── feature/mcp-integration (active development)
-├── feature/lambda-labs-setup (infrastructure)
-├── hotfix/* (emergency fixes)
-└── develop (integration testing)
-```
+### ⚡ **Recent Fixes Applied:**
+- **Database Configuration**: Auto-switching between SQLite (dev) and PostgreSQL (staging/prod)
+- **Missing Dependencies**: Added `aiosqlite`, `clsx`, `tailwind-merge`
+- **Frontend Utils**: Created comprehensive `@/lib/utils` with all required functions
+- **Requirements**: Updated with complete dependency list
+- **Import Errors**: Resolved all TypeScript path resolution issues
 
-### **Branch Protection Rules**
+## 🏗️ **4-Layer Environment Isolation Strategy**
 
-#### **🔒 MAIN Branch (Sacred)**
-- **Protected**: No direct commits
-- **Requires**: Pull request with reviews
-- **Tested**: All CI/CD checks must pass
-- **Stable**: Only production-ready code
-- **Deployment**: Auto-deploys to production
+### **Layer 1: Development Environment** ✅
+- **Database**: SQLite (local file)
+- **Services**: Local frontend + API
+- **Dependencies**: Minimal for rapid development
+- **Status**: **FULLY OPERATIONAL**
 
-#### **🚧 Feature Branches**
-- **Naming**: `feature/descriptive-name`
-- **Lifespan**: Short-lived (max 2 weeks)
-- **Base**: Always from latest `main`
-- **Testing**: Local testing required before PR
-
-#### **🆘 Hotfix Branches**
-- **Naming**: `hotfix/issue-description`
-- **Base**: From `main` branch
-- **Merge**: Direct to `main` after testing
-- **Notification**: Immediate team alert
-
-### **Critical IaC Branch Handling**
 ```bash
-# SAFE Integration Process
-git checkout main
-git checkout -b feature/mcp-integration
-git fetch origin
-git checkout origin/codex/integrate-customized-iac-agent-mode -- [specific-files]
-# Test thoroughly before committing
+# Start development environment
+./start_orchestra.sh
 ```
 
-## 🛡️ Environment Isolation Strategy
+### **Layer 2: Staging Environment** 🚧
+- **Database**: PostgreSQL (45.77.87.106)
+- **Services**: Full stack with MCP servers
+- **Infrastructure**: Pulumi-managed
+- **Status**: Ready for deployment
 
-### **Development Environment Layers**
-
-#### **Layer 1: Local Development**
-```yaml
-Purpose: Individual developer work
-Isolation: Complete local environment
-Database: SQLite (api/database/sqlite_connection.py)
-Services: Local ports only (3000, 8000)
-MCP: Disabled by default
-```
-
-#### **Layer 2: Integration Testing**
-```yaml  
-Purpose: Feature integration testing
-Isolation: Shared development database
-Database: PostgreSQL (with proper connection)
-Services: Extended port range (8000-8014)
-MCP: Basic servers enabled
-```
-
-#### **Layer 3: Staging**
-```yaml
-Purpose: Production simulation
-Isolation: Production-like environment
-Database: Full PostgreSQL + Redis + Weaviate
-Services: Complete MCP ecosystem
-Lambda Labs: GPU instances enabled
-```
-
-#### **Layer 4: Production**
-```yaml
-Purpose: Live system
-Isolation: Complete production isolation  
-Database: Full stack with backups
-Services: All MCP servers + monitoring
-Infrastructure: Lambda Labs + auto-scaling
-```
-
-## 🔧 Development Environment Best Practices
-
-### **Startup Sequence (Safe)**
 ```bash
-# 1. Environment Check
-./setup_dev_environment.sh --verify
-
-# 2. Clean Startup
-./start_orchestra.sh --clean
-
-# 3. Health Verification
-curl http://localhost:8000/api/health
-curl http://localhost:3000
+# Deploy staging environment
+cd pulumi && pulumi up --stack=staging
 ```
 
-### **Error Prevention Checklist**
-- [ ] Virtual environment activated
-- [ ] Dependencies up to date (`pip install -r requirements.txt`)
-- [ ] Ports available (no conflicts)
-- [ ] Database accessible
-- [ ] Environment variables set
-- [ ] Git status clean
+### **Layer 3: Production Environment** 🎯
+- **Database**: PostgreSQL cluster
+- **GPU Cluster**: Lambda Labs integration
+- **MCP Servers**: Full ecosystem (ports 8003, 8006-8009)
+- **Infrastructure**: Complete Pulumi stack
 
-### **Daily Development Workflow**
 ```bash
-# Morning Startup
-git status                          # Check for uncommitted changes
-git pull origin main               # Get latest updates
-./start_orchestra.sh              # Start all services
-curl http://localhost:8000/api/health  # Verify backend
-
-# During Development
-git checkout -b feature/my-feature  # Create feature branch
-# ... development work ...
-./test_setup.py                   # Run environment tests
-
-# End of Day
-git add .                          # Stage changes
-git commit -m "descriptive message"  # Commit work
-git push origin feature/my-feature   # Push to remote
-./stop_all_services.sh            # Clean shutdown
+# Deploy production environment
+cd pulumi && pulumi up --stack=production
 ```
 
-## 🚀 MCP Integration Strategy
+### **Layer 4: Lambda Labs GPU Integration** 🎮
+- **GPU Management**: Auto-scaling clusters
+- **Cost Optimization**: Spot instances
+- **Model Deployment**: Automated CI/CD
+- **Monitoring**: Comprehensive observability
 
-### **Phase 1: Foundation (Week 1)**
+## 🛠️ **Development Workflow Process**
+
+### **Phase 1: Local Development** (Current)
+```mermaid
+graph TD
+    A[Feature Development] --> B[Local Testing]
+    B --> C[Frontend: localhost:3000]
+    C --> D[API: localhost:8000]
+    D --> E[SQLite Database]
+    E --> F[Git Commit]
+    F --> G[Push to Feature Branch]
+```
+
+### **Phase 2: Integration Testing**
+```mermaid
+graph TD
+    A[Feature Complete] --> B[Merge to Staging]
+    B --> C[Pulumi Deploy Staging]
+    C --> D[PostgreSQL Testing]
+    D --> E[MCP Server Integration]
+    E --> F[Automated Testing]
+    F --> G[Ready for Production]
+```
+
+### **Phase 3: Production Deployment**
+```mermaid
+graph TD
+    A[Staging Approved] --> B[Merge to Main]
+    B --> C[Pulumi Deploy Production]
+    C --> D[Lambda Labs GPU Cluster]
+    D --> E[Full MCP Ecosystem]
+    E --> F[Monitoring & Alerts]
+    F --> G[Production Ready]
+```
+
+## 📋 **Development Best Practices**
+
+### **🔄 Git Workflow:**
+1. **Feature Branches**: Always create feature branches from `main`
+2. **Testing**: Test locally before pushing
+3. **Reviews**: Code review required for main branch merges
+4. **Staging**: Deploy to staging for integration testing
+
+### **🐛 Debugging Workflow:**
+1. **Local Issues**: Use `python3 validate_environment.py`
+2. **API Issues**: Check `./start_api.sh` logs
+3. **Frontend Issues**: Check Vite dev server console
+4. **Database Issues**: Check SQLite file in `data/orchestra_dev.db`
+
+### **🚀 Deployment Safety:**
+1. **Environment Validation**: Run validation before deployment
+2. **Gradual Rollout**: Staging → Production progression
+3. **Rollback Ready**: Pulumi state management for quick rollbacks
+4. **Health Checks**: Comprehensive monitoring at each stage
+
+## 🔧 **Infrastructure Management with Pulumi**
+
+### **Configuration Management:**
 ```yaml
-Goal: Safe integration of basic MCP infrastructure
-Actions:
-  - Create feature/mcp-integration branch
-  - Integrate claude_mcp_config.json
-  - Test basic MCP server startup
-  - Validate port allocation strategy
-  - Document integration process
+# pulumi/Pulumi.yaml
+config:
+  environment: development|staging|production
+  mcp_enabled: true
+  lambda_labs_api_key: {secret: true}
+  gpu_instance_type: gpu_1x_a100
 ```
 
-### **Phase 2: Core Services (Week 2)**  
-```yaml
-Goal: Deploy essential MCP servers
-Actions:
-  - Integrate memory management server (port 8003)
-  - Deploy code intelligence server (port 8007)
-  - Set up tools registry server (port 8006)
-  - Test inter-service communication
-  - Monitor resource usage
-```
-
-### **Phase 3: Advanced Features (Week 3)**
-```yaml
-Goal: Full MCP ecosystem deployment
-Actions:
-  - Deploy git intelligence server (port 8008)
-  - Integrate unified MCP server
-  - Set up Lambda Labs infrastructure
-  - Enable advanced development tools
-  - Configure monitoring and alerting
-```
-
-### **Phase 4: Production Ready (Week 4)**
-```yaml
-Goal: Production deployment preparation
-Actions:
-  - Complete infrastructure automation
-  - Set up cost monitoring
-  - Implement backup procedures
-  - Deploy to staging environment
-  - Performance optimization
-```
-
-## 🔒 Safety Protocols
-
-### **Before Making Changes**
-1. **Environment Backup**
-   ```bash
-   git stash push -m "backup before changes"
-   cp -r .env .env.backup
-   ```
-
-2. **Health Check**
-   ```bash
-   ./test_setup.py --comprehensive
-   ```
-
-3. **Service Status**
-   ```bash
-   ps aux | grep -E "(python|node|uvicorn)" | grep -v grep
-   ```
-
-### **Emergency Recovery Procedures**
-
-#### **🚨 Environment Corruption**
+### **Deployment Commands:**
 ```bash
-# Stop all services
-pkill -f "python.*orchestra"
-pkill -f "node.*vite"
+# Development (local SQLite)
+cd pulumi && pulumi up --stack=development
 
-# Reset to known good state
-git stash
-git checkout main
-git reset --hard origin/main
+# Staging (PostgreSQL + MCP)
+cd pulumi && pulumi up --stack=staging
 
-# Clean restart
-./setup_dev_environment.sh --force
-./start_orchestra.sh --clean
+# Production (Full stack + GPU)
+cd pulumi && pulumi up --stack=production
 ```
 
-#### **🚨 Port Conflicts**
-```bash
-# Find and kill conflicting processes
-lsof -ti:8000 | xargs kill -9
-lsof -ti:3000 | xargs kill -9
+### **Infrastructure Components:**
+- **`pulumi/__main__.py`**: Main orchestration
+- **`pulumi/lambda_labs.py`**: GPU cluster management
+- **`pulumi/mcp_infrastructure.py`**: MCP server deployment
+- **`pulumi/monitoring.py`**: Observability stack
 
-# Clean restart with port verification
-./start_orchestra.sh --check-ports
-```
+## 📊 **Monitoring & Observability**
 
-#### **🚨 Database Issues**
-```bash
-# Switch to SQLite backup
-export USE_SQLITE=true
-./start_api.sh --simple
+### **Development Monitoring:**
+- **Health Endpoints**: `/api/health` for quick checks
+- **Log Files**: Console output for immediate feedback
+- **Browser DevTools**: Frontend debugging
 
-# Or reset database
-./setup_sqlite_database.sh --reset
-```
+### **Production Monitoring:**
+- **Prometheus**: Metrics collection
+- **Grafana**: Visualization dashboards
+- **Alertmanager**: Incident management
+- **Lambda Labs**: GPU utilization tracking
 
-## 📊 Monitoring and Alerts
+## 🎯 **Next Phase Roadmap**
 
-### **Development Monitoring**
-```yaml
-Services:
-  - API Health: http://localhost:8000/api/health
-  - Frontend: http://localhost:3000
-  - Hot Reload: Automatic file watching
+### **Immediate (Week 1):**
+- ✅ Fix critical frontend/backend issues
+- ✅ Implement SQLite fallback for development
+- ✅ Complete Pulumi migration documentation
+- 🔄 Deploy first MCP server (Memory Management - port 8003)
 
-Alerts:
-  - Service down: Immediate terminal notification
-  - Import errors: Detailed error logging
-  - Port conflicts: Automatic resolution attempts
-```
+### **Short Term (Week 2-3):**
+- 🎯 Complete MCP server ecosystem deployment
+- 🎯 PostgreSQL connectivity testing (45.77.87.106)
+- 🎯 Advanced monitoring implementation
+- 🎯 CI/CD pipeline with GitHub Actions
 
-### **Integration Monitoring**
-```yaml
-MCP Servers:
-  - Status endpoint: http://localhost:8000/mcp/status
-  - Health checks: Every 30 seconds
-  - Resource usage: Memory and CPU tracking
+### **Medium Term (Week 4-8):**
+- 🎯 Lambda Labs GPU cluster integration
+- 🎯 Advanced AI model deployment
+- 🎯 Cost optimization and auto-scaling
+- 🎯 Security hardening and compliance
 
-Alerts:
-  - MCP server down: Automatic restart attempt
-  - Resource threshold: Warning at 80% usage
-  - Communication failure: Detailed error logs
-```
+## 🏆 **Success Metrics**
+
+### **Development Velocity:**
+- **Local Setup Time**: < 5 minutes
+- **Build Time**: < 30 seconds
+- **Test Feedback**: < 1 minute
+
+### **Infrastructure Reliability:**
+- **Uptime**: > 99.9%
+- **Deployment Success**: > 95%
+- **Rollback Time**: < 5 minutes
+
+### **Performance Targets:**
+- **API Response**: < 200ms
+- **Frontend Load**: < 2 seconds
+- **GPU Scaling**: < 60 seconds
+
+## 🔐 **Security Considerations**
+
+### **Development Security:**
+- Local SQLite (no external connections)
+- Environment variable isolation
+- Safe secret management with Pulumi
+
+### **Production Security:**
+- Database encryption in transit/rest
+- Network policies and RBAC
+- mTLS for service communication
+- Lambda Labs API key rotation
+
+---
+
+**Orchestra AI is now fully operational with a robust, scalable development workflow powered by Pulumi infrastructure management. All critical issues have been resolved, and the platform is ready for advanced AI orchestration development.**
 
 ## 🎯 Key Decision Points
 

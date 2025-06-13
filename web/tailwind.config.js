@@ -17,6 +17,29 @@ export default {
     },
     extend: {
       colors: {
+        // Orchestra AI Design System Colors
+        'orchestra-primary': '#2563eb',
+        'orchestra-primary-hover': '#1d4ed8',
+        'orchestra-primary-light': '#dbeafe',
+        'orchestra-secondary': '#7c3aed',
+        'orchestra-accent': '#059669',
+        'orchestra-accent-hover': '#047857',
+        'orchestra-success': '#059669',
+        'orchestra-warning': '#d97706',
+        'orchestra-error': '#dc2626',
+        'orchestra-gray': {
+          50: '#f9fafb',
+          100: '#f3f4f6',
+          200: '#e5e7eb',
+          300: '#d1d5db',
+          400: '#9ca3af',
+          500: '#6b7280',
+          600: '#4b5563',
+          700: '#374151',
+          800: '#1f2937',
+          900: '#111827',
+        },
+        
         // Midnight Elegance Theme
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
@@ -98,6 +121,11 @@ export default {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
+      },
+      fontFamily: {
+        'primary': ['Inter', 'system-ui', 'sans-serif'],
+        'mono': ['JetBrains Mono', 'Fira Code', 'monospace'],
+        'display': ['Cal Sans', 'Inter', 'sans-serif'],
       },
       borderRadius: {
         lg: "var(--radius)",

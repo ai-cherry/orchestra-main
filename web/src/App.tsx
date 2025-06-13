@@ -5,31 +5,27 @@ import { Dashboard } from './pages/Dashboard'
 import { AgentFactory } from './pages/AgentFactory'
 import { SystemMonitor } from './pages/SystemMonitor'
 import { DataIntegrationPage } from './pages/DataIntegrationPage'
-import { PersonaProvider } from './contexts/PersonaContext'
-import { WebSocketProvider } from './contexts/WebSocketContext'
+import { DesignSystemDemo } from './pages/DesignSystemDemo'
 
 function App() {
   return (
-    <PersonaProvider>
-      <WebSocketProvider>
-        <Router>
-          <div className="flex h-screen bg-background">
-            <Sidebar />
-            <main className="flex-1 overflow-hidden">
-              <Routes>
-                <Route path="/" element={<ChatInterface />} />
-                <Route path="/chat" element={<ChatInterface />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/agent-factory" element={<AgentFactory />} />
-                <Route path="/data-integration" element={<DataIntegrationPage />} />
-                <Route path="/system-monitor" element={<SystemMonitor />} />
-              </Routes>
-            </main>
-          </div>
-        </Router>
-      </WebSocketProvider>
-    </PersonaProvider>
+    <Router>
+      <div className="flex h-screen bg-background">
+        <Sidebar />
+        <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
+          <Routes>
+            <Route path="/" element={<ChatInterface />} />
+            <Route path="/chat" element={<ChatInterface />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/agent-factory" element={<AgentFactory />} />
+            <Route path="/data-integration" element={<DataIntegrationPage />} />
+            <Route path="/system-monitor" element={<SystemMonitor />} />
+            <Route path="/design-system" element={<DesignSystemDemo />} />
+          </Routes>
+        </main>
+      </div>
+    </Router>
   )
 }
 
-export default App 
+export default App

@@ -1,0 +1,85 @@
+{
+  "services": {
+    "mcp_memory": {
+      "name": "MCP Memory Server",
+      "command": [
+        "/Users/lynnmusil/orchestra-dev/venv/bin/python",
+        "-m",
+        "uvicorn",
+        "memory_management_server:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8003",
+        "--workers",
+        "1"
+      ],
+      "cwd": "/Users/lynnmusil/orchestra-dev/mcp_servers",
+      "port": 8003,
+      "health_url": "http://localhost:8003/health",
+      "env": {
+        "PYTHONPATH": "/Users/lynnmusil/orchestra-dev:/Users/lynnmusil/orchestra-dev/api::/Users/lynnmusil/code/ai-cherry/orchestrator-core/src:/Users/lynnmusil/code/ai-cherry/agents-core/src:/Users/lynnmusil/code/ai-cherry/utilities-core/src:/Users/lynnmusil/code/ai-cherry/orchestrator-core/src:/Users/lynnmusil/code/ai-cherry/agents-core/src:/Users/lynnmusil/code/ai-cherry/utilities-core/src",
+        "ENVIRONMENT": "production",
+        "MAGIC_LIB": "/opt/homebrew/lib/libmagic.dylib",
+        "PYTHONDONTWRITEBYTECODE": "1"
+      },
+      "restart_delay": 5,
+      "max_restarts": 10,
+      "restart_window": 300,
+      "required_for_system": true,
+      "dependencies": []
+    },
+    "api_server": {
+      "name": "Orchestra AI API",
+      "command": [
+        "/Users/lynnmusil/orchestra-dev/venv/bin/python",
+        "-m",
+        "uvicorn",
+        "main:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8000",
+        "--workers",
+        "1"
+      ],
+      "cwd": "/Users/lynnmusil/orchestra-dev/api",
+      "port": 8000,
+      "health_url": "http://localhost:8000/api/health",
+      "env": {
+        "PYTHONPATH": "/Users/lynnmusil/orchestra-dev:/Users/lynnmusil/orchestra-dev/api::/Users/lynnmusil/code/ai-cherry/orchestrator-core/src:/Users/lynnmusil/code/ai-cherry/agents-core/src:/Users/lynnmusil/code/ai-cherry/utilities-core/src:/Users/lynnmusil/code/ai-cherry/orchestrator-core/src:/Users/lynnmusil/code/ai-cherry/agents-core/src:/Users/lynnmusil/code/ai-cherry/utilities-core/src",
+        "ENVIRONMENT": "production",
+        "MAGIC_LIB": "/opt/homebrew/lib/libmagic.dylib",
+        "PYTHONDONTWRITEBYTECODE": "1"
+      },
+      "restart_delay": 5,
+      "max_restarts": 10,
+      "restart_window": 300,
+      "required_for_system": true,
+      "dependencies": [
+        "mcp_memory"
+      ]
+    },
+    "frontend": {
+      "name": "Orchestra Frontend",
+      "command": [
+        "npm",
+        "run",
+        "dev"
+      ],
+      "cwd": "/Users/lynnmusil/orchestra-dev/web",
+      "port": 3002,
+      "health_url": "http://localhost:3002/real-admin.html",
+      "env": {
+        "NODE_ENV": "production"
+      },
+      "restart_delay": 5,
+      "max_restarts": 10,
+      "restart_window": 300,
+      "required_for_system": false,
+      "dependencies": [
+        "api_server"
+      ]
+    }
+  }
+}

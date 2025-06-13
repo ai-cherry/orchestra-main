@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.orchestra.ai.supervisor</string>
+    
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/lynnmusil/orchestra-dev/venv/bin/python</string>
+        <string>/Users/lynnmusil/orchestra-dev/orchestra_supervisor.py</string>
+    </array>
+    
+    <key>WorkingDirectory</key>
+    <string>/Users/lynnmusil/orchestra-dev</string>
+    
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/homebrew/bin</string>
+        <key>PYTHONPATH</key>
+        <string>/Users/lynnmusil/orchestra-dev:/Users/lynnmusil/orchestra-dev/api</string>
+        <key>VIRTUAL_ENV</key>
+        <string>/Users/lynnmusil/orchestra-dev/venv</string>
+        <key>ENVIRONMENT</key>
+        <string>production</string>
+        <key>MAGIC_LIB</key>
+        <string>/opt/homebrew/lib/libmagic.dylib</string>
+    </dict>
+    
+    <key>StandardOutPath</key>
+    <string>/Users/lynnmusil/orchestra-dev/logs/supervisor-stdout.log</string>
+    
+    <key>StandardErrorPath</key>
+    <string>/Users/lynnmusil/orchestra-dev/logs/supervisor-stderr.log</string>
+    
+    <key>RunAtLoad</key>
+    <true/>
+    
+    <key>KeepAlive</key>
+    <dict>
+        <key>SuccessfulExit</key>
+        <false/>
+        <key>Crashed</key>
+        <true/>
+    </dict>
+    
+    <key>ThrottleInterval</key>
+    <integer>10</integer>
+    
+    <key>ProcessType</key>
+    <string>Background</string>
+    
+    <key>AbandonProcessGroup</key>
+    <true/>
+    
+    <key>ExitTimeOut</key>
+    <integer>30</integer>
+</dict>
+</plist> 

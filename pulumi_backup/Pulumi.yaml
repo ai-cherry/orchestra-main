@@ -1,0 +1,77 @@
+name: orchestra-ai-infrastructure
+runtime: python
+description: Orchestra AI Infrastructure as Code with Lambda Labs GPU integration
+
+config:
+  # Lambda Labs Configuration
+  lambda_labs_api_key:
+    type: string
+    secret: true
+    description: "Lambda Labs API key for GPU cluster management"
+  
+  # GPU Cluster Configuration
+  gpu_instance_type:
+    type: string
+    default: "gpu_1x_a100"
+    description: "Lambda Labs GPU instance type"
+  
+  instance_count:
+    type: integer
+    default: 2
+    description: "Number of GPU instances to deploy"
+  
+  min_instances:
+    type: integer
+    default: 1
+    description: "Minimum instances for auto-scaling"
+  
+  max_instances:
+    type: integer
+    default: 10
+    description: "Maximum instances for auto-scaling"
+  
+  # Environment Configuration
+  environment:
+    type: string
+    default: "development"
+    description: "Deployment environment (development/staging/production)"
+  
+  region:
+    type: string
+    default: "us-west-2"
+    description: "Deployment region"
+  
+  # MCP Configuration
+  mcp_enabled:
+    type: boolean
+    default: true
+    description: "Enable MCP server deployment"
+  
+  # Database Configuration
+  postgres_host:
+    type: string
+    default: "45.77.87.106"
+    description: "PostgreSQL database host"
+  
+  postgres_port:
+    type: integer
+    default: 5432
+    description: "PostgreSQL database port"
+  
+  postgres_database:
+    type: string
+    default: "orchestra_ai"
+    description: "PostgreSQL database name"
+  
+  postgres_user:
+    type: string
+    secret: true
+    description: "PostgreSQL database username"
+  
+  postgres_password:
+    type: string
+    secret: true
+    description: "PostgreSQL database password"
+
+backend:
+  url: s3://orchestra-ai-pulumi-state 

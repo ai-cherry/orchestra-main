@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Import Orchestra AI Design Tokens */
+@import './styles/design-tokens.css';
+
 @layer base {
   :root {
     --background: 210 40% 98%;
