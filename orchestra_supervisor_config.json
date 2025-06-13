@@ -18,7 +18,7 @@
       "port": 8003,
       "health_url": "http://localhost:8003/health",
       "env": {
-        "PYTHONPATH": "/Users/lynnmusil/orchestra-dev:/Users/lynnmusil/orchestra-dev/api::/Users/lynnmusil/code/ai-cherry/orchestrator-core/src:/Users/lynnmusil/code/ai-cherry/agents-core/src:/Users/lynnmusil/code/ai-cherry/utilities-core/src:/Users/lynnmusil/code/ai-cherry/orchestrator-core/src:/Users/lynnmusil/code/ai-cherry/agents-core/src:/Users/lynnmusil/code/ai-cherry/utilities-core/src",
+        "PYTHONPATH": "/Users/lynnmusil/orchestra-dev:/Users/lynnmusil/orchestra-dev/api:/Users/lynnmusil/orchestra-dev:/Users/lynnmusil/orchestra-dev/api",
         "ENVIRONMENT": "production",
         "MAGIC_LIB": "/opt/homebrew/lib/libmagic.dylib",
         "PYTHONDONTWRITEBYTECODE": "1"
@@ -47,7 +47,7 @@
       "port": 8000,
       "health_url": "http://localhost:8000/api/health",
       "env": {
-        "PYTHONPATH": "/Users/lynnmusil/orchestra-dev:/Users/lynnmusil/orchestra-dev/api::/Users/lynnmusil/code/ai-cherry/orchestrator-core/src:/Users/lynnmusil/code/ai-cherry/agents-core/src:/Users/lynnmusil/code/ai-cherry/utilities-core/src:/Users/lynnmusil/code/ai-cherry/orchestrator-core/src:/Users/lynnmusil/code/ai-cherry/agents-core/src:/Users/lynnmusil/code/ai-cherry/utilities-core/src",
+        "PYTHONPATH": "/Users/lynnmusil/orchestra-dev:/Users/lynnmusil/orchestra-dev/api:/Users/lynnmusil/orchestra-dev:/Users/lynnmusil/orchestra-dev/api",
         "ENVIRONMENT": "production",
         "MAGIC_LIB": "/opt/homebrew/lib/libmagic.dylib",
         "PYTHONDONTWRITEBYTECODE": "1"
