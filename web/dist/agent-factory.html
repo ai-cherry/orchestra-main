@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orchestra AI - Agent Factory</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            /* Midnight Elegance Color Palette */
+            --primary: #0A1929;
+            --secondary: #3B82F6;
+            --accent: #8B5CF6;
+            --background: #050A14;
+            --surface: #121F33;
+            --text-primary: #FFFFFF;
+            --text-secondary: #D1D5DB;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --error: #EF4444;
+            
+            /* Persona Colors */
+            --cherry: #E11D48;
+            --cherry-gradient: linear-gradient(135deg, #FF4D6D 0%, #C01441 100%);
+            --sophia: #2563EB;
+            --sophia-gradient: linear-gradient(135deg, #60A5FA 0%, #1E40AF 100%);
+            --karen: #059669;
+            --karen-gradient: linear-gradient(135deg, #34D399 0%, #047857 100%);
+            
+            /* Typography */
+            --font-primary: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            background: var(--background);
+            color: var(--text-primary);
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .factory-container {
+            display: flex;
+            height: 100vh;
+            background: var(--background);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 320px;
+            background: var(--primary);
+            border-right: 1px solid rgba(59, 130, 246, 0.2);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .sidebar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 1px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--secondary) 0%, var(--accent) 100%);
+            opacity: 0.3;
+        }
+
+        .sidebar-header {
+            padding: 2rem;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            text-decoration: none;
+        }
+
+        .logo i {
+            background: var(--sophia-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2rem;
+        }
+
+        .page-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .page-description {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        /* Template Library */
+        .template-section {
+            flex: 1;
+            padding: 1.5rem 2rem;
+            overflow-y: auto;
+        }
+
+        .section-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1rem;
+        }
+
+        .template-grid {
+            display: grid;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .template-card {
+            background: var(--surface);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .template-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.15);
+            border-color: var(--secondary);
+        }
+
+        .template-card.selected {
+            border-color: var(--secondary);
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.2);
+        }
+
+        .template-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .template-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: white;
+        }
+
+        .template-icon.assistant { background: var(--sophia-gradient); }
+        .template-icon.creative { background: var(--cherry-gradient); }
+        .template-icon.automation { background: var(--karen-gradient); }
+        .template-icon.analytics { background: linear-gradient(135deg, var(--warning) 0%, #D97706 100%); }
+
+        .template-info h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .template-info p {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .template-description {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+            margin-bottom: 1rem;
+        }
+
+        .template-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .template-tag {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--secondary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        /* Main Factory Area */
+        .factory-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--background);
+        }
+
+        .factory-header {
+            background: var(--surface);
+            border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+            padding: 1.5rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .factory-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .factory-title h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .factory-title .status {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .factory-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .action-btn {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: var(--secondary);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .action-btn:hover {
+            background: rgba(59, 130, 246, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .action-btn.primary {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .action-btn.primary:hover {
+            background: var(--accent);
+        }
+
+        /* Factory Workspace */
+        .factory-workspace {
+            flex: 1;
+            display: flex;
+            background: var(--background);
+        }
+
+        .visual-builder {
+            flex: 1;
+            background: var(--background);
+            border-right: 1px solid rgba(59, 130, 246, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .builder-header {
+            background: var(--surface);
+            padding: 1rem 2rem;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .builder-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .builder-canvas {
+            flex: 1;
+            padding: 2rem;
+            position: relative;
+            overflow: auto;
+        }
+
+        .agent-preview {
+            background: var(--surface);
+            border: 2px dashed rgba(59, 130, 246, 0.3);
+            border-radius: 16px;
+            padding: 3rem;
+            text-align: center;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .agent-preview:hover {
+            border-color: var(--secondary);
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .agent-preview-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--sophia-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            margin-bottom: 1.5rem;
+        }
+
+        .agent-preview h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .agent-preview p {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            max-width: 400px;
+        }
+
+        .capability-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .capability-card {
+            background: var(--primary);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: left;
+        }
+
+        .capability-card h4 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .capability-card p {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        /* Code Editor */
+        .code-editor {
+            width: 50%;
+            background: var(--primary);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .editor-header {
+            background: var(--surface);
+            padding: 1rem 2rem;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .editor-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .editor-tabs {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .editor-tab {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--text-secondary);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .editor-tab.active {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .editor-content {
+            flex: 1;
+            background: var(--background);
+            font-family: var(--font-mono);
+            font-size: 0.875rem;
+            line-height: 1.6;
+            padding: 2rem;
+            overflow: auto;
+            white-space: pre-wrap;
+            color: var(--text-primary);
+        }
+
+        .code-line {
+            display: block;
+            padding: 0.25rem 0;
+        }
+
+        .code-comment { color: #6B7280; }
+        .code-keyword { color: #3B82F6; }
+        .code-string { color: #10B981; }
+        .code-function { color: #F59E0B; }
+        .code-variable { color: #8B5CF6; }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .factory-workspace {
+                flex-direction: column;
+            }
+            
+            .visual-builder {
+                border-right: none;
+                border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+            }
+            
+            .code-editor {
+                width: 100%;
+                height: 50%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: -320px;
+                z-index: 1000;
+                transition: left 0.3s ease;
+            }
+            
+            .sidebar.open {
+                left: 0;
+            }
+            
+            .factory-main {
+                width: 100%;
+            }
+            
+            .factory-header {
+                padding: 1rem;
+            }
+            
+            .builder-canvas {
+                padding: 1rem;
+            }
+        }
+
+        /* Custom Scrollbar */
+        .template-section::-webkit-scrollbar,
+        .builder-canvas::-webkit-scrollbar,
+        .editor-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .template-section::-webkit-scrollbar-track,
+        .builder-canvas::-webkit-scrollbar-track,
+        .editor-content::-webkit-scrollbar-track {
+            background: var(--primary);
+        }
+
+        .template-section::-webkit-scrollbar-thumb,
+        .builder-canvas::-webkit-scrollbar-thumb,
+        .editor-content::-webkit-scrollbar-thumb {
+            background: var(--secondary);
+            border-radius: 3px;
+        }
+
+        .template-section::-webkit-scrollbar-thumb:hover,
+        .builder-canvas::-webkit-scrollbar-thumb:hover,
+        .editor-content::-webkit-scrollbar-thumb:hover {
+            background: var(--accent);
+        }
+    </style>
+</head>
+<body>
+    <div class="factory-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a href="/index.html" class="logo">
+                    <i class="fas fa-music"></i>
+                    Orchestra AI
+                </a>
+                <div class="page-title">Agent Factory</div>
+                <div class="page-description">
+                    Create, configure, and deploy AI agents with visual tools and code editing
+                </div>
+            </div>
+
+            <!-- Template Library -->
+            <div class="template-section">
+                <div class="section-title">Agent Templates</div>
+                <div class="template-grid">
+                    <div class="template-card selected" data-template="assistant">
+                        <div class="template-header">
+                            <div class="template-icon assistant">
+                                <i class="fas fa-user-tie"></i>
+                            </div>
+                            <div class="template-info">
+                                <h3>Assistant Agent</h3>
+                                <p>General purpose</p>
+                            </div>
+                        </div>
+                        <div class="template-description">
+                            Versatile AI assistant for customer support, Q&A, and general interactions
+                        </div>
+                        <div class="template-tags">
+                            <span class="template-tag">Support</span>
+                            <span class="template-tag">Q&A</span>
+                            <span class="template-tag">Chat</span>
+                        </div>
+                    </div>
+
+                    <div class="template-card" data-template="creative">
+                        <div class="template-header">
+                            <div class="template-icon creative">
+                                <i class="fas fa-palette"></i>
+                            </div>
+                            <div class="template-info">
+                                <h3>Creative Agent</h3>
+                                <p>Content creation</p>
+                            </div>
+                        </div>
+                        <div class="template-description">
+                            Specialized in content creation, writing, design, and creative problem-solving
+                        </div>
+                        <div class="template-tags">
+                            <span class="template-tag">Writing</span>
+                            <span class="template-tag">Design</span>
+                            <span class="template-tag">Creative</span>
+                        </div>
+                    </div>
+
+                    <div class="template-card" data-template="automation">
+                        <div class="template-header">
+                            <div class="template-icon automation">
+                                <i class="fas fa-cogs"></i>
+                            </div>
+                            <div class="template-info">
+                                <h3>Automation Agent</h3>
+                                <p>Workflow execution</p>
+                            </div>
+                        </div>
+                        <div class="template-description">
+                            Focused on task automation, workflow management, and process optimization
+                        </div>
+                        <div class="template-tags">
+                            <span class="template-tag">Automation</span>
+                            <span class="template-tag">Workflows</span>
+                            <span class="template-tag">Tasks</span>
+                        </div>
+                    </div>
+
+                    <div class="template-card" data-template="analytics">
+                        <div class="template-header">
+                            <div class="template-icon analytics">
+                                <i class="fas fa-chart-bar"></i>
+                            </div>
+                            <div class="template-info">
+                                <h3>Analytics Agent</h3>
+                                <p>Data analysis</p>
+                            </div>
+                        </div>
+                        <div class="template-description">
+                            Advanced data analysis, reporting, and insights generation capabilities
+                        </div>
+                        <div class="template-tags">
+                            <span class="template-tag">Analytics</span>
+                            <span class="template-tag">Reports</span>
+                            <span class="template-tag">Data</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-title">Quick Actions</div>
+                <div class="template-grid">
+                    <button class="action-btn" onclick="createFromScratch()">
+                        <i class="fas fa-plus"></i>
+                        Create from Scratch
+                    </button>
+                    <button class="action-btn" onclick="importAgent()">
+                        <i class="fas fa-upload"></i>
+                        Import Agent
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Factory Area -->
+        <main class="factory-main">
+            <div class="factory-header">
+                <div class="factory-title">
+                    <h1 id="agentName">Assistant Agent</h1>
+                    <div class="status">Draft</div>
+                </div>
+                <div class="factory-actions">
+                    <button class="action-btn" onclick="testAgent()">
+                        <i class="fas fa-play"></i>
+                        Test
+                    </button>
+                    <button class="action-btn" onclick="saveAgent()">
+                        <i class="fas fa-save"></i>
+                        Save
+                    </button>
+                    <button class="action-btn primary" onclick="deployAgent()">
+                        <i class="fas fa-rocket"></i>
+                        Deploy
+                    </button>
+                </div>
+            </div>
+
+            <div class="factory-workspace">
+                <!-- Visual Builder -->
+                <div class="visual-builder">
+                    <div class="builder-header">
+                        <div class="builder-title">Visual Builder</div>
+                    </div>
+                    <div class="builder-canvas">
+                        <div class="agent-preview" id="agentPreview">
+                            <div class="agent-preview-icon">
+                                <i class="fas fa-user-tie" id="agentIcon"></i>
+                            </div>
+                            <h3 id="previewName">Assistant Agent</h3>
+                            <p id="previewDescription">Versatile AI assistant for customer support, Q&A, and general interactions with advanced natural language processing capabilities.</p>
+                            
+                            <div class="capability-grid" id="capabilityGrid">
+                                <div class="capability-card">
+                                    <h4>Natural Language Processing</h4>
+                                    <p>Advanced text understanding and generation</p>
+                                </div>
+                                <div class="capability-card">
+                                    <h4>Context Awareness</h4>
+                                    <p>Maintains conversation context and memory</p>
+                                </div>
+                                <div class="capability-card">
+                                    <h4>Multi-turn Dialogue</h4>
+                                    <p>Supports complex conversation flows</p>
+                                </div>
+                                <div class="capability-card">
+                                    <h4>Knowledge Integration</h4>
+                                    <p>Access to external knowledge sources</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Code Editor -->
+                <div class="code-editor">
+                    <div class="editor-header">
+                        <div class="editor-title">Configuration</div>
+                        <div class="editor-tabs">
+                            <div class="editor-tab active" data-tab="config">Config</div>
+                            <div class="editor-tab" data-tab="prompts">Prompts</div>
+                            <div class="editor-tab" data-tab="functions">Functions</div>
+                        </div>
+                    </div>
+                    <div class="editor-content" id="editorContent">
+<span class="code-comment"># Agent Configuration</span>
+<span class="code-line"><span class="code-keyword">name</span>: <span class="code-string">"Assistant Agent"</span></span>
+<span class="code-line"><span class="code-keyword">type</span>: <span class="code-string">"assistant"</span></span>
+<span class="code-line"><span class="code-keyword">version</span>: <span class="code-string">"1.0.0"</span></span>
+
+<span class="code-comment"># Core Settings</span>
+<span class="code-line"><span class="code-keyword">model</span>:</span>
+<span class="code-line">  <span class="code-keyword">provider</span>: <span class="code-string">"openai"</span></span>
+<span class="code-line">  <span class="code-keyword">name</span>: <span class="code-string">"gpt-4"</span></span>
+<span class="code-line">  <span class="code-keyword">temperature</span>: <span class="code-variable">0.7</span></span>
+<span class="code-line">  <span class="code-keyword">max_tokens</span>: <span class="code-variable">2048</span></span>
+
+<span class="code-comment"># Capabilities</span>
+<span class="code-line"><span class="code-keyword">capabilities</span>:</span>
+<span class="code-line">  - <span class="code-string">"natural_language_processing"</span></span>
+<span class="code-line">  - <span class="code-string">"context_awareness"</span></span>
+<span class="code-line">  - <span class="code-string">"multi_turn_dialogue"</span></span>
+<span class="code-line">  - <span class="code-string">"knowledge_integration"</span></span>
+
+<span class="code-comment"># System Prompt</span>
+<span class="code-line"><span class="code-keyword">system_prompt</span>: <span class="code-string">|</span></span>
+<span class="code-line">  <span class="code-string">You are a helpful AI assistant designed to provide</span></span>
+<span class="code-line">  <span class="code-string">accurate, helpful, and contextual responses to user</span></span>
+<span class="code-line">  <span class="code-string">queries. You maintain conversation context and</span></span>
+<span class="code-line">  <span class="code-string">provide thoughtful, well-reasoned answers.</span></span>
+
+<span class="code-comment"># Memory Configuration</span>
+<span class="code-line"><span class="code-keyword">memory</span>:</span>
+<span class="code-line">  <span class="code-keyword">type</span>: <span class="code-string">"conversation"</span></span>
+<span class="code-line">  <span class="code-keyword">max_history</span>: <span class="code-variable">50</span></span>
+<span class="code-line">  <span class="code-keyword">context_window</span>: <span class="code-variable">4096</span></span>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Agent templates data
+        const agentTemplates = {
+            assistant: {
+                name: 'Assistant Agent',
+                icon: 'fas fa-user-tie',
+                description: 'Versatile AI assistant for customer support, Q&A, and general interactions with advanced natural language processing capabilities.',
+                capabilities: [
+                    { name: 'Natural Language Processing', desc: 'Advanced text understanding and generation' },
+                    { name: 'Context Awareness', desc: 'Maintains conversation context and memory' },
+                    { name: 'Multi-turn Dialogue', desc: 'Supports complex conversation flows' },
+                    { name: 'Knowledge Integration', desc: 'Access to external knowledge sources' }
+                ],
+                config: `# Agent Configuration
+name: "Assistant Agent"
+type: "assistant"
+version: "1.0.0"
+
+# Core Settings
+model:
+  provider: "openai"
+  name: "gpt-4"
+  temperature: 0.7
+  max_tokens: 2048
+
+# Capabilities
+capabilities:
+  - "natural_language_processing"
+  - "context_awareness"
+  - "multi_turn_dialogue"
+  - "knowledge_integration"
+
+# System Prompt
+system_prompt: |
+  You are a helpful AI assistant designed to provide
+  accurate, helpful, and contextual responses to user
+  queries. You maintain conversation context and
+  provide thoughtful, well-reasoned answers.
+
+# Memory Configuration
+memory:
+  type: "conversation"
+  max_history: 50
+  context_window: 4096`
+            },
+            creative: {
+                name: 'Creative Agent',
+                icon: 'fas fa-palette',
+                description: 'Specialized AI for content creation, writing, design, and creative problem-solving with enhanced imagination and artistic capabilities.',
+                capabilities: [
+                    { name: 'Content Generation', desc: 'Creates engaging written content' },
+                    { name: 'Creative Writing', desc: 'Stories, poems, and creative texts' },
+                    { name: 'Design Assistance', desc: 'Visual and conceptual design help' },
+                    { name: 'Brainstorming', desc: 'Innovative idea generation' }
+                ],
+                config: `# Creative Agent Configuration
+name: "Creative Agent"
+type: "creative"
+version: "1.0.0"
+
+# Core Settings
+model:
+  provider: "openai"
+  name: "gpt-4"
+  temperature: 0.9
+  max_tokens: 3072
+
+# Capabilities
+capabilities:
+  - "content_generation"
+  - "creative_writing"
+  - "design_assistance"
+  - "brainstorming"
+
+# System Prompt
+system_prompt: |
+  You are a creative AI assistant specialized in content
+  creation, writing, and design. You approach problems
+  with imagination and artistic flair, helping users
+  explore creative solutions and generate original ideas.
+
+# Creative Settings
+creativity:
+  style: "innovative"
+  tone: "inspiring"
+  approach: "experimental"`
+            },
+            automation: {
+                name: 'Automation Agent',
+                icon: 'fas fa-cogs',
+                description: 'Focused on task automation, workflow management, and process optimization with advanced execution capabilities.',
+                capabilities: [
+                    { name: 'Task Automation', desc: 'Automates repetitive tasks' },
+                    { name: 'Workflow Management', desc: 'Manages complex workflows' },
+                    { name: 'Process Optimization', desc: 'Improves efficiency' },
+                    { name: 'Integration Control', desc: 'Manages system integrations' }
+                ],
+                config: `# Automation Agent Configuration
+name: "Automation Agent"
+type: "automation"
+version: "1.0.0"
+
+# Core Settings
+model:
+  provider: "openai"
+  name: "gpt-4"
+  temperature: 0.3
+  max_tokens: 2048
+
+# Capabilities
+capabilities:
+  - "task_automation"
+  - "workflow_management"
+  - "process_optimization"
+  - "integration_control"
+
+# System Prompt
+system_prompt: |
+  You are an automation-focused AI assistant designed
+  to help with task automation, workflow management,
+  and process optimization. You think systematically
+  and focus on efficiency and reliability.
+
+# Automation Settings
+automation:
+  execution_mode: "sequential"
+  error_handling: "retry_with_backoff"
+  monitoring: "enabled"`
+            },
+            analytics: {
+                name: 'Analytics Agent',
+                icon: 'fas fa-chart-bar',
+                description: 'Advanced data analysis, reporting, and insights generation with sophisticated analytical capabilities.',
+                capabilities: [
+                    { name: 'Data Analysis', desc: 'Advanced statistical analysis' },
+                    { name: 'Report Generation', desc: 'Automated report creation' },
+                    { name: 'Insight Discovery', desc: 'Finds patterns and trends' },
+                    { name: 'Visualization', desc: 'Creates data visualizations' }
+                ],
+                config: `# Analytics Agent Configuration
+name: "Analytics Agent"
+type: "analytics"
+version: "1.0.0"
+
+# Core Settings
+model:
+  provider: "openai"
+  name: "gpt-4"
+  temperature: 0.2
+  max_tokens: 4096
+
+# Capabilities
+capabilities:
+  - "data_analysis"
+  - "report_generation"
+  - "insight_discovery"
+  - "visualization"
+
+# System Prompt
+system_prompt: |
+  You are an analytics-focused AI assistant specialized
+  in data analysis, reporting, and insights generation.
+  You approach data systematically and provide clear,
+  actionable insights based on thorough analysis.
+
+# Analytics Settings
+analytics:
+  precision: "high"
+  confidence_threshold: 0.85
+  visualization_style: "professional"`
+            }
+        };
+
+        let currentTemplate = 'assistant';
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            setupEventListeners();
+            updateAgentPreview(currentTemplate);
+        });
+
+        function setupEventListeners() {
+            // Template selection
+            document.querySelectorAll('.template-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    const template = this.dataset.template;
+                    selectTemplate(template);
+                });
+            });
+
+            // Editor tabs
+            document.querySelectorAll('.editor-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabName = this.dataset.tab;
+                    switchEditorTab(tabName);
+                });
+            });
+
+            // Mobile sidebar toggle
+            if (window.innerWidth <= 768) {
+                const header = document.querySelector('.factory-header');
+                const menuButton = document.createElement('button');
+                menuButton.innerHTML = '<i class="fas fa-bars"></i>';
+                menuButton.className = 'action-btn';
+                menuButton.onclick = toggleSidebar;
+                header.querySelector('.factory-actions').prepend(menuButton);
+            }
+        }
+
+        function selectTemplate(template) {
+            // Update UI
+            document.querySelectorAll('.template-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            document.querySelector(`[data-template="${template}"]`).classList.add('selected');
+
+            currentTemplate = template;
+            updateAgentPreview(template);
+        }
+
+        function updateAgentPreview(template) {
+            const templateData = agentTemplates[template];
+            
+            // Update header
+            document.getElementById('agentName').textContent = templateData.name;
+            
+            // Update preview
+            document.getElementById('agentIcon').className = templateData.icon;
+            document.getElementById('previewName').textContent = templateData.name;
+            document.getElementById('previewDescription').textContent = templateData.description;
+            
+            // Update capabilities
+            const capabilityGrid = document.getElementById('capabilityGrid');
+            capabilityGrid.innerHTML = templateData.capabilities.map(cap => `
+                <div class="capability-card">
+                    <h4>${cap.name}</h4>
+                    <p>${cap.desc}</p>
+                </div>
+            `).join('');
+            
+            // Update editor content
+            updateEditorContent('config', templateData.config);
+        }
+
+        function switchEditorTab(tabName) {
+            // Update tab UI
+            document.querySelectorAll('.editor-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+            
+            // Update content based on tab
+            const templateData = agentTemplates[currentTemplate];
+            let content = templateData.config;
+            
+            if (tabName === 'prompts') {
+                content = `# System Prompts
+primary_prompt: |
+  You are a ${templateData.name.toLowerCase()} designed to help users
+  with specific tasks related to your domain expertise.
+
+# Response Templates
+greeting: "Hello! I'm your ${templateData.name}. How can I assist you today?"
+error_response: "I apologize, but I encountered an issue. Let me try a different approach."
+clarification: "Could you provide more details about what you're looking for?"
+
+# Conversation Flow
+conversation_starters:
+  - "What would you like to work on?"
+  - "How can I help you today?"
+  - "What's your main goal right now?"`;
+            } else if (tabName === 'functions') {
+                content = `# Available Functions
+functions:
+  - name: "process_request"
+    description: "Process user requests and generate responses"
+    parameters:
+      - user_input: string
+      - context: object
+    
+  - name: "maintain_context"
+    description: "Maintain conversation context across turns"
+    parameters:
+      - conversation_history: array
+      - current_context: object
+    
+  - name: "generate_response"
+    description: "Generate contextual responses"
+    parameters:
+      - processed_input: object
+      - response_type: string
+
+# Integration Points
+integrations:
+  - external_apis: []
+  - databases: []
+  - services: []`;
+            }
+            
+            updateEditorContent(tabName, content);
+        }
+
+        function updateEditorContent(tab, content) {
+            const editorContent = document.getElementById('editorContent');
+            
+            // Simple syntax highlighting
+            const highlighted = content
+                .replace(/(#.*$)/gm, '<span class="code-comment">$1</span>')
+                .replace(/^(\w+):/gm, '<span class="code-keyword">$1</span>:')
+                .replace(/"([^"]*)"/g, '<span class="code-string">"$1"</span>')
+                .replace(/\b(\d+\.?\d*)\b/g, '<span class="code-variable">$1</span>')
+                .replace(/\n/g, '</span>\n<span class="code-line">')
+                .replace(/^/, '<span class="code-line">')
+                .replace(/$/, '</span>');
+            
+            editorContent.innerHTML = highlighted;
+        }
+
+        // Action functions
+        function createFromScratch() {
+            if (confirm('Create a new agent from scratch? This will clear the current configuration.')) {
+                // Reset to blank template
+                document.getElementById('agentName').textContent = 'New Agent';
+                document.getElementById('previewName').textContent = 'New Agent';
+                document.getElementById('previewDescription').textContent = 'Custom agent created from scratch';
+                
+                const capabilityGrid = document.getElementById('capabilityGrid');
+                capabilityGrid.innerHTML = `
+                    <div class="capability-card">
+                        <h4>Custom Capability</h4>
+                        <p>Define your own capabilities</p>
+                    </div>
+                `;
+                
+                updateEditorContent('config', '# New Agent Configuration\nname: "New Agent"\ntype: "custom"\nversion: "1.0.0"');
+            }
+        }
+
+        function importAgent() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json,.yaml,.yml';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        try {
+                            const content = e.target.result;
+                            updateEditorContent('config', content);
+                            alert('Agent configuration imported successfully!');
+                        } catch (error) {
+                            alert('Error importing agent configuration: ' + error.message);
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            };
+            input.click();
+        }
+
+        function testAgent() {
+            alert('Agent testing functionality would open a test environment here.');
+        }
+
+        function saveAgent() {
+            const agentName = document.getElementById('agentName').textContent;
+            alert(`Agent "${agentName}" saved successfully!`);
+        }
+
+        async function deployAgent() {
+            const agentName = document.getElementById('agentName').textContent;
+            if (confirm(`Deploy "${agentName}" to production?`)) {
+                try {
+                    const deploymentData = {
+                        agent_type: currentTemplate,
+                        name: agentName,
+                        config: agentTemplates[currentTemplate]
+                    };
+                    
+                    const response = await fetch('/api/agents/deploy', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(deploymentData)
+                    });
+                    
+                    const result = await response.json();
+                    alert(`Agent "${agentName}" deployed successfully! Agent ID: ${result.agent_id}`);
+                    
+                    // Update status
+                    document.querySelector('.status').textContent = 'Deployed';
+                    document.querySelector('.status').style.background = 'rgba(16, 185, 129, 0.1)';
+                    document.querySelector('.status').style.color = 'var(--success)';
+                } catch (error) {
+                    console.error('Deployment failed:', error);
+                    alert('Deployment failed. Please try again.');
+                }
+            }
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                document.getElementById('sidebar').classList.remove('open');
+            }
+        });
+    </script>
+</body>
+</html> 
