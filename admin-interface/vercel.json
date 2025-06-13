@@ -3,7 +3,11 @@
   "framework": "vite",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "installCommand": "npm ci",
+  "installCommand": "npm install",
+  "github": {
+    "enabled": true,
+    "silent": false
+  },
   "headers": [
     {
       "source": "/assets/(.*)",
@@ -14,9 +18,5 @@
         }
       ]
     }
-  ],
-  "github": {
-    "enabled": true,
-    "silent": false
-  }
+  ]
 }
