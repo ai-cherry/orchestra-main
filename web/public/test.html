@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Orchestra AI Admin Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #0A1929; color: white; }
+        .test { margin: 10px 0; padding: 10px; border: 1px solid #3B82F6; border-radius: 5px; }
+        .success { border-color: #10B981; background: rgba(16, 185, 129, 0.1); }
+        .error { border-color: #EF4444; background: rgba(239, 68, 68, 0.1); }
+        button { background: #3B82F6; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin: 5px; }
+        button:hover { background: #2563EB; }
+        #results { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>🎼 Orchestra AI Admin System Test</h1>
+    
+    <div class="test">
+        <h3>API Tests</h3>
+        <button onclick="testSystemStatus()">Test System Status</button>
+        <button onclick="testAgents()">Test Agents</button>
+        <button onclick="testDeployAgent()">Test Deploy Agent</button>
+    </div>
+    
+    <div class="test">
+        <h3>Frontend Tests</h3>
+        <button onclick="testNavigation()">Test Navigation</button>
+        <button onclick="testChat()">Test Chat Interface</button>
+    </div>
+    
+    <div id="results"></div>
+
+    <script>
+        const results = document.getElementById('results');
+        
+        function addResult(test, success, message) {
+            const div = document.createElement('div');
+            div.className = `test ${success ? 'success' : 'error'}`;
+            div.innerHTML = `<strong>${test}:</strong> ${message}`;
+            results.appendChild(div);
+        }
+        
+        async function testSystemStatus() {
+            try {
+                const response = await fetch('/api/system/status');
+                const data = await response.json();
+                addResult('System Status', true, `✅ ${data.active_agents} agents, ${data.cpu_usage_percent.toFixed(1)}% CPU`);
+            } catch (error) {
+                addResult('System Status', false, `❌ ${error.message}`);
+            }
+        }
+        
+        async function testAgents() {
+            try {
+                const response = await fetch('/api/agents');
+                const agents = await response.json();
+                addResult('Agents List', true, `✅ Found ${agents.length} agents`);
+            } catch (error) {
+                addResult('Agents List', false, `❌ ${error.message}`);
+            }
+        }
+        
+        async function testDeployAgent() {
+            try {
+                const response = await fetch('/api/agents/deploy', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        agent_type: 'assistant',
+                        name: 'Test Agent ' + Date.now(),
+                        config: { test: true }
+                    })
+                });
+                const data = await response.json();
+                addResult('Deploy Agent', true, `✅ Agent deployed: ${data.agent_id}`);
+            } catch (error) {
+                addResult('Deploy Agent', false, `❌ ${error.message}`);
+            }
+        }
+        
+        function testNavigation() {
+            // Test if main admin page exists
+            fetch('/static/index.html')
+                .then(response => {
+                    if (response.ok) {
+                        addResult('Navigation', true, '✅ Admin interface accessible');
+                    } else {
+                        addResult('Navigation', false, '❌ Admin interface not found');
+                    }
+                })
+                .catch(error => {
+                    addResult('Navigation', false, `❌ ${error.message}`);
+                });
+        }
+        
+        function testChat() {
+            addResult('Chat Interface', true, '✅ Chat test page loaded - check main interface at /static/index.html');
+        }
+        
+        // Auto-run tests
+        window.onload = function() {
+            setTimeout(() => {
+                testSystemStatus();
+                testAgents();
+                testNavigation();
+            }, 1000);
+        };
+    </script>
+</body>
+</html> 

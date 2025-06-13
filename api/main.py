@@ -518,11 +518,19 @@ async def health_check():
 
 # Functions defined after app creation
 
-# Mount static files (for serving the frontend)
+# Mount static files for local development
 import os
+from fastapi.staticfiles import StaticFiles
+
 static_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "web", "public")
 if os.path.exists(static_dir):
     app.mount("/static", StaticFiles(directory=static_dir), name="static")
+    print(f"✅ Static files mounted from: {static_dir}")
+else:
+    print(f"❌ Static directory not found: {static_dir}")
+
+# For Vercel deployment
+handler = app
 
 if __name__ == "__main__":
     import uvicorn
