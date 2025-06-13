@@ -2,26 +2,29 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/main.py",
-      "use": "@vercel/python"
-    },
-    {
-      "src": "web/public/**",
-      "use": "@vercel/static"
+      "src": "modern-admin/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
     }
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "/api/main.py"
+      "src": "/admin/(.*)",
+      "dest": "/modern-admin/dist/$1"
     },
     {
-      "src": "/static/(.*)",
-      "dest": "/web/public/$1"
+      "src": "/admin",
+      "dest": "/modern-admin/dist/index.html"
+    },
+    {
+      "handle": "filesystem"
     },
     {
       "src": "/(.*)",
-      "dest": "/web/public/$1"
+      "dest": "/index.html"
     }
   ]
-} 
+}
+
