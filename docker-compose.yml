@@ -5,26 +5,36 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.api
+    container_name: orchestra-api
     ports:
       - "8000:8000"
+    environment:
+      - DATABASE_URL=sqlite+aiosqlite:///app/data/orchestra.db
+      - PYTHONPATH=/app
     volumes:
-      - .:/app
+      - ./:/app
+      - ./data:/app/data
+      - ./uploads:/app/uploads
     restart: unless-stopped
 
   mcp_server:
     build:
       context: .
       dockerfile: Dockerfile.mcp
+    container_name: orchestra-mcp
     ports:
       - "8003:8003"
+    environment:
+      - PYTHONPATH=/app
     volumes:
-      - .:/app
+      - ./:/app
     restart: unless-stopped
 
   frontend:
     build:
       context: ./web
-      dockerfile: Dockerfile
+      dockerfile: ../Dockerfile.frontend
+    container_name: orchestra-frontend
     ports:
       - "3000:80"
     depends_on:
