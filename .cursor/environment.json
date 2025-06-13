@@ -1,0 +1,8 @@
+{
+  "pre_commands": [
+    "pulumi stack select dev"
+  ],
+  "post_commands": [
+    "pulumi preview"
+  ]
+}

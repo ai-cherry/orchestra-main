@@ -282,7 +282,8 @@ Orchestra AI centralizes all secrets using **Pulumi**. Run `scripts/generate_env
 
 ### **Development Tools Integration**
 - **Cursor AI**: Backend development with Claude models + persona integration
-- **Continue.dev**: UI development with UI-GPT-4O + persona coordination  
+- **Cursor IaC Agent Mode**: Automated Pulumi workflows for Lambda Labs and data services (see `CURSOR_IAC_AGENT_MODE.md`)
+- **Continue.dev**: UI development with UI-GPT-4O + persona coordination
 - **MCP Protocol**: Seamless tool coordination across all AI assistants
 - **Real-time Sync**: Shared context and cross-tool communication
 
