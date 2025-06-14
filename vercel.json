@@ -1,22 +1,21 @@
 {
   "version": 2,
-  "public": true,
   "buildCommand": "cd modern-admin && npm install && npm run build",
   "outputDirectory": "modern-admin/dist",
   "framework": null,
   "installCommand": "npm install",
   "ignoreCommand": "git diff HEAD^ HEAD --quiet .",
-  "functions": {
-    "api/proxy.js": {
-      "maxDuration": 30
-    }
-  },
   "rewrites": [
     {
       "source": "/api/:path*",
       "destination": "/api/proxy.js"
     }
   ],
+  "functions": {
+    "api/proxy.js": {
+      "maxDuration": 30
+    }
+  },
   "env": {
     "LAMBDA_BACKEND_URL": "http://150.136.94.139:8000"
   },
