@@ -16,8 +16,12 @@ echo "📋 Checking Lambda Labs instances status..."
 curl -u "$LAMBDA_API_KEY:" https://cloud.lambda.ai/api/v1/instances | jq '.data[] | {name: .name, ip: .ip, status: .status, instance_type: .instance_type.name}'
 
 echo "🔧 Setting up SSH connection to production instance..."
-# Test SSH connectivity
-ssh -o ConnectTimeout=10 -o StrictHostKeyChecking=no ubuntu@$PROD_INSTANCE "echo 'SSH connection successful to production instance'"
+# Test SSH connectivity with proper host key checking
+if ! ssh -o ConnectTimeout=10 -o StrictHostKeyChecking=yes ubuntu@$PROD_INSTANCE "echo 'SSH connection successful to production instance'" 2>/dev/null; then
+    echo "⚠️  Host key verification failed. Adding host to known_hosts..."
+    ssh-keyscan -H $PROD_INSTANCE >> ~/.ssh/known_hosts
+    ssh -o ConnectTimeout=10 -o StrictHostKeyChecking=yes ubuntu@$PROD_INSTANCE "echo 'SSH connection successful to production instance'"
+fi
 
 echo "🐳 Installing Docker and K3s on production instance..."
 ssh ubuntu@$PROD_INSTANCE << 'REMOTE_SCRIPT'

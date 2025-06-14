@@ -207,26 +207,25 @@ class LambdaLabsInfrastructureServer:
                         "sudo systemctl restart nginx"
                     ])
                 
-                # Execute deployment
-                ssh_command = f"ssh -i {ssh_key_file} -o StrictHostKeyChecking=no ubuntu@{self.production_ip} '{'; '.join(ssh_commands)}'"
+                # Execute deployment using secure SSH manager
+                from security.ssh_manager import secure_ssh
                 
-                result = subprocess.run(
-                    ssh_command,
-                    shell=True,
-                    capture_output=True,
-                    text=True,
-                    timeout=300
+                script_content = '\n'.join(ssh_commands)
+                result = secure_ssh.execute_ssh_script(
+                    hostname=self.production_ip,
+                    script_content=script_content,
+                    username='ubuntu'
                 )
                 
-                if result.returncode == 0:
+                if result['success']:
                     response = f"✅ **Deployment Successful**\n\n"
                     response += f"- Branch: {branch}\n"
                     response += f"- Services restarted: {restart_services}\n"
                     response += f"- Timestamp: {datetime.now().isoformat()}\n\n"
-                    response += f"**Output:**\n```\n{result.stdout}\n```"
+                    response += f"**Output:**\n```\n{result['stdout']}\n```"
                 else:
                     response = f"❌ **Deployment Failed**\n\n"
-                    response += f"**Error:**\n```\n{result.stderr}\n```"
+                    response += f"**Error:**\n```\n{result.get('stderr', result.get('error', 'Unknown error'))}\n```"
                 
                 return [TextContent(type="text", text=response)]
                 
@@ -311,25 +310,21 @@ class LambdaLabsInfrastructureServer:
             if scope in ["network", "all"]:
                 # Check firewall status
                 try:
-                    ssh_key = secret_manager.get_secret('SSH_PRIVATE_KEY')
-                    if ssh_key:
-                        # Check UFW status
-                        result = subprocess.run(
-                            f"ssh -o StrictHostKeyChecking=no ubuntu@{self.production_ip} 'sudo ufw status'",
-                            shell=True,
-                            capture_output=True,
-                            text=True,
-                            timeout=30
-                        )
-                        
-                        if "Status: active" in result.stdout:
-                            audit_results.append("✅ Firewall is active")
-                        else:
-                            audit_results.append("❌ Firewall is not active")
+                    from security.ssh_manager import secure_ssh
+                    
+                    # Check UFW status
+                    result = secure_ssh.execute_ssh_command(
+                        hostname=self.production_ip,
+                        command='sudo ufw status',
+                        username='ubuntu'
+                    )
+                    
+                    if result['success'] and "Status: active" in result['stdout']:
+                        audit_results.append("✅ Firewall is active")
                     else:
-                        audit_results.append("⚠️ Cannot check network security - SSH key not available")
-                except:
-                    audit_results.append("❌ Network security check failed")
+                        audit_results.append("❌ Firewall is not active")
+                except Exception as e:
+                    audit_results.append(f"⚠️ Cannot check firewall status: {str(e)}")
             
             if scope in ["services", "all"]:
                 # Check service health
@@ -413,19 +408,19 @@ class LambdaLabsInfrastructureServer:
                 try:
                     os.chmod(ssh_key_file, 0o600)
                     
-                    result = subprocess.run(
-                        f"ssh -i {ssh_key_file} -o StrictHostKeyChecking=no ubuntu@{self.production_ip} '{command}'",
-                        shell=True,
-                        capture_output=True,
-                        text=True,
-                        timeout=120
+                    from security.ssh_manager import secure_ssh
+                    
+                    result = secure_ssh.execute_ssh_command(
+                        hostname=self.production_ip,
+                        command=command,
+                        username='ubuntu'
                     )
                     
                     response = f"🗄️ **Database {action.title()} - {database.title()}**\n\n"
-                    if result.returncode == 0:
-                        response += f"✅ Success\n\n**Output:**\n```\n{result.stdout}\n```"
+                    if result['success']:
+                        response += f"✅ Success\n\n**Output:**\n```\n{result['stdout']}\n```"
                     else:
-                        response += f"❌ Failed\n\n**Error:**\n```\n{result.stderr}\n```"
+                        response += f"❌ Failed\n\n**Error:**\n```\n{result.get('stderr', result.get('error', 'Unknown error'))}\n```"
                     
                     return [TextContent(type="text", text=response)]
                     
@@ -465,30 +460,37 @@ class LambdaLabsInfrastructureServer:
                 
                 if metric == "all":
                     results = []
+                    from security.ssh_manager import secure_ssh
+                    
                     for m, cmd in commands.items():
                         try:
-                            result = subprocess.run(
-                                f"ssh -i {ssh_key_file} -o StrictHostKeyChecking=no ubuntu@{self.production_ip} '{cmd}'",
-                                shell=True,
-                                capture_output=True,
-                                text=True,
-                                timeout=30
+                            result = secure_ssh.execute_ssh_command(
+                                hostname=self.production_ip,
+                                command=cmd,
+                                username='ubuntu'
                             )
-                            results.append(f"**{m.upper()}:**\n```\n{result.stdout}\n```")
+                            if result['success']:
+                                results.append(f"**{m.upper()}:**\n```\n{result['stdout']}\n```")
+                            else:
+                                results.append(f"**{m.upper()}:** Error getting data")
                         except:
                             results.append(f"**{m.upper()}:** Error getting data")
                     
                     response = "📊 **Resource Monitoring**\n\n" + "\n\n".join(results)
                 else:
                     if metric in commands:
-                        result = subprocess.run(
-                            f"ssh -i {ssh_key_file} -o StrictHostKeyChecking=no ubuntu@{self.production_ip} '{commands[metric]}'",
-                            shell=True,
-                            capture_output=True,
-                            text=True,
-                            timeout=30
+                        from security.ssh_manager import secure_ssh
+                        
+                        result = secure_ssh.execute_ssh_command(
+                            hostname=self.production_ip,
+                            command=commands[metric],
+                            username='ubuntu'
                         )
-                        response = f"📊 **{metric.upper()} Monitoring**\n\n```\n{result.stdout}\n```"
+                        
+                        if result['success']:
+                            response = f"📊 **{metric.upper()} Monitoring**\n\n```\n{result['stdout']}\n```"
+                        else:
+                            response = f"📊 **{metric.upper()} Monitoring**\n\n❌ Error getting data"
                     else:
                         response = f"❌ Unknown metric: {metric}"
                 

@@ -11,7 +11,6 @@ from fastapi import FastAPI, HTTPException, Depends, BackgroundTasks, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, JSONResponse
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel
 from typing import List, Dict, Optional, Any
 import asyncio
@@ -25,6 +24,10 @@ import subprocess
 import logging
 from pathlib import Path
 import structlog
+
+# Import secure authentication
+from auth.authentication import get_current_user_id, get_current_user, get_admin_user
+from auth.routes import router as auth_router
 
 # Import Phase 2 services
 from api.database.connection import init_database, close_database, get_db, db_manager
@@ -65,8 +68,7 @@ structlog.configure(
 
 logger = structlog.get_logger(__name__)
 
-# Security
-security = HTTPBearer()
+# Security - now using secure JWT authentication from auth/authentication.py
 
 # Background task to update metrics
 async def update_metrics():
@@ -331,11 +333,7 @@ def initialize_sample_data():
         )
     ]
 
-# Utility functions
-async def get_current_user_id(credentials: HTTPAuthorizationCredentials = Depends(security)):
-    """Extract user ID from token (simplified for demo)"""
-    # In production, this would validate JWT token and extract user ID
-    return "demo-user-001"
+# Utility functions - authentication now handled by auth/authentication.py
 
 # === CORE API ENDPOINTS ===
 
