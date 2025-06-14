@@ -14,22 +14,25 @@ import {
   RefreshCw,
   Clock
 } from 'lucide-react';
+import { api } from '@/lib/api';
 
 const HealthDashboard = () => {
   const [healthData, setHealthData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [lastUpdate, setLastUpdate] = useState(null);
   const [autoRefresh, setAutoRefresh] = useState(true);
+  const [error, setError] = useState(null);
 
   const fetchHealthData = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/health/');
-      const data = await response.json();
+      const data = await api.get('/api/health/');
       setHealthData(data);
       setLastUpdate(new Date());
+      setError(null);
     } catch (error) {
       console.error('Failed to fetch health data:', error);
+      setError(error.message);
     } finally {
       setLoading(false);
     }

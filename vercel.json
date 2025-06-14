@@ -1,38 +1,33 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "web/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
-    }
-  ],
-  "routes": [
-    {
-      "src": "/assets/(.*)",
-      "dest": "/web/dist/assets/$1"
-    },
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
-    },
-    {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/web/dist/index.html"
-    }
-  ],
+  "framework": "vite",
+  "buildCommand": "cd modern-admin && pnpm install && pnpm run build",
+  "outputDirectory": "modern-admin/dist",
+  "devCommand": "cd modern-admin && pnpm run dev",
+  "installCommand": "cd modern-admin && pnpm install",
+  "regions": ["sfo1"],
   "functions": {
-    "api/main.py": {
-      "runtime": "python3.11"
+    "api/proxy.js": {
+      "runtime": "@vercel/node@3.1.0",
+      "maxDuration": 30
     }
   },
-  "env": {
-    "PYTHON_VERSION": "3.11"
-  }
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "/api/proxy"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Credentials", "value": "true" },
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET,OPTIONS,PATCH,DELETE,POST,PUT" },
+        { "key": "Access-Control-Allow-Headers", "value": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version" }
+      ]
+    }
+  ]
 }
 
