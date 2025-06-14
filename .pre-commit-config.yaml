@@ -1,0 +1,185 @@
+# Orchestra AI Pre-commit Configuration
+# Following CI/CD standards from .cursor/rules.md
+
+repos:
+  # Python formatting
+  - repo: https://github.com/psf/black
+    rev: 24.2.0
+    hooks:
+      - id: black
+        language_version: python3.11
+        args: [--line-length=100]
+
+  # Python imports sorting
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        args: [--profile=black, --line-length=100]
+
+  # Python linting
+  - repo: https://github.com/pycqa/flake8
+    rev: 7.0.0
+    hooks:
+      - id: flake8
+        args: [--max-line-length=100, --extend-ignore=E203]
+        additional_dependencies: [flake8-docstrings, flake8-annotations]
+
+  # Python type checking
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.8.0
+    hooks:
+      - id: mypy
+        additional_dependencies: [types-all]
+        args: [--ignore-missing-imports]
+
+  # Security checks
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.7
+    hooks:
+      - id: bandit
+        args: [-r, --skip=B101]  # Skip assert_used test
+
+  # Secrets detection
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
+    hooks:
+      - id: detect-secrets
+        args: [--baseline, .secrets.baseline]
+
+  # YAML linting
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.35.1
+    hooks:
+      - id: yamllint
+        args: [-c=.yamllint.yml]
+
+  # Markdown linting
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.39.0
+    hooks:
+      - id: markdownlint
+        args: [--config=.markdownlint.json]
+
+  # TypeScript/JavaScript formatting
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v3.1.0
+    hooks:
+      - id: prettier
+        types_or: [javascript, jsx, ts, tsx, css, scss, json, yaml, markdown]
+
+  # TypeScript/JavaScript linting
+  - repo: https://github.com/pre-commit/mirrors-eslint
+    rev: v8.56.0
+    hooks:
+      - id: eslint
+        files: \.[jt]sx?$
+        types: [file]
+        additional_dependencies:
+          - eslint@8.56.0
+          - eslint-config-prettier@9.1.0
+          - "@typescript-eslint/parser@6.19.0"
+          - "@typescript-eslint/eslint-plugin@6.19.0"
+
+  # Dockerfile linting
+  - repo: https://github.com/hadolint/hadolint
+    rev: v2.12.0
+    hooks:
+      - id: hadolint-docker
+        args: [--ignore=DL3008, --ignore=DL3009]  # Ignore apt-get version pinning
+
+  # Shell script linting
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.9.0.6
+    hooks:
+      - id: shellcheck
+
+  # General file checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+        args: [--maxkb=1000]
+      - id: check-json
+      - id: check-toml
+      - id: check-xml
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: detect-private-key
+      - id: mixed-line-ending
+        args: [--fix=lf]
+
+  # Git commit message linting
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v3.13.0
+    hooks:
+      - id: commitizen
+        stages: [commit-msg]
+
+  # License headers
+  - repo: https://github.com/Lucas-C/pre-commit-hooks
+    rev: v1.5.4
+    hooks:
+      - id: insert-license
+        files: \.py$
+        args:
+          - --license-filepath
+          - .license-header.txt
+          - --comment-style
+          - "#"
+
+# Custom local hooks
+  - repo: local
+    hooks:
+      # Check for TODO comments
+      - id: check-todos
+        name: Check TODO comments
+        entry: ./scripts/check-todos.sh
+        language: script
+        pass_filenames: false
+
+      # Validate OpenAPI specs
+      - id: validate-openapi
+        name: Validate OpenAPI specifications
+        entry: ./scripts/validate-openapi.sh
+        language: script
+        files: openapi.*\.ya?ml$
+
+      # Check database migrations
+      - id: check-migrations
+        name: Check database migrations
+        entry: ./scripts/check-migrations.sh
+        language: script
+        pass_filenames: false
+
+      # Validate environment files
+      - id: validate-env
+        name: Validate environment files
+        entry: ./scripts/validate-env.sh
+        language: script
+        files: \.env\..*$
+
+# Configuration for specific hooks
+default_language_version:
+  python: python3.11
+
+exclude: |
+  (?x)(
+    ^venv/|
+    ^\.venv/|
+    ^node_modules/|
+    ^dist/|
+    ^build/|
+    ^\.git/|
+    ^.*\.min\.(js|css)$|
+    ^.*\.bundle\.(js|css)$|
+    migrations/|
+    __pycache__/|
+    \.egg-info/
+  )
+
+fail_fast: false
+minimum_pre_commit_version: 3.6.0 

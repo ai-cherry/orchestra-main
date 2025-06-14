@@ -1,0 +1,390 @@
+# Orchestra AI Infrastructure Deployment
+# Based on patterns from .cursor/iac-agent.md
+
+name: Deploy Infrastructure
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'pulumi/**'
+      - 'k8s/**'
+      - 'docker/**'
+      - 'mcp_servers/**'
+      - '.github/workflows/deploy-infrastructure.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'pulumi/**'
+      - 'k8s/**'
+      - 'docker/**'
+      - 'mcp_servers/**'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - development
+          - staging
+          - production
+
+env:
+  PYTHON_VERSION: '3.11'
+  NODE_VERSION: '20'
+  PULUMI_VERSION: '3.100.0'
+
+jobs:
+  # Validate infrastructure code
+  validate:
+    name: Validate Infrastructure
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Cache Python dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r pulumi/requirements.txt
+          pip install pylint mypy black isort
+
+      - name: Lint infrastructure code
+        run: |
+          cd pulumi
+          black --check .
+          isort --check-only .
+          pylint *.py
+          mypy *.py
+
+      - name: Validate Dockerfiles
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: docker/Dockerfile.*
+          ignore: DL3008,DL3009
+
+      - name: Validate Kubernetes manifests
+        run: |
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          find k8s -name "*.yaml" -o -name "*.yml" | xargs -I {} ./kubectl --dry-run=client apply -f {}
+
+  # Security scanning
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy security scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy scan results
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+      - name: Run Checkov
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: .
+          framework: all
+          output_format: sarif
+          output_file_path: checkov.sarif
+
+      - name: Upload Checkov results
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'checkov.sarif'
+
+  # Build Docker images
+  build:
+    name: Build Docker Images
+    runs-on: ubuntu-latest
+    needs: [validate, security]
+    strategy:
+      matrix:
+        service:
+          - api
+          - mcp-memory
+          - mcp-code-intelligence
+          - mcp-tools-registry
+          - frontend
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/Dockerfile.${{ matrix.service }}
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: |
+            orchestra/${{ matrix.service }}:latest
+            orchestra/${{ matrix.service }}:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # Deploy with Pulumi
+  deploy-pulumi:
+    name: Deploy Infrastructure (Pulumi)
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event_name != 'pull_request'
+    environment:
+      name: ${{ github.event.inputs.environment || (github.ref == 'refs/heads/main' && 'production' || 'staging') }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install Pulumi CLI
+        uses: pulumi/actions@v5
+        with:
+          version: ${{ env.PULUMI_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          cd pulumi
+          pip install -r requirements.txt
+
+      - name: Pulumi Preview
+        run: |
+          cd pulumi
+          pulumi stack select ${{ env.STACK_NAME }}
+          pulumi preview
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+          STACK_NAME: ${{ github.event.inputs.environment || (github.ref == 'refs/heads/main' && 'production' || 'staging') }}
+          LAMBDA_LABS_API_KEY: ${{ secrets.LAMBDA_LABS_API_KEY }}
+          POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
+          REDIS_HOST: ${{ secrets.REDIS_HOST }}
+          WEAVIATE_URL: ${{ secrets.WEAVIATE_URL }}
+
+      - name: Pulumi Deploy
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        run: |
+          cd pulumi
+          pulumi stack select ${{ env.STACK_NAME }}
+          pulumi up --yes
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+          STACK_NAME: ${{ github.event.inputs.environment || (github.ref == 'refs/heads/main' && 'production' || 'staging') }}
+          LAMBDA_LABS_API_KEY: ${{ secrets.LAMBDA_LABS_API_KEY }}
+          POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
+          REDIS_HOST: ${{ secrets.REDIS_HOST }}
+          WEAVIATE_URL: ${{ secrets.WEAVIATE_URL }}
+
+      - name: Export stack outputs
+        run: |
+          cd pulumi
+          pulumi stack output --json > ../stack-outputs.json
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+          STACK_NAME: ${{ github.event.inputs.environment || (github.ref == 'refs/heads/main' && 'production' || 'staging') }}
+
+      - name: Upload stack outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: stack-outputs
+          path: stack-outputs.json
+
+  # Deploy MCP servers
+  deploy-mcp:
+    name: Deploy MCP Servers
+    runs-on: ubuntu-latest
+    needs: deploy-pulumi
+    if: github.event_name != 'pull_request'
+    environment:
+      name: ${{ github.event.inputs.environment || (github.ref == 'refs/heads/main' && 'production' || 'staging') }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download stack outputs
+        uses: actions/download-artifact@v4
+        with:
+          name: stack-outputs
+
+      - name: Configure kubectl
+        run: |
+          # Get kubeconfig from Pulumi output
+          KUBECONFIG_DATA=$(jq -r '.kubeconfig' stack-outputs.json)
+          echo "$KUBECONFIG_DATA" | base64 -d > kubeconfig
+          export KUBECONFIG=$(pwd)/kubeconfig
+
+      - name: Deploy MCP servers to Kubernetes
+        run: |
+          # Apply MCP server configurations
+          kubectl apply -f k8s/mcp-namespace.yaml
+          kubectl apply -f k8s/mcp-services.yaml
+          kubectl apply -f k8s/mcp-deployments.yaml
+          
+          # Wait for deployments
+          kubectl -n mcp-system rollout status deployment/mcp-memory
+          kubectl -n mcp-system rollout status deployment/mcp-code-intelligence
+          kubectl -n mcp-system rollout status deployment/mcp-tools-registry
+
+      - name: Verify MCP health
+        run: |
+          # Get MCP endpoints
+          MCP_ENDPOINTS=$(kubectl -n mcp-system get svc -o json | jq -r '.items[].status.loadBalancer.ingress[0].ip')
+          
+          # Check health of each MCP server
+          for endpoint in $MCP_ENDPOINTS; do
+            curl -f http://$endpoint:8003/health || exit 1
+          done
+
+  # Run integration tests
+  integration-tests:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    needs: deploy-mcp
+    if: github.event_name != 'pull_request'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install test dependencies
+        run: |
+          pip install pytest pytest-asyncio pytest-cov httpx
+
+      - name: Run integration tests
+        run: |
+          pytest tests/integration/ -v --cov=api --cov-report=xml
+        env:
+          API_URL: ${{ secrets.API_URL }}
+          MCP_MEMORY_URL: ${{ secrets.MCP_MEMORY_URL }}
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage.xml
+          flags: integration
+
+  # Monitor deployment
+  monitor:
+    name: Monitor Deployment
+    runs-on: ubuntu-latest
+    needs: integration-tests
+    if: always() && github.event_name != 'pull_request'
+    steps:
+      - name: Check deployment health
+        run: |
+          # Monitor for 5 minutes
+          for i in {1..10}; do
+            echo "Health check $i/10"
+            
+            # Check API health
+            curl -f ${{ secrets.API_URL }}/health || exit 1
+            
+            # Check MCP servers
+            curl -f ${{ secrets.MCP_MEMORY_URL }}/health || exit 1
+            
+            sleep 30
+          done
+
+      - name: Notify deployment status
+        if: always()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          text: |
+            Infrastructure deployment ${{ job.status }}
+            Environment: ${{ github.event.inputs.environment || (github.ref == 'refs/heads/main' && 'production' || 'staging') }}
+            Commit: ${{ github.sha }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+
+  # Rollback on failure
+  rollback:
+    name: Rollback Deployment
+    runs-on: ubuntu-latest
+    needs: [deploy-pulumi, deploy-mcp, integration-tests]
+    if: failure() && github.event_name != 'pull_request'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Pulumi
+        uses: pulumi/actions@v5
+        with:
+          version: ${{ env.PULUMI_VERSION }}
+
+      - name: Rollback Pulumi stack
+        run: |
+          cd pulumi
+          pulumi stack select ${{ env.STACK_NAME }}
+          pulumi stack history
+          pulumi stack rollback --yes
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+          STACK_NAME: ${{ github.event.inputs.environment || (github.ref == 'refs/heads/main' && 'production' || 'staging') }}
+
+      - name: Notify rollback
+        uses: 8398a7/action-slack@v3
+        with:
+          status: custom
+          custom_payload: |
+            {
+              text: "⚠️ Infrastructure deployment failed and was rolled back",
+              attachments: [{
+                color: 'warning',
+                fields: [{
+                  title: 'Environment',
+                  value: '${{ github.event.inputs.environment || (github.ref == 'refs/heads/main' && 'production' || 'staging') }}',
+                  short: true
+                }, {
+                  title: 'Commit',
+                  value: '${{ github.sha }}',
+                  short: true
+                }]
+              }]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }} 
