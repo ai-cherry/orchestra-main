@@ -3,7 +3,7 @@ Orchestra AI Database Package
 """
 
 from .connection import init_database, close_database, get_db, db_manager
-from .models import User, Agent, Workflow, APIKey, AuditLog
+from .models import User, Persona, FileRecord, ProcessingJob, SearchQuery, VectorChunk
 
 __all__ = [
     "init_database",
@@ -11,8 +11,9 @@ __all__ = [
     "get_db",
     "db_manager",
     "User",
-    "Agent", 
-    "Workflow",
-    "APIKey",
-    "AuditLog"
+    "Persona", 
+    "FileRecord",
+    "ProcessingJob",
+    "SearchQuery",
+    "VectorChunk"
 ]

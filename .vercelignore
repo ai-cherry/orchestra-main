@@ -1,0 +1,56 @@
+# Python files
+*.py
+*.pyc
+__pycache__/
+venv/
+requirements.txt
+pytest.ini
+
+# Backend services
+api/services/
+database/
+auth/
+services/
+mcp_servers/
+pulumi/
+packages/mcp-enhanced/
+
+# Docker files
+Dockerfile*
+docker-compose*.yml
+
+# Scripts
+*.sh
+
+# Logs and temp files
+*.log
+logs/
+uploads/
+data/
+
+# Documentation
+*.md
+!modern-admin/README.md
+
+# Development configs
+.env
+.env.*
+!.env.example
+
+# Other directories not needed for frontend
+admin-interface/
+backups/
+fluentd/
+nginx/
+scripts/
+security/
+shared/
+src/
+systemd/
+tests/
+web/
+mobile/
+
+# Keep only what's needed
+!api/proxy.js
+!modern-admin/ 

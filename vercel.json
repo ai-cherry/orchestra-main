@@ -1,9 +1,11 @@
 {
   "version": 2,
   "public": true,
-  "buildCommand": "cd modern-admin && npm install && npm run build",
+  "buildCommand": "cd modern-admin && pnpm install && pnpm run build",
   "outputDirectory": "modern-admin/dist",
   "framework": null,
+  "installCommand": "npm install -g pnpm@10.4.1",
+  "ignoreCommand": "git diff HEAD^ HEAD --quiet .",
   "functions": {
     "api/proxy.js": {
       "maxDuration": 30
@@ -12,11 +14,21 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "/api/proxy"
+      "destination": "/api/proxy.js"
     }
   ],
   "env": {
-    "LAMBDA_BACKEND_URL": "http://150.136.94.139:8000"
+    "LAMBDA_BACKEND_URL": "http://150.136.94.139"
+  },
+  "build": {
+    "env": {
+      "VITE_API_URL": "",
+      "VITE_API_TIMEOUT": "30000",
+      "VITE_ENABLE_WEBSOCKET": "false",
+      "VITE_ENABLE_MONITORING": "true",
+      "VITE_ENABLE_AI_CHAT": "true",
+      "VITE_DEBUG": "false"
+    }
   },
   "headers": [
     {
