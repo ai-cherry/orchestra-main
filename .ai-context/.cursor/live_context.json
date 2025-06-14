@@ -155,51 +155,46 @@
       "type": "critical",
       "source": "CRITICAL_FIXES_NEEDED.md",
       "summary": "Docker build failures, API module imports"
-    },
-    {
-      "type": "blocking",
-      "source": "ISSUES_SUMMARY.md",
-      "summary": "Frontend build failures, missing dependencies"
     }
   ],
   "real_time": {
-    "timestamp": "2025-06-14T17:08:02.249505",
+    "timestamp": "2025-06-14T18:19:52.859354",
     "system": {
-      "cpu_percent": 13.5,
-      "memory_percent": 62.7,
-      "disk_usage": 15.2,
+      "cpu_percent": 12.5,
+      "memory_percent": 62.3,
+      "disk_usage": 15.3,
       "network_connections": -1
     },
     "services": {
       "api": {
         "port": 8000,
         "status": "running",
-        "checked_at": "2025-06-14T17:08:03.255175"
+        "checked_at": "2025-06-14T18:19:53.863484"
       },
       "mcp_memory": {
         "port": 8003,
-        "status": "stopped",
-        "checked_at": "2025-06-14T17:08:03.255336"
+        "status": "running",
+        "checked_at": "2025-06-14T18:19:53.863821"
       },
       "mcp_portkey": {
         "port": 8004,
         "status": "running",
-        "checked_at": "2025-06-14T17:08:03.255508"
+        "checked_at": "2025-06-14T18:19:53.864116"
       },
       "frontend": {
         "port": 3000,
         "status": "stopped",
-        "checked_at": "2025-06-14T17:08:03.255643"
+        "checked_at": "2025-06-14T18:19:53.864308"
       },
       "postgresql": {
         "port": 5432,
         "status": "running",
-        "checked_at": "2025-06-14T17:08:03.255789"
+        "checked_at": "2025-06-14T18:19:53.864539"
       },
       "redis": {
         "port": 6379,
-        "status": "stopped",
-        "checked_at": "2025-06-14T17:08:03.255960"
+        "status": "running",
+        "checked_at": "2025-06-14T18:19:53.864751"
       }
     },
     "lambda_labs": {
@@ -212,7 +207,7 @@
       "status": "unknown"
     },
     "deployment": {
-      "last_deployment": "2025-06-14T17:08:03.256000",
+      "last_deployment": "2025-06-14T18:19:53.864777",
       "status": "ready",
       "url": "https://orchestra-ai.vercel.app"
     }
