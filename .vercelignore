@@ -1,4 +1,4 @@
-# Python files
+# Python files (except in modern-admin)
 *.py
 *.pyc
 __pycache__/
@@ -30,7 +30,6 @@ data/
 
 # Documentation
 *.md
-!modern-admin/README.md
 
 # Development configs
 .env
@@ -51,6 +50,5 @@ tests/
 web/
 mobile/
 
-# Keep only what's needed
-!api/proxy.js
-!modern-admin/ 
+# Keep api/proxy.js
+!api/proxy.js 
