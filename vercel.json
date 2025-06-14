@@ -1,11 +1,14 @@
 {
   "version": 2,
-  "public": true,
-  "buildCommand": "cd modern-admin && npm install --force && npm run build",
-  "outputDirectory": "modern-admin/dist",
-  "framework": null,
-  "installCommand": "npm install -g pnpm@10.4.1",
-  "ignoreCommand": "git diff HEAD^ HEAD --quiet .",
+  "builds": [
+    {
+      "src": "modern-admin/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "modern-admin/dist"
+      }
+    }
+  ],
   "functions": {
     "api/proxy.js": {
       "maxDuration": 30
