@@ -1,12 +1,11 @@
 {
   "version": 2,
-  "builds": [
+  "buildCommand": "cd modern-admin && npm install && npm run build",
+  "outputDirectory": "modern-admin/dist",
+  "rewrites": [
     {
-      "src": "modern-admin/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "modern-admin/dist"
-      }
+      "source": "/api/:path*",
+      "destination": "/api/proxy.js"
     }
   ],
   "functions": {
@@ -14,12 +13,6 @@
       "maxDuration": 30
     }
   },
-  "rewrites": [
-    {
-      "source": "/api/:path*",
-      "destination": "/api/proxy.js"
-    }
-  ],
   "env": {
     "LAMBDA_BACKEND_URL": "http://150.136.94.139"
   },
