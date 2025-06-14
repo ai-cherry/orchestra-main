@@ -5,6 +5,7 @@ import ChatInterface from './components/ChatInterface'
 import Dashboard from './components/Dashboard'
 import AgentFactory from './components/AgentFactory'
 import SystemMonitor from './components/SystemMonitor'
+import HealthDashboard from './components/HealthDashboard'
 import Sidebar from './components/Sidebar'
 
 function App() {
@@ -30,8 +31,9 @@ function App() {
               />
             } />
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/agent-factory" element={<AgentFactory />} />
-            <Route path="/system-monitor" element={<SystemMonitor />} />
+            <Route path="/health" element={<HealthDashboard />} />
+            <Route path="/agents" element={<AgentFactory />} />
+            <Route path="/monitor" element={<SystemMonitor />} />
           </Routes>
         </main>
       </div>

@@ -28,6 +28,7 @@ import structlog
 
 # Import Phase 2 services
 from api.database.connection import init_database, close_database, get_db, db_manager
+from api.health_monitor import router as health_router
 from database.models import (
     User, Persona, FileRecord, FileStatus, PersonaType, 
     SearchQuery, SearchMode, ProcessingJob
@@ -339,6 +340,9 @@ async def get_current_user_id(credentials: HTTPAuthorizationCredentials = Depend
 
 # === CORE API ENDPOINTS ===
 
+# Include health monitoring router
+app.include_router(health_router)
+
 @app.get("/")
 async def root():
     return {
@@ -350,7 +354,8 @@ async def root():
             "Vector search capabilities", 
             "Advanced persona management",
             "Database integration",
-            "Real-time notifications"
+            "Real-time notifications",
+            "Health monitoring"
         ]
     }
 

@@ -105,3 +105,30 @@ id_ed25519.pub
 *.gpg
 *.asc
 
+
+# Temporary and build files
+*.tmp
+*.temp
+.cache/
+.pytest_cache/
+coverage/
+.coverage
+.nyc_output/
+
+# Archive directories
+archive/
+
+# AI agent temporary files
+*_temp.py
+*_draft.py
+*_backup.py
+temp_*.py
+draft_*.py
+
+# One-time scripts and reports
+*_one_time.sh
+*_temp.sh
+TEMP_*.md
+DRAFT_*.md
+*_BACKUP.md
+

@@ -1,0 +1,33 @@
+[Unit]
+Description=Orchestra AI Frontend Server
+After=network.target orchestra-api.service
+Wants=orchestra-api.service
+
+[Service]
+Type=simple
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/home/ubuntu/orchestra-main/modern-admin
+Environment=NODE_ENV=production
+Environment=PORT=3000
+Environment=HOST=0.0.0.0
+ExecStartPre=/bin/bash -c 'cd /home/ubuntu/orchestra-main/modern-admin && npm install'
+ExecStart=/usr/bin/npm run dev -- --host 0.0.0.0 --port 3000
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=orchestra-frontend
+
+# Resource limits
+LimitNOFILE=65536
+MemoryMax=1G
+CPUQuota=150%
+
+# Health check (wait longer for frontend to start)
+ExecStartPost=/bin/bash -c 'sleep 30 && curl -f http://localhost:3000 || exit 1'
+
+[Install]
+WantedBy=multi-user.target
+
