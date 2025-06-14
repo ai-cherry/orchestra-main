@@ -8,8 +8,7 @@
   "ignoreCommand": "git diff HEAD^ HEAD --quiet .",
   "functions": {
     "api/proxy.js": {
-      "maxDuration": 30,
-      "runtime": "nodejs20.x"
+      "maxDuration": 30
     }
   },
   "rewrites": [
@@ -28,8 +27,7 @@
       "VITE_ENABLE_WEBSOCKET": "false",
       "VITE_ENABLE_MONITORING": "true",
       "VITE_ENABLE_AI_CHAT": "true",
-      "VITE_DEBUG": "false",
-      "NODE_VERSION": "20"
+      "VITE_DEBUG": "false"
     }
   },
   "headers": [
