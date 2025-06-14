@@ -61,7 +61,7 @@ fi
 echo -e "${BLUE}Starting API server (simplified)...${NC}"
 if [ -f "api/main_simple.py" ]; then
     cd api
-    python main_simple.py &
+    python3 main_simple.py &
     API_PID=$!
     cd ..
     echo -e "${GREEN}✅ API server started (PID: $API_PID)${NC}"

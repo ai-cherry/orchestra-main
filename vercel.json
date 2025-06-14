@@ -1,11 +1,11 @@
 {
   "version": 2,
+  "public": true,
   "buildCommand": "cd modern-admin && npm install && npm run build",
   "outputDirectory": "modern-admin/dist",
   "framework": null,
   "functions": {
     "api/proxy.js": {
-      "runtime": "@vercel/node@3.1.0",
       "maxDuration": 30
     }
   },
@@ -15,14 +15,25 @@
       "destination": "/api/proxy"
     }
   ],
+  "env": {
+    "LAMBDA_BACKEND_URL": "http://150.136.94.139:8000"
+  },
   "headers": [
     {
       "source": "/api/(.*)",
       "headers": [
-        { "key": "Access-Control-Allow-Credentials", "value": "true" },
-        { "key": "Access-Control-Allow-Origin", "value": "*" },
-        { "key": "Access-Control-Allow-Methods", "value": "GET,OPTIONS,PATCH,DELETE,POST,PUT" },
-        { "key": "Access-Control-Allow-Headers", "value": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version" }
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET, POST, PUT, DELETE, OPTIONS"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "Content-Type, Authorization"
+        }
       ]
     }
   ]

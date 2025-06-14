@@ -80,7 +80,7 @@ start_server() {
     fi
     
     # Start the server
-    nohup python "$script" > "$log_file" 2>&1 &
+    nohup python3 "$script" > "$log_file" 2>&1 &
     local pid=$!
     echo $pid > "$pid_file"
     

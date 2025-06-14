@@ -178,7 +178,7 @@ start_mcp_server() {
     fi
     
     # Start MCP server with proper logging
-    nohup python "$script_path" \
+    nohup python3 "$script_path" \
         > "$LOG_DIR/mcp-$server_name/access.log" 2> "$LOG_DIR/mcp-$server_name/error.log" &
     
     echo $! > "$PID_DIR/mcp-$server_name.pid"
