@@ -1,7 +1,34 @@
-name: orchestra-ai-infrastructure
-description: A minimal Python Pulumi program
+name: orchestra-ai
 runtime: python
+description: Orchestra AI Infrastructure with Secure Secret Management
+
 config:
-  pulumi:tags:
-    value:
-      pulumi:template: python
+  # Public configuration (not sensitive)
+  environment:
+    type: string
+    default: production
+  project_name:
+    type: string
+    default: orchestra-ai
+  ssh_public_key:
+    type: string
+    description: SSH public key for instance access
+    
+  # Secret configuration (encrypted in Pulumi state)
+  lambda_api_key:
+    type: string
+    secret: true
+    description: Lambda Labs API key for infrastructure provisioning
+  ssh_private_key:
+    type: string
+    secret: true
+    description: SSH private key for instance access
+  github_token:
+    type: string
+    secret: true
+    description: GitHub personal access token for repository access
+  vercel_token:
+    type: string
+    secret: true
+    description: Vercel access token for frontend deployment
+

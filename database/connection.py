@@ -1,7 +1,5 @@
 """
-Database Connection Management
-
-Handles PostgreSQL connections, connection pooling, and database session management.
+Updated Database Connection with Secure Secret Management
 """
 
 import os
@@ -12,27 +10,32 @@ from sqlalchemy.orm import declarative_base
 from sqlalchemy import text
 import structlog
 
+# Import secure secret management
+from security.secret_manager import secret_manager
+
 logger = structlog.get_logger(__name__)
 
 # Base class for all SQLAlchemy models
 Base = declarative_base()
 
 class DatabaseManager:
-    """Manages database connections and sessions"""
+    """Manages database connections with secure secret handling"""
     
     def __init__(self):
         self.engine = None
         self.async_session = None
-        self.database_url = self._get_database_url()
+        self.database_url = self._get_secure_database_url()
         
-    def _get_database_url(self) -> str:
-        """Get database URL from environment or use default"""
-        db_url = os.getenv('DATABASE_URL')
+    def _get_secure_database_url(self) -> str:
+        """Get database URL using secure secret management"""
+        
+        # Try to get full DATABASE_URL first
+        db_url = secret_manager.get_secret('DATABASE_URL')
         if db_url:
             return db_url
         
-        # Use SQLite for development by default
-        environment = os.getenv('ENVIRONMENT', 'development')
+        # Build URL from individual components
+        environment = secret_manager.get_secret('ENVIRONMENT', 'production')
         
         if environment == 'development':
             # SQLite for development
@@ -41,34 +44,44 @@ class DatabaseManager:
             db_path.parent.mkdir(exist_ok=True)
             return f"sqlite+aiosqlite:///{db_path}"
         else:
-            # PostgreSQL for staging/production
-            host = os.getenv('POSTGRES_HOST', '45.77.87.106')
-            port = os.getenv('POSTGRES_PORT', '5432')
-            user = os.getenv('POSTGRES_USER', 'postgres')
-            password = os.getenv('POSTGRES_PASSWORD', 'password')
-            database = os.getenv('POSTGRES_DB', 'orchestra_ai')
+            # PostgreSQL for staging/production with secure credentials
+            host = secret_manager.get_secret('POSTGRES_HOST', 'postgres')
+            port = secret_manager.get_secret('POSTGRES_PORT', '5432')
+            user = secret_manager.get_secret('POSTGRES_USER', 'orchestra')
+            password = secret_manager.get_secret('POSTGRES_PASSWORD')
+            database = secret_manager.get_secret('POSTGRES_DB', 'orchestra_ai')
+            
+            if not password:
+                logger.error("PostgreSQL password not found in secure storage")
+                raise ValueError("Database password required for production environment")
             
             return f"postgresql+asyncpg://{user}:{password}@{host}:{port}/{database}"
     
     async def initialize(self):
         """Initialize database engine and session factory"""
         try:
+            # Validate database URL is secure
+            if 'password' in self.database_url.lower() and 'password' in self.database_url:
+                logger.warning("Database URL may contain hardcoded password")
+            
             # Different configuration for SQLite vs PostgreSQL
             if self.database_url.startswith('sqlite'):
                 # SQLite configuration (no pooling)
                 self.engine = create_async_engine(
                     self.database_url,
-                    echo=False,  # Set to True for SQL logging in development
+                    echo=False,  # Never log SQL in production
                 )
             else:
                 # PostgreSQL configuration (with pooling)
                 self.engine = create_async_engine(
                     self.database_url,
-                    echo=False,  # Set to True for SQL logging in development
+                    echo=False,  # Never log SQL in production
                     pool_size=20,
                     max_overflow=30,
                     pool_pre_ping=True,
                     pool_recycle=3600,
+                    # Security: Hide connection string in logs
+                    hide_parameters=True
                 )
             
             self.async_session = async_sessionmaker(
@@ -77,7 +90,8 @@ class DatabaseManager:
                 expire_on_commit=False
             )
             
-            logger.info("Database initialized successfully", url=self.database_url)
+            logger.info("Database initialized successfully", 
+                       environment=secret_manager.get_secret('ENVIRONMENT', 'production'))
             
         except Exception as e:
             logger.error("Failed to initialize database", error=str(e))
@@ -133,4 +147,5 @@ async def init_database():
 
 async def close_database():
     """Close database for application shutdown"""
-    await db_manager.close() 
+    await db_manager.close()
+
