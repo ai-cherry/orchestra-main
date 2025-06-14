@@ -7,8 +7,8 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ORCHESTRA_HOME="$SCRIPT_DIR"
-LOG_DIR="/var/log/orchestra"
-PID_DIR="/var/run/orchestra"
+LOG_DIR="$ORCHESTRA_HOME/logs/services"
+PID_DIR="$ORCHESTRA_HOME/run"
 
 # Colors for output
 RED='\033[0;31m'
@@ -199,11 +199,11 @@ start_mcp_servers() {
     
     # Define MCP servers (name, port, script)
     declare -a mcp_servers=(
-        "memory:8003:mcp_memory_server.py"
-        "task:8006:mcp_task_server.py"
-        "agent:8007:mcp_agent_server.py"
-        "data:8008:mcp_data_server.py"
-        "monitor:8009:mcp_monitor_server.py"
+        "memory:8003:start_mcp_memory.py"
+        # "task:8006:mcp_task_server.py"
+        # "agent:8007:mcp_agent_server.py"
+        # "data:8008:mcp_data_server.py"
+        # "monitor:8009:mcp_monitor_server.py"
     )
     
     for server_config in "${mcp_servers[@]}"; do

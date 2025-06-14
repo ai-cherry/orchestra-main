@@ -1,46 +1,304 @@
 version: '3.8'
 
+networks:
+  orchestra-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  postgres-data:
+  redis-data:
+  weaviate-data:
+  logs-data:
+
 services:
+  # Database Services
+  postgres:
+    image: postgres:16-alpine
+    container_name: orchestra-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: orchestra_ai
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      orchestra-network:
+        ipv4_address: 172.20.0.10
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  redis:
+    image: redis:7-alpine
+    container_name: orchestra-redis
+    restart: always
+    command: redis-server --appendonly yes
+    volumes:
+      - redis-data:/data
+    networks:
+      orchestra-network:
+        ipv4_address: 172.20.0.11
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  weaviate:
+    image: semitechnologies/weaviate:latest
+    container_name: orchestra-weaviate
+    restart: always
+    environment:
+      QUERY_DEFAULTS_LIMIT: 25
+      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: 'true'
+      PERSISTENCE_DATA_PATH: '/var/lib/weaviate'
+      DEFAULT_VECTORIZER_MODULE: 'text2vec-openai'
+      ENABLE_MODULES: 'text2vec-openai'
+      CLUSTER_HOSTNAME: 'weaviate'
+    volumes:
+      - weaviate-data:/var/lib/weaviate
+    networks:
+      orchestra-network:
+        ipv4_address: 172.20.0.12
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/v1/.well-known/ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # API Server
   api:
     build:
       context: .
       dockerfile: Dockerfile.api
     container_name: orchestra-api
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-postgres}@postgres:5432/orchestra_ai
+      REDIS_URL: redis://redis:6379
+      WEAVIATE_URL: http://weaviate:8080
+      PYTHONPATH: /app
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    volumes:
+      - ./api:/app/api
+      - ./logs:/app/logs
+      - logs-data:/var/log/orchestra
+    networks:
+      orchestra-network:
+        ipv4_address: 172.20.0.20
     ports:
       - "8000:8000"
-    environment:
-      - DATABASE_URL=sqlite+aiosqlite:///app/data/orchestra.db
-      - PYTHONPATH=/app
-    volumes:
-      - ./:/app
-      - ./data:/app/data
-      - ./uploads:/app/uploads
-    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "5"
 
-  mcp_server:
+  # MCP Memory Server
+  mcp-memory:
     build:
-      context: .
-      dockerfile: Dockerfile.mcp
-    container_name: orchestra-mcp
+      context: ./mcp_servers
+      dockerfile: Dockerfile.memory
+    container_name: orchestra-mcp-memory
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      REDIS_URL: redis://redis:6379
+      WEAVIATE_URL: http://weaviate:8080
+      SERVER_PORT: 8003
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    volumes:
+      - ./mcp_servers:/app
+      - logs-data:/var/log/mcp
+    networks:
+      orchestra-network:
+        ipv4_address: 172.20.0.23
     ports:
       - "8003:8003"
-    environment:
-      - PYTHONPATH=/app
-    volumes:
-      - ./:/app
-    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8003/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
+  # AI Context Service
+  ai-context:
+    build:
+      context: .
+      dockerfile: Dockerfile.context
+    container_name: orchestra-ai-context
+    restart: always
+    depends_on:
+      redis:
+        condition: service_healthy
+    environment:
+      REDIS_URL: redis://redis:6379
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-postgres}@postgres:5432/orchestra_ai
+      WEAVIATE_URL: http://weaviate:8080
+      SERVER_PORT: 8005
+      PYTHONPATH: /app
+      CONTEXT_UPDATE_INTERVAL: 30
+    volumes:
+      - ./.ai-context:/app/.ai-context
+      - ./pulumi:/app/pulumi:ro
+      - logs-data:/var/log/context
+    networks:
+      orchestra-network:
+        ipv4_address: 172.20.0.25
+    ports:
+      - "8005:8005"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8005/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Portkey MCP Server
+  portkey-mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile.portkey
+    container_name: orchestra-portkey-mcp
+    restart: always
+    depends_on:
+      redis:
+        condition: service_healthy
+    environment:
+      REDIS_URL: redis://redis:6379
+      PORTKEY_API_KEY: ${PORTKEY_API_KEY}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
+      SERVER_PORT: 8004
+      CACHE_TTL: 3600
+      PYTHONPATH: /app
+    volumes:
+      - ./packages/mcp-enhanced:/app/packages/mcp-enhanced
+      - logs-data:/var/log/portkey
+    networks:
+      orchestra-network:
+        ipv4_address: 172.20.0.24
+    ports:
+      - "8004:8004"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8004/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Frontend
   frontend:
     build:
       context: ./web
-      dockerfile: ../Dockerfile.frontend
+      dockerfile: Dockerfile
+      args:
+        NODE_ENV: production
     container_name: orchestra-frontend
+    restart: always
+    environment:
+      VITE_API_URL: ${VITE_API_URL:-http://localhost:8000}
+      VITE_PORTKEY_API_KEY: ${VITE_PORTKEY_API_KEY}
+      NODE_ENV: production
+    networks:
+      orchestra-network:
+        ipv4_address: 172.20.0.30
     ports:
-      - "3000:80"
-    depends_on:
-      - api
-    restart: unless-stopped
+      - "3000:3000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
-volumes:
-  database-data:
+  # Monitoring - Prometheus
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: orchestra-prometheus
+    restart: always
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    networks:
+      orchestra-network:
+        ipv4_address: 172.20.0.40
+    ports:
+      - "9090:9090"
+
+  # Monitoring - Grafana
+  grafana:
+    image: grafana/grafana:latest
+    container_name: orchestra-grafana
+    restart: always
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources
+      - grafana-data:/var/lib/grafana
+    networks:
+      orchestra-network:
+        ipv4_address: 172.20.0.41
+    ports:
+      - "3001:3000"
+    depends_on:
+      - prometheus
+
+  # Service Registry
+  consul:
+    image: consul:latest
+    container_name: orchestra-consul
+    restart: always
+    command: agent -dev -ui -client=0.0.0.0
+    networks:
+      orchestra-network:
+        ipv4_address: 172.20.0.50
+    ports:
+      - "8500:8500"
+      - "8600:8600/udp"
+    healthcheck:
+      test: ["CMD", "consul", "members"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 

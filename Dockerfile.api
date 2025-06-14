@@ -2,25 +2,37 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install system dependencies including gcc for psutil
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
+    build-essential \
+    curl \
+    libpq-dev \
     gcc \
     python3-dev \
-    libmagic1 \
-    libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
+# Copy requirements first for better caching
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Copy application code
 COPY . .
 
-# Set proper Python path
-ENV PYTHONPATH=/app:$PYTHONPATH
+# Create necessary directories
+RUN mkdir -p /app/logs /app/data /app/uploads
 
 # Create non-root user
-RUN useradd -m appuser
-USER appuser
+RUN useradd -m -u 1000 orchestra && \
+    chown -R orchestra:orchestra /app
 
+USER orchestra
+
+# Expose port
 EXPOSE 8000
-CMD ["uvicorn", "main_api:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+  CMD curl -f http://localhost:8000/api/health || exit 1
+
+# Run the application
+CMD ["python", "-m", "uvicorn", "main_simple:app", "--host", "0.0.0.0", "--port", "8000", "--log-config", "logging.yaml"]

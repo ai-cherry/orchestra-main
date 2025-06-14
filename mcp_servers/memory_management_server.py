@@ -10,8 +10,11 @@ import json
 from fastapi import HTTPException
 from pydantic import BaseModel
 import uvicorn
+import structlog
 
-from base_mcp_server import BaseMCPServer, MCP_PORT_ALLOCATION
+from .base_mcp_server import BaseMCPServer, MCP_PORT_ALLOCATION, request_count
+
+logger = structlog.get_logger(__name__)
 
 
 class MemoryEntry(BaseModel):
@@ -52,7 +55,7 @@ class MemoryManagementServer(BaseMCPServer):
     
     async def initialize_resources(self):
         """Initialize memory management resources"""
-        self.logger.info("Initializing memory management server")
+        logger.info("Initializing memory management server")
         
         # Load persistent memory if exists
         try:
@@ -60,11 +63,11 @@ class MemoryManagementServer(BaseMCPServer):
                 stored_memories = json.load(f)
                 for key, data in stored_memories.items():
                     self.memory_store[key] = MemoryEntry(**data)
-                self.logger.info(f"Loaded {len(self.memory_store)} memories")
+                logger.info(f"Loaded {len(self.memory_store)} memories")
         except FileNotFoundError:
-            self.logger.info("No persistent memory found, starting fresh")
+            logger.info("No persistent memory found, starting fresh")
         except Exception as e:
-            self.logger.error(f"Failed to load memory: {e}")
+            logger.error(f"Failed to load memory: {e}")
     
     def get_custom_endpoints(self):
         """Define memory management endpoints"""
@@ -88,7 +91,7 @@ class MemoryManagementServer(BaseMCPServer):
                 })
                 
                 # Increment metrics
-                self.request_count.labels(
+                request_count.labels(
                     method="POST",
                     endpoint="/memory/store",
                     status="success"
@@ -100,7 +103,7 @@ class MemoryManagementServer(BaseMCPServer):
                     "timestamp": entry.timestamp
                 }
             except Exception as e:
-                self.logger.error(f"Memory store error: {e}")
+                logger.error(f"Memory store error: {e}")
                 raise HTTPException(status_code=500, detail=str(e))
         
         @self.app.post("/memory/retrieve")
@@ -153,7 +156,7 @@ class MemoryManagementServer(BaseMCPServer):
                     "memories": results
                 }
             except Exception as e:
-                self.logger.error(f"Memory retrieve error: {e}")
+                logger.error(f"Memory retrieve error: {e}")
                 raise HTTPException(status_code=500, detail=str(e))
         
         @self.app.delete("/memory/clear")
@@ -186,7 +189,7 @@ class MemoryManagementServer(BaseMCPServer):
                     "message": message
                 }
             except Exception as e:
-                self.logger.error(f"Memory clear error: {e}")
+                logger.error(f"Memory clear error: {e}")
                 raise HTTPException(status_code=500, detail=str(e))
         
         @self.app.get("/memory/stats")
@@ -210,7 +213,7 @@ class MemoryManagementServer(BaseMCPServer):
                     "uptime_seconds": (datetime.utcnow() - self.start_time).total_seconds()
                 }
             except Exception as e:
-                self.logger.error(f"Memory stats error: {e}")
+                logger.error(f"Memory stats error: {e}")
                 raise HTTPException(status_code=500, detail=str(e))
         
         @self.app.post("/memory/persist")
@@ -232,12 +235,12 @@ class MemoryManagementServer(BaseMCPServer):
                     "message": f"Persisted {len(self.memory_store)} entries"
                 }
             except Exception as e:
-                self.logger.error(f"Memory persist error: {e}")
+                logger.error(f"Memory persist error: {e}")
                 raise HTTPException(status_code=500, detail=str(e))
     
     async def cleanup_resources(self):
         """Cleanup and persist memory on shutdown"""
-        self.logger.info("Shutting down memory management server")
+        logger.info("Shutting down memory management server")
         
         # Persist memory
         try:
@@ -247,27 +250,27 @@ class MemoryManagementServer(BaseMCPServer):
             }
             with open("memory_store.json", "w") as f:
                 json.dump(serializable, f, indent=2)
-            self.logger.info(f"Persisted {len(self.memory_store)} memories")
+            logger.info(f"Persisted {len(self.memory_store)} memories")
         except Exception as e:
-            self.logger.error(f"Failed to persist memory: {e}")
+            logger.error(f"Failed to persist memory: {e}")
     
     async def _custom_startup(self):
         """Custom startup logic"""
-        pass
+        await self.initialize_resources()
     
     async def _custom_shutdown(self):
         """Custom shutdown logic"""
-        pass
+        await self.cleanup_resources()
     
     def _setup_custom_routes(self):
         """Setup custom routes - implemented via get_custom_endpoints"""
-        pass
+        self.get_custom_endpoints()
     
     async def _check_custom_connections(self) -> Dict[str, bool]:
         """Check custom service connections"""
         return {}
     
-    def _get_health_metrics(self) -> Dict[str, Any]:
+    async def _get_health_metrics(self) -> Dict[str, Any]:
         """Get custom health metrics"""
         return {
             "memory_entries": len(self.memory_store),
