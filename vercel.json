@@ -1,11 +1,8 @@
 {
   "version": 2,
-  "framework": "vite",
-  "buildCommand": "cd modern-admin && pnpm install && pnpm run build",
+  "buildCommand": "cd modern-admin && npm install && npm run build",
   "outputDirectory": "modern-admin/dist",
-  "devCommand": "cd modern-admin && pnpm run dev",
-  "installCommand": "cd modern-admin && pnpm install",
-  "regions": ["sfo1"],
+  "framework": null,
   "functions": {
     "api/proxy.js": {
       "runtime": "@vercel/node@3.1.0",
