@@ -9,6 +9,9 @@ from datetime import datetime
 import os
 import logging
 
+# Import chat and search functionality
+from chat_search_endpoints import add_chat_endpoints
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -27,6 +30,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Add chat and search endpoints
+add_chat_endpoints(app)
 
 # Database connection
 def get_db_connection():

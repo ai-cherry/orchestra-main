@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { 
   Send, 
   Mic, 
@@ -9,6 +9,7 @@ import {
   Bot,
   User
 } from 'lucide-react'
+import { apiClient } from '../lib/api'
 
 const personas = {
   cherry: {
@@ -55,6 +56,7 @@ export default function ChatInterface({ activePersona, onPersonaChange }) {
   const [messages, setMessages] = useState(sampleMessages)
   const [inputValue, setInputValue] = useState('')
   const [isTyping, setIsTyping] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const messagesEndRef = useRef(null)
   const inputRef = useRef(null)
 
@@ -67,7 +69,7 @@ export default function ChatInterface({ activePersona, onPersonaChange }) {
   }, [messages])
 
   const handleSendMessage = async () => {
-    if (!inputValue.trim()) return
+    if (!inputValue.trim() || isLoading) return
 
     const userMessage = {
       id: Date.now(),
@@ -77,44 +79,47 @@ export default function ChatInterface({ activePersona, onPersonaChange }) {
     }
 
     setMessages(prev => [...prev, userMessage])
+    const currentInput = inputValue
     setInputValue('')
     setIsTyping(true)
+    setIsLoading(true)
 
-    // Simulate AI response
-    setTimeout(() => {
+    try {
+      // Call the real API
+      console.log('Sending chat request:', { message: currentInput, persona: activePersona })
+      
+      const response = await apiClient.sendChatMessage(currentInput, activePersona)
+      
+      console.log('Chat response received:', response)
+      
       const aiResponse = {
         id: Date.now() + 1,
         type: 'ai',
         persona: activePersona,
-        content: generateAIResponse(inputValue, activePersona),
+        content: response.response || 'I received your message but had trouble processing it.',
+        sources: response.sources || [],
         timestamp: new Date()
       }
+      
       setMessages(prev => [...prev, aiResponse])
+      
+    } catch (error) {
+      console.error('Chat API error:', error)
+      
+      // Fallback response
+      const errorResponse = {
+        id: Date.now() + 1,
+        type: 'ai',
+        persona: activePersona,
+        content: `I apologize, but I'm having trouble connecting to my AI services right now. Error: ${error.message}`,
+        timestamp: new Date()
+      }
+      
+      setMessages(prev => [...prev, errorResponse])
+    } finally {
       setIsTyping(false)
-    }, 1500)
-  }
-
-  const generateAIResponse = (input, persona) => {
-    const responses = {
-      cherry: [
-        "I love creative challenges! Let me help you design something amazing.",
-        "That's an interesting creative problem. Here's my artistic perspective...",
-        "Let's think outside the box and create something innovative!"
-      ],
-      sophia: [
-        "Let me analyze this strategically and provide you with a comprehensive solution.",
-        "Based on my analysis, here's the optimal approach to your challenge.",
-        "I'll help you break this down into manageable strategic components."
-      ],
-      karen: [
-        "I'll help you execute this efficiently. Here's the step-by-step process.",
-        "Let me streamline this workflow for maximum productivity.",
-        "I can automate this process to save you time and effort."
-      ]
+      setIsLoading(false)
     }
-    
-    const personaResponses = responses[persona] || responses.sophia
-    return personaResponses[Math.floor(Math.random() * personaResponses.length)]
   }
 
   const handleKeyPress = (e) => {
@@ -124,84 +129,109 @@ export default function ChatInterface({ activePersona, onPersonaChange }) {
     }
   }
 
-  const formatTime = (date) => {
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  const formatTime = (timestamp) => {
+    return timestamp.toLocaleTimeString('en-US', { 
+      hour: '2-digit', 
+      minute: '2-digit',
+      hour12: true 
+    })
   }
 
   return (
-    <div className="flex flex-col h-full bg-background">
+    <div className="flex flex-col h-full bg-gray-900">
       {/* Header */}
-      <div className="flex items-center justify-between p-6 border-b border-border bg-card">
-        <div className="flex items-center gap-4">
-          <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-semibold ${personas[activePersona].gradient}`}>
-            {personas[activePersona].name[0]}
+      <div className="flex items-center justify-between p-4 border-b border-gray-800">
+        <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-2">
+            <Bot className="w-5 h-5 text-blue-400" />
+            <h2 className="text-lg font-semibold text-white">Orchestra AI Chat</h2>
           </div>
-          <div>
-            <h2 className="text-xl font-semibold text-foreground">
-              {personas[activePersona].name}
-            </h2>
-            <p className="text-sm text-muted-foreground">
-              {activePersona === 'cherry' && 'Creative AI focused on design and innovation'}
-              {activePersona === 'sophia' && 'Strategic AI focused on analysis and planning'}
-              {activePersona === 'karen' && 'Operational AI focused on execution and automation'}
-            </p>
+          <div className="flex items-center space-x-1">
+            <Sparkles className="w-4 h-4 text-yellow-400" />
+            <span className="text-sm text-gray-400">AI-powered</span>
           </div>
         </div>
         
-        <div className="flex items-center gap-2">
-          <button className="p-2 rounded-lg hover:bg-accent transition-colors">
-            <History className="w-5 h-5 text-muted-foreground" />
+        <div className="flex items-center space-x-2">
+          <button className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
+            <History className="w-4 h-4" />
           </button>
-          <button className="p-2 rounded-lg hover:bg-accent transition-colors">
-            <Settings className="w-5 h-5 text-muted-foreground" />
+          <button className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
+            <Settings className="w-4 h-4" />
           </button>
         </div>
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-6">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((message) => (
           <div
             key={message.id}
-            className={`flex gap-4 ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
+            className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
           >
-            {message.type === 'ai' && (
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold flex-shrink-0 ${personas[message.persona].gradient}`}>
-                <Bot className="w-5 h-5" />
-              </div>
-            )}
-            
-            <div className={`max-w-2xl ${message.type === 'user' ? 'order-first' : ''}`}>
-              <div className={`rounded-2xl px-4 py-3 ${
-                message.type === 'user'
-                  ? 'bg-primary text-primary-foreground ml-auto'
-                  : `${personas[message.persona || activePersona].bgColor} ${personas[message.persona || activePersona].borderColor} border`
-              }`}>
+            <div className={`max-w-[80%] ${message.type === 'user' ? 'order-2' : 'order-1'}`}>
+              {message.type === 'ai' && (
+                <div className="flex items-center space-x-2 mb-1">
+                  <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white ${personas[message.persona]?.bgColor || 'bg-gray-600'}`}>
+                    {personas[message.persona]?.name?.[0] || 'A'}
+                  </div>
+                  <span className={`text-sm font-medium ${personas[message.persona]?.color || 'text-gray-400'}`}>
+                    {personas[message.persona]?.name || 'AI'}
+                  </span>
+                  <span className="text-xs text-gray-500">
+                    {formatTime(message.timestamp)}
+                  </span>
+                </div>
+              )}
+              
+              <div
+                className={`p-3 rounded-lg ${
+                  message.type === 'user'
+                    ? 'bg-blue-600 text-white'
+                    : `${personas[message.persona]?.bgColor || 'bg-gray-800'} ${personas[message.persona]?.borderColor || 'border-gray-700'} border text-gray-100`
+                }`}
+              >
                 <p className="text-sm leading-relaxed">{message.content}</p>
+                
+                {message.sources && message.sources.length > 0 && (
+                  <div className="mt-2 pt-2 border-t border-gray-600">
+                    <p className="text-xs text-gray-400">Sources: {message.sources.join(', ')}</p>
+                  </div>
+                )}
               </div>
-              <p className="text-xs text-muted-foreground mt-1 px-2">
-                {formatTime(message.timestamp)}
-              </p>
+              
+              {message.type === 'user' && (
+                <div className="flex items-center justify-end space-x-2 mt-1">
+                  <span className="text-xs text-gray-500">
+                    {formatTime(message.timestamp)}
+                  </span>
+                  <div className="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center">
+                    <User className="w-3 h-3 text-white" />
+                  </div>
+                </div>
+              )}
             </div>
-            
-            {message.type === 'user' && (
-              <div className="w-10 h-10 rounded-full bg-accent flex items-center justify-center flex-shrink-0">
-                <User className="w-5 h-5 text-accent-foreground" />
-              </div>
-            )}
           </div>
         ))}
         
         {isTyping && (
-          <div className="flex gap-4 justify-start">
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold ${personas[activePersona].gradient}`}>
-              <Bot className="w-5 h-5" />
-            </div>
-            <div className={`rounded-2xl px-4 py-3 ${personas[activePersona].bgColor} ${personas[activePersona].borderColor} border`}>
-              <div className="flex gap-1">
-                <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+          <div className="flex justify-start">
+            <div className="max-w-[80%]">
+              <div className="flex items-center space-x-2 mb-1">
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white ${personas[activePersona]?.bgColor || 'bg-gray-600'}`}>
+                  {personas[activePersona]?.name?.[0] || 'A'}
+                </div>
+                <span className={`text-sm font-medium ${personas[activePersona]?.color || 'text-gray-400'}`}>
+                  {personas[activePersona]?.name || 'AI'}
+                </span>
+              </div>
+              
+              <div className={`p-3 rounded-lg ${personas[activePersona]?.bgColor || 'bg-gray-800'} ${personas[activePersona]?.borderColor || 'border-gray-700'} border`}>
+                <div className="flex space-x-1">
+                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                </div>
               </div>
             </div>
           </div>
@@ -211,48 +241,56 @@ export default function ChatInterface({ activePersona, onPersonaChange }) {
       </div>
 
       {/* Input */}
-      <div className="p-6 border-t border-border bg-card">
-        <div className="flex items-end gap-4">
-          <div className="flex-1">
-            <div className="relative">
-              <textarea
-                ref={inputRef}
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder="Type your message or command..."
-                className="w-full px-4 py-3 pr-12 bg-input border border-border rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-ring text-foreground placeholder:text-muted-foreground"
-                rows={1}
-                style={{ minHeight: '48px', maxHeight: '120px' }}
-              />
-              <button className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-lg hover:bg-accent transition-colors">
-                <Paperclip className="w-4 h-4 text-muted-foreground" />
-              </button>
-            </div>
+      <div className="p-4 border-t border-gray-800">
+        <div className="flex items-end space-x-2">
+          <div className="flex-1 relative">
+            <textarea
+              ref={inputRef}
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder="Type your message or command..."
+              className="w-full p-3 pr-12 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              rows="1"
+              style={{ minHeight: '44px', maxHeight: '120px' }}
+              disabled={isLoading}
+            />
             
-            <div className="flex items-center justify-between mt-2 px-2">
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <Sparkles className="w-3 h-3" />
-                <span>AI-powered commands available</span>
-              </div>
-              <div className="text-xs text-muted-foreground">
-                Press Enter to send, Shift+Enter for new line
-              </div>
+            <div className="absolute right-2 bottom-2 flex items-center space-x-1">
+              <button 
+                className="p-1 text-gray-400 hover:text-white transition-colors"
+                disabled={isLoading}
+              >
+                <Paperclip className="w-4 h-4" />
+              </button>
+              <button 
+                className="p-1 text-gray-400 hover:text-white transition-colors"
+                disabled={isLoading}
+              >
+                <Mic className="w-4 h-4" />
+              </button>
             </div>
           </div>
           
-          <div className="flex gap-2">
-            <button className="p-3 rounded-xl bg-accent hover:bg-accent/80 transition-colors">
-              <Mic className="w-5 h-5 text-accent-foreground" />
-            </button>
-            <button
-              onClick={handleSendMessage}
-              disabled={!inputValue.trim()}
-              className="p-3 rounded-xl bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              <Send className="w-5 h-5 text-primary-foreground" />
-            </button>
-          </div>
+          <button
+            onClick={handleSendMessage}
+            disabled={!inputValue.trim() || isLoading}
+            className="p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            <Send className="w-4 h-4" />
+          </button>
+        </div>
+        
+        <div className="flex items-center justify-between mt-2">
+          <p className="text-xs text-gray-500">
+            AI-powered commands available • Press Enter to send, Shift+Enter for new line
+          </p>
+          
+          {isLoading && (
+            <p className="text-xs text-blue-400">
+              Connecting to AI services...
+            </p>
+          )}
         </div>
       </div>
     </div>
