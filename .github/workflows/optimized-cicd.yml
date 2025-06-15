@@ -1,0 +1,422 @@
+# Optimized CI/CD Pipeline for Orchestra AI
+# Based on optimal IaC workflow architecture recommendations
+
+name: Orchestra AI - Optimized CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+        - production
+        - staging
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  DOCKER_BUILDKIT: 1
+  BUILDKIT_PROGRESS: plain
+
+# Global job defaults for optimization
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  # Parallel job for code quality and security
+  code-quality:
+    name: Code Quality & Security Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    strategy:
+      matrix:
+        check: [lint, security, dependencies]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Full history for better analysis
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+        cache-dependency-path: 'requirements.txt'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install flake8 black isort bandit safety
+    
+    - name: Run linting
+      if: matrix.check == 'lint'
+      run: |
+        echo "::group::Flake8 Linting"
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        echo "::endgroup::"
+        
+        echo "::group::Black Formatting Check"
+        black --check --diff .
+        echo "::endgroup::"
+        
+        echo "::group::Import Sorting Check"
+        isort --check-only --diff .
+        echo "::endgroup::"
+    
+    - name: Security scanning
+      if: matrix.check == 'security'
+      run: |
+        echo "::group::Bandit Security Scan"
+        bandit -r . -f json -o bandit-report.json || true
+        echo "::endgroup::"
+        
+        echo "::group::Trivy Filesystem Scan"
+        docker run --rm -v ${{ github.workspace }}:/workspace \
+          aquasec/trivy:latest fs --format sarif --output trivy-fs.sarif /workspace
+        echo "::endgroup::"
+    
+    - name: Dependency scanning
+      if: matrix.check == 'dependencies'
+      run: |
+        echo "::group::Safety Dependency Check"
+        safety check --json --output safety-report.json || true
+        echo "::endgroup::"
+        
+        echo "::group::Pip Audit"
+        pip install pip-audit
+        pip-audit --format=json --output=pip-audit.json || true
+        echo "::endgroup::"
+    
+    - name: Upload security results
+      if: matrix.check == 'security'
+      uses: github/codeql-action/upload-sarif@v2
+      with:
+        sarif_file: trivy-fs.sarif
+        category: trivy-fs
+
+  # Parallel testing with matrix strategy
+  test:
+    name: Test Suite
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    
+    strategy:
+      matrix:
+        python-version: ['3.11']
+        test-type: [unit, integration, e2e]
+    
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_USER: test_user
+          POSTGRES_DB: test_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+        cache: 'pip'
+        cache-dependency-path: 'requirements.txt'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-cov pytest-xdist pytest-mock
+    
+    - name: Run unit tests
+      if: matrix.test-type == 'unit'
+      run: |
+        pytest tests/unit/ -v --cov=. --cov-report=xml --cov-report=html \
+          --junitxml=junit-unit.xml -n auto
+    
+    - name: Run integration tests
+      if: matrix.test-type == 'integration'
+      env:
+        DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db
+        REDIS_URL: redis://localhost:6379/0
+      run: |
+        pytest tests/integration/ -v --junitxml=junit-integration.xml -n auto
+    
+    - name: Run E2E tests
+      if: matrix.test-type == 'e2e'
+      run: |
+        pytest tests/e2e/ -v --junitxml=junit-e2e.xml
+    
+    - name: Upload test results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: test-results-${{ matrix.test-type }}
+        path: |
+          junit-*.xml
+          htmlcov/
+          .coverage
+    
+    - name: Upload coverage to Codecov
+      if: matrix.test-type == 'unit'
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+
+  # Optimized Docker build with advanced caching
+  build:
+    name: Build & Push Images
+    runs-on: ubuntu-latest
+    needs: [code-quality, test]
+    timeout-minutes: 30
+    
+    strategy:
+      matrix:
+        component: [backend, frontend]
+    
+    outputs:
+      backend-digest: ${{ steps.backend-build.outputs.digest }}
+      frontend-digest: ${{ steps.frontend-build.outputs.digest }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      with:
+        driver-opts: |
+          network=host
+    
+    - name: Log in to Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${{ matrix.component }}
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=sha,prefix={{branch}}-
+          type=raw,value=latest,enable={{is_default_branch}}
+        labels: |
+          org.opencontainers.image.title=Orchestra AI ${{ matrix.component }}
+          org.opencontainers.image.description=Optimized ${{ matrix.component }} for Orchestra AI
+    
+    - name: Build and push backend image
+      if: matrix.component == 'backend'
+      id: backend-build
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ./Dockerfile.backend.optimized
+        platforms: linux/amd64,linux/arm64
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        build-args: |
+          BUILDKIT_INLINE_CACHE=1
+    
+    - name: Build and push frontend image
+      if: matrix.component == 'frontend'
+      id: frontend-build
+      uses: docker/build-push-action@v5
+      with:
+        context: ./modern-admin
+        file: ./modern-admin/Dockerfile.frontend.optimized
+        platforms: linux/amd64,linux/arm64
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        build-args: |
+          BUILDKIT_INLINE_CACHE=1
+    
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: ${{ steps.meta.outputs.tags }}
+        format: 'sarif'
+        output: 'trivy-${{ matrix.component }}.sarif'
+    
+    - name: Upload Trivy scan results
+      uses: github/codeql-action/upload-sarif@v2
+      with:
+        sarif_file: 'trivy-${{ matrix.component }}.sarif'
+        category: trivy-${{ matrix.component }}
+
+  # Infrastructure deployment with Pulumi
+  infrastructure:
+    name: Deploy Infrastructure
+    runs-on: ubuntu-latest
+    needs: [build]
+    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+    timeout-minutes: 20
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install Pulumi CLI
+      uses: pulumi/actions@v4
+    
+    - name: Deploy infrastructure
+      uses: pulumi/actions@v4
+      with:
+        command: up
+        stack-name: production
+        work-dir: ./pulumi
+      env:
+        PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+
+  # Production deployment with canary strategy
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [build, infrastructure]
+    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+    environment: 
+      name: production
+      url: https://orchestra-ai.com
+    timeout-minutes: 15
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Deploy with canary strategy
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.PRODUCTION_HOST }}
+        username: ${{ secrets.PRODUCTION_USER }}
+        key: ${{ secrets.PRODUCTION_SSH_KEY }}
+        script: |
+          set -e
+          
+          echo "Starting canary deployment..."
+          cd /opt/orchestra-ai
+          
+          # Pull latest changes
+          git pull origin main
+          
+          # Deploy with optimized configuration
+          docker-compose -f docker-compose.optimized.yml pull
+          
+          # Canary deployment - start new containers alongside old ones
+          docker-compose -f docker-compose.optimized.yml up -d --scale backend=2 --scale frontend=2
+          
+          # Health check new containers
+          sleep 30
+          ./health-check.sh docker-compose.optimized.yml
+          
+          # If health checks pass, scale down old containers
+          docker-compose -f docker-compose.prod.yml down
+          
+          # Final health check
+          ./health-check.sh docker-compose.optimized.yml
+          
+          echo "Canary deployment completed successfully"
+    
+    - name: Notify deployment status
+      if: always()
+      uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        channel: '#deployments'
+        webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+
+  # Performance and smoke tests
+  post-deploy-tests:
+    name: Post-Deployment Tests
+    runs-on: ubuntu-latest
+    needs: [deploy-production]
+    if: github.ref == 'refs/heads/main'
+    timeout-minutes: 10
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Run smoke tests
+      run: |
+        echo "Running smoke tests against production..."
+        curl -f https://orchestra-ai.com/health
+        curl -f https://orchestra-ai.com/api/health
+    
+    - name: Run performance tests
+      run: |
+        echo "Running performance tests..."
+        # Add performance testing commands here
+        echo "Performance tests completed"
+
+  # Cleanup job
+  cleanup:
+    name: Cleanup
+    runs-on: ubuntu-latest
+    needs: [post-deploy-tests]
+    if: always()
+    
+    steps:
+    - name: Clean up old images
+      uses: actions/delete-package-versions@v4
+      with:
+        package-name: ${{ env.IMAGE_NAME }}-backend
+        package-type: container
+        min-versions-to-keep: 5
+        delete-only-untagged-versions: true
+    
+    - name: Clean up old frontend images
+      uses: actions/delete-package-versions@v4
+      with:
+        package-name: ${{ env.IMAGE_NAME }}-frontend
+        package-type: container
+        min-versions-to-keep: 5
+        delete-only-untagged-versions: true
+
