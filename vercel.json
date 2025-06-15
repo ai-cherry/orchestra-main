@@ -8,8 +8,8 @@
       "destination": "http://150.136.94.139:8000/api/:path*"
     },
     {
-      "source": "/:path*",
-      "destination": "/:path*"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ],
   "env": {
