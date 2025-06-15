@@ -82,8 +82,52 @@ class ApiClient {
       })
     });
   }
+
+  // Persona management
   async getPersonas() {
     return this.request('/api/personas');
+  }
+
+  async getPersona(personaId) {
+    return this.request(`/api/personas/${personaId}`);
+  }
+
+  async createPersona(personaData) {
+    return this.request('/api/personas', {
+      method: 'POST',
+      body: JSON.stringify(personaData)
+    });
+  }
+
+  async updatePersona(personaId, personaData) {
+    return this.request(`/api/personas/${personaId}`, {
+      method: 'PUT',
+      body: JSON.stringify(personaData)
+    });
+  }
+
+  async deletePersona(personaId) {
+    return this.request(`/api/personas/${personaId}`, {
+      method: 'DELETE'
+    });
+  }
+
+  async getPersonaAnalytics() {
+    return this.request('/api/personas/analytics/summary');
+  }
+
+  async updatePersonaDomainLeanings(personaId, leanings) {
+    return this.request(`/api/personas/${personaId}/domain-leanings`, {
+      method: 'PUT',
+      body: JSON.stringify(leanings)
+    });
+  }
+
+  async updatePersonaVoiceSettings(personaId, voiceSettings) {
+    return this.request(`/api/personas/${personaId}/voice-settings`, {
+      method: 'PUT',
+      body: JSON.stringify(voiceSettings)
+    });
   }
 
   // Workflows

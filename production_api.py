@@ -9,8 +9,9 @@ from datetime import datetime
 import os
 import logging
 
-# Import chat and search functionality
+# Import chat, search, and persona management functionality
 from chat_search_endpoints import add_chat_endpoints
+from persona_management_api import add_persona_management_endpoints
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -31,8 +32,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Add chat and search endpoints
+# Add chat, search, and persona management endpoints
 add_chat_endpoints(app)
+add_persona_management_endpoints(app)
 
 # Database connection
 def get_db_connection():

@@ -6,6 +6,7 @@ import Dashboard from './components/Dashboard'
 import AgentFactory from './components/AgentFactory'
 import SystemMonitor from './components/SystemMonitor'
 import HealthDashboard from './components/HealthDashboard'
+import PersonaManagement from './components/PersonaManagement'
 import Sidebar from './components/Sidebar'
 
 function App() {
@@ -34,6 +35,7 @@ function App() {
             <Route path="/health" element={<HealthDashboard />} />
             <Route path="/agents" element={<AgentFactory />} />
             <Route path="/monitor" element={<SystemMonitor />} />
+            <Route path="/personas" element={<PersonaManagement />} />
           </Routes>
         </main>
       </div>
