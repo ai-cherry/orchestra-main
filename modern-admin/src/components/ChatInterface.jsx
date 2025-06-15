@@ -91,10 +91,18 @@ export default function ChatInterface({ activePersona, onPersonaChange }) {
     setIsLoading(true)
 
     try {
-      // Call the real API
-      console.log('Sending chat request:', { message: currentInput, persona: activePersona })
+      // Call the real API with search mode
+      console.log('Sending chat request:', { 
+        message: currentInput, 
+        persona: activePersona,
+        searchMode: searchMode 
+      })
       
-      const response = await apiClient.sendChatMessage(currentInput, activePersona)
+      const response = await apiClient.sendChatMessage(
+        currentInput, 
+        activePersona,
+        searchMode
+      )
       
       console.log('Chat response received:', response)
       
@@ -104,6 +112,8 @@ export default function ChatInterface({ activePersona, onPersonaChange }) {
         persona: activePersona,
         content: response.response || 'I received your message but had trouble processing it.',
         sources: response.sources || [],
+        searchResults: response.search_results || [],
+        metadata: response.metadata || {},
         timestamp: new Date()
       }
       
@@ -271,6 +281,59 @@ export default function ChatInterface({ activePersona, onPersonaChange }) {
 
       {/* Input */}
       <div className="p-4 border-t border-gray-800">
+        {/* Search Mode Selector */}
+        <div className="flex items-center space-x-2 mb-3">
+          <span className="text-sm text-gray-400">Search Mode:</span>
+          <div className="flex items-center space-x-1">
+            <button
+              onClick={() => setSearchMode('normal')}
+              className={`px-3 py-1 text-xs rounded-lg transition-colors ${
+                searchMode === 'normal' 
+                  ? 'bg-blue-600 text-white' 
+                  : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+              }`}
+            >
+              <Search className="w-3 h-3 inline mr-1" />
+              Normal
+            </button>
+            <button
+              onClick={() => setSearchMode('deep')}
+              className={`px-3 py-1 text-xs rounded-lg transition-colors ${
+                searchMode === 'deep' 
+                  ? 'bg-purple-600 text-white' 
+                  : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+              }`}
+            >
+              <Zap className="w-3 h-3 inline mr-1" />
+              Deep
+            </button>
+            <button
+              onClick={() => setSearchMode('deeper')}
+              className={`px-3 py-1 text-xs rounded-lg transition-colors ${
+                searchMode === 'deeper' 
+                  ? 'bg-indigo-600 text-white' 
+                  : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+              }`}
+            >
+              <Sparkles className="w-3 h-3 inline mr-1" />
+              Deeper
+            </button>
+            {activePersona === 'cherry' && (
+              <button
+                onClick={() => setSearchMode('uncensored')}
+                className={`px-3 py-1 text-xs rounded-lg transition-colors ${
+                  searchMode === 'uncensored' 
+                    ? 'bg-red-600 text-white' 
+                    : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                }`}
+              >
+                <Shield className="w-3 h-3 inline mr-1" />
+                Uncensored
+              </button>
+            )}
+          </div>
+        </div>
+
         <div className="flex items-end space-x-2">
           <div className="flex-1 relative">
             <textarea
@@ -278,7 +341,7 @@ export default function ChatInterface({ activePersona, onPersonaChange }) {
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder="Type your message or command..."
+              placeholder={`Type your message or search query (${searchMode} mode)...`}
               className="w-full p-3 pr-12 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               rows="1"
               style={{ minHeight: '44px', maxHeight: '120px' }}

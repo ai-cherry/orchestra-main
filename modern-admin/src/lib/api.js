@@ -62,14 +62,27 @@ class ApiClient {
   }
 
   // Chat functionality
-  async sendChatMessage(message, persona = 'sophia') {
-    return this.request('/api/chat', {
+  async sendChatMessage(message, persona = 'sophia', searchMode = 'normal') {
+    return this.request('/api/chat/v2', {
       method: 'POST',
       body: JSON.stringify({
         message: message,
-        persona: persona
+        persona: persona,
+        search_mode: searchMode,
+        blend_ratio: null, // Use backend defaults
+        session_id: this.getSessionId()
       })
     });
+  }
+
+  getSessionId() {
+    // Get or create session ID for context management
+    let sessionId = sessionStorage.getItem('orchestra_session_id');
+    if (!sessionId) {
+      sessionId = `session_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+      sessionStorage.setItem('orchestra_session_id', sessionId);
+    }
+    return sessionId;
   }
 
   // Search functionality

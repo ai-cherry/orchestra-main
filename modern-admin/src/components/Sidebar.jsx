@@ -116,44 +116,23 @@ export default function Sidebar({ collapsed, onToggle, activePersona, onPersonaC
         </div>
       </nav>
 
-      {/* Personas */}
+      {/* Quick Actions */}
       {!collapsed && (
         <div className="p-4 border-t border-sidebar-border">
           <h3 className="text-sm font-semibold text-sidebar-foreground/60 uppercase tracking-wider mb-4">
-            AI Personas
+            Quick Actions
           </h3>
           
-          <div className="space-y-3">
-            {personas.map((persona) => (
-              <button
-                key={persona.id}
-                onClick={() => onPersonaChange(persona.id)}
-                className={`w-full p-4 rounded-xl border transition-all duration-200 text-left group ${
-                  activePersona === persona.id
-                    ? 'border-sidebar-primary bg-sidebar-primary/10 shadow-lg'
-                    : 'border-sidebar-border hover:border-sidebar-primary/50 hover:bg-sidebar-accent/50'
-                }`}
-              >
-                <div className="flex items-center gap-3 mb-2">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold ${persona.gradient}`}>
-                    {persona.name[0]}
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                      <h4 className="font-semibold text-sidebar-foreground">{persona.name}</h4>
-                      <div className={`w-2 h-2 rounded-full ${
-                        persona.status === 'active' ? 'bg-green-500' : 'bg-gray-400'
-                      }`} />
-                    </div>
-                    <p className="text-xs text-sidebar-foreground/60 capitalize">{persona.status}</p>
-                  </div>
-                </div>
-                
-                <p className="text-sm text-sidebar-foreground/70 leading-relaxed">
-                  {persona.description}
-                </p>
-              </button>
-            ))}
+          <div className="space-y-2">
+            <button className="w-full text-left px-3 py-2 rounded-lg text-sm text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors">
+              New Chat Session
+            </button>
+            <button className="w-full text-left px-3 py-2 rounded-lg text-sm text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors">
+              View Search History
+            </button>
+            <button className="w-full text-left px-3 py-2 rounded-lg text-sm text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors">
+              Export Conversations
+            </button>
           </div>
         </div>
       )}
