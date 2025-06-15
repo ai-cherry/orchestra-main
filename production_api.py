@@ -9,11 +9,12 @@ from datetime import datetime
 import os
 import logging
 
-# Import chat, search, persona management, advanced search, and creative content functionality
+# Import chat, search, persona management, advanced search, creative content, and premium orchestration functionality
 from chat_search_endpoints import add_chat_endpoints
 from persona_management_api import add_persona_management_endpoints
 from advanced_search_engine import add_advanced_search_endpoints
 from creative_content_engine import add_creative_content_endpoints
+from premium_orchestration_endpoints import add_premium_orchestration_endpoints
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -34,11 +35,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Add chat, search, persona management, advanced search, and creative content endpoints
+# Add chat, search, persona management, advanced search, creative content, and premium orchestration endpoints
 add_chat_endpoints(app)
 add_persona_management_endpoints(app)
 add_advanced_search_endpoints(app)
 add_creative_content_endpoints(app)
+add_premium_orchestration_endpoints(app)
 
 # Database connection
 def get_db_connection():
