@@ -1,87 +1,63 @@
-<<<<<<< HEAD
-aiohappyeyeballs==2.6.1
-aiohttp==3.12.13
-aiosignal==1.3.2
-attrs==25.3.0
-beautifulsoup4==4.13.4
-blinker==1.9.0
-certifi==2025.6.15
-charset-normalizer==3.4.2
-click==8.2.1
+# Orchestra AI Unified Platform - Production Dependencies
+
+# Core Web Framework (Flask-based unified architecture)
 Flask==3.1.1
 flask-cors==6.0.0
 Flask-SQLAlchemy==3.1.1
-frozenlist==1.7.0
+Werkzeug==3.1.3
+
+# Database (Synchronous SQLAlchemy for unified architecture)
+SQLAlchemy==2.0.41
+psycopg2-binary==2.9.10
 greenlet==3.2.3
-idna==3.10
-iniconfig==2.1.0
-itsdangerous==2.2.0
+
+# HTTP and Web Scraping
+requests==2.32.4
+beautifulsoup4==4.13.4
+aiohttp==3.12.13
+aiosignal==1.3.2
+aiohappyeyeballs==2.6.1
+
+# Search Integration
+duckduckgo-search==3.9.6
+wikipedia-api==0.6.0
+
+# Template Engine and Utilities
 Jinja2==3.1.6
 MarkupSafe==3.0.2
+click==8.2.1
+blinker==1.9.0
+itsdangerous==2.2.0
+
+# HTTP and Network
+urllib3==2.4.0
+certifi==2025.6.15
+charset-normalizer==3.4.2
+idna==3.10
+
+# Data Processing
+attrs==25.3.0
+frozenlist==1.7.0
 multidict==6.4.4
+propcache==0.3.2
+yarl==1.20.1
+soupsieve==2.7
+
+# Testing Framework
+pytest==8.4.0
+pytest-asyncio==0.21.1
+iniconfig==2.1.0
 packaging==25.0
 pluggy==1.6.0
-propcache==0.3.2
-psycopg2-binary==2.9.10
 Pygments==2.19.1
-pytest==8.4.0
-requests==2.32.4
-soupsieve==2.7
-SQLAlchemy==2.0.41
-typing_extensions==4.14.0
-urllib3==2.4.0
-Werkzeug==3.1.3
-yarl==1.20.1
-=======
-# FastAPI and Web Framework
-fastapi==0.104.1
-uvicorn==0.24.0
-python-multipart==0.0.6
-pydantic==2.5.0
 
-# Database
-sqlalchemy==2.0.25
-asyncpg==0.29.0
-aiosqlite==0.21.0
-greenlet==3.2.3
-psycopg2-binary==2.9.9
-
-# HTTP and API Clients
-aiohttp==3.9.1
-requests==2.31.0
-
-# File Processing
-python-magic==0.4.27
-PyPDF2==3.0.1
-pdfplumber==0.10.3
-python-docx==1.1.0
-beautifulsoup4==4.12.2
-openpyxl==3.1.2
-Pillow==10.1.0
-
-# AI and ML
-sentence-transformers==2.2.2
-weaviate-client==3.25.3
-
-# Basic OpenAI integration (without LangChain for now)
-openai==1.3.7
-
-# Monitoring and Logging
-structlog==23.2.0
-prometheus-client==0.19.0
-
-# System and Utilities
-psutil==5.9.6
-redis==5.0.1
+# Development and Environment
 python-dotenv==1.0.0
-click==8.1.7
+typing_extensions==4.14.0
 
-# Development and Testing
-pytest==7.4.3
-black==23.12.0
-mypy==1.8.0
+# Redis (for caching in production)
+redis==5.0.1
 
-# CORS Support
-fastapi-cors==0.0.6
+# Production WSGI Server
+gunicorn==21.2.0
 
->>>>>>> 9910fc360ca9c587991443355fcdf718feffb2cc
