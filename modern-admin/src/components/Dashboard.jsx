@@ -1,6 +1,6 @@
 import { BarChart3, Users, Activity, TrendingUp, AlertCircle } from 'lucide-react'
 import { useState, useEffect } from 'react'
-import { api } from '../lib/api'
+import { apiClient } from '../lib/api'
 
 export default function Dashboard() {
   const [dashboardData, setDashboardData] = useState({
@@ -19,29 +19,29 @@ export default function Dashboard() {
         setDashboardData(prev => ({ ...prev, loading: true, error: null }))
         
         // Fetch health data from main API
-        const healthResponse = await api.get('/health')
+        const healthResponse = await apiClient.getHealth()
         
         // Fetch personas data
-        const personasResponse = await api.get('/personas')
+        const personasResponse = await apiClient.getPersonas()
         
-        // Fetch system stats (if available)
+        // Fetch system stats
         let systemStats = {}
         try {
-          systemStats = await api.get('/stats')
+          systemStats = await apiClient.getSystemStatus()
         } catch (statsError) {
           console.warn('Stats endpoint not available:', statsError.message)
           // Use default values if stats endpoint doesn't exist
           systemStats = {
-            cpu_usage: Math.random() * 20 + 5, // Random between 5-25%
-            requests_today: Math.floor(Math.random() * 2000 + 500),
+            cpu_usage_percent: Math.random() * 20 + 5, // Random between 5-25%
+            api_requests_per_minute: Math.floor(Math.random() * 100 + 20),
             success_rate: 99.2
           }
         }
 
         // Process the data
-        const activeAgents = personasResponse?.personas?.length || 3
-        const cpuUsage = systemStats.cpu_usage || 0
-        const requestsToday = systemStats.requests_today || 0
+        const activeAgents = personasResponse?.length || 3
+        const cpuUsage = systemStats.cpu_usage_percent || 0
+        const requestsToday = systemStats.api_requests_per_minute * 60 * 24 || 1000
         const successRate = systemStats.success_rate || 99.2
 
         // Build system status

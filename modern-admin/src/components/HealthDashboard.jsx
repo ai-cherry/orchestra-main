@@ -11,7 +11,7 @@ import {
   RefreshCw,
   Clock
 } from 'lucide-react';
-import { api } from '../lib/api';
+import { apiClient } from '../lib/api';
 
 const HealthDashboard = () => {
   const [healthData, setHealthData] = useState(null);
@@ -24,18 +24,8 @@ const HealthDashboard = () => {
     try {
       setLoading(true);
       
-      // Try multiple health endpoints
-      let data = null;
-      const endpoints = ['/health', '/api/health/', '/api/health'];
-      
-      for (const endpoint of endpoints) {
-        try {
-          data = await api.get(endpoint);
-          break;
-        } catch (err) {
-          console.warn(`Health endpoint ${endpoint} failed:`, err.message);
-        }
-      }
+      // Get health data from production API
+      const data = await apiClient.getHealth();
       
       if (!data) {
         throw new Error('All health endpoints failed');
