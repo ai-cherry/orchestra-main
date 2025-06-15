@@ -286,9 +286,14 @@ class APIConnectivityTester:
             return
         
         try:
+            headers = {"x-portkey-api-key": api_key}
+            config_id = secret_manager.get_secret("PORTKEY_CONFIG")
+            if config_id:
+                headers["x-portkey-config"] = config_id
+            
             response = requests.get(
                 "https://api.portkey.ai/v1/health",
-                headers={"x-portkey-api-key": api_key},
+                headers=headers,
                 timeout=10
             )
             

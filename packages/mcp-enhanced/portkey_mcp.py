@@ -55,9 +55,21 @@ class PortkeyMCP:
         
         # Initialize Portkey client
         self.portkey = None
+        self.portkey_config_id = os.getenv("PORTKEY_CONFIG", "")
         if PORTKEY_API_KEY:
+            # Set up headers for Portkey
+            headers = {
+                "x-portkey-api-key": PORTKEY_API_KEY,
+                "x-portkey-provider": "openai",  # Default provider
+            }
+            # If config is provided and valid, it will override the provider
+            if self.portkey_config_id:
+                headers["x-portkey-config"] = self.portkey_config_id
+            
             self.portkey = Portkey(
                 api_key=PORTKEY_API_KEY,
+                base_url="https://api.portkey.ai/v1",
+                default_headers=headers,
                 config={
                     "retry": {
                         "attempts": self.config["retry_attempts"],

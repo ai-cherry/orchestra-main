@@ -324,9 +324,14 @@ class EnhancedSecretManager:
         """Test Portkey API connection"""
         try:
             import requests
+            headers = {"x-portkey-api-key": api_key}
+            config_id = self.get_secret("PORTKEY_CONFIG")
+            if config_id:
+                headers["x-portkey-config"] = config_id
+            
             response = requests.get(
                 "https://api.portkey.ai/v1/health",
-                headers={"x-portkey-api-key": api_key},
+                headers=headers,
                 timeout=10
             )
             return {

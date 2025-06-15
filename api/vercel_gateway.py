@@ -17,8 +17,19 @@ from portkey_ai import Portkey
 logger = structlog.get_logger()
 
 # Initialize Portkey client
+PORTKEY_CONFIG = os.getenv("PORTKEY_CONFIG", "")
+portkey_headers = {
+    "x-portkey-api-key": os.getenv("PORTKEY_API_KEY", ""),
+    "x-portkey-provider": "openai",  # Default provider
+}
+# If config is provided and valid, it will override the provider
+if PORTKEY_CONFIG:
+    portkey_headers["x-portkey-config"] = PORTKEY_CONFIG
+
 portkey = Portkey(
     api_key=os.getenv("PORTKEY_API_KEY"),
+    base_url="https://api.portkey.ai/v1",
+    default_headers=portkey_headers,
     config={
         "retry": {
             "attempts": 3,
@@ -224,6 +235,7 @@ VERCEL_CONFIG = {
     },
     "env": [
         "PORTKEY_API_KEY",
+        "PORTKEY_CONFIG",
         "OPENROUTER_API_KEY",
         "REDIS_URL",
         "PINECONE_API_KEY",
