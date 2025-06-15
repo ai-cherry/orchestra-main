@@ -1,7 +1,8 @@
 // Updated API configuration for Orchestra AI
 // This ensures the frontend connects to the real backend API
 
-const API_BASE_URL = 'https://8000-i741zlsczcpdjuuafsc4p-c02a81ef.manusvm.computer';
+// Use environment variable or fallback to working Manus backend
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://vgh0i1cj5wvv.manus.space/api';
 
 console.log('API Client initialized with URL:', API_BASE_URL);
 
