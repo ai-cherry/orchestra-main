@@ -1,138 +1,75 @@
+# docker-compose.dev.yml - Orchestra AI Development Environment
 version: '3.8'
 
 services:
-  # Redis for caching and session management
-  redis:
-    image: redis:7-alpine
-    container_name: orchestra-redis
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis-data:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-      timeout: 3s
-      retries: 5
-    networks:
-      - orchestra-network
-
-  # PostgreSQL for main database
-  postgres:
-    image: postgres:15-alpine
-    container_name: orchestra-postgres
-    environment:
-      POSTGRES_DB: orchestra
-      POSTGRES_USER: orchestra
-      POSTGRES_PASSWORD: orchestra123
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U orchestra"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - orchestra-network
-
-  # Main API service
-  api:
+  orchestra-backend:
     build:
       context: .
-      dockerfile: Dockerfile.api
-    container_name: orchestra-api
-    environment:
-      - DATABASE_URL=postgresql://orchestra:orchestra123@postgres:5432/orchestra
-      - REDIS_URL=redis://redis:6379
-      - ENVIRONMENT=development
-      - PYTHONPATH=/app
+      dockerfile: Dockerfile.backend
+      target: builder
     ports:
       - "8000:8000"
-    volumes:
-      - ./api:/app/api
-      - ./main_api.py:/app/main_api.py
-      - ./requirements.txt:/app/requirements.txt
-    depends_on:
-      redis:
-        condition: service_healthy
-      postgres:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-    networks:
-      - orchestra-network
-    command: uvicorn main_api:app --host 0.0.0.0 --port 8000 --reload
-
-  # MCP Memory Service
-  mcp-memory:
-    build:
-      context: .
-      dockerfile: Dockerfile.mcp
-    container_name: orchestra-mcp-memory
     environment:
+      - ENVIRONMENT=development
+      - DEBUG=true
+      - NOTION_API_KEY=${NOTION_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - DATABASE_URL=postgresql://orchestra:orchestra_dev@postgres:5432/orchestra_dev
       - REDIS_URL=redis://redis:6379
-      - PYTHONPATH=/app
-    ports:
-      - "8003:8003"
     volumes:
-      - ./mcp_servers:/app/mcp_servers
-      - ./start_mcp_memory.py:/app/start_mcp_memory.py
+      - .:/app
+      - /app/node_modules
     depends_on:
-      redis:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8003/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+      - postgres
+      - redis
     networks:
       - orchestra-network
-    command: python3 start_mcp_memory.py
+    command: ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
 
-  # Admin Frontend
-  admin-frontend:
+  orchestra-frontend:
     build:
       context: ./modern-admin
-      dockerfile: Dockerfile
-    container_name: orchestra-admin
-    environment:
-      - VITE_API_URL=http://api:8000
+      dockerfile: Dockerfile.frontend
+      target: builder
     ports:
-      - "5173:5173"
+      - "3000:3000"
+    environment:
+      - VITE_API_URL=http://localhost:8000
+      - VITE_APP_NAME=Orchestra AI Dev
     volumes:
       - ./modern-admin:/app
       - /app/node_modules
-    depends_on:
-      api:
-        condition: service_healthy
     networks:
       - orchestra-network
-    command: npm run dev -- --host 0.0.0.0
+    command: ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
 
-  # Nginx Reverse Proxy
-  nginx:
-    image: nginx:alpine
-    container_name: orchestra-nginx
+  postgres:
+    image: postgres:15-alpine
     ports:
-      - "80:80"
-      - "443:443"
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=orchestra_dev
+      - POSTGRES_USER=orchestra
+      - POSTGRES_PASSWORD=orchestra_dev
     volumes:
-      - ./nginx/dev.conf:/etc/nginx/conf.d/default.conf:ro
-    depends_on:
-      - api
-      - admin-frontend
+      - postgres_dev_data:/var/lib/postgresql/data
     networks:
       - orchestra-network
 
-volumes:
-  redis-data:
-  postgres-data:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_dev_data:/data
+    networks:
+      - orchestra-network
 
 networks:
   orchestra-network:
-    driver: bridge 
+    driver: bridge
+
+volumes:
+  postgres_dev_data:
+  redis_dev_data:
+

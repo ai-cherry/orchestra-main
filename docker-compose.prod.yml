@@ -1,0 +1,98 @@
+# docker-compose.yml - Orchestra AI Production Deployment
+version: '3.8'
+
+services:
+  orchestra-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    restart: unless-stopped
+    environment:
+      - ENVIRONMENT=production
+      - DEBUG=false
+      - NOTION_API_KEY=${NOTION_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - DATABASE_URL=${DATABASE_URL:-postgresql://orchestra:orchestra@postgres:5432/orchestra}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379}
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - orchestra-network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  orchestra-frontend:
+    build:
+      context: ./modern-admin
+      dockerfile: Dockerfile.frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    environment:
+      - VITE_API_URL=http://orchestra-backend:8000
+      - VITE_APP_NAME=Orchestra AI
+    depends_on:
+      - orchestra-backend
+    networks:
+      - orchestra-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  postgres:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-orchestra}
+      - POSTGRES_USER=${POSTGRES_USER:-orchestra}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-orchestra_prod}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - orchestra-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-orchestra}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+    networks:
+      - orchestra-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  nginx-proxy:
+    image: nginx:alpine
+    restart: unless-stopped
+    ports:
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/ssl:/etc/nginx/ssl
+    depends_on:
+      - orchestra-frontend
+    networks:
+      - orchestra-network
+
+networks:
+  orchestra-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
+

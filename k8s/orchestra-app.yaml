@@ -1,0 +1,218 @@
+# Kubernetes namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: orchestra-ai
+  labels:
+    name: orchestra-ai
+    environment: production
+---
+# ConfigMap for application configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: orchestra-config
+  namespace: orchestra-ai
+data:
+  ENVIRONMENT: "production"
+  DEBUG: "false"
+  VITE_APP_NAME: "Orchestra AI"
+  REDIS_URL: "redis://redis-service:6379"
+  DATABASE_URL: "postgresql://orchestra:password@postgres-service:5432/orchestra"
+---
+# Secret for sensitive data
+apiVersion: v1
+kind: Secret
+metadata:
+  name: orchestra-secrets
+  namespace: orchestra-ai
+type: Opaque
+data:
+  NOTION_API_KEY: <base64-encoded-key>
+  OPENAI_API_KEY: <base64-encoded-key>
+  POSTGRES_PASSWORD: <base64-encoded-password>
+---
+# Backend deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orchestra-backend
+  namespace: orchestra-ai
+  labels:
+    app: orchestra-backend
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: orchestra-backend
+  template:
+    metadata:
+      labels:
+        app: orchestra-backend
+    spec:
+      containers:
+      - name: orchestra-backend
+        image: ghcr.io/ai-cherry/orchestra-main:main-backend
+        ports:
+        - containerPort: 8000
+        env:
+        - name: NOTION_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: orchestra-secrets
+              key: NOTION_API_KEY
+        - name: OPENAI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: orchestra-secrets
+              key: OPENAI_API_KEY
+        envFrom:
+        - configMapRef:
+            name: orchestra-config
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+# Backend service
+apiVersion: v1
+kind: Service
+metadata:
+  name: orchestra-backend-service
+  namespace: orchestra-ai
+spec:
+  selector:
+    app: orchestra-backend
+  ports:
+  - protocol: TCP
+    port: 8000
+    targetPort: 8000
+  type: ClusterIP
+---
+# Frontend deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orchestra-frontend
+  namespace: orchestra-ai
+  labels:
+    app: orchestra-frontend
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: orchestra-frontend
+  template:
+    metadata:
+      labels:
+        app: orchestra-frontend
+    spec:
+      containers:
+      - name: orchestra-frontend
+        image: ghcr.io/ai-cherry/orchestra-main:main-frontend
+        ports:
+        - containerPort: 80
+        env:
+        - name: VITE_API_URL
+          value: "http://orchestra-backend-service:8000"
+        envFrom:
+        - configMapRef:
+            name: orchestra-config
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 10
+---
+# Frontend service
+apiVersion: v1
+kind: Service
+metadata:
+  name: orchestra-frontend-service
+  namespace: orchestra-ai
+spec:
+  selector:
+    app: orchestra-frontend
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+  type: ClusterIP
+---
+# Ingress for external access
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: orchestra-ingress
+  namespace: orchestra-ai
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  tls:
+  - hosts:
+    - orchestra.ai
+    - api.orchestra.ai
+    secretName: orchestra-tls
+  rules:
+  - host: orchestra.ai
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: orchestra-frontend-service
+            port:
+              number: 80
+  - host: api.orchestra.ai
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: orchestra-backend-service
+            port:
+              number: 8000
+
