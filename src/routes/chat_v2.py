@@ -26,7 +26,7 @@ def get_orchestrator():
     return orchestrator
 
 @chat_v2_bp.route('/api/chat/v2', methods=['POST'])
-async def chat_with_search():
+def chat_with_search():
     """
     Enhanced chat endpoint with integrated search capabilities
     
@@ -68,14 +68,18 @@ async def chat_with_search():
         orch = get_orchestrator()
         
         # Execute orchestration
-        result = await orch.execute({
+        # Run async function in sync context
+        import asyncio
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        result = loop.run_until_complete(orch.execute({
             'query': message,
             'persona': persona,
             'search_mode': search_mode,
             'blend_ratio': blend_ratio,
             'session_id': session_id,
             'user_id': request.headers.get('X-User-ID')  # Optional user ID
-        })
+        }))
         
         # Format response
         response = {
@@ -99,7 +103,7 @@ async def chat_with_search():
         }), 500
 
 @chat_v2_bp.route('/api/search/v2', methods=['POST'])
-async def unified_search():
+def unified_search():
     """
     Direct search endpoint for advanced search interface
     
@@ -132,24 +136,28 @@ async def unified_search():
         search_manager = UnifiedSearchManager()
         
         # Execute search
-        results = await search_manager.execute_search(
+        import asyncio
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        
+        results = loop.run_until_complete(search_manager.execute_search(
             query=query,
             mode=search_mode,
             persona=persona,
             blend_ratio=blend_ratio,
             max_results=50
-        )
+        ))
         
         # Blend results
         from ..search.result_blender import SearchResultBlender
         blender = SearchResultBlender(orch.redis_client, orch.pinecone_index)
         
-        blended = await blender.blend_results(
+        blended = loop.run_until_complete(blender.blend_results(
             results_by_source=results,
             query=query,
             persona=persona,
             blend_ratio=blend_ratio or {'database': 0.5, 'web': 0.5}
-        )
+        ))
         
         response = {
             'query': query,
@@ -205,7 +213,7 @@ def get_search_modes():
     return jsonify(modes), 200
 
 @chat_v2_bp.route('/api/chat/context/<session_id>', methods=['GET'])
-async def get_chat_context(session_id):
+def get_chat_context(session_id):
     """Get conversation context for a session"""
     try:
         orch = get_orchestrator()

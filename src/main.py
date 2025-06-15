@@ -4,9 +4,12 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from flask import Flask, send_from_directory
+import asyncio
+from asgiref.wsgi import WsgiToAsgi
 from flask_cors import CORS
 from src.models.user import db
 from src.routes.user import user_bp
+from src.routes.chat_v2 import chat_v2_bp
 from src.routes.chat import chat_bp
 from src.routes.search import search_bp
 from src.routes.personas import personas_bp
@@ -20,6 +23,7 @@ CORS(app, origins="*", allow_headers=["Content-Type", "Authorization"])
 
 # Register all API blueprints
 app.register_blueprint(user_bp, url_prefix='/api')
+app.register_blueprint(chat_v2_bp)
 app.register_blueprint(chat_bp, url_prefix='/api')
 app.register_blueprint(search_bp, url_prefix='/api')
 app.register_blueprint(personas_bp, url_prefix='/api')

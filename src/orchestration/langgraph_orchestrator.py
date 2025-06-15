@@ -39,11 +39,11 @@ class OrchestraOrchestrator:
     """Main orchestrator using LangGraph for dynamic AI coordination"""
     
     def __init__(self):
-        # Initialize LLM with OpenRouter
+        # Initialize LLM - use OpenAI directly for now
+        # TODO: Switch to OpenRouter when API key is available
         self.llm = ChatOpenAI(
-            base_url="https://openrouter.ai/api/v1",
-            api_key=os.getenv("OPENROUTER_API_KEY"),
-            model="anthropic/claude-3-opus",
+            api_key=os.getenv("OPENAI_API_KEY"),
+            model="gpt-4-turbo-preview",
             temperature=0.7
         )
         
@@ -54,19 +54,24 @@ class OrchestraOrchestrator:
             decode_responses=True
         )
         
-        # Initialize Pinecone for vector storage
-        pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
-        if "orchestra-context" not in pc.list_indexes().names():
-            pc.create_index(
-                name="orchestra-context",
-                dimension=1536,
-                metric="cosine",
-                spec=ServerlessSpec(
-                    cloud="aws",
-                    region="us-west-2"
+        # Initialize Pinecone for vector storage (if API key available)
+        pinecone_key = os.getenv("PINECONE_API_KEY")
+        if pinecone_key:
+            pc = Pinecone(api_key=pinecone_key)
+            if "orchestra-context" not in pc.list_indexes().names():
+                pc.create_index(
+                    name="orchestra-context",
+                    dimension=1536,
+                    metric="cosine",
+                    spec=ServerlessSpec(
+                        cloud="aws",
+                        region="us-west-2"
+                    )
                 )
-            )
-        self.pinecone_index = pc.Index("orchestra-context")
+            self.pinecone_index = pc.Index("orchestra-context")
+        else:
+            logger.warning("Pinecone API key not found - vector storage disabled")
+            self.pinecone_index = None
         
         # Build the orchestration graph
         self.graph = self._build_graph()
