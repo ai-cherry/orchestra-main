@@ -7,9 +7,13 @@ import {
   History,
   Sparkles,
   Bot,
-  User
+  User,
+  Search,
+  Zap,
+  Shield
 } from 'lucide-react'
-import { apiClient } from '../lib/api'
+import apiClient from '../lib/api'
+import AdvancedSearchInterface from './AdvancedSearchInterface'
 
 const personas = {
   cherry: {
@@ -57,6 +61,8 @@ export default function ChatInterface({ activePersona, onPersonaChange }) {
   const [inputValue, setInputValue] = useState('')
   const [isTyping, setIsTyping] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [showAdvancedSearch, setShowAdvancedSearch] = useState(false)
+  const [searchMode, setSearchMode] = useState('normal')
   const messagesEndRef = useRef(null)
   const inputRef = useRef(null)
 
@@ -240,6 +246,29 @@ export default function ChatInterface({ activePersona, onPersonaChange }) {
         <div ref={messagesEndRef} />
       </div>
 
+      {/* Advanced Search Interface */}
+      {showAdvancedSearch && (
+        <div className="p-4 border-t border-gray-800 bg-gray-900/50">
+          <AdvancedSearchInterface 
+            onSearch={(results) => {
+              // Add search results as a message
+              const searchMessage = {
+                id: Date.now(),
+                type: 'ai',
+                persona: activePersona,
+                content: `Found ${results.total_results} results in ${results.processing_time_ms}ms using ${results.search_mode} mode.`,
+                timestamp: new Date(),
+                searchResults: results
+              }
+              setMessages(prev => [...prev, searchMessage])
+              setShowAdvancedSearch(false)
+            }}
+            isSearching={isLoading}
+            currentMode={searchMode}
+          />
+        </div>
+      )}
+
       {/* Input */}
       <div className="p-4 border-t border-gray-800">
         <div className="flex items-end space-x-2">
@@ -257,6 +286,18 @@ export default function ChatInterface({ activePersona, onPersonaChange }) {
             />
             
             <div className="absolute right-2 bottom-2 flex items-center space-x-1">
+              <button 
+                onClick={() => setShowAdvancedSearch(!showAdvancedSearch)}
+                className={`p-1 transition-colors ${
+                  showAdvancedSearch 
+                    ? 'text-blue-400 hover:text-blue-300' 
+                    : 'text-gray-400 hover:text-white'
+                }`}
+                disabled={isLoading}
+                title="Advanced Search"
+              >
+                <Search className="w-4 h-4" />
+              </button>
               <button 
                 className="p-1 text-gray-400 hover:text-white transition-colors"
                 disabled={isLoading}

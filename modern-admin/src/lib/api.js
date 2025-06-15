@@ -123,10 +123,19 @@ class ApiClient {
     });
   }
 
-  async updatePersonaVoiceSettings(personaId, voiceSettings) {
-    return this.request(`/api/personas/${personaId}/voice-settings`, {
-      method: 'PUT',
-      body: JSON.stringify(voiceSettings)
+  // Advanced search functionality
+  async getAdvancedSearchModes() {
+    return this.request('/api/search/modes');
+  }
+
+  async getSearchSources() {
+    return this.request('/api/search/sources');
+  }
+
+  async executeAdvancedSearch(searchRequest) {
+    return this.request('/api/search/advanced', {
+      method: 'POST',
+      body: JSON.stringify(searchRequest)
     });
   }
 

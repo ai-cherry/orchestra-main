@@ -1,234 +1,367 @@
-# 🚀 Orchestra AI - Setup Guide
+# Orchestra AI Platform - Setup Guide
 
-Welcome to Orchestra AI! This guide will help you get both the web and mobile mockups up and running.
+## 🚀 Quick Start Guide
 
-## 📋 Prerequisites
+This guide will help you set up the Orchestra AI platform with advanced persona management and search capabilities.
 
-- **Node.js** 16+ 
-- **npm** or **yarn**
-- **React Native CLI** (for mobile development)
-- **Xcode** (for iOS development)
-- **Android Studio** (for Android development)
+### Prerequisites
 
-## 🌐 Web Application Setup
+- **Python 3.11+**
+- **Node.js 18+** 
+- **Docker & Docker Compose**
+- **PostgreSQL** (for production) or SQLite (for development)
+- **Git**
 
-### Quick Start (HTML Mockups)
-The fastest way to view the web mockups:
-
-```bash
-cd web/public
-python -m http.server 8000
-# or
-npx serve .
-```
-
-Then open:
-- Homepage: http://localhost:8000/index.html
-- Dashboard: http://localhost:8000/dashboard.html
-- Workflow Builder: http://localhost:8000/../mockups/workflow-builder.html
-
-### Full React Development
-
-1. **Install Dependencies**
-   ```bash
-   cd web
-   npm install
-   ```
-
-2. **Start Development Server**
-   ```bash
-   npm start
-   ```
-
-3. **Build for Production**
-   ```bash
-   npm run build
-   ```
-
-4. **Run Tests**
-   ```bash
-   npm test
-   ```
-
-## 📱 Mobile Application Setup
-
-### View Mobile Mockups
-Open the HTML mockups in your browser:
+### 1. Clone Repository
 
 ```bash
-cd mobile/mockups
-python -m http.server 8001
+git clone https://github.com/ai-cherry/orchestra-main.git
+cd orchestra-main
 ```
 
-Then open:
-- Home Screen: http://localhost:8001/home-screen.html
-- Analytics: http://localhost:8001/analytics-screen.html
+### 2. Environment Setup
 
-### Full React Native Development
-
-1. **Install Dependencies**
-   ```bash
-   cd mobile
-   npm install
-   ```
-
-2. **iOS Setup**
-   ```bash
-   cd ios
-   pod install
-   cd ..
-   npm run ios
-   ```
-
-3. **Android Setup**
-   ```bash
-   npm run android
-   ```
-
-4. **Start Metro Bundler**
-   ```bash
-   npm start
-   ```
-
-## 🎨 Design System
-
-### Colors
-- **Primary**: Blue gradients (#3b82f6 to #1d4ed8)
-- **Success**: Green gradients (#10b981 to #059669)
-- **Warning**: Yellow gradients (#f59e0b to #d97706)
-- **Danger**: Red gradients (#ef4444 to #dc2626)
-
-### Typography
-- **Font Family**: Inter
-- **Weights**: 300, 400, 500, 600, 700
-
-### Components
-All components are built with:
-- **Tailwind CSS** for styling
-- **TypeScript** for type safety
-- **Responsive design** for all screen sizes
-- **Accessibility** features built-in
-
-## 🔧 Development Tools
-
-### Recommended VS Code Extensions
-- ES7+ React/Redux/React-Native snippets
-- Tailwind CSS IntelliSense
-- TypeScript Importer
-- Auto Rename Tag
-- Prettier - Code formatter
-
-### Linting & Formatting
 ```bash
-# Web
-cd web
-npm run lint
-npm run format
+# Copy environment template
+cp .env.template .env
 
-# Mobile
-cd mobile
-npm run lint
+# Edit .env file with your configuration
+nano .env
 ```
 
-## 📁 Project Structure
+**Required Environment Variables:**
+```bash
+# Database (Production)
+DATABASE_HOST=localhost
+DATABASE_NAME=orchestra_prod
+DATABASE_USER=orchestra
+DATABASE_PASSWORD=Orchestra_Prod_2025_Secure
 
-```
-orchestra-dev/
-├── web/                    # Web application
-│   ├── public/            # Static HTML mockups
-│   ├── src/               # React source code
-│   ├── mockups/           # Additional mockups
-│   └── package.json
-├── mobile/                 # Mobile application
-│   ├── src/               # React Native source
-│   ├── mockups/           # Mobile mockups
-│   ├── ios/               # iOS project files
-│   ├── android/           # Android project files
-│   └── package.json
-└── shared/                 # Shared components
-    ├── components/        # Reusable UI components
-    ├── utils/             # Utility functions
-    └── types/             # TypeScript definitions
+# Optional: Advanced Search API Keys
+EXA_AI_API_KEY=your_exa_key
+SERP_API_KEY=your_serp_key
+APIFY_API_KEY=your_apify_key
+PHANTOMBUSTER_API_KEY=your_phantombuster_key
+ZENROWS_API_KEY=your_zenrows_key
+
+# Optional: Voice Integration
+ELEVENLABS_API_KEY=your_elevenlabs_key
 ```
 
-## 🌟 Features Included
+### 3. Database Setup
 
-### Web Application
-- ✅ Modern responsive homepage
-- ✅ Feature-rich dashboard
-- ✅ Interactive workflow builder
-- ✅ Real-time data updates
-- ✅ Beautiful animations
-- ✅ Accessible design
+#### Option A: Docker Database (Recommended)
+```bash
+# Start PostgreSQL with Docker
+docker-compose -f docker-compose.database.yml up -d
 
-### Mobile Application
-- ✅ Native-feeling interface
-- ✅ Touch-optimized interactions
-- ✅ Real-time analytics
-- ✅ Gesture support
-- ✅ Status bar integration
-- ✅ Bottom navigation
+# Verify database is running
+docker-compose -f docker-compose.database.yml ps
+```
 
-### Shared Components
-- ✅ Button component with variants
-- ✅ TypeScript interfaces
-- ✅ Consistent styling
-- ✅ Reusable utilities
+#### Option B: Local PostgreSQL
+```bash
+# Install PostgreSQL locally
+sudo apt-get install postgresql postgresql-contrib
+
+# Create database and user
+sudo -u postgres psql
+CREATE DATABASE orchestra_prod;
+CREATE USER orchestra WITH PASSWORD 'Orchestra_Prod_2025_Secure';
+GRANT ALL PRIVILEGES ON DATABASE orchestra_prod TO orchestra;
+\q
+```
+
+### 4. Python Dependencies
+
+```bash
+# Install Python dependencies
+pip install -r requirements.txt
+
+# Verify installation
+python3 -c "import fastapi, psycopg2, aiohttp; print('Dependencies OK')"
+```
+
+### 5. Database Schema
+
+```bash
+# Apply database schema
+python3 -c "
+import psycopg2
+conn = psycopg2.connect(
+    host='localhost',
+    database='orchestra_prod', 
+    user='orchestra',
+    password='Orchestra_Prod_2025_Secure'
+)
+cursor = conn.cursor()
+
+# Create schema
+cursor.execute('CREATE SCHEMA IF NOT EXISTS orchestra;')
+
+# Create personas table with extensions
+cursor.execute('''
+CREATE TABLE IF NOT EXISTS orchestra.personas (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR(100) NOT NULL,
+    persona_type VARCHAR(50) NOT NULL,
+    description TEXT,
+    communication_style JSONB,
+    knowledge_domains TEXT[],
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    domain_leanings JSONB,
+    voice_settings JSONB,
+    api_access_config JSONB,
+    search_preferences JSONB
+);
+''')
+
+# Insert default personas
+cursor.execute('''
+INSERT INTO orchestra.personas (name, persona_type, description, communication_style, knowledge_domains)
+VALUES 
+    ('Cherry', 'assistant', 'Creative AI specialized in content creation, design, and innovation', 
+     '{\"tone\": \"friendly\", \"style\": \"creative\"}', ARRAY['creative', 'design', 'content']),
+    ('Sophia', 'analyst', 'Strategic AI focused on analysis, planning, and complex problem-solving', 
+     '{\"tone\": \"professional\", \"style\": \"analytical\"}', ARRAY['analysis', 'strategy', 'business']),
+    ('Karen', 'manager', 'Operational AI focused on execution, automation, and workflow management', 
+     '{\"tone\": \"authoritative\", \"style\": \"structured\"}', ARRAY['operations', 'automation', 'management'])
+ON CONFLICT (name) DO NOTHING;
+''')
+
+conn.commit()
+cursor.close()
+conn.close()
+print('Database schema applied successfully!')
+"
+```
+
+### 6. Start Backend API
+
+```bash
+# Start the production API server
+python3 production_api.py
+
+# Verify API is running
+curl http://localhost:8000/health
+curl http://localhost:8000/api/personas
+```
+
+### 7. Frontend Setup
+
+```bash
+# Navigate to frontend directory
+cd modern-admin
+
+# Install dependencies
+pnpm install
+
+# Development mode (with hot reload)
+pnpm run dev
+
+# Production build
+pnpm run build
+```
+
+### 8. Verify Installation
+
+```bash
+# Test persona management
+curl http://localhost:8000/api/personas
+
+# Test search modes
+curl http://localhost:8000/api/search/modes
+
+# Test search sources
+curl http://localhost:8000/api/search/sources
+
+# Test advanced search
+curl -X POST http://localhost:8000/api/search/advanced \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "artificial intelligence trends",
+    "search_mode": "normal",
+    "persona": "sophia",
+    "max_results": 5
+  }'
+```
+
+## 🎯 Feature Overview
+
+### Persona Management System
+- **3 Pre-configured Personas**: Cherry (Creative), Sophia (Strategic), Karen (Operational)
+- **Domain Leanings**: Keyword-based preference learning
+- **Voice Integration**: ElevenLabs voice configuration
+- **Analytics**: Usage tracking and performance metrics
+
+### Advanced Search Engine
+- **Normal Mode**: Database + DuckDuckGo (Free, 2-5s)
+- **Deep Mode**: 4 sources including APIs ($0.02-0.05, 10-20s)
+- **Super Deep**: 6 sources with scraping ($0.05-0.10, 20-30s)
+- **Uncensored**: Alternative sources ($0.03-0.08, 15-25s)
+
+### Modern UI Features
+- **Persona Management Page**: `/personas` route
+- **Advanced Search Interface**: Search button in chat
+- **Real-time Results**: Professional results display
+- **Cost Tracking**: Transparent pricing information
+
+## 🔧 Configuration
+
+### Persona Configuration
+Access the persona management interface at `/personas` to configure:
+- **Identity Settings**: Name, description, personality traits
+- **Domain Leanings**: Keywords and preference weights
+- **Voice Settings**: ElevenLabs voice configuration
+- **Search Preferences**: Default search modes and options
+
+### Search API Configuration
+To enable advanced search modes, add API keys to your `.env` file:
+```bash
+# For Deep and Super Deep modes
+EXA_AI_API_KEY=your_exa_key
+SERP_API_KEY=your_serp_key
+
+# For Super Deep mode (web scraping)
+APIFY_API_KEY=your_apify_key
+PHANTOMBUSTER_API_KEY=your_phantombuster_key
+
+# For Uncensored mode
+ZENROWS_API_KEY=your_zenrows_key
+VENICE_AI_API_KEY=your_venice_key
+```
 
 ## 🚀 Deployment
 
-### Web Deployment
+### Development Deployment
 ```bash
-# Build for production
-cd web
-npm run build
-
-# Deploy to Vercel
-vercel --prod
-
-# Deploy to Netlify
-netlify deploy --prod --dir=build
+# Start all services
+docker-compose -f docker-compose.database.yml up -d
+python3 production_api.py &
+cd modern-admin && pnpm run dev
 ```
 
-### Mobile Deployment
+### Production Deployment
 ```bash
-# iOS
-cd mobile
-npm run build:ios
+# Build frontend
+cd modern-admin
+pnpm run build
 
-# Android
-npm run build:android
+# Deploy frontend (automatically handled by Manus hosting)
+# Backend runs on production server with environment variables
 ```
 
-## 🎯 Next Steps
+## 📊 Monitoring
 
-1. **Customize the Design**: Update colors, fonts, and layouts in the CSS/styles
-2. **Add Real Data**: Connect to your backend APIs
-3. **Enhance Interactions**: Add more animations and micro-interactions
-4. **Test on Devices**: Ensure compatibility across different screen sizes
-5. **Performance**: Optimize images and bundle sizes
+### Health Checks
+```bash
+# API health
+curl http://localhost:8000/health
 
-## 📚 Resources
+# Database connection
+curl http://localhost:8000/api/system/status
 
-- [React Documentation](https://reactjs.org/docs)
-- [React Native Guide](https://reactnative.dev/docs)
-- [Tailwind CSS](https://tailwindcss.com/docs)
-- [TypeScript Handbook](https://www.typescriptlang.org/docs)
+# Search capabilities
+curl http://localhost:8000/api/search/sources
+```
 
-## 🤝 Contributing
+### Performance Monitoring
+- **API Response Times**: Available in logs
+- **Search Cost Tracking**: Real-time cost estimation
+- **Persona Analytics**: Usage patterns and preferences
+- **Database Performance**: Query optimization metrics
 
+## 🔒 Security
+
+### Database Security
+- **Encrypted Connections**: SSL/TLS for database connections
+- **User Isolation**: Dedicated database user with limited privileges
+- **Password Security**: Strong passwords required
+
+### API Security
+- **Rate Limiting**: Prevents abuse and controls costs
+- **Input Validation**: Comprehensive request validation
+- **Error Handling**: Secure error messages without data leakage
+
+### Search Privacy
+- **Query Anonymization**: Optional query anonymization
+- **Cost Controls**: Per-user cost limits and tracking
+- **Source Isolation**: Separate API keys for different sources
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+#### Database Connection Failed
+```bash
+# Check database status
+docker-compose -f docker-compose.database.yml ps
+
+# Restart database
+docker-compose -f docker-compose.database.yml restart
+
+# Check logs
+docker-compose -f docker-compose.database.yml logs postgres
+```
+
+#### API Not Starting
+```bash
+# Check Python dependencies
+pip install -r requirements.txt
+
+# Check database connection
+python3 -c "import psycopg2; print('PostgreSQL OK')"
+
+# Check port availability
+lsof -i :8000
+```
+
+#### Frontend Build Issues
+```bash
+# Clear cache and reinstall
+cd modern-admin
+rm -rf node_modules package-lock.json
+pnpm install
+pnpm run build
+```
+
+#### Search API Issues
+```bash
+# Test search endpoints
+curl http://localhost:8000/api/search/sources
+
+# Check API key configuration
+grep -E "(EXA|SERP|APIFY)" .env
+
+# Test basic search
+curl -X POST http://localhost:8000/api/search/advanced \
+  -H "Content-Type: application/json" \
+  -d '{"query": "test", "search_mode": "normal"}'
+```
+
+## 📞 Support
+
+### Documentation
+- **API Documentation**: Available at `http://localhost:8000/docs`
+- **Implementation Progress**: See `todo.md`
+- **Deployment Guide**: See `DEPLOYMENT_SOLUTION_COMPLETE.md`
+
+### Getting Help
+1. Check the troubleshooting section above
+2. Review logs for error messages
+3. Verify environment configuration
+4. Test individual components separately
+
+### Contributing
 1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
+2. Create a feature branch
+3. Make changes and test thoroughly
+4. Submit a pull request with detailed description
 
 ---
 
-**Happy coding! 🎉**
+**Orchestra AI Setup Complete! 🎉**
 
-*Built with ❤️ for the future of AI orchestration* 
+Your advanced AI orchestration platform with persona management and intelligent search is now ready for use.
+
