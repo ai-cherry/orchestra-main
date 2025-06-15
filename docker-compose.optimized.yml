@@ -1,0 +1,221 @@
+# Optimized Docker Compose for Orchestra AI Production
+# Based on optimal IaC workflow architecture recommendations
+
+version: '3.8'
+
+services:
+  # Backend service with optimized configuration
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend.optimized
+      cache_from:
+        - orchestra-backend:latest
+      args:
+        BUILDKIT_INLINE_CACHE: 1
+    image: orchestra-backend:latest
+    container_name: orchestra-backend
+    restart: unless-stopped
+    
+    # Resource limits for optimal performance
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4G
+        reservations:
+          cpus: '1.0'
+          memory: 2G
+    
+    # Environment configuration
+    environment:
+      - NODE_ENV=production
+      - PYTHONUNBUFFERED=1
+      - PYTHONDONTWRITEBYTECODE=1
+    
+    # Health check configuration
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    
+    # Network configuration
+    networks:
+      - orchestra-network
+    
+    # Volume mounts for logs and data
+    volumes:
+      - backend-logs:/app/logs
+      - backend-data:/app/data
+    
+    # Dependencies
+    depends_on:
+      database:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # Frontend service with optimized configuration
+  frontend:
+    build:
+      context: ./modern-admin
+      dockerfile: Dockerfile.frontend.optimized
+      cache_from:
+        - orchestra-frontend:latest
+      args:
+        BUILDKIT_INLINE_CACHE: 1
+    image: orchestra-frontend:latest
+    container_name: orchestra-frontend
+    restart: unless-stopped
+    
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    
+    # Port mapping (using 8080 for non-root)
+    ports:
+      - "80:8080"
+    
+    # Health check
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    
+    # Network configuration
+    networks:
+      - orchestra-network
+    
+    # Dependencies
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  # Database service with optimized configuration
+  database:
+    image: postgres:15-alpine
+    container_name: orchestra-database
+    restart: unless-stopped
+    
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4G
+        reservations:
+          cpus: '1.0'
+          memory: 2G
+    
+    # Environment configuration
+    environment:
+      POSTGRES_DB: orchestra_prod
+      POSTGRES_USER: orchestra
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+    
+    # Optimized PostgreSQL configuration
+    command: >
+      postgres
+      -c max_connections=200
+      -c shared_buffers=256MB
+      -c effective_cache_size=1GB
+      -c maintenance_work_mem=64MB
+      -c checkpoint_completion_target=0.9
+      -c wal_buffers=16MB
+      -c default_statistics_target=100
+      -c random_page_cost=1.1
+      -c effective_io_concurrency=200
+      -c work_mem=4MB
+      -c min_wal_size=1GB
+      -c max_wal_size=4GB
+    
+    # Health check
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U orchestra -d orchestra_prod"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    
+    # Network configuration
+    networks:
+      - orchestra-network
+    
+    # Volume mounts
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./database/init:/docker-entrypoint-initdb.d:ro
+
+  # Redis service with optimized configuration
+  redis:
+    image: redis:7-alpine
+    container_name: orchestra-redis
+    restart: unless-stopped
+    
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    
+    # Optimized Redis configuration
+    command: >
+      redis-server
+      --maxmemory 512mb
+      --maxmemory-policy allkeys-lru
+      --save 900 1
+      --save 300 10
+      --save 60 10000
+      --appendonly yes
+      --appendfsync everysec
+    
+    # Health check
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    
+    # Network configuration
+    networks:
+      - orchestra-network
+    
+    # Volume mounts
+    volumes:
+      - redis-data:/data
+
+# Network configuration
+networks:
+  orchestra-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+# Volume configuration
+volumes:
+  postgres-data:
+    driver: local
+  redis-data:
+    driver: local
+  backend-logs:
+    driver: local
+  backend-data:
+    driver: local
+

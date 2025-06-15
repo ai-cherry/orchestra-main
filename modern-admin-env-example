@@ -1,0 +1,17 @@
+# Frontend Environment Configuration
+# Copy this to modern-admin/.env.local for local development
+
+# API Configuration
+VITE_API_URL=http://localhost:8000
+VITE_API_TIMEOUT=30000
+
+# Feature Flags
+VITE_ENABLE_WEBSOCKET=true
+VITE_ENABLE_MONITORING=true
+VITE_ENABLE_AI_CHAT=true
+
+# Analytics (optional)
+VITE_ANALYTICS_ID=
+
+# Development
+VITE_DEBUG=false 

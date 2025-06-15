@@ -1,0 +1,198 @@
+name: Orchestra AI Development Rules
+version: 1.0
+description: Rules and guidelines for AI agents working on Orchestra AI platform
+
+# Project Context
+project:
+  name: Orchestra AI
+  type: Python Monorepo
+  deployment: Vercel
+  infrastructure: Pulumi
+  databases:
+    - PostgreSQL
+    - Redis
+    - Pinecone
+    - Weaviate
+
+# Agent Permissions
+permissions:
+  auto_approve:
+    - "*.py"  # Python files
+    - "*.tsx" # TypeScript React
+    - "*.ts"  # TypeScript
+    - "requirements.txt"
+    - "package.json"
+    - "docker-compose.yml"
+  
+  require_review:
+    - "Pulumi.*.yaml"
+    - ".env*"
+    - "*.sql"
+    - "vercel.json"
+  
+  forbidden:
+    - ".env.production"
+    - "*/secrets/*"
+    - "*.pem"
+    - "*.key"
+
+# Code Generation Rules
+code_generation:
+  python:
+    style: black
+    type_hints: required
+    docstring_format: google
+    async_by_default: true
+    error_handling: comprehensive
+    logging: structlog
+    
+  typescript:
+    style: prettier
+    strict_mode: true
+    prefer_functional: true
+    
+  imports:
+    sort_order: 
+      - standard_library
+      - third_party
+      - local_application
+    
+# Infrastructure Rules
+infrastructure:
+  pulumi:
+    preview_required: true
+    stack_naming: "{environment}-{region}"
+    resource_tagging:
+      required:
+        - environment
+        - project
+        - managed_by
+    
+  lambda_labs:
+    default_gpu: A100
+    auto_shutdown: true
+    cost_alerts: enabled
+    
+# Database Rules
+databases:
+  postgresql:
+    migrations: required
+    connection_pooling: true
+    ssl_mode: require
+    
+  redis:
+    persistence: true
+    maxmemory_policy: allkeys-lru
+    
+  vector_stores:
+    pinecone:
+      dimension: 1536
+      metric: cosine
+      pods: 1
+    weaviate:
+      vectorizer: text2vec-openai
+      modules:
+        - qna-openai
+        - generative-openai
+
+# API Development
+api:
+  framework: FastAPI
+  validation: pydantic
+  authentication: required
+  rate_limiting: true
+  cors:
+    allowed_origins:
+      - http://localhost:3000
+      - https://*.vercel.app
+  
+# Testing Requirements
+testing:
+  minimum_coverage: 80
+  required_tests:
+    - unit
+    - integration
+    - api_endpoints
+  mock_external_services: true
+  
+# Deployment Rules
+deployment:
+  platform: vercel
+  branch_strategy:
+    production: main
+    staging: staging
+    preview: feature/*
+  environment_variables:
+    required:
+      - DATABASE_URL
+      - REDIS_URL
+      - PINECONE_API_KEY
+      - WEAVIATE_URL
+      - PORTKEY_API_KEY
+      - OPENROUTER_API_KEY
+  
+# AI Agent Specific Rules
+ai_agents:
+  context_awareness:
+    - Always check existing MCP servers before creating new ones
+    - Reuse vector indexes when possible
+    - Maintain backwards compatibility
+    
+  performance_optimization:
+    - Batch vector operations
+    - Use Redis for caching
+    - Implement request queuing
+    
+  error_handling:
+    - Log all errors with context
+    - Implement exponential backoff
+    - Provide meaningful error messages
+    
+  documentation:
+    - Update README for new features
+    - Add inline comments for complex logic
+    - Create examples for new APIs
+
+# Common Patterns
+patterns:
+  vector_search: |
+    1. Generate embedding using OpenAI
+    2. Query vector store (Pinecone/Weaviate)
+    3. Post-process with metadata
+    4. Cache results in Redis
+    
+  api_endpoint: |
+    1. Validate input with Pydantic
+    2. Check authentication
+    3. Process request
+    4. Log operation
+    5. Return standardized response
+    
+  infrastructure_change: |
+    1. Update Pulumi configuration
+    2. Run pulumi preview
+    3. Review changes
+    4. Apply with pulumi up
+    5. Update documentation
+
+# Troubleshooting Hints
+troubleshooting:
+  docker_build_fails:
+    - Check if gcc is installed in Dockerfile
+    - Verify Python version compatibility
+    - Ensure all system dependencies are included
+    
+  module_import_errors:
+    - Check PYTHONPATH in Docker
+    - Verify package structure
+    - Ensure __init__.py files exist
+    
+  vector_search_slow:
+    - Check index configuration
+    - Verify embedding dimensions
+    - Consider using approximate search
+    
+  vercel_deployment_fails:
+    - Check build command
+    - Verify environment variables
+    - Review function size limits 

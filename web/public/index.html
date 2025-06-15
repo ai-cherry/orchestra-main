@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orchestra AI - Chat Interface</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            /* Midnight Elegance Color Palette */
+            --primary: #0A1929;
+            --secondary: #3B82F6;
+            --accent: #8B5CF6;
+            --background: #050A14;
+            --surface: #121F33;
+            --text-primary: #FFFFFF;
+            --text-secondary: #D1D5DB;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --error: #EF4444;
+            
+            /* Persona Colors */
+            --cherry: #E11D48;
+            --cherry-gradient: linear-gradient(135deg, #FF4D6D 0%, #C01441 100%);
+            --sophia: #2563EB;
+            --sophia-gradient: linear-gradient(135deg, #60A5FA 0%, #1E40AF 100%);
+            --karen: #059669;
+            --karen-gradient: linear-gradient(135deg, #34D399 0%, #047857 100%);
+            
+            /* Typography */
+            --font-primary: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            background: var(--background);
+            color: var(--text-primary);
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .chat-container {
+            display: flex;
+            height: 100vh;
+            background: var(--background);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 320px;
+            background: var(--primary);
+            border-right: 1px solid rgba(59, 130, 246, 0.2);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .sidebar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 1px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--secondary) 0%, var(--accent) 100%);
+            opacity: 0.3;
+        }
+
+        .sidebar-header {
+            padding: 2rem;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .logo i {
+            background: var(--sophia-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2rem;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+            box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Persona Selection */
+        .persona-selection {
+            padding: 1.5rem 2rem;
+        }
+
+        .persona-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1rem;
+        }
+
+        .persona-grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .persona-card {
+            background: var(--surface);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .persona-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--secondary);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .persona-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.15);
+            border-color: var(--secondary);
+        }
+
+        .persona-card:hover::before {
+            opacity: 1;
+        }
+
+        .persona-card.active {
+            border-color: var(--secondary);
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.2);
+        }
+
+        .persona-card.active::before {
+            opacity: 1;
+        }
+
+        .persona-card.cherry.active::before { background: var(--cherry-gradient); }
+        .persona-card.sophia.active::before { background: var(--sophia-gradient); }
+        .persona-card.karen.active::before { background: var(--karen-gradient); }
+
+        .persona-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .persona-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .persona-avatar.cherry { background: var(--cherry-gradient); }
+        .persona-avatar.sophia { background: var(--sophia-gradient); }
+        .persona-avatar.karen { background: var(--karen-gradient); }
+
+        .persona-info h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .persona-status {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .persona-description {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        /* Navigation */
+        .sidebar-nav {
+            flex: 1;
+            padding: 1.5rem 2rem;
+        }
+
+        .nav-section {
+            margin-bottom: 2rem;
+        }
+
+        .nav-section-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-item:hover {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--secondary);
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--background);
+            position: relative;
+        }
+
+        .page-content {
+            display: none;
+            flex: 1;
+            flex-direction: column;
+            background: var(--background);
+        }
+
+        .page-content.active {
+            display: flex;
+        }
+
+        .page-header {
+            background: var(--surface);
+            border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+            padding: 2rem;
+        }
+
+        .page-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .page-header p {
+            font-size: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .coming-soon {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 4rem;
+        }
+
+        .coming-soon i {
+            font-size: 4rem;
+            color: var(--secondary);
+            margin-bottom: 2rem;
+            opacity: 0.5;
+        }
+
+        .coming-soon h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .coming-soon p {
+            font-size: 1rem;
+            color: var(--text-secondary);
+        }
+
+        /* Factory Workspace */
+        .factory-workspace {
+            flex: 1;
+            padding: 2rem;
+        }
+
+        .template-section h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+        }
+
+        .template-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .template-card {
+            background: var(--surface);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .template-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.15);
+            border-color: var(--secondary);
+        }
+
+        .template-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            margin: 0 auto 1rem;
+        }
+
+        .template-icon.assistant { background: var(--sophia-gradient); }
+        .template-icon.creative { background: var(--cherry-gradient); }
+
+        .template-card h4 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .template-card p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        /* Dashboard Content */
+        .dashboard-content {
+            flex: 1;
+            padding: 2rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .chat-header {
+            background: var(--surface);
+            border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+            padding: 1.5rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .active-persona {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .active-persona-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .active-persona-info h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .active-persona-info p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .chat-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .action-btn {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: var(--secondary);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .action-btn:hover {
+            background: rgba(59, 130, 246, 0.2);
+            transform: translateY(-1px);
+        }
+
+        /* Chat Messages */
+        .chat-messages {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .message {
+            display: flex;
+            gap: 1rem;
+            max-width: 80%;
+        }
+
+        .message.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: 600;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .message-avatar.user {
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--accent) 100%);
+        }
+
+        .message-content {
+            background: var(--surface);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 16px;
+            padding: 1rem 1.5rem;
+            position: relative;
+        }
+
+        .message.user .message-content {
+            background: var(--primary);
+            border-color: var(--secondary);
+        }
+
+        .message-text {
+            font-size: 0.875rem;
+            line-height: 1.5;
+            color: var(--text-primary);
+        }
+
+        .message-time {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+
+        /* Chat Input */
+        .chat-input-container {
+            background: var(--surface);
+            border-top: 1px solid rgba(59, 130, 246, 0.1);
+            padding: 1.5rem 2rem;
+        }
+
+        .chat-input-wrapper {
+            background: var(--primary);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 24px;
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .chat-input-wrapper:focus-within {
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .chat-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            font-family: var(--font-primary);
+        }
+
+        .chat-input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .input-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .input-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .input-btn:hover {
+            color: var(--secondary);
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .send-btn {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .send-btn:hover {
+            background: var(--accent);
+            transform: translateY(-1px);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: -320px;
+                z-index: 1000;
+                transition: left 0.3s ease;
+            }
+            
+            .sidebar.open {
+                left: 0;
+            }
+            
+            .chat-main {
+                width: 100%;
+            }
+            
+            .chat-header {
+                padding: 1rem;
+            }
+            
+            .chat-messages {
+                padding: 1rem;
+            }
+            
+            .chat-input-container {
+                padding: 1rem;
+            }
+        }
+
+        /* Custom Scrollbar */
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: var(--primary);
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: var(--secondary);
+            border-radius: 3px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb:hover {
+            background: var(--accent);
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-music"></i>
+                    Orchestra AI
+                </div>
+                <div class="status-indicator">
+                    <div class="status-dot"></div>
+                    All systems operational
+                </div>
+            </div>
+
+            <!-- Persona Selection -->
+            <div class="persona-selection">
+                <div class="persona-title">AI Personas</div>
+                <div class="persona-grid">
+                    <div class="persona-card sophia active" data-persona="sophia">
+                        <div class="persona-header">
+                            <div class="persona-avatar sophia">S</div>
+                            <div class="persona-info">
+                                <h3>Sophia</h3>
+                                <div class="persona-status">Active</div>
+                            </div>
+                        </div>
+                        <div class="persona-description">
+                            Strategic AI focused on analysis, planning, and complex problem-solving
+                        </div>
+                    </div>
+
+                    <div class="persona-card cherry" data-persona="cherry">
+                        <div class="persona-header">
+                            <div class="persona-avatar cherry">C</div>
+                            <div class="persona-info">
+                                <h3>Cherry</h3>
+                                <div class="persona-status">Available</div>
+                            </div>
+                        </div>
+                        <div class="persona-description">
+                            Creative AI specialized in content creation, design, and innovation
+                        </div>
+                    </div>
+
+                    <div class="persona-card karen" data-persona="karen">
+                        <div class="persona-header">
+                            <div class="persona-avatar karen">K</div>
+                            <div class="persona-info">
+                                <h3>Karen</h3>
+                                <div class="persona-status">Available</div>
+                            </div>
+                        </div>
+                        <div class="persona-description">
+                            Operational AI focused on execution, automation, and workflow management
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Core</div>
+                    <a href="#" class="nav-item active" data-page="chat">
+                        <i class="fas fa-comments"></i>
+                        Chat Interface
+                    </a>
+                    <a href="#" class="nav-item" data-page="agent-factory">
+                        <i class="fas fa-robot"></i>
+                        Agent Factory
+                    </a>
+                    <a href="#" class="nav-item" data-page="workflow-studio">
+                        <i class="fas fa-project-diagram"></i>
+                        Workflow Studio
+                    </a>
+                    <a href="#" class="nav-item" data-page="dashboard">
+                        <i class="fas fa-tachometer-alt"></i>
+                        Dashboard
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Tools</div>
+                    <a href="#" class="nav-item" data-page="data-hub">
+                        <i class="fas fa-database"></i>
+                        Data Hub
+                    </a>
+                    <a href="#" class="nav-item" data-page="kanban">
+                        <i class="fas fa-tasks"></i>
+                        Kanban Center
+                    </a>
+                    <a href="#" class="nav-item" data-page="system-monitor">
+                        <i class="fas fa-chart-line"></i>
+                        System Monitor
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content" id="mainContent">
+            <!-- Chat Interface (Default) -->
+            <div class="page-content active" id="chat-page">
+                <div class="chat-header">
+                    <div class="active-persona">
+                        <div class="active-persona-avatar sophia" id="activePersonaAvatar">S</div>
+                        <div class="active-persona-info">
+                            <h2 id="activePersonaName">Sophia</h2>
+                            <p id="activePersonaDescription">Strategic AI focused on analysis and planning</p>
+                        </div>
+                    </div>
+                    <div class="chat-actions">
+                        <button class="action-btn">
+                            <i class="fas fa-history"></i>
+                            History
+                        </button>
+                        <button class="action-btn">
+                            <i class="fas fa-cog"></i>
+                            Settings
+                        </button>
+                    </div>
+                </div>
+
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message">
+                        <div class="message-avatar sophia">S</div>
+                        <div class="message-content">
+                            <div class="message-text">
+                                Hello! I'm Sophia, your strategic AI assistant. I can help you navigate the Orchestra AI admin system. Try commands like "show dashboard", "open agent factory", or "system status".
+                            </div>
+                            <div class="message-time">Just now</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chat-input-container">
+                    <div class="chat-input-wrapper">
+                        <input type="text" class="chat-input" placeholder="Type your message or command..." id="messageInput">
+                        <div class="input-actions">
+                            <button class="input-btn" title="Attach file">
+                                <i class="fas fa-paperclip"></i>
+                            </button>
+                            <button class="input-btn" title="Voice input">
+                                <i class="fas fa-microphone"></i>
+                            </button>
+                            <button class="input-btn" title="Emoji">
+                                <i class="fas fa-smile"></i>
+                            </button>
+                        </div>
+                        <button class="send-btn" id="sendBtn">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Agent Factory Page -->
+            <div class="page-content" id="agent-factory-page">
+                <div class="page-header">
+                    <h1>Agent Factory</h1>
+                    <p>Create, configure, and deploy AI agents</p>
+                </div>
+                <div class="factory-workspace">
+                    <div class="template-section">
+                        <h3>Agent Templates</h3>
+                        <div class="template-grid">
+                            <div class="template-card" data-template="assistant">
+                                <div class="template-icon assistant"><i class="fas fa-user-tie"></i></div>
+                                <h4>Assistant Agent</h4>
+                                <p>General purpose AI assistant</p>
+                            </div>
+                            <div class="template-card" data-template="creative">
+                                <div class="template-icon creative"><i class="fas fa-palette"></i></div>
+                                <h4>Creative Agent</h4>
+                                <p>Content creation specialist</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Page -->
+            <div class="page-content" id="dashboard-page">
+                <div class="page-header">
+                    <h1>System Dashboard</h1>
+                    <p>Monitor system performance and activity</p>
+                </div>
+                <div class="dashboard-content">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon system"><i class="fas fa-server"></i></div>
+                            <div class="stat-value" id="dashSystemUptime">99.8%</div>
+                            <div class="stat-label">System Uptime</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon agents"><i class="fas fa-robot"></i></div>
+                            <div class="stat-value" id="dashActiveAgents">5</div>
+                            <div class="stat-label">Active Agents</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Other Pages (Placeholder) -->
+            <div class="page-content" id="workflow-studio-page">
+                <div class="page-header">
+                    <h1>Workflow Studio</h1>
+                    <p>Design and manage automation workflows</p>
+                </div>
+                <div class="coming-soon">
+                    <i class="fas fa-project-diagram"></i>
+                    <h3>Coming Soon</h3>
+                    <p>Visual workflow builder in development</p>
+                </div>
+            </div>
+
+            <div class="page-content" id="data-hub-page">
+                <div class="page-header">
+                    <h1>Data Integration Hub</h1>
+                    <p>Manage external data sources and connections</p>
+                </div>
+                <div class="coming-soon">
+                    <i class="fas fa-database"></i>
+                    <h3>Coming Soon</h3>
+                    <p>Data integration tools in development</p>
+                </div>
+            </div>
+
+            <div class="page-content" id="kanban-page">
+                <div class="page-header">
+                    <h1>Kanban Command Center</h1>
+                    <p>Unified task management across platforms</p>
+                </div>
+                <div class="coming-soon">
+                    <i class="fas fa-tasks"></i>
+                    <h3>Coming Soon</h3>
+                    <p>Kanban board integration in development</p>
+                </div>
+            </div>
+
+            <div class="page-content" id="system-monitor-page">
+                <div class="page-header">
+                    <h1>System Monitor</h1>
+                    <p>Advanced system monitoring and diagnostics</p>
+                </div>
+                <div class="coming-soon">
+                    <i class="fas fa-chart-line"></i>
+                    <h3>Coming Soon</h3>
+                    <p>Advanced monitoring tools in development</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Persona data
+        const personas = {
+            sophia: {
+                name: 'Sophia',
+                description: 'Strategic AI focused on analysis and planning',
+                avatar: 'S',
+                class: 'sophia',
+                greeting: "Hello! I'm Sophia, your strategic AI assistant. I'm here to help you with analysis, planning, and complex problem-solving. What would you like to work on today?"
+            },
+            cherry: {
+                name: 'Cherry',
+                description: 'Creative AI specialized in content and design',
+                avatar: 'C',
+                class: 'cherry',
+                greeting: "Hi there! I'm Cherry, your creative AI companion. I love helping with content creation, design projects, and innovative solutions. What creative challenge can we tackle together?"
+            },
+            karen: {
+                name: 'Karen',
+                description: 'Operational AI focused on execution and automation',
+                avatar: 'K',
+                class: 'karen',
+                greeting: "Greetings! I'm Karen, your operational AI assistant. I excel at execution, automation, and workflow management. How can I help streamline your processes today?"
+            }
+        };
+
+        let currentPersona = 'sophia';
+        let messageHistory = [];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Orchestra AI Admin System Loading...');
+            initializeChat();
+            setupEventListeners();
+            loadSystemStatus();
+            
+            // Update system status every 30 seconds
+            setInterval(loadSystemStatus, 30000);
+            
+            console.log('✅ Orchestra AI Admin System Loaded Successfully!');
+            console.log('Try clicking navigation items or typing "dashboard" in chat');
+        });
+
+        function initializeChat() {
+            updateActivePersona(currentPersona);
+        }
+
+        async function loadSystemStatus() {
+            try {
+                const response = await fetch('/api/system/status');
+                const data = await response.json();
+                
+                // Update status indicator
+                const statusText = document.querySelector('.status-indicator');
+                if (data.active_agents > 0) {
+                    statusText.innerHTML = `
+                        <div class="status-dot"></div>
+                        ${data.active_agents} agents active
+                    `;
+                } else {
+                    statusText.innerHTML = `
+                        <div class="status-dot" style="background: var(--warning);"></div>
+                        System idle
+                    `;
+                }
+            } catch (error) {
+                console.error('Failed to load system status:', error);
+                const statusText = document.querySelector('.status-indicator');
+                statusText.innerHTML = `
+                    <div class="status-dot" style="background: var(--error);"></div>
+                    Connection error
+                `;
+            }
+        }
+
+        function setupEventListeners() {
+            // Navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const page = this.dataset.page;
+                    if (page) {
+                        navigateToPage(page);
+                    }
+                });
+            });
+
+            // Persona selection
+            document.querySelectorAll('.persona-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    const persona = this.dataset.persona;
+                    switchPersona(persona);
+                });
+            });
+
+            // Send message
+            document.getElementById('sendBtn').addEventListener('click', sendMessage);
+            document.getElementById('messageInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+
+            // Mobile sidebar toggle
+            if (window.innerWidth <= 768) {
+                const header = document.querySelector('.chat-header');
+                const menuButton = document.createElement('button');
+                menuButton.innerHTML = '<i class="fas fa-bars"></i>';
+                menuButton.className = 'action-btn';
+                menuButton.onclick = toggleSidebar;
+                header.querySelector('.chat-actions').prepend(menuButton);
+            }
+        }
+
+        function navigateToPage(page) {
+            console.log(`🔄 Navigating to page: ${page}`);
+            
+            // Hide all pages
+            document.querySelectorAll('.page-content').forEach(p => {
+                p.classList.remove('active');
+            });
+
+            // Show selected page
+            const targetPage = document.getElementById(page + '-page');
+            if (targetPage) {
+                targetPage.classList.add('active');
+                console.log(`✅ Page ${page} activated`);
+            } else {
+                console.error(`❌ Page ${page} not found`);
+            }
+
+            // Update navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            const navItem = document.querySelector(`[data-page="${page}"]`);
+            if (navItem) {
+                navItem.classList.add('active');
+            }
+
+            // Load page-specific data
+            if (page === 'dashboard') {
+                loadDashboardData();
+            }
+
+            // Add navigation message to chat
+            const pageNames = {
+                'chat': 'Chat Interface',
+                'agent-factory': 'Agent Factory',
+                'dashboard': 'Dashboard',
+                'workflow-studio': 'Workflow Studio',
+                'data-hub': 'Data Integration Hub',
+                'kanban': 'Kanban Command Center',
+                'system-monitor': 'System Monitor'
+            };
+
+            if (page !== 'chat') {
+                addMessage(`Navigated to ${pageNames[page]}`, 'ai', currentPersona);
+            }
+        }
+
+        async function loadDashboardData() {
+            try {
+                const response = await fetch('/api/system/status');
+                const data = await response.json();
+                
+                document.getElementById('dashSystemUptime').textContent = 
+                    ((data.uptime_hours / (24 * 30)) * 100).toFixed(1) + '%';
+                document.getElementById('dashActiveAgents').textContent = data.active_agents;
+            } catch (error) {
+                console.error('Failed to load dashboard data:', error);
+            }
+        }
+
+        function switchPersona(persona) {
+            if (persona === currentPersona) return;
+
+            // Update UI
+            document.querySelectorAll('.persona-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            document.querySelector(`[data-persona="${persona}"]`).classList.add('active');
+
+            currentPersona = persona;
+            updateActivePersona(persona);
+
+            // Add persona switch message
+            addMessage(personas[persona].greeting, 'ai', persona);
+        }
+
+        function updateActivePersona(persona) {
+            const personaData = personas[persona];
+            const avatar = document.getElementById('activePersonaAvatar');
+            const name = document.getElementById('activePersonaName');
+            const description = document.getElementById('activePersonaDescription');
+
+            avatar.className = `active-persona-avatar ${personaData.class}`;
+            avatar.textContent = personaData.avatar;
+            name.textContent = personaData.name;
+            description.textContent = personaData.description;
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+
+            // Add user message
+            addMessage(message, 'user');
+            input.value = '';
+
+            // Show typing indicator
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message';
+            typingDiv.innerHTML = `
+                <div class="message-avatar ${currentPersona}">${personas[currentPersona].avatar}</div>
+                <div class="message-content">
+                    <div class="message-text">
+                        <i class="fas fa-circle" style="animation: pulse 1s infinite;"></i>
+                        <i class="fas fa-circle" style="animation: pulse 1s infinite 0.2s;"></i>
+                        <i class="fas fa-circle" style="animation: pulse 1s infinite 0.4s;"></i>
+                        Thinking...
+                    </div>
+                </div>
+            `;
+            const messagesContainer = document.getElementById('chatMessages');
+            messagesContainer.appendChild(typingDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            try {
+                // Process message based on content
+                let response = await processUserMessage(message);
+                
+                // Remove typing indicator
+                messagesContainer.removeChild(typingDiv);
+                
+                // Add AI response
+                addMessage(response, 'ai', currentPersona);
+            } catch (error) {
+                console.error('Error processing message:', error);
+                messagesContainer.removeChild(typingDiv);
+                addMessage("I apologize, but I'm having trouble connecting to the system right now. Please try again.", 'ai', currentPersona);
+            }
+        }
+
+        async function processUserMessage(message) {
+            const lowerMessage = message.toLowerCase();
+            
+            // Navigation commands
+            if (lowerMessage.includes('show dashboard') || lowerMessage.includes('open dashboard') || lowerMessage.includes('dashboard')) {
+                navigateToPage('dashboard');
+                return "Opening the system dashboard for you. Here you can monitor performance metrics and system health.";
+            }
+            
+            if (lowerMessage.includes('agent factory') || lowerMessage.includes('create agent') || lowerMessage.includes('build agent')) {
+                navigateToPage('agent-factory');
+                return "Welcome to the Agent Factory! Here you can create and deploy new AI agents using our templates.";
+            }
+            
+            if (lowerMessage.includes('workflow') && (lowerMessage.includes('studio') || lowerMessage.includes('show') || lowerMessage.includes('open'))) {
+                navigateToPage('workflow-studio');
+                return "Opening Workflow Studio - your visual workflow builder (coming soon).";
+            }
+            
+            if (lowerMessage.includes('data hub') || lowerMessage.includes('data integration')) {
+                navigateToPage('data-hub');
+                return "Accessing Data Integration Hub for managing external connections (coming soon).";
+            }
+            
+            if (lowerMessage.includes('kanban') || lowerMessage.includes('tasks')) {
+                navigateToPage('kanban');
+                return "Opening Kanban Command Center for unified task management (coming soon).";
+            }
+            
+            if (lowerMessage.includes('system monitor') || lowerMessage.includes('monitoring')) {
+                navigateToPage('system-monitor');
+                return "Accessing System Monitor for advanced diagnostics (coming soon).";
+            }
+            
+            if (lowerMessage.includes('chat') || lowerMessage.includes('home') || lowerMessage.includes('back')) {
+                navigateToPage('chat');
+                return "Welcome back to the chat interface! How can I help you today?";
+            }
+            
+            // System status commands
+            if (lowerMessage.includes('status') || lowerMessage.includes('health')) {
+                try {
+                    const response = await fetch('/api/system/status');
+                    const data = await response.json();
+                    return `System Status: ${data.active_agents} active agents, ${data.cpu_usage_percent.toFixed(1)}% CPU usage, ${data.memory_usage_percent.toFixed(1)}% memory usage. Uptime: ${data.uptime_hours.toFixed(1)} hours.`;
+                } catch (error) {
+                    return "I'm having trouble accessing system status right now.";
+                }
+            }
+            
+            // Agent commands
+            if (lowerMessage.includes('agent')) {
+                if (lowerMessage.includes('list') || lowerMessage.includes('show')) {
+                    try {
+                        const response = await fetch('/api/agents');
+                        const agents = await response.json();
+                        const agentList = agents.map(a => `${a.name} (${a.status})`).join(', ');
+                        return `Current agents: ${agentList}`;
+                    } catch (error) {
+                        return "I can't retrieve the agent list right now.";
+                    }
+                }
+                if (lowerMessage.includes('deploy') || lowerMessage.includes('create')) {
+                    return "I can help you create a new agent! You can use the Agent Factory to build custom agents, or I can deploy a basic assistant agent. What type of agent would you like?";
+                }
+            }
+            
+            // Workflow commands
+            if (lowerMessage.includes('workflow')) {
+                try {
+                    const response = await fetch('/api/workflows');
+                    const workflows = await response.json();
+                    const workflowList = workflows.map(w => `${w.name} (${w.status})`).join(', ');
+                    return `Active workflows: ${workflowList}`;
+                } catch (error) {
+                    return "I can't access workflow information right now.";
+                }
+            }
+            
+            // Emergency commands
+            if (lowerMessage.includes('emergency') || lowerMessage.includes('stop all')) {
+                try {
+                    const response = await fetch('/api/system/emergency-stop', { method: 'POST' });
+                    const data = await response.json();
+                    return `Emergency stop executed: ${data.message}`;
+                } catch (error) {
+                    return "Emergency stop failed. Please check system manually.";
+                }
+            }
+            
+            // Backup commands
+            if (lowerMessage.includes('backup')) {
+                try {
+                    const response = await fetch('/api/system/backup', { method: 'POST' });
+                    const data = await response.json();
+                    return `Backup initiated: ${data.message} (ID: ${data.backup_id})`;
+                } catch (error) {
+                    return "Backup initiation failed.";
+                }
+            }
+            
+            // Default persona responses
+            const personaResponses = {
+                sophia: [
+                    "Let me analyze that for you. Based on the current system metrics, I recommend...",
+                    "From a strategic perspective, we should consider...",
+                    "I've reviewed the data and here's my analysis...",
+                    "That's an excellent question. Let me break down the key factors..."
+                ],
+                cherry: [
+                    "What a creative challenge! Here's an innovative approach...",
+                    "I love that idea! Let me add some creative flair...",
+                    "That sparks my imagination! How about we try...",
+                    "Ooh, that's exciting! I have some colorful ideas..."
+                ],
+                karen: [
+                    "I'll execute that efficiently. Here's the step-by-step process...",
+                    "Let me handle that systematically. First, we need to...",
+                    "I can automate that workflow for you. The optimal sequence is...",
+                    "That's a perfect automation candidate. I'll set up the process..."
+                ]
+            };
+            
+            const responses = personaResponses[currentPersona];
+            return responses[Math.floor(Math.random() * responses.length)];
+        }
+
+        function addMessage(text, type, persona = null) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+
+            const avatarClass = type === 'user' ? 'user' : (persona || currentPersona);
+            const avatarText = type === 'user' ? 'U' : personas[persona || currentPersona].avatar;
+
+            messageDiv.innerHTML = `
+                <div class="message-avatar ${avatarClass}">${avatarText}</div>
+                <div class="message-content">
+                    <div class="message-text">${text}</div>
+                    <div class="message-time">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                </div>
+            `;
+
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            // Store in history
+            messageHistory.push({
+                text,
+                type,
+                persona: persona || currentPersona,
+                timestamp: new Date()
+            });
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                document.getElementById('sidebar').classList.remove('open');
+            }
+        });
+    </script>
+</body>
+</html> 

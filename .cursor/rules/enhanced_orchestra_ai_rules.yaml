@@ -1,0 +1,300 @@
+name: Orchestra AI Enhanced Development Rules
+version: 2.0
+description: Enhanced rules and guidelines for AI agents working on Orchestra AI platform with anti-junk file protection
+
+# Project Context
+project:
+  name: Orchestra AI
+  type: Production AI Orchestration Platform
+  deployment: Vercel + Lambda Labs
+  infrastructure: Pulumi (Python-based IaC)
+  architecture: FastAPI + React + PostgreSQL + Redis + Vector DBs
+
+# CRITICAL: Anti-Junk File Rules
+anti_junk:
+  forbidden_patterns:
+    - "*_temp.py"
+    - "*_draft.py" 
+    - "*_backup.py"
+    - "*_test.py"      # Use tests/ directory
+    - "*_old.py"
+    - "temp_*.py"
+    - "draft_*.py"
+    - "backup_*.py"
+    - "one_time_*.sh"  # Archive in archive/one_time_scripts/
+    - "quick_*.sh"
+    - "temp_*.sh"
+    - "TEMP_*.md"
+    - "DRAFT_*.md"
+    - "*_BACKUP.md"
+  
+  file_creation_rules:
+    - Use descriptive, permanent names
+    - Follow established directory structure
+    - Check DOCUMENTATION_INDEX.md before creating docs
+    - Use git for version control, not backup files
+    - Archive one-time scripts properly
+  
+  cleanup_actions:
+    - Move one-time scripts to archive/one_time_scripts/
+    - Remove temporary files immediately after use
+    - Use /tmp for truly temporary files
+    - Use feature branches for draft work
+
+# Enhanced Agent Permissions
+permissions:
+  auto_approve:
+    - "*.py"           # Python files (following patterns)
+    - "*.tsx"          # TypeScript React
+    - "*.ts"           # TypeScript
+    - "requirements.txt"
+    - "package.json"
+    - "tests/**/*.py"  # Test files in proper location
+  
+  require_review:
+    - "Pulumi.*.yaml"
+    - ".env*"
+    - "*.sql"
+    - "vercel.json"
+    - "archive/**/*"   # Don't modify archived files
+  
+  forbidden:
+    - ".env.production"
+    - "*/secrets/*"
+    - "*.pem"
+    - "*.key"
+    - Files matching anti_junk.forbidden_patterns
+
+# Enhanced Code Generation Rules
+code_generation:
+  python:
+    style: black
+    type_hints: required
+    docstring_format: google
+    async_by_default: true
+    error_handling: comprehensive
+    logging: structlog
+    secret_management: enhanced_secret_manager
+    
+  typescript:
+    style: prettier
+    strict_mode: true
+    prefer_functional: true
+    error_boundaries: required
+    
+  patterns:
+    api_endpoint: |
+      from fastapi import APIRouter, HTTPException, Depends
+      from security.enhanced_secret_manager import secret_manager
+      import structlog
+      
+      router = APIRouter(prefix="/api/feature", tags=["feature"])
+      logger = structlog.get_logger(__name__)
+      
+      @router.get("/")
+      async def endpoint() -> Dict[str, Any]:
+          try:
+              # Implementation
+              return {"status": "success", "data": data}
+          except Exception as e:
+              logger.error("Operation failed", error=str(e))
+              raise HTTPException(status_code=500, detail="Internal server error")
+    
+    react_component: |
+      import React, { useState, useEffect } from 'react';
+      import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+      
+      interface Props {
+        data: DataType;
+        onUpdate: (data: DataType) => Promise<void>;
+      }
+      
+      export const Component: React.FC<Props> = ({ data, onUpdate }) => {
+        const [loading, setLoading] = useState(false);
+        const [error, setError] = useState<string | null>(null);
+        
+        // Implementation with proper error handling
+        
+        return <Card>...</Card>;
+      };
+
+# Secret Management Integration
+secret_management:
+  always_use: security.enhanced_secret_manager
+  never_hardcode: true
+  patterns:
+    get_secret: |
+      from security.enhanced_secret_manager import secret_manager
+      api_key = secret_manager.get_secret("API_KEY_NAME")
+    
+    ai_context: |
+      secrets_status = secret_manager.get_all_secrets_for_ai_agents()
+      # Returns masked secrets for AI agent context
+
+# Health Monitoring Integration
+health_monitoring:
+  always_integrate: true
+  check_before_operations: true
+  patterns:
+    health_check: |
+      from api.health_monitor import health_monitor
+      health_data = await health_monitor.get_system_health()
+      if health_data["overall_status"] != "healthy":
+          logger.warning("System health issues", status=health_data["overall_status"])
+    
+    add_endpoint: |
+      # Add health check for new services
+      # Update api/health_monitor.py with new service checks
+
+# Database Rules (Enhanced)
+databases:
+  postgresql:
+    always_async: true
+    connection_pooling: required
+    migrations: required
+    pattern: |
+      from sqlalchemy.ext.asyncio import AsyncSession
+      from sqlalchemy import select
+      
+      async def get_entity(db: AsyncSession, entity_id: str):
+          stmt = select(EntityModel).where(EntityModel.id == entity_id)
+          result = await db.execute(stmt)
+          return result.scalar_one_or_none()
+  
+  redis:
+    async_client: required
+    key_naming: "service:entity:id"
+    expiration: always_set
+  
+  vector_stores:
+    pinecone:
+      dimension: 1536
+      metric: cosine
+    weaviate:
+      vectorizer: text2vec-openai
+
+# File Organization Rules (Enhanced)
+file_organization:
+  structure:
+    api: "FastAPI backend code"
+    modern-admin: "React admin interface"
+    security: "Security and secret management"
+    tests: "All test files (unit, integration)"
+    archive: "Historical files (DO NOT MODIFY)"
+    
+  naming_conventions:
+    descriptive: true
+    permanent: true
+    no_temp_prefixes: true
+    follow_existing: true
+  
+  before_creating:
+    - Check DOCUMENTATION_INDEX.md
+    - Verify directory structure
+    - Ensure permanent naming
+    - Consider file lifecycle
+
+# Testing Requirements (Enhanced)
+testing:
+  minimum_coverage: 80
+  required_tests:
+    - unit
+    - integration
+    - api_endpoints
+    - health_monitoring
+  
+  test_structure:
+    unit: tests/unit/
+    integration: tests/integration/
+    performance: tests/performance/
+  
+  patterns:
+    api_test: |
+      import pytest
+      from fastapi.testclient import TestClient
+      
+      def test_endpoint(client: TestClient):
+          response = client.get("/api/endpoint")
+          assert response.status_code == 200
+          assert response.json()["status"] == "success"
+
+# AI Agent Context Awareness
+context_awareness:
+  always_check:
+    - System health via /api/health/
+    - Secrets availability via secret_manager
+    - Existing documentation via DOCUMENTATION_INDEX.md
+    - Current architecture patterns
+  
+  integration_points:
+    health_monitoring: api/health_monitor.py
+    secret_management: security/enhanced_secret_manager.py
+    frontend_health: modern-admin/src/components/HealthDashboard.jsx
+    testing: tests/ subdirectories
+  
+  quick_reference:
+    health_api: "curl http://localhost:8000/api/health/"
+    secrets_status: "curl http://localhost:8000/api/health/secrets"
+    api_docs: "http://localhost:8000/docs"
+
+# Deployment Rules (Enhanced)
+deployment:
+  platform: vercel
+  infrastructure: pulumi
+  gpu_compute: lambda_labs
+  
+  environment_variables:
+    use_secret_manager: true
+    never_hardcode: true
+    required:
+      - DATABASE_URL
+      - REDIS_URL
+      - PINECONE_API_KEY
+      - WEAVIATE_URL
+      - PORTKEY_API_KEY
+      - OPENAI_API_KEY
+
+# Quality Gates
+quality_gates:
+  code_review:
+    - No junk file patterns
+    - Proper error handling
+    - Secret manager integration
+    - Health monitoring integration
+    - Test coverage
+  
+  deployment_checks:
+    - Health endpoints respond
+    - Secrets validation passes
+    - All tests pass
+    - No hardcoded credentials
+
+# Troubleshooting (Enhanced)
+troubleshooting:
+  common_issues:
+    secret_not_found:
+      solution: "Check .env files and secret_manager configuration"
+    
+    health_check_fails:
+      solution: "Verify service is running and health endpoint exists"
+    
+    junk_files_created:
+      solution: "Remove immediately and use proper naming conventions"
+    
+    import_errors:
+      solution: "Check PYTHONPATH and package structure"
+
+# Success Metrics
+success_metrics:
+  code_quality:
+    - Zero junk files created
+    - All secrets managed centrally
+    - Health monitoring integrated
+    - Comprehensive error handling
+  
+  maintainability:
+    - Clear file organization
+    - Consistent naming conventions
+    - Proper documentation
+    - Test coverage > 80%
+

@@ -1,0 +1,32 @@
+[Unit]
+Description=Orchestra AI API Server
+After=network.target postgresql.service redis.service
+Wants=postgresql.service redis.service
+
+[Service]
+Type=simple
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/home/ubuntu/orchestra-main
+Environment=PATH=/home/ubuntu/orchestra-main/venv/bin:/usr/local/bin:/usr/bin:/bin
+Environment=PYTHONPATH=/home/ubuntu/orchestra-main
+ExecStartPre=/bin/bash -c 'cd /home/ubuntu/orchestra-main && source venv/bin/activate && python -c "from security.enhanced_secret_manager import secret_manager; print(\"Secrets validated\")"'
+ExecStart=/home/ubuntu/orchestra-main/venv/bin/uvicorn api.main:app --host 0.0.0.0 --port 8000 --workers 1
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=orchestra-api
+
+# Resource limits
+LimitNOFILE=65536
+MemoryMax=2G
+CPUQuota=200%
+
+# Health check
+ExecStartPost=/bin/bash -c 'sleep 10 && curl -f http://localhost:8000/api/health/ || exit 1'
+
+[Install]
+WantedBy=multi-user.target
+

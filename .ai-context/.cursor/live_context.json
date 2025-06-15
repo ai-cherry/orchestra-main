@@ -1,0 +1,215 @@
+{
+  "project_meta": {
+    "name": "Orchestra AI Platform",
+    "type": "monorepo",
+    "primary_language": "python",
+    "deployment_target": "vercel",
+    "infrastructure": "pulumi",
+    "ai_providers": [
+      "portkey",
+      "openrouter"
+    ],
+    "vector_dbs": [
+      "pinecone",
+      "weaviate"
+    ],
+    "services": {
+      "api": "FastAPI at port 8000",
+      "mcp_server": "Memory management at port 8003",
+      "frontend": "React/Vite at port 3000"
+    }
+  },
+  "infrastructure": {
+    "provider": "pulumi",
+    "stack": "development",
+    "resources": {
+      "lambda": "Lambda Labs GPU instances",
+      "databases": [
+        "PostgreSQL",
+        "Redis"
+      ],
+      "vector_stores": [
+        "Pinecone",
+        "Weaviate"
+      ]
+    },
+    "config": {}
+  },
+  "database_schemas": {
+    "postgresql": {
+      "location": "/Users/lynnmusil/orchestra-dev/database/unified_schema.sql",
+      "tables": [
+        "users",
+        "agents",
+        "conversations",
+        "memories",
+        "files"
+      ]
+    },
+    "vector_stores": {
+      "pinecone": {
+        "indexes": [
+          "embeddings",
+          "documents"
+        ],
+        "dimensions": 1536
+      },
+      "weaviate": {
+        "classes": [
+          "Document",
+          "Memory",
+          "Agent"
+        ],
+        "vectorizer": "text2vec-openai"
+      }
+    }
+  },
+  "vector_configs": {
+    "pinecone": {
+      "api_key_env": "PINECONE_API_KEY",
+      "environment": "us-east-1",
+      "index_name": "orchestra-embeddings"
+    },
+    "weaviate": {
+      "url": "http://localhost:8080",
+      "embedded": true,
+      "modules": [
+        "text2vec-openai",
+        "qna-openai"
+      ]
+    }
+  },
+  "api_endpoints": [
+    {
+      "path": "/api/health",
+      "method": "GET",
+      "description": "Health check"
+    },
+    {
+      "path": "/api/agents",
+      "method": "GET",
+      "description": "List agents"
+    },
+    {
+      "path": "/api/agents",
+      "method": "POST",
+      "description": "Create agent"
+    },
+    {
+      "path": "/api/conversations",
+      "method": "POST",
+      "description": "Start conversation"
+    },
+    {
+      "path": "/api/files/upload",
+      "method": "POST",
+      "description": "Upload file"
+    },
+    {
+      "path": "/memory",
+      "method": "POST",
+      "description": "Store memory (MCP)"
+    },
+    {
+      "path": "/memory/search",
+      "method": "POST",
+      "description": "Search memories (MCP)"
+    }
+  ],
+  "deployment_info": {
+    "platform": "vercel",
+    "build_command": "npm run build",
+    "output_directory": "dist",
+    "environment_variables": [
+      "DATABASE_URL",
+      "REDIS_URL",
+      "PINECONE_API_KEY",
+      "WEAVIATE_URL",
+      "PORTKEY_API_KEY",
+      "OPENROUTER_API_KEY"
+    ],
+    "functions": {
+      "api": "api/index.py",
+      "maxDuration": 30
+    }
+  },
+  "coding_standards": {
+    "python": {
+      "formatter": "black",
+      "linter": "mypy",
+      "docstring_style": "google",
+      "type_hints": "required"
+    },
+    "typescript": {
+      "formatter": "prettier",
+      "linter": "eslint",
+      "style": "airbnb"
+    },
+    "git": {
+      "branch_naming": "feature/*, fix/*, chore/*",
+      "commit_style": "conventional"
+    }
+  },
+  "active_issues": [
+    {
+      "type": "critical",
+      "source": "CRITICAL_FIXES_NEEDED.md",
+      "summary": "Docker build failures, API module imports"
+    }
+  ],
+  "real_time": {
+    "timestamp": "2025-06-15T10:26:32.983098",
+    "system": {
+      "cpu_percent": 20.2,
+      "memory_percent": 62.4,
+      "disk_usage": 15.5,
+      "network_connections": -1
+    },
+    "services": {
+      "api": {
+        "port": 8000,
+        "status": "running",
+        "checked_at": "2025-06-15T10:26:33.991046"
+      },
+      "mcp_memory": {
+        "port": 8003,
+        "status": "stopped",
+        "checked_at": "2025-06-15T10:26:33.991416"
+      },
+      "mcp_portkey": {
+        "port": 8004,
+        "status": "running",
+        "checked_at": "2025-06-15T10:26:33.991838"
+      },
+      "frontend": {
+        "port": 3000,
+        "status": "stopped",
+        "checked_at": "2025-06-15T10:26:33.992850"
+      },
+      "postgresql": {
+        "port": 5432,
+        "status": "running",
+        "checked_at": "2025-06-15T10:26:33.993457"
+      },
+      "redis": {
+        "port": 6379,
+        "status": "running",
+        "checked_at": "2025-06-15T10:26:33.994181"
+      }
+    },
+    "lambda_labs": {
+      "gpu_available": true,
+      "instance_type": "A10",
+      "status": "active",
+      "usage_hours": 42.5
+    },
+    "pulumi_stack": {
+      "status": "unknown"
+    },
+    "deployment": {
+      "last_deployment": "2025-06-15T10:26:33.994349",
+      "status": "ready",
+      "url": "https://orchestra-ai.vercel.app"
+    }
+  }
+}

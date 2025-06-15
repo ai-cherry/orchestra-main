@@ -1,0 +1,82 @@
+{
+  "services": {
+    "ai_context": {
+      "name": "AI Context Service",
+      "command": "python .ai-context/context_service.py",
+      "type": "daemon",
+      "port": 8005,
+      "health_check": "http://localhost:8005/health",
+      "restart_on_failure": true,
+      "start_delay": 0,
+      "description": "Provides real-time context to AI agents"
+    },
+    "portkey_mcp": {
+      "name": "Enhanced Portkey MCP Server",
+      "command": "python packages/mcp-enhanced/portkey_mcp.py",
+      "type": "daemon", 
+      "port": 8004,
+      "health_check": "http://localhost:8004/health",
+      "restart_on_failure": true,
+      "start_delay": 2,
+      "description": "Unified LLM access with caching and fallbacks"
+    },
+    "mcp_memory": {
+      "name": "MCP Memory Server",
+      "command": "cd mcp_servers && python memory_management_server.py",
+      "type": "daemon",
+      "port": 8003,
+      "health_check": "http://localhost:8003/health",
+      "restart_on_failure": true,
+      "start_delay": 5,
+      "description": "Memory management for AI agents"
+    },
+    "api": {
+      "name": "Orchestra API Server",
+      "command": "python main_simple.py",
+      "type": "daemon",
+      "port": 8000,
+      "health_check": "http://localhost:8000/api/health",
+      "restart_on_failure": true,
+      "start_delay": 10,
+      "description": "Main API server"
+    },
+    "frontend": {
+      "name": "React Frontend",
+      "command": "cd web && npm run dev",
+      "type": "daemon",
+      "port": 3000,
+      "health_check": "http://localhost:3000",
+      "restart_on_failure": true,
+      "start_delay": 15,
+      "description": "Vite development server"
+    },
+    "setup_ai_agents": {
+      "name": "AI Agent Setup",
+      "command": "python scripts/setup_ai_agents.py",
+      "type": "once",
+      "restart_on_failure": false,
+      "start_delay": 20,
+      "description": "Initialize AI agent configurations"
+    },
+    "infrastructure_prompts": {
+      "name": "Infrastructure Prompts Export",
+      "command": "python -c 'from src.utils.infrastructure_prompts import export_infrastructure_prompts; export_infrastructure_prompts()'",
+      "type": "once",
+      "restart_on_failure": false,
+      "start_delay": 22,
+      "description": "Export infrastructure prompts for AI agents"
+    }
+  },
+  "settings": {
+    "log_directory": "logs",
+    "pid_directory": ".orchestra",
+    "health_check_interval": 30,
+    "restart_delay": 10,
+    "max_restart_attempts": 3,
+    "environment": {
+      "PYTHONPATH": ".",
+      "NODE_ENV": "development",
+      "PULUMI_STACK": "development"
+    }
+  }
+}

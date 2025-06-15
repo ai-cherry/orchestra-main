@@ -1,0 +1,164 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Import Orchestra AI Design Tokens */
+@import './styles/design-tokens.css';
+
+@layer base {
+  :root {
+    --background: 210 40% 98%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222.2 84% 4.9%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222.2 84% 4.9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221.2 83.2% 53.3%;
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    /* Midnight Elegance Theme */
+    --background: 210 50% 7%;
+    --foreground: 213 31% 91%;
+    --card: 210 50% 10%;
+    --card-foreground: 213 31% 91%;
+    --popover: 210 50% 10%;
+    --popover-foreground: 213 31% 91%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 210 50% 7%;
+    --secondary: 210 50% 12%;
+    --secondary-foreground: 213 31% 91%;
+    --muted: 210 50% 12%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 210 50% 12%;
+    --accent-foreground: 213 31% 91%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 213 31% 91%;
+    --border: 210 50% 12%;
+    --input: 210 50% 12%;
+    --ring: 217 91% 60%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer components {
+  /* Custom scrollbar for dark theme */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-muted/30;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-muted-foreground/30 rounded-full;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground/50;
+  }
+
+  /* Glassmorphism effect */
+  .glass {
+    @apply bg-card/50 backdrop-blur-sm border border-border/50;
+  }
+
+  /* Gradient backgrounds for personas */
+  .cherry-gradient {
+    background: linear-gradient(135deg, theme('colors.cherry.600'), theme('colors.cherry.800'));
+  }
+  
+  .sophia-gradient {
+    background: linear-gradient(135deg, theme('colors.sophia.600'), theme('colors.sophia.800'));
+  }
+  
+  .karen-gradient {
+    background: linear-gradient(135deg, theme('colors.karen.600'), theme('colors.karen.800'));
+  }
+
+  /* Upload zone styles */
+  .upload-zone {
+    @apply border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center transition-colors duration-200;
+  }
+  
+  .upload-zone:hover {
+    @apply border-primary/50 bg-primary/5;
+  }
+  
+  .upload-zone.drag-active {
+    @apply border-primary bg-primary/10;
+  }
+
+  /* File upload animations */
+  .file-upload-enter {
+    @apply opacity-0 scale-95;
+  }
+  
+  .file-upload-enter-active {
+    @apply opacity-100 scale-100 transition-all duration-300;
+  }
+  
+  .file-upload-exit {
+    @apply opacity-100 scale-100;
+  }
+  
+  .file-upload-exit-active {
+    @apply opacity-0 scale-95 transition-all duration-300;
+  }
+}
+
+@layer utilities {
+  /* Text selection */
+  .select-none {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  /* Focus ring utilities */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background;
+  }
+
+  /* Animation utilities */
+  .animate-in {
+    animation-fill-mode: both;
+  }
+
+  .fade-in {
+    animation-name: fade-in;
+    animation-duration: 0.5s;
+    animation-timing-function: ease-out;
+  }
+
+  .slide-in-from-left {
+    animation-name: slide-in;
+    animation-duration: 0.3s;
+    animation-timing-function: ease-out;
+  }
+} 

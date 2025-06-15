@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orchestra AI Mobile - Analytics</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .phone-mockup {
+            width: 375px;
+            height: 812px;
+            background: #000;
+            border-radius: 40px;
+            padding: 8px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            background: #f8fafc;
+            border-radius: 32px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            height: 44px;
+            background: transparent;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .time {
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .status-icons {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            padding: 60px 20px 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title {
+            color: white;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .time-filter {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        /* Content */
+        .content {
+            flex: 1;
+            padding: 20px;
+            background: #f8fafc;
+            overflow-y: auto;
+            padding-bottom: 110px;
+        }
+
+        /* Performance Summary */
+        .performance-summary {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e2e8f0;
+        }
+
+        .summary-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 20px;
+        }
+
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .summary-stat {
+            text-align: center;
+        }
+
+        .summary-stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .summary-stat-value.success {
+            color: #10b981;
+        }
+
+        .summary-stat-value.warning {
+            color: #f59e0b;
+        }
+
+        .summary-stat-value.primary {
+            color: #3b82f6;
+        }
+
+        .summary-stat-value.purple {
+            color: #8b5cf6;
+        }
+
+        .summary-stat-label {
+            font-size: 12px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .summary-stat-change {
+            font-size: 11px;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+        }
+
+        .summary-stat-change.positive {
+            color: #10b981;
+        }
+
+        .summary-stat-change.negative {
+            color: #ef4444;
+        }
+
+        /* Chart Card */
+        .chart-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e2e8f0;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .chart-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .chart-period {
+            font-size: 12px;
+            color: #64748b;
+            background: #f1f5f9;
+            padding: 4px 12px;
+            border-radius: 12px;
+        }
+
+        .chart-container {
+            height: 180px;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-bars {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            height: 120px;
+            width: 80%;
+            position: relative;
+        }
+
+        .chart-bar {
+            width: 12px;
+            background: linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%);
+            border-radius: 6px 6px 0 0;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .chart-bar:nth-child(2n) {
+            background: linear-gradient(180deg, #10b981 0%, #059669 100%);
+        }
+
+        .chart-bar:nth-child(3n) {
+            background: linear-gradient(180deg, #8b5cf6 0%, #7c3aed 100%);
+        }
+
+        /* Activity Feed */
+        .activity-feed {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e2e8f0;
+        }
+
+        .activity-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 15px;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: white;
+        }
+
+        .activity-icon.success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .activity-icon.warning {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+
+        .activity-icon.info {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-text {
+            font-size: 13px;
+            color: #1e293b;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .activity-time {
+            font-size: 11px;
+            color: #64748b;
+        }
+
+        .activity-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        /* Workflow Performance */
+        .workflow-performance {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e2e8f0;
+        }
+
+        .workflow-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .workflow-item:last-child {
+            border-bottom: none;
+        }
+
+        .workflow-info {
+            flex: 1;
+        }
+
+        .workflow-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .workflow-executions {
+            font-size: 11px;
+            color: #64748b;
+        }
+
+        .workflow-success-rate {
+            text-align: right;
+        }
+
+        .success-percentage {
+            font-size: 16px;
+            font-weight: 600;
+            color: #10b981;
+        }
+
+        .success-bar {
+            width: 60px;
+            height: 4px;
+            background: #f1f5f9;
+            border-radius: 2px;
+            margin-top: 4px;
+            overflow: hidden;
+        }
+
+        .success-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 90px;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding-bottom: 25px;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #64748b;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item.active {
+            color: #3b82f6;
+        }
+
+        .nav-item i {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .nav-item span {
+            font-size: 10px;
+            font-weight: 500;
+        }
+
+        /* Home Indicator */
+        .home-indicator {
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 134px;
+            height: 5px;
+            background: #000;
+            border-radius: 3px;
+        }
+
+        /* Animations */
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide-in-up {
+            animation: slideInUp 0.6s ease-out;
+        }
+
+        @keyframes growHeight {
+            from {
+                height: 0;
+            }
+            to {
+                height: var(--target-height);
+            }
+        }
+
+        .chart-bar.animate {
+            animation: growHeight 1s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-mockup">
+        <div class="phone-screen">
+            <!-- Status Bar -->
+            <div class="status-bar">
+                <div class="time">9:41</div>
+                <div class="status-icons">
+                    <i class="fas fa-signal" style="font-size: 12px;"></i>
+                    <i class="fas fa-wifi" style="font-size: 12px;"></i>
+                    <i class="fas fa-battery-three-quarters" style="font-size: 12px;"></i>
+                </div>
+            </div>
+
+            <!-- Header -->
+            <div class="header">
+                <div class="header-content">
+                    <h1 class="header-title">Analytics</h1>
+                    <select class="time-filter">
+                        <option>Last 7 days</option>
+                        <option>Last 30 days</option>
+                        <option>Last 90 days</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="content">
+                <!-- Performance Summary -->
+                <div class="performance-summary slide-in-up">
+                    <div class="summary-title">Performance Summary</div>
+                    <div class="summary-stats">
+                        <div class="summary-stat">
+                            <div class="summary-stat-value success">98.5%</div>
+                            <div class="summary-stat-label">Success Rate</div>
+                            <div class="summary-stat-change positive">
+                                <i class="fas fa-arrow-up"></i>
+                                +2.1%
+                            </div>
+                        </div>
+                        <div class="summary-stat">
+                            <div class="summary-stat-value primary">1,429</div>
+                            <div class="summary-stat-label">Total Tasks</div>
+                            <div class="summary-stat-change positive">
+                                <i class="fas fa-arrow-up"></i>
+                                +185
+                            </div>
+                        </div>
+                        <div class="summary-stat">
+                            <div class="summary-stat-value warning">2.3s</div>
+                            <div class="summary-stat-label">Avg Response</div>
+                            <div class="summary-stat-change negative">
+                                <i class="fas fa-arrow-down"></i>
+                                -0.2s
+                            </div>
+                        </div>
+                        <div class="summary-stat">
+                            <div class="summary-stat-value purple">24</div>
+                            <div class="summary-stat-label">Active Workflows</div>
+                            <div class="summary-stat-change positive">
+                                <i class="fas fa-arrow-up"></i>
+                                +3
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Usage Chart -->
+                <div class="chart-card slide-in-up" style="animation-delay: 0.2s;">
+                    <div class="chart-header">
+                        <div class="chart-title">Daily Usage</div>
+                        <div class="chart-period">This Week</div>
+                    </div>
+                    <div class="chart-container">
+                        <div class="chart-bars">
+                            <div class="chart-bar animate" style="--target-height: 45px; height: 45px;"></div>
+                            <div class="chart-bar animate" style="--target-height: 78px; height: 78px;"></div>
+                            <div class="chart-bar animate" style="--target-height: 62px; height: 62px;"></div>
+                            <div class="chart-bar animate" style="--target-height: 95px; height: 95px;"></div>
+                            <div class="chart-bar animate" style="--target-height: 88px; height: 88px;"></div>
+                            <div class="chart-bar animate" style="--target-height: 120px; height: 120px;"></div>
+                            <div class="chart-bar animate" style="--target-height: 72px; height: 72px;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="activity-feed slide-in-up" style="animation-delay: 0.4s;">
+                    <div class="activity-title">Recent Activity</div>
+                    <div class="activity-item">
+                        <div class="activity-icon success">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-text">Workflow completed successfully</div>
+                            <div class="activity-time">2 minutes ago</div>
+                        </div>
+                        <div class="activity-value">+142</div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon info">
+                            <i class="fas fa-rocket"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-text">New agent deployed</div>
+                            <div class="activity-time">15 minutes ago</div>
+                        </div>
+                        <div class="activity-value">AI-001</div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon warning">
+                            <i class="fas fa-exclamation"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-text">Rate limit approaching</div>
+                            <div class="activity-time">1 hour ago</div>
+                        </div>
+                        <div class="activity-value">85%</div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon success">
+                            <i class="fas fa-sync"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-text">Data sync completed</div>
+                            <div class="activity-time">2 hours ago</div>
+                        </div>
+                        <div class="activity-value">2.1GB</div>
+                    </div>
+                </div>
+
+                <!-- Workflow Performance -->
+                <div class="workflow-performance slide-in-up" style="animation-delay: 0.6s;">
+                    <div class="activity-title">Top Performing Workflows</div>
+                    <div class="workflow-item">
+                        <div class="workflow-info">
+                            <div class="workflow-name">Customer Onboarding</div>
+                            <div class="workflow-executions">142 executions today</div>
+                        </div>
+                        <div class="workflow-success-rate">
+                            <div class="success-percentage">98%</div>
+                            <div class="success-bar">
+                                <div class="success-fill" style="width: 98%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="workflow-item">
+                        <div class="workflow-info">
+                            <div class="workflow-name">Lead Qualification</div>
+                            <div class="workflow-executions">89 executions today</div>
+                        </div>
+                        <div class="workflow-success-rate">
+                            <div class="success-percentage">94%</div>
+                            <div class="success-bar">
+                                <div class="success-fill" style="width: 94%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="workflow-item">
+                        <div class="workflow-info">
+                            <div class="workflow-name">Email Automation</div>
+                            <div class="workflow-executions">67 executions today</div>
+                        </div>
+                        <div class="workflow-success-rate">
+                            <div class="success-percentage">96%</div>
+                            <div class="success-bar">
+                                <div class="success-fill" style="width: 96%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="workflow-item">
+                        <div class="workflow-info">
+                            <div class="workflow-name">Data Processing</div>
+                            <div class="workflow-executions">45 executions today</div>
+                        </div>
+                        <div class="workflow-success-rate">
+                            <div class="success-percentage">92%</div>
+                            <div class="success-bar">
+                                <div class="success-fill" style="width: 92%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Navigation -->
+            <div class="bottom-nav">
+                <a href="#" class="nav-item">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-project-diagram"></i>
+                    <span>Workflows</span>
+                </a>
+                <a href="#" class="nav-item active">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Analytics</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-user"></i>
+                    <span>Profile</span>
+                </a>
+            </div>
+
+            <!-- Home Indicator -->
+            <div class="home-indicator"></div>
+        </div>
+    </div>
+
+    <script>
+        // Add touch feedback
+        document.querySelectorAll('.nav-item, .time-filter').forEach(element => {
+            element.addEventListener('touchstart', function() {
+                this.style.transform = 'scale(0.95)';
+            });
+            
+            element.addEventListener('touchend', function() {
+                this.style.transform = 'scale(1)';
+            });
+        });
+
+        // Animate chart bars on load
+        setTimeout(() => {
+            const bars = document.querySelectorAll('.chart-bar');
+            bars.forEach((bar, index) => {
+                setTimeout(() => {
+                    bar.classList.add('animate');
+                }, index * 100);
+            });
+        }, 800);
+
+        // Simulate real-time updates
+        setInterval(() => {
+            const statValues = document.querySelectorAll('.summary-stat-value, .success-percentage, .activity-value');
+            statValues.forEach(stat => {
+                if (Math.random() > 0.95) { // 5% chance to update
+                    const currentValue = parseInt(stat.textContent.replace(/[^\d]/g, ''));
+                    if (currentValue > 0) {
+                        const change = Math.floor(Math.random() * 3) - 1; // -1, 0, or 1
+                        if (change !== 0) {
+                            const newValue = Math.max(0, currentValue + change);
+                            if (stat.textContent.includes('%')) {
+                                stat.textContent = Math.min(100, newValue) + '%';
+                            } else {
+                                stat.textContent = newValue.toLocaleString();
+                            }
+                        }
+                    }
+                }
+            });
+        }, 4000);
+
+        // Update time
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', { 
+                hour: 'numeric', 
+                minute: '2-digit',
+                hour12: false 
+            });
+            document.querySelector('.time').textContent = timeString;
+        }
+        
+        updateTime();
+        setInterval(updateTime, 60000);
+
+        // Animate success bars
+        setTimeout(() => {
+            const successFills = document.querySelectorAll('.success-fill');
+            successFills.forEach((fill, index) => {
+                setTimeout(() => {
+                    fill.style.transition = 'width 1s ease-out';
+                    const targetWidth = fill.style.width;
+                    fill.style.width = '0%';
+                    setTimeout(() => {
+                        fill.style.width = targetWidth;
+                    }, 100);
+                }, index * 200);
+            });
+        }, 1200);
+    </script>
+</body>
+</html> 

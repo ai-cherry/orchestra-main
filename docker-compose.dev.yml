@@ -1,0 +1,75 @@
+# docker-compose.dev.yml - Orchestra AI Development Environment
+version: '3.8'
+
+services:
+  orchestra-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+      target: builder
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=development
+      - DEBUG=true
+      - NOTION_API_KEY=${NOTION_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - DATABASE_URL=postgresql://orchestra:orchestra_dev@postgres:5432/orchestra_dev
+      - REDIS_URL=redis://redis:6379
+    volumes:
+      - .:/app
+      - /app/node_modules
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - orchestra-network
+    command: ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+
+  orchestra-frontend:
+    build:
+      context: ./modern-admin
+      dockerfile: Dockerfile.frontend
+      target: builder
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_URL=http://localhost:8000
+      - VITE_APP_NAME=Orchestra AI Dev
+    volumes:
+      - ./modern-admin:/app
+      - /app/node_modules
+    networks:
+      - orchestra-network
+    command: ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+
+  postgres:
+    image: postgres:15-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=orchestra_dev
+      - POSTGRES_USER=orchestra
+      - POSTGRES_PASSWORD=orchestra_dev
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+    networks:
+      - orchestra-network
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_dev_data:/data
+    networks:
+      - orchestra-network
+
+networks:
+  orchestra-network:
+    driver: bridge
+
+volumes:
+  postgres_dev_data:
+  redis_dev_data:
+

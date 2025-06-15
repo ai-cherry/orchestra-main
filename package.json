@@ -1,0 +1,15 @@
+{
+  "name": "orchestra-ai",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Orchestra AI - Full-stack AI platform",
+  "scripts": {
+    "dev": "cd modern-admin && pnpm run dev",
+    "build": "cd modern-admin && pnpm run build",
+    "preview": "cd modern-admin && pnpm run preview",
+    "lint": "cd modern-admin && pnpm run lint"
+  },
+  "devDependencies": {
+    "pnpm": "^10.4.1"
+  }
+} 
