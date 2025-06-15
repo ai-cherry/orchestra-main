@@ -1,0 +1,47 @@
+{
+  "timestamp": "2025-06-14T19:23:30.321320",
+  "environment": "production",
+  "secret_sources": [
+    ".env file",
+    ".secrets.production.json",
+    "Pulumi configuration"
+  ],
+  "api_tests": {
+    "lambda_labs": {
+      "status": "connection_failed",
+      "error": "'ip_address'"
+    },
+    "github": {
+      "status": "connected",
+      "user": "scoobyjava",
+      "scopes": [
+        ""
+      ]
+    },
+    "vercel": {
+      "status": "connected",
+      "user": null
+    },
+    "openai": {
+      "status": "connected",
+      "total_models": 75,
+      "gpt4_models": 41
+    },
+    "portkey": {
+      "status": "error",
+      "status_code": 400
+    },
+    "orchestra_backend": {
+      "status": "healthy",
+      "ip": "150.136.94.139"
+    }
+  },
+  "missing_secrets": [],
+  "recommendations": [
+    {
+      "priority": "HIGH",
+      "action": "Fix API connectivity issues",
+      "details": "Failed APIs: lambda_labs, portkey"
+    }
+  ]
+}

@@ -158,43 +158,43 @@
     }
   ],
   "real_time": {
-    "timestamp": "2025-06-14T19:12:43.133612",
+    "timestamp": "2025-06-15T02:27:43.007694",
     "system": {
-      "cpu_percent": 16.9,
-      "memory_percent": 61.4,
-      "disk_usage": 15.4,
+      "cpu_percent": 9.1,
+      "memory_percent": 61.1,
+      "disk_usage": 15.5,
       "network_connections": -1
     },
     "services": {
       "api": {
         "port": 8000,
         "status": "stopped",
-        "checked_at": "2025-06-14T19:12:44.140338"
+        "checked_at": "2025-06-15T02:27:44.016142"
       },
       "mcp_memory": {
         "port": 8003,
         "status": "stopped",
-        "checked_at": "2025-06-14T19:12:44.140532"
+        "checked_at": "2025-06-15T02:27:44.016894"
       },
       "mcp_portkey": {
         "port": 8004,
         "status": "running",
-        "checked_at": "2025-06-14T19:12:44.140804"
+        "checked_at": "2025-06-15T02:27:44.017736"
       },
       "frontend": {
         "port": 3000,
         "status": "stopped",
-        "checked_at": "2025-06-14T19:12:44.140996"
+        "checked_at": "2025-06-15T02:27:44.018571"
       },
       "postgresql": {
         "port": 5432,
         "status": "running",
-        "checked_at": "2025-06-14T19:12:44.141198"
+        "checked_at": "2025-06-15T02:27:44.019466"
       },
       "redis": {
         "port": 6379,
         "status": "running",
-        "checked_at": "2025-06-14T19:12:44.141344"
+        "checked_at": "2025-06-15T02:27:44.020379"
       }
     },
     "lambda_labs": {
@@ -207,7 +207,7 @@
       "status": "unknown"
     },
     "deployment": {
-      "last_deployment": "2025-06-14T19:12:44.141412",
+      "last_deployment": "2025-06-15T02:27:44.020522",
       "status": "ready",
       "url": "https://orchestra-ai.vercel.app"
     }

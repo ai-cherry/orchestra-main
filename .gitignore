@@ -139,3 +139,4 @@ TEMP_*.md
 DRAFT_*.md
 *_BACKUP.md
 
+.vercel
