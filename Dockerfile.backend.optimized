@@ -10,12 +10,12 @@ ARG BUILDKIT_INLINE_CACHE=1
 # Set working directory
 WORKDIR /app
 
-# Install build dependencies in a single layer
+# Install build dependencies in a single layer with pinned versions
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    gcc \
-    g++ \
-    libpq-dev \
-    libffi-dev \
+    gcc=4:11.2.0-1ubuntu1 \
+    g++=4:11.2.0-1ubuntu1 \
+    libpq-dev=14.12-0ubuntu0.22.04.1 \
+    libffi-dev=3.4.2-4 \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements first for optimal layer caching

@@ -1,7 +1,7 @@
 // Updated API configuration for Orchestra AI
 // This ensures the frontend connects to the real backend API
 
-const API_BASE_URL = 'https://8000-ivp4wb670lvqa3xuy004a-c02a81ef.manusvm.computer';
+const API_BASE_URL = 'https://8000-i741zlsczcpdjuuafsc4p-c02a81ef.manusvm.computer';
 
 console.log('API Client initialized with URL:', API_BASE_URL);
 
