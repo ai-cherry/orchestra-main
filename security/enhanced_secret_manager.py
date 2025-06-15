@@ -110,8 +110,8 @@ class EnhancedSecretManager:
                 env_value = os.getenv(alias)
                 if env_value:
                     logger.info(f"Found secret under alias: {alias} for {key}")
-                    self.secrets_cache[key] = env_value
-                    return env_value
+            self.secrets_cache[key] = env_value
+            return env_value
         
         # 3. Check Pulumi config (if available)
         pulumi_value = self._get_pulumi_secret(key)
