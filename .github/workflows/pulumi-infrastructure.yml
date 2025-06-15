@@ -11,7 +11,8 @@ env:
   PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
   VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
   LAMBDA_API_KEY: ${{ secrets.LAMBDA_API_KEY }}
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  GH_FINE_GRAINED_TOKEN: ${{ secrets.GH_FINE_GRAINED_TOKEN }}
+  GH_CLASSIC_PAT_TOKEN: ${{ secrets.GH_CLASSIC_PAT_TOKEN }}
 
 jobs:
   preview:

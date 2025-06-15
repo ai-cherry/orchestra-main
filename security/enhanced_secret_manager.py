@@ -25,6 +25,13 @@ class EnhancedSecretManager:
         self.secrets_cache: Dict[str, Any] = {}
         self._encryption_key = None
         
+        # Secret name aliases for compatibility
+        self.secret_aliases = {
+            "GITHUB_TOKEN": ["GH_FINE_GRAINED_TOKEN", "GH_CLASSIC_PAT_TOKEN", "GITHUB_PAT"],
+            "OPENAI_API_KEY": ["OPENAI_KEY", "OPEN_AI_API_KEY"],
+            "LAMBDA_API_KEY": ["LAMBDA_LABS_API_KEY", "LAMBDALABS_API_KEY"]
+        }
+        
         # Load environment files in priority order
         self._load_environment_files()
         
@@ -96,6 +103,15 @@ class EnhancedSecretManager:
         if env_value:
             self.secrets_cache[key] = env_value
             return env_value
+        
+        # 2a. Check aliases if direct lookup fails
+        if key in self.secret_aliases and not env_value:
+            for alias in self.secret_aliases[key]:
+                env_value = os.getenv(alias)
+                if env_value:
+                    logger.info(f"Found secret under alias: {alias} for {key}")
+                    self.secrets_cache[key] = env_value
+                    return env_value
         
         # 3. Check Pulumi config (if available)
         pulumi_value = self._get_pulumi_secret(key)
