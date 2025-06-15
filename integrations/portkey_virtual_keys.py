@@ -157,16 +157,16 @@ class PortkeyVirtualKeyManager:
     def _get_default_model(self, provider: str) -> str:
         """Get default model for each provider"""
         default_models = {
+            "openrouter": "openai/gpt-3.5-turbo",  # Primary provider
             "openai": "gpt-3.5-turbo",
             "anthropic": "claude-3-haiku-20240307",
             "deepseek": "deepseek-chat",
-            "google": "gemini-pro",
+            "google": "gemini-1.5-flash",  # Updated to working model
             "perplexity": "llama-3.1-sonar-small-128k-online",
             "xai": "grok-beta",
-            "together": "meta-llama/Llama-2-7b-chat-hf",
-            "openrouter": "openai/gpt-3.5-turbo"
+            "together": "meta-llama/Llama-3-8b-chat-hf"  # Updated to Llama 3
         }
-        return default_models.get(provider.lower(), "gpt-3.5-turbo")
+        return default_models.get(provider.lower(), "openai/gpt-3.5-turbo")
     
     def get_available_providers(self) -> List[str]:
         """Get list of available providers from virtual keys"""
@@ -223,7 +223,7 @@ class PortkeyVirtualKeyIntegration:
     def __init__(self):
         self.portkey_manager = PortkeyVirtualKeyManager()
         self.fallback_enabled = False  # No fallback needed with virtual keys
-        self.default_provider = "openai"
+        self.default_provider = "openrouter"  # OpenRouter as primary provider
     
     def chat_completion(self, 
                        messages: List[Dict[str, str]], 
@@ -254,14 +254,19 @@ class PortkeyVirtualKeyIntegration:
         # This would typically call Portkey's models API
         # For now, return common models per provider
         provider_models = {
+            "openrouter": [  # Primary provider with extensive model access
+                "openai/gpt-4", "openai/gpt-4-turbo", "openai/gpt-3.5-turbo",
+                "anthropic/claude-3-opus", "anthropic/claude-3-sonnet", "anthropic/claude-3-haiku",
+                "google/gemini-pro", "meta-llama/llama-3-70b-instruct",
+                "mistralai/mixtral-8x7b-instruct"
+            ],
             "openai": ["gpt-4", "gpt-4-turbo", "gpt-3.5-turbo"],
             "anthropic": ["claude-3-opus-20240229", "claude-3-sonnet-20240229", "claude-3-haiku-20240307"],
             "deepseek": ["deepseek-chat", "deepseek-coder"],
-            "google": ["gemini-pro", "gemini-pro-vision"],
+            "google": ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-pro"],
             "perplexity": ["llama-3.1-sonar-small-128k-online", "llama-3.1-sonar-large-128k-online"],
             "xai": ["grok-beta"],
-            "together": ["meta-llama/Llama-2-7b-chat-hf", "meta-llama/Llama-2-13b-chat-hf"],
-            "openrouter": ["openai/gpt-3.5-turbo", "anthropic/claude-3-haiku"]
+            "together": ["meta-llama/Llama-3-8b-chat-hf", "meta-llama/Llama-3-70b-chat-hf"]
         }
         return provider_models.get(provider.lower(), [])
     

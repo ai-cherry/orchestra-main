@@ -182,7 +182,7 @@ class PortkeyIntegration:
     def __init__(self):
         self.portkey_manager = PortkeyManager()
         self.fallback_enabled = True
-        self.default_provider = "openai"
+        self.default_provider = "openai"  # Note: For virtual keys, use portkey_virtual_keys.py with openrouter
     
     def chat_completion(self, 
                        messages: List[Dict[str, str]], 

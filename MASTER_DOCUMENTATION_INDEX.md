@@ -49,6 +49,8 @@
 - [🎭 AI Persona System](./guides/AI_PERSONA_SYSTEM.md) - Cherry, Sophia, Karen personas
 - [🤖 MCP Server Architecture](./guides/MCP_SERVER_ARCHITECTURE.md) - Model Context Protocol servers
 - [🧠 AI Integration Patterns](./guides/AI_INTEGRATION_PATTERNS.md) - AI service integration
+- [🔌 Portkey Setup](./PORTKEY_SETUP_SUMMARY.md) - AI provider management via Portkey
+- [⚙️ Portkey Configuration](./PORTKEY_OPTIMIZATION_GUIDE.md) - Portkey optimization guide
 
 ### **Data & Integration**
 - [📊 Database Schema](./database/SCHEMA_DOCUMENTATION.md) - Complete database schema
