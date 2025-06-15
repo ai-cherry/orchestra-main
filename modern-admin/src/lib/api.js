@@ -132,10 +132,51 @@ class ApiClient {
     return this.request('/api/search/sources');
   }
 
-  async executeAdvancedSearch(searchRequest) {
-    return this.request('/api/search/advanced', {
+  // Creative content functionality
+  async getCreativeTemplates() {
+    return this.request('/api/creative/templates');
+  }
+
+  async getCreativeGallery() {
+    return this.request('/api/creative/gallery');
+  }
+
+  async getCreativeStatus() {
+    return this.request('/api/creative/status');
+  }
+
+  async generateDocument(documentRequest) {
+    return this.request('/api/creative/document', {
       method: 'POST',
-      body: JSON.stringify(searchRequest)
+      body: JSON.stringify(documentRequest)
+    });
+  }
+
+  async generateImage(imageRequest) {
+    return this.request('/api/creative/image', {
+      method: 'POST',
+      body: JSON.stringify(imageRequest)
+    });
+  }
+
+  async generateVideo(videoRequest) {
+    return this.request('/api/creative/video', {
+      method: 'POST',
+      body: JSON.stringify(videoRequest)
+    });
+  }
+
+  async generateAudio(audioRequest) {
+    return this.request('/api/creative/audio', {
+      method: 'POST',
+      body: JSON.stringify(audioRequest)
+    });
+  }
+
+  async generatePresentation(presentationRequest) {
+    return this.request('/api/creative/presentation', {
+      method: 'POST',
+      body: JSON.stringify(presentationRequest)
     });
   }
 

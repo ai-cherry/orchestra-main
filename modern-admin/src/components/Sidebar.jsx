@@ -7,6 +7,7 @@ import {
   Bot, 
   Activity,
   Brain,
+  Palette,
   ChevronLeft,
   ChevronRight,
   Circle
@@ -43,6 +44,7 @@ const navigation = [
   { name: 'Chat', href: '/', icon: MessageSquare },
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'Personas', href: '/personas', icon: Brain },
+  { name: 'Creative Studio', href: '/creative', icon: Palette },
   { name: 'Agent Factory', href: '/agent-factory', icon: Bot },
   { name: 'System Monitor', href: '/system-monitor', icon: Activity },
 ]
