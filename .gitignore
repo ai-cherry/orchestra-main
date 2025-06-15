@@ -230,3 +230,11 @@ screenshots/
 temp/
 tmp/
 
+# Node modules and build files
+web/node_modules/
+web/.vite/
+run/
+
+# AI context files
+.ai-context/
+

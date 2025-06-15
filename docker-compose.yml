@@ -6,8 +6,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    container_name: orchestra-app
     ports:
-      - "5000:5000"
+      - "5100:5000"
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/orchestra_ai
       - REDIS_URL=redis://redis:6379
