@@ -1,42 +1,56 @@
 {
   "version": 2,
-  "buildCommand": "cd modern-admin && npm install --legacy-peer-deps && npm run build",
-  "outputDirectory": "modern-admin/dist",
-  "framework": null,
-  "installCommand": "npm install --legacy-peer-deps",
-  "ignoreCommand": "git diff HEAD^ HEAD --quiet .",
-  "rewrites": [
+  "builds": [
     {
-      "source": "/api/:path*",
-      "destination": "/api/proxy.js"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "src": "modern-admin/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
     }
   ],
-  "functions": {
-    "api/proxy.js": {
-      "maxDuration": 30
+  "routes": [
+    {
+      "src": "/assets/(.*)",
+      "dest": "/modern-admin/dist/assets/$1"
+    },
+    {
+      "src": "/api/(.*)",
+      "dest": "https://orchestra-ai-backend.railway.app/api/$1"
+    },
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/modern-admin/dist/index.html"
     }
-  },
+  ],
   "env": {
-    "LAMBDA_BACKEND_URL": "http://150.136.94.139:8000"
-  },
-  "build": {
-    "env": {
-      "VITE_API_URL": "",
-      "VITE_API_TIMEOUT": "30000",
-      "VITE_ENABLE_WEBSOCKET": "false",
-      "VITE_ENABLE_MONITORING": "true",
-      "VITE_ENABLE_AI_CHAT": "true",
-      "VITE_DEBUG": "false"
-    }
+    "VITE_API_URL": "https://orchestra-ai-backend.railway.app",
+    "VITE_APP_NAME": "Orchestra AI Admin",
+    "VITE_APP_VERSION": "2.0.0"
   },
   "headers": [
     {
-      "source": "/api/(.*)",
+      "source": "/(.*)",
       "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
         {
           "key": "Access-Control-Allow-Origin",
           "value": "*"
