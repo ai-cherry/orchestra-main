@@ -220,7 +220,9 @@ def get_chat_context(session_id):
         
         # Load context from Redis
         context_key = f"context:{session_id}"
-        context_data = await orch.redis_client.lrange(context_key, 0, -1)
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        context_data = loop.run_until_complete(orch.redis_client.lrange(context_key, 0, -1))
         
         context = []
         for entry in context_data:
@@ -235,4 +237,4 @@ def get_chat_context(session_id):
         
     except Exception as e:
         logger.error(f"Context retrieval error: {str(e)}")
-        return jsonify({'error': 'Failed to retrieve context'}), 500 
+        return jsonify({'error': 'Failed to retrieve context'}), 500
