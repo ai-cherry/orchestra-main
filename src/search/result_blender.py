@@ -366,4 +366,4 @@ class SearchResultBlender:
         
         summary_parts.append(f"Source distribution: {', '.join(f'{s} ({c})' for s, c in source_counts.items())}")
         
-        return ". ".join(summary_parts) 
+        return ". ".join(summary_parts)

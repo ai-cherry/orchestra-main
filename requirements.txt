@@ -54,6 +54,8 @@ Pygments==2.19.1
 # Development and Environment
 python-dotenv==1.0.0
 typing_extensions==4.14.0
+python-jose==3.3.0
+cryptography==42.0.5
 
 # Redis (for caching in production)
 redis==5.0.1
