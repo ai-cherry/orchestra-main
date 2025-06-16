@@ -14,9 +14,10 @@ from src.routes.chat import chat_bp
 from src.routes.search import search_bp
 from src.routes.personas import personas_bp
 from src.routes.health import health_bp
+from src.config import Config
 
 app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
-app.config['SECRET_KEY'] = 'Orchestra_AI_Unified_2025_Secure_Key'
+app.config.from_object(Config)
 
 # Enable CORS for all routes (unified app eliminates cross-origin issues)
 CORS(app, origins="*", allow_headers=["Content-Type", "Authorization"])
@@ -29,19 +30,8 @@ app.register_blueprint(search_bp, url_prefix='/api')
 app.register_blueprint(personas_bp, url_prefix='/api')
 app.register_blueprint(health_bp, url_prefix='/api')
 
-# Database configuration - support both SQLite and PostgreSQL
-database_url = os.getenv('DATABASE_URL')
-if database_url:
-    # Production PostgreSQL
-    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
-else:
-    # Development SQLite
-    app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(os.path.dirname(__file__), 'database', 'app.db')}"
-
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db.init_app(app)
-
 # Initialize database
+db.init_app(app)
 with app.app_context():
     db.create_all()
 
