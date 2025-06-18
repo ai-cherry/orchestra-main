@@ -1,5 +1,4 @@
-from sqlalchemy import func
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy import func, JSON
 from decimal import Decimal
 
 from .user import db
@@ -14,8 +13,8 @@ class EnhancedConversation(db.Model):
     apartment_relevance = db.Column(db.Numeric(5, 2))
     business_value = db.Column(db.Numeric(12, 2))
     call_outcome = db.Column(db.String(100))
-    competitive_mentions = db.Column(JSONB)
-    sophia_insights = db.Column(JSONB)
+    competitive_mentions = db.Column(JSON)  # Changed from JSONB to JSON for SQLite compatibility
+    sophia_insights = db.Column(JSON)       # Changed from JSONB to JSON for SQLite compatibility
     created_at = db.Column(db.DateTime, server_default=func.now())
 
     def to_dict(self):
@@ -31,3 +30,4 @@ class EnhancedConversation(db.Model):
             'sophia_insights': self.sophia_insights,
             'created_at': self.created_at.isoformat() if self.created_at else None,
         }
+
