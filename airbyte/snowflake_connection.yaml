@@ -1,0 +1,20 @@
+# Airbyte connection example for Snowflake
+source:
+  name: salesforce
+  connector: source-salesforce
+  config:
+    start_date: "2024-01-01T00:00:00Z"
+
+destination:
+  name: snowflake-dw
+  connector: destination-snowflake
+  config:
+    host: ${SNOWFLAKE_ACCOUNT}.snowflakecomputing.com
+    user: ${SNOWFLAKE_USER}
+    password: ${SNOWFLAKE_PASSWORD}
+    warehouse: ${SNOWFLAKE_WAREHOUSE}
+    database: ${SNOWFLAKE_DATABASE}
+    schema: ${SNOWFLAKE_SCHEMA}
+
+sync_mode: incremental
+schedule: "0 * * * *"

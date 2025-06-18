@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Depends, HTTPException, Request
+import sentry_sdk
 
 """
 Orchestra AI Admin API - Phase 2
@@ -67,6 +68,12 @@ structlog.configure(
 )
 
 logger = structlog.get_logger(__name__)
+
+# Initialize Sentry for error tracking if DSN is provided
+sentry_dsn = os.getenv("SENTRY_DSN")
+if sentry_dsn:
+    sentry_sdk.init(dsn=sentry_dsn, traces_sample_rate=1.0)
+    logger.info("Sentry initialized", has_dsn=bool(sentry_dsn))
 
 # Security - now using secure JWT authentication from auth/authentication.py
 
