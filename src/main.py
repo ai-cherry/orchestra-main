@@ -14,6 +14,7 @@ from src.routes.chat import chat_bp
 from src.routes.search import search_bp
 from src.routes.personas import personas_bp
 from src.routes.health import health_bp
+from src.routes.conversations import conversations_bp
 from src.config import Config
 
 app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
@@ -29,6 +30,7 @@ app.register_blueprint(chat_bp, url_prefix='/api')
 app.register_blueprint(search_bp, url_prefix='/api')
 app.register_blueprint(personas_bp, url_prefix='/api')
 app.register_blueprint(health_bp, url_prefix='/api')
+app.register_blueprint(conversations_bp, url_prefix='/api')
 
 # Initialize database
 db.init_app(app)
