@@ -311,6 +311,15 @@ class TestOrchestraAPI(unittest.TestCase):
         self.assertIn('results', data)
         self.assertIn('total_matches', data)
         self.assertEqual(data['query'], 'strategic')
+
+    def test_conversations_endpoint(self):
+        """Test conversations retrieval with limit"""
+        response = self.client.get('/api/conversations?limit=1')
+        self.assertEqual(response.status_code, 200)
+
+        data = json.loads(response.data)
+        self.assertIn('conversations', data)
+        self.assertLessEqual(len(data['conversations']), 1)
     
     def test_frontend_serving(self):
         """Test frontend serving"""
