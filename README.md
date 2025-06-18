@@ -25,6 +25,7 @@ Orchestra AI is a comprehensive AI orchestration platform featuring advanced sea
 - **Unified Flask Application**: Single deployment, zero CORS issues
 - **Comprehensive API**: RESTful endpoints for all functionality
 - **Database Integration**: PostgreSQL with full schema
+- **Snowflake Warehouse**: Optional data warehouse via Airbyte
 - **Monitoring**: Health checks, metrics, performance tracking
 - **Containerization**: Docker Compose with microservices
 
@@ -103,6 +104,9 @@ python tests/test_api.py
 
 # Run with pytest
 pytest tests/ -v
+
+# Performance testing with k6
+k6 run tests/performance/load-test.js
 ```
 
 **Test Coverage**: 27/28 tests passing (96.4% success rate)
@@ -200,6 +204,7 @@ orchestra-main/
 ### Monitoring & Observability
 - Prometheus metrics collection
 - Grafana dashboards
+- Sentry error tracking
 - Health check endpoints
 - Performance monitoring
 - Error tracking and alerting

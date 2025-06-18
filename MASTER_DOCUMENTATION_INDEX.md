@@ -41,6 +41,7 @@
 ### **System Health & Monitoring**
 - [💊 Health Monitoring](./api/health_monitor.py) - System health monitoring implementation
 - [📊 Metrics & Analytics](./guides/METRICS_ANALYTICS.md) - Performance metrics and analytics
+- [🐞 Sentry Setup](./monitoring/SENTRY_SETUP.md) - Error tracking configuration
 - [🚨 Alerting & Incident Response](./guides/INCIDENT_RESPONSE.md) - Alert handling and response procedures
 
 ## 🎼 **Orchestra AI Specific**
